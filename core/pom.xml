@@ -113,6 +113,11 @@
 			<artifactId>dokkat-api</artifactId>
 			<version>${dokkat-api}</version>
 		</dependency>
+		<dependency>
+			<groupId>no.nav.tjenester.fim</groupId>
+			<artifactId>nav-digitalKontaktinformasjon-v1-tjenestespesifikasjon</artifactId>
+			<classifier>jaxws</classifier>
+		</dependency>
 
 		<!--test-->
 		<dependency>

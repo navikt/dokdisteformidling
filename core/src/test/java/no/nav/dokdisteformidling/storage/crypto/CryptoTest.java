@@ -1,4 +1,4 @@
-package java.no.nav.dokdisteformidling.storage.crypto;
+package no.nav.dokdisteformidling.storage.crypto;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;

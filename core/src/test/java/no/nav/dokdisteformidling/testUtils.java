@@ -1,4 +1,4 @@
-package java.no.nav.dokdisteformidling;
+package no.nav.dokdisteformidling;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
