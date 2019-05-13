@@ -13,8 +13,9 @@ import no.nav.tjeneste.virksomhet.digitalkontaktinformasjon.v1.meldinger.HentSik
 public class SikkerDigitalKontaktinfoMapper {
 
 	public HentSikkerDigitalPostadresseResponseTo map(HentSikkerDigitalPostadresseResponse response) {
+		if (response == null) { return null; }
 		SikkerDigitalKontaktinformasjon kontaktinfo = response.getSikkerDigitalKontaktinformasjon();
-		return HentSikkerDigitalPostadresseResponseTo.builder()
+		return kontaktinfo == null ? null : HentSikkerDigitalPostadresseResponseTo.builder()
 				.digitalKontaktinformasjon(mapKontaktinformasjon(kontaktinfo.getDigitalKontaktinformasjon()))
 				.sikkerDigitalPostkasse(mapDigitalPostkasse(kontaktinfo.getSikkerDigitalPostkasse()))
 				.sertifikat(kontaktinfo.getSertifikat())

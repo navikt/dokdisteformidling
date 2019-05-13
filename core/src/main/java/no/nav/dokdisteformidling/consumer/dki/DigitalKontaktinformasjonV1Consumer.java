@@ -40,17 +40,17 @@ public class DigitalKontaktinformasjonV1Consumer implements DigitalKontaktinform
 			return sikkerDigitalKontaktinfoMapper.map(response);
 		} catch (HentSikkerDigitalPostadresseKontaktinformasjonIkkeFunnet e) {
 			throw new DigitalKontaktinformasjonV1KontaktinformasjonIkkeFunnetFunctionalException(
-					String.format("Kontaktinformasjon ikke funnet for personident=%s", personident), e);
+					"Digital kontaktinformasjon ikke funnet ved henting av sikker digital postadresse", e);
 		} catch (HentSikkerDigitalPostadressePersonIkkeFunnet e) {
 			throw new DigitalKontaktinformasjonV1PersonIkkeFunnetFunctionalException(
-					String.format("Person ikke funnet for personident=%s", personident), e);
+					"Person ikke funnet ved henting av sikker digital postadresse", e);
 		} catch (HentSikkerDigitalPostadresseSikkerhetsbegrensing e) {
 			throw new DigitalKontaktinformasjonV1SikkerhetsbegrensingFunctionalException(
-					String.format("Sikkerhetsbegrensing for personident=%s", personident), e);
+					"Sikkerhetsbegrensing ved henting av sikker digital postadresse", e);
 		} catch (Exception e) {
 			throw new DigitalKontaktinformasjonV1HentSikkerDigitalPostadresseTechnicalException(
-					String.format("Teknisk feil mot DigitalKontaktinformasjonV1:hentSikkerDigitalPostadresse. personident=%s. Feilmelding=%s",
-							personident, e.getMessage()), e);
+					String.format("Teknisk feil mot DigitalKontaktinformasjonV1:hentSikkerDigitalPostadresse. Feilmelding=%s",
+							e.getMessage()), e);
 		}
 	}
 }

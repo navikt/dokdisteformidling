@@ -1,14 +1,14 @@
 package no.nav.dokdisteformidling.consumer.dki;
 
 import lombok.Builder;
-import lombok.Data;
+import lombok.Value;
 
 import javax.xml.datatype.XMLGregorianCalendar;
 
 /**
  * @author Erik Bråten, Visma Consulting.
  */
-@Data
+@Value
 @Builder
 public class HentSikkerDigitalPostadresseResponseTo {
 
@@ -16,7 +16,7 @@ public class HentSikkerDigitalPostadresseResponseTo {
 	private final DigitalPostkasse sikkerDigitalPostkasse;
 	private final byte[] sertifikat;
 
-	@Data
+	@Value
 	@Builder
 	public static class Kontaktinformasjon {
 		private final String personident;
@@ -25,7 +25,7 @@ public class HentSikkerDigitalPostadresseResponseTo {
 		private final Mobiltelefonnummer mobiltelefonnummer;
 	}
 
-	@Data
+	@Value
 	@Builder
 	public static class Epostadresse {
 		private final String value;
@@ -33,7 +33,7 @@ public class HentSikkerDigitalPostadresseResponseTo {
 		private final XMLGregorianCalendar sistOppdatert;
 	}
 
-	@Data
+	@Value
 	@Builder
 	public static class Mobiltelefonnummer {
 		private final String value;
@@ -41,7 +41,7 @@ public class HentSikkerDigitalPostadresseResponseTo {
 		private final XMLGregorianCalendar sistVerifisert;
 	}
 
-	@Data
+	@Value
 	@Builder
 	public static class DigitalPostkasse {
 		private final String leverandoerAdresse;
