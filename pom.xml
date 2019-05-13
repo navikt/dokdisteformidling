@@ -40,6 +40,7 @@
 		<awaitility.version>3.1.2</awaitility.version>
 		<dokkat-schemas.version>10.4.2</dokkat-schemas.version>
 		<melding-virksomhet-dokdistfordeling.version>2.0.4</melding-virksomhet-dokdistfordeling.version>
+		<nav-digitalKontaktinformasjon-v1-tjenestespesifikasjon>2.0.0</nav-digitalKontaktinformasjon-v1-tjenestespesifikasjon>
 	</properties>
 
 	<dependencyManagement>
@@ -126,6 +127,14 @@
 				<artifactId>awaitility</artifactId>
 				<version>${awaitility.version}</version>
 				<scope>test</scope>
+			</dependency>
+
+			<!--Tjenestegrensesnitt-->
+			<dependency>
+				<groupId>no.nav.tjenester.fim</groupId>
+				<artifactId>nav-digitalKontaktinformasjon-v1-tjenestespesifikasjon</artifactId>
+				<version>${nav-digitalKontaktinformasjon-v1-tjenestespesifikasjon}</version>
+				<classifier>jaxws</classifier>
 			</dependency>
 
 			<!--Selftest metrics-->

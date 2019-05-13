@@ -1,4 +1,4 @@
-package java.no.nav.dokdisteformidling.storage;
+package no.nav.dokdisteformidling.storage;
 
 import static no.nav.dokdisteformidling.constants.RetryConstants.MAX_ATTEMPTS_SHORT;
 import static no.nav.dokdisteformidling.storage.config.StorageConfiguration.BUCKET_NAME;
@@ -14,10 +14,6 @@ import static org.mockito.Mockito.when;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.S3Object;
 import no.nav.dokdisteformidling.exception.technical.KunneIkkeLeseFraS3BucketTechnicalException;
-import no.nav.dokdisteformidling.storage.DokdistDokument;
-import no.nav.dokdisteformidling.storage.JsonSerializer;
-import no.nav.dokdisteformidling.storage.S3Storage;
-import no.nav.dokdisteformidling.storage.Storage;
 import no.nav.dokdisteformidling.storage.crypto.Crypto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
