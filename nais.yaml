@@ -50,4 +50,6 @@ fasitResources:
       resourceType: queue
     - alias: "virksomhet:DigitalKontakinformasjon_v1"
       resourceType: webserviceendpoint
+      propertyMap:
+        endpointUrl: virksomhet.digitalkontakinformasjon.v1.endpointurl
 
