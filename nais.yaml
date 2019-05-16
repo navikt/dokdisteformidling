@@ -28,6 +28,13 @@ fasitResources:
       propertyMap:
         username: serviceuser_username
         password: serviceuser_password
+    - alias: sftp_privateKey
+      resourceType: certificate
+      propertyMap:
+        password: sftp_privateKeyPassphrase
+        keystore: sftp_privateKeyFile
+    - alias: dokdisteformidling_config
+      resourceType: applicationproperties
     - alias: dokdisteformidling_s3_creds
       resourceType: credential
     - alias: dokdistmellomlager_s3_storage_crypto
@@ -49,6 +56,8 @@ fasitResources:
     - alias: dokdisteformidling_qdist011_dist_til_dpi
       resourceType: queue
     - alias: dokdisteformidling_qdist011_funk_feil
+      resourceType: queue
+    - alias: dokdistSdpBatchIntern
       resourceType: queue
     - alias: "virksomhet:DigitalKontakinformasjon_v1"
       resourceType: webserviceendpoint

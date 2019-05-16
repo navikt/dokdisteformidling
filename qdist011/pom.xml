@@ -19,5 +19,10 @@
 			<groupId>no.nav.meldinger.virksomhet</groupId>
 			<artifactId>melding-virksomhet-dokdistfordeling</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>no.nav.tjenester</groupId>
+			<artifactId>nav-sdpkanal-tjenestespesifikasjon</artifactId>
+			<classifier>jaxws</classifier>
+		</dependency>
 	</dependencies>
 </project>

@@ -37,6 +37,11 @@ public class JmsConfig {
 	}
 
 	@Bean
+	public Queue tdist005(@Value("${dokdistSdpBatchIntern.queuename}") String tdist005QueueName) throws JMSException {
+		return new MQQueue(tdist005QueueName);
+	}
+
+	@Bean
 	public ConnectionFactory wmqConnectionFactory(final MqGatewayAlias mqGatewayAlias,
 												  final @Value("${dokdisteformidling_channel.name}") String channelName,
 												  final SrvAppserverProperties srvAppserverProperties) throws JMSException {

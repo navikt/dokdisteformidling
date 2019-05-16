@@ -11,4 +11,5 @@ import lombok.Value;
 public class DokumenttypeInfoTo {
 
 	private final String varselTypeId;
+	private int sikkerhetsnivaa;
 }
