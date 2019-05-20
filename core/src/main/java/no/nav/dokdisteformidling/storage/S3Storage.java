@@ -6,7 +6,6 @@ import static no.nav.dokdisteformidling.storage.S3Configuration.BUCKET_NAME;
 
 import com.amazonaws.SdkClientException;
 import com.amazonaws.services.s3.AmazonS3;
-import no.nav.dokdisteformidling.exception.functional.DocumentNotFoundInS3FunctionalException;
 import no.nav.dokdisteformidling.exception.technical.AbstractDokdisteformidlingTechnicalException;
 import no.nav.dokdisteformidling.exception.technical.S3FailedToGetDocumentTechnicalException;
 import org.springframework.retry.annotation.Backoff;
@@ -33,15 +32,10 @@ public class S3Storage implements Storage {
 	@Retryable(include = AbstractDokdisteformidlingTechnicalException.class, backoff = @Backoff(delay = DELAY_SHORT, multiplier = MULTIPLIER_SHORT))
 	public String get(String key) {
 		try {
-			String result = s3WithStrictEncryption.getObjectAsString(BUCKET_NAME, key);
-
-			if (result != null) {
-				return result;
-			} else {
-				throw new DocumentNotFoundInS3FunctionalException(String.format("Henting fra AmazonS3 på key=%s returnerte tom verdi", key));
-			}
+			return s3WithStrictEncryption.getObjectAsString(BUCKET_NAME, key);
 		} catch (SdkClientException e) {
-			throw new S3FailedToGetDocumentTechnicalException(String.format("Teknisk feil mot AmazonS3 ved henting på key=%s", key), e);
+			throw new S3FailedToGetDocumentTechnicalException(String.format("Teknisk feil mot AmazonS3 ved henting på key=%s. Feilmelding=%s", key,
+					e.getMessage()), e);
 		} catch (SecurityException e) {
 			throw new S3FailedToGetDocumentTechnicalException(String.format("Objektet som ble forsøkt hentet fra AmazonS3 på key=%s var ikke kryptert.", key), e);
 		}
