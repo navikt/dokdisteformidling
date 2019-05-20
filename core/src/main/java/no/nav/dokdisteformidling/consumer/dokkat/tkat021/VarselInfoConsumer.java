@@ -5,12 +5,15 @@ import static java.lang.String.format;
 
 import no.nav.dokdisteformidling.config.alias.ServiceuserAlias;
 import no.nav.dokdisteformidling.config.cache.LokalCacheConfig;
+import no.nav.dokdisteformidling.constants.DomainConstants;
 import no.nav.dokdisteformidling.constants.RetryConstants;
+import no.nav.dokdisteformidling.exception.functional.Tkat020FunctionalException;
 import no.nav.dokdisteformidling.exception.functional.Tkat021FunctionalException;
 import no.nav.dokdisteformidling.exception.technical.AbstractDokdisteformidlingTechnicalException;
 import no.nav.dokdisteformidling.exception.technical.Tkat021TechnicalException;
 import no.nav.dokdisteformidling.metrics.Monitor;
 import no.nav.dokkat.schemas.tkat021.VarselInfoRestTo;
+import no.nav.dokkat.schemas.tkat021.VarselMalRestTo;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.cache.annotation.Cacheable;
@@ -67,6 +70,31 @@ public class VarselInfoConsumer implements VarselInfo {
 		return VarselInfoTo.builder()
 				.varselTypeId(response.getVarseltypeId())
 				.stoppRepeterendeVarsel(response.getRevarslingIntervall() != null)
+				.antallDagerListe(toDagerListe(response))
+				.varslingsTekst(getVarslingsTekst(response).toString())
+				.preferertKanal(response.getPreferertKanal().toString())
 				.build();
 	}
+
+	private VarselMalRestTo getVarslingsTekst(VarselInfoRestTo varselInfoRestTo){
+
+		//Todo
+		//Denne er ikke riktig! Skal ikke sjekke distribusjonskanal, men preferert kanal?
+		//Sjekk tdist004/qdist104?
+		//Er ikke dette egenltig riktig? Men feil feilhåndtering?
+		return varselInfoRestTo.getVarselmals().stream()
+				.filter(VarselMalRestTo -> DomainConstants.DISTRIBUSJONS_KANAL.equals(VarselMalRestTo.getKanal()))
+				.findAny()
+				.orElseThrow(() -> new Tkat021FunctionalException(format("Fant ingen distribusjonVarsel med varselForDistribusjonKanal=%s for dokumenttypeId=%s",
+						DomainConstants.DISTRIBUSJONS_KANAL, varselInfoRestTo.getVarseltypeId())));
+	}
+
+	private String toDagerListe(VarselInfoRestTo varselInfoRestTo) {
+		StringBuilder sb = new StringBuilder("0");
+		for (int i = 0; i < varselInfoRestTo.getAntallRevarslinger(); i++) {
+			sb.append(',').append(varselInfoRestTo.getRevarslingIntervall() * (i + 1));
+		}
+		return sb.toString();
+	}
+
 }

@@ -1,16 +1,14 @@
-package no.nav.dokdisteformidling.qdist011;
+package no.nav.dokdisteformidling.qdist011.domain;
 
 import lombok.Builder;
 import lombok.Value;
 
 /**
- * @author Heidi Elisabeth Sando, Visma Consulting.
+ * @author Erik Bråten, Visma Consulting.
  */
-
 @Value
 @Builder
 public class DistribuerForsendelseTilDpi {
 
 	private String forsendelseId;
-
 }

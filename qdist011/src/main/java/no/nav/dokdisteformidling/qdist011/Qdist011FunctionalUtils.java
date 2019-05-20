@@ -1,17 +1,21 @@
 package no.nav.dokdisteformidling.qdist011;
 
 import no.nav.dokdisteformidling.constants.DomainConstants;
-import no.nav.dokdisteformidling.consumer.dokkat.tkat021.VarselInfoTo;
 import no.nav.dokdisteformidling.consumer.rdist001.HentForsendelseResponseTo;
 import no.nav.dokdisteformidling.exception.functional.InvalidForsendelseStatusException;
+import no.nav.dokdisteformidling.exception.technical.KunneIkkeHenteDagensDatoTechnicalException;
 
+import javax.xml.datatype.DatatypeConfigurationException;
+import javax.xml.datatype.DatatypeFactory;
+import javax.xml.datatype.XMLGregorianCalendar;
+import java.util.GregorianCalendar;
 import java.util.stream.Collectors;
 
 /**
  * @author Heidi Elisabeth Sando, Visma Consulting.
  */
 
-public class Qdist011FunctionalUtils{
+public class Qdist011FunctionalUtils {
 
 	private Qdist011FunctionalUtils() {
 	}
@@ -29,6 +33,16 @@ public class Qdist011FunctionalUtils{
 				.map(HentForsendelseResponseTo.DokumentTo::getDokumenttypeId)
 				.collect(Collectors.toList())
 				.get(0);
+	}
+
+	public static XMLGregorianCalendar getNow() {
+		XMLGregorianCalendar now;
+		try {
+			now = DatatypeFactory.newInstance().newXMLGregorianCalendar(new GregorianCalendar());
+		} catch (DatatypeConfigurationException e) {
+			throw new KunneIkkeHenteDagensDatoTechnicalException("qdist011 kunne ikke hente dagens dato", e);
+		}
+		return now;
 	}
 
 }

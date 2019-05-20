@@ -5,6 +5,8 @@ import static no.nav.dokdisteformidling.qdist011.Qdist011FunctionalUtils.getDoku
 import static no.nav.dokdisteformidling.qdist011.Qdist011FunctionalUtils.validateForsendelseStatus;
 
 import com.amazonaws.SdkClientException;
+import no.nav.dokdisteformidling.consumer.dki.DigitalKontaktinformasjonV1;
+import no.nav.dokdisteformidling.consumer.dki.HentSikkerDigitalPostadresseResponseTo;
 import no.nav.dokdisteformidling.consumer.dokkat.tkat020.DokumentkatalogAdmin;
 import no.nav.dokdisteformidling.consumer.dokkat.tkat020.DokumenttypeInfoTo;
 import no.nav.dokdisteformidling.consumer.dokkat.tkat021.VarselInfo;
@@ -13,9 +15,11 @@ import no.nav.dokdisteformidling.consumer.rdist001.AdministrerForsendelse;
 import no.nav.dokdisteformidling.consumer.rdist001.HentForsendelseResponseTo;
 import no.nav.dokdisteformidling.exception.functional.DokumentIkkeFunnetIS3Exception;
 import no.nav.dokdisteformidling.exception.functional.KunneIkkeDeserialisereS3JsonPayloadFunctionalException;
+import no.nav.dokdisteformidling.qdist011.domain.DistribuerForsendelseTilDpi;
 import no.nav.dokdisteformidling.storage.DokdistDokument;
 import no.nav.dokdisteformidling.storage.JsonSerializer;
 import no.nav.dokdisteformidling.storage.Storage;
+import no.nav.tjeneste.virksomhet.digitalpost.senddigitalpost.v1.SendDigitalPost;
 import org.apache.camel.Exchange;
 import org.apache.camel.Handler;
 import org.springframework.stereotype.Component;
@@ -35,46 +39,47 @@ public class Qdist011Service {
 	private final VarselInfo varselInfo;
 	private final AdministrerForsendelse administrerForsendelse;
 	private final Storage storage;
+	private final DigitalKontaktinformasjonV1 digitalKontaktinformasjonV1;
+
 
 	@Inject
 	public Qdist011Service(DokumentkatalogAdmin dokumentkatalogAdmin,
 						   VarselInfo varselInfo,
 						   AdministrerForsendelse administrerForsendelse,
-						   Storage storage){
+						   Storage storage,
+						   DigitalKontaktinformasjonV1 digitalKontaktinformasjonV1) {
 		this.dokumentkatalogAdmin = dokumentkatalogAdmin;
 		this.varselInfo = varselInfo;
 		this.administrerForsendelse = administrerForsendelse;
 		this.storage = storage;
+		this.digitalKontaktinformasjonV1 = digitalKontaktinformasjonV1;
 	}
 
 	@Handler
-	public void distribuerForsendelseTilDPIService(DistribuerForsendelseTilDpi distribuerForsendelseTilDpi, Exchange exchange){
+	public void distribuerForsendelseTilDPIService(DistribuerForsendelseTilDpi distribuerForsendelseTilDpi, Exchange exchange) {
 
 		HentForsendelseResponseTo hentForsendelseResponseTo = administrerForsendelse.hentForsendelse(distribuerForsendelseTilDpi
 				.getForsendelseId());
 		validateForsendelseStatus(hentForsendelseResponseTo.getForsendelseStatus());
 
-		//3. hent kontaktinformasjon: input: hentForsendelseResponseTo.getMottaker().getMottakerId();
-		//Output? Erik.
+		HentSikkerDigitalPostadresseResponseTo hentSikkerDigitalPostadresseResponseTo = digitalKontaktinformasjonV1.
+				hentSikkerDigitalPostadresse(hentForsendelseResponseTo.getMottaker().getMottakerId());
 
-		//Skal det ikke være et TO-objekt?
 		DokumenttypeInfoTo dokumenttypeInfoTo = dokumentkatalogAdmin.getDokumenttypeInfo(getDokumenttypeIdHoveddokument(hentForsendelseResponseTo));
 
-		VarselInfoTo varselInfoTo = varselInfo.getVarselInfo(dokumenttypeInfoTo.getVarselTypeId());		//Denne sjekker vel også at det er en valid varselinfo?
+		VarselInfoTo varselInfoTo = varselInfo.getVarselInfo(dokumenttypeInfoTo.getVarselTypeId());
 
-		//. Valider kontaktinformasjon (etter 3.)
+		//DigitalKontaktInformasjonValidator.process(hentSikkerDigitalPostadresseResponseTo);
 
 		List<DokdistDokument> dokdistDokumentList = getDocumentsFromS3(hentForsendelseResponseTo);
 
-		//Router?
-		//. last opp dokumenter via sftp til filkanal slik at sdp-kanal kan hente de
+		//Last opp dokumenter til sdp
 
-		//. distribuer forsendelse - i router!?
-		//input: forsendelse fra steg 1, digitalkontaktinfo fra steg 3, distribusjonsinfo fra steg 4, varselinfo fra steg 5.
-		//input: hentForsendelseResponseTo, diginfo, dokumenttypeInfoTo, varselInfoTo
-		//Dette er kanskje output fra hele servicefunksjonen?
+		SendDigitalPost sendDigitalPost = BridgeMotSDPMapper.map(hentForsendelseResponseTo, hentSikkerDigitalPostadresseResponseTo,
+				dokumenttypeInfoTo, varselInfoTo);
 
-		//. Oppdater forsendelsesstatus: I Router
+		//Oppdater forsendelsestatus
+
 	}
 
 	private List<DokdistDokument> getDocumentsFromS3(HentForsendelseResponseTo hentForsendelseResponseTo) {

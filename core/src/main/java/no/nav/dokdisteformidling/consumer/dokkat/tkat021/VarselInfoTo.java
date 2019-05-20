@@ -12,4 +12,7 @@ public class VarselInfoTo {
 
 	private final String varselTypeId;
 	private final boolean stoppRepeterendeVarsel;
+	private final String varslingsTekst;
+	private final String antallDagerListe;
+	private final String preferertKanal;
 }

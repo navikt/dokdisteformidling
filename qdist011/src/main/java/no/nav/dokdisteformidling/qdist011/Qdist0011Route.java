@@ -62,7 +62,7 @@ public class Qdist0011Route extends SpringRouteBuilder {
 		errorHandler(defaultErrorHandler()
 				.maximumRedeliveries(0)
 				.log(log)
-				.logExhaustedMessageBody(true)
+				.logExhaustedMessageBody(false)
 				.loggingLevel(ERROR));
 
 		onException(AbstractDokdisteformidlingFunctionalException.class, ValidationException.class)
@@ -89,6 +89,11 @@ public class Qdist0011Route extends SpringRouteBuilder {
 				.bean(qdist011Service)
 //				.to(SFTP_SERVER fixme
 				//todo: legg på kø til qdist005
+				.process(exchange -> {
+					System.out.println(exchange.getIn().getBody());
+				})
+
+
 				.log(LoggingLevel.INFO, log, "qdist011 har lagt forsendelse med " + getIdsForLogging() + " på NFS filshare for distribusjon via DPI")
 				.bean(dokdistStatusUpdater)
 				.log(LoggingLevel.INFO, log, "qdist011 har oppdatert forsendelseStatus i dokdist og avslutter behandling av forsendelse med " + getIdsForLogging());
