@@ -13,7 +13,6 @@ import no.nav.dokdisteformidling.consumer.dokkat.tkat021.VarselInfo;
 import no.nav.dokdisteformidling.consumer.dokkat.tkat021.VarselInfoTo;
 import no.nav.dokdisteformidling.consumer.rdist001.AdministrerForsendelse;
 import no.nav.dokdisteformidling.consumer.rdist001.HentForsendelseResponseTo;
-import no.nav.dokdisteformidling.exception.functional.DokumentIkkeFunnetIS3Exception;
 import no.nav.dokdisteformidling.exception.functional.KunneIkkeDeserialisereS3JsonPayloadFunctionalException;
 import no.nav.dokdisteformidling.qdist011.domain.DistribuerForsendelseTilDpi;
 import no.nav.dokdisteformidling.storage.DokdistDokument;
@@ -22,6 +21,7 @@ import no.nav.dokdisteformidling.storage.Storage;
 import no.nav.tjeneste.virksomhet.digitalpost.senddigitalpost.v1.SendDigitalPost;
 import org.apache.camel.Exchange;
 import org.apache.camel.Handler;
+import org.apache.camel.ProducerTemplate;
 import org.springframework.stereotype.Component;
 
 import javax.inject.Inject;
@@ -40,54 +40,56 @@ public class Qdist011Service {
 	private final AdministrerForsendelse administrerForsendelse;
 	private final Storage storage;
 	private final DigitalKontaktinformasjonV1 digitalKontaktinformasjonV1;
-
+	private final ProducerTemplate producer;
+	private final BridgeMotSDPMapper bridgeMotSDPMapper;
+	private final DigitalKontaktInformasjonValidator digitalKontaktInformasjonValidator;
 
 	@Inject
 	public Qdist011Service(DokumentkatalogAdmin dokumentkatalogAdmin,
 						   VarselInfo varselInfo,
 						   AdministrerForsendelse administrerForsendelse,
 						   Storage storage,
-						   DigitalKontaktinformasjonV1 digitalKontaktinformasjonV1) {
+						   DigitalKontaktinformasjonV1 digitalKontaktinformasjonV1,
+						   ProducerTemplate producer, BridgeMotSDPMapper bridgeMotSDPMapper,
+						   DigitalKontaktInformasjonValidator digitalKontaktInformasjonValidator){
 		this.dokumentkatalogAdmin = dokumentkatalogAdmin;
 		this.varselInfo = varselInfo;
 		this.administrerForsendelse = administrerForsendelse;
 		this.storage = storage;
 		this.digitalKontaktinformasjonV1 = digitalKontaktinformasjonV1;
+		this.producer = producer;
+		this.bridgeMotSDPMapper = bridgeMotSDPMapper;
+		this.digitalKontaktInformasjonValidator = digitalKontaktInformasjonValidator;
 	}
 
 	@Handler
-	public void distribuerForsendelseTilDPIService(DistribuerForsendelseTilDpi distribuerForsendelseTilDpi, Exchange exchange) {
+	public SendDigitalPost distribuerForsendelseTilDPIService(DistribuerForsendelseTilDpi distribuerForsendelseTilDpi, Exchange exchange){
 
 		HentForsendelseResponseTo hentForsendelseResponseTo = administrerForsendelse.hentForsendelse(distribuerForsendelseTilDpi
 				.getForsendelseId());
 		validateForsendelseStatus(hentForsendelseResponseTo.getForsendelseStatus());
 
-		HentSikkerDigitalPostadresseResponseTo hentSikkerDigitalPostadresseResponseTo = digitalKontaktinformasjonV1.
-				hentSikkerDigitalPostadresse(hentForsendelseResponseTo.getMottaker().getMottakerId());
+		HentSikkerDigitalPostadresseResponseTo hentSikkerDigitalPostadresseResponseTo =
+				digitalKontaktinformasjonV1.hentSikkerDigitalPostadresse(hentForsendelseResponseTo.getMottaker().getMottakerId());
 
 		DokumenttypeInfoTo dokumenttypeInfoTo = dokumentkatalogAdmin.getDokumenttypeInfo(getDokumenttypeIdHoveddokument(hentForsendelseResponseTo));
 
 		VarselInfoTo varselInfoTo = varselInfo.getVarselInfo(dokumenttypeInfoTo.getVarselTypeId());
 
-		//DigitalKontaktInformasjonValidator.process(hentSikkerDigitalPostadresseResponseTo);
+		hentSikkerDigitalPostadresseResponseTo = digitalKontaktInformasjonValidator.validateKontaktinfo(hentSikkerDigitalPostadresseResponseTo, varselInfoTo);
 
 		List<DokdistDokument> dokdistDokumentList = getDocumentsFromS3(hentForsendelseResponseTo);
+		for (DokdistDokument dokdistDokument : dokdistDokumentList) {
+			producer.sendBody(LastOppDokumentRoute.ROUTE, dokdistDokument);
+		}
 
-		//Last opp dokumenter til sdp
-
-		SendDigitalPost sendDigitalPost = BridgeMotSDPMapper.map(hentForsendelseResponseTo, hentSikkerDigitalPostadresseResponseTo,
-				dokumenttypeInfoTo, varselInfoTo);
-
-		//Oppdater forsendelsestatus
-
+		return bridgeMotSDPMapper.map(hentForsendelseResponseTo, hentSikkerDigitalPostadresseResponseTo, dokumenttypeInfoTo, varselInfoTo);
 	}
 
 	private List<DokdistDokument> getDocumentsFromS3(HentForsendelseResponseTo hentForsendelseResponseTo) {
 		return hentForsendelseResponseTo.getDokumenter().stream()
 				.map(dokumentTo -> {
-					String jsonPayload = storage.get(dokumentTo.getDokumentObjektReferanse())
-							.orElseThrow(() -> new DokumentIkkeFunnetIS3Exception(format("Kunne ikke finne dokument i S3 med key=dokumentObjektReferanse=%s", dokumentTo
-									.getDokumentObjektReferanse())));
+					String jsonPayload = storage.get(dokumentTo.getDokumentObjektReferanse());
 					return deserializeS3JsonPayloadToDokdistDokument(jsonPayload, dokumentTo.getDokumentObjektReferanse());
 				})
 				.collect(Collectors.toList());

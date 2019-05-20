@@ -3,12 +3,14 @@ package no.nav.dokdisteformidling.qdist011;
 import static no.nav.dokdisteformidling.constants.MdcConstants.CALL_ID;
 import static org.apache.camel.LoggingLevel.ERROR;
 
+import com.google.common.base.Charsets;
 import no.nav.dokdisteformidling.exception.functional.AbstractDokdisteformidlingFunctionalException;
 import no.nav.meldinger.virksomhet.dokdistfordeling.qdist008.out.DistribuerTilKanal;
 import org.apache.camel.ExchangePattern;
 import org.apache.camel.LoggingLevel;
 import org.apache.camel.ValidationException;
 import org.apache.camel.converter.jaxb.JaxbDataFormat;
+import org.apache.camel.spi.DataFormat;
 import org.apache.camel.spring.SpringRouteBuilder;
 import org.slf4j.MDC;
 import org.springframework.stereotype.Component;
@@ -22,36 +24,35 @@ import javax.xml.bind.JAXBContext;
  * @author Sigurd Midttun, Visma Consulting.
  */
 @Component
-public class Qdist0011Route extends SpringRouteBuilder {
+public class Qdist011Route extends SpringRouteBuilder {
 
 	public static final String QDIST011_SERVICE_ID = "qdist011";
 	static final String PROPERTY_BESTILLINGS_ID = "bestillingsId";
 	static final String PROPERTY_FORSENDELSE_ID = "forsendelseId";
-	//fixme
-//	private static final String SFTP_FILETYPE = ".zip";
-//	private static final String SFTP_FILE_CONFIG = "binary=true&fileName=${exchangeProperty." + PROPERTY_BESTILLINGS_ID + "}" + SFTP_FILETYPE + "&";
-//	private static final String SFTP_SECURITY_CONFIG = "privateKeyFile={{sftp.privateKeyFile}}&privateKeyPassphrase={{sftp.privateKeyPassphrase}}&preferredAuthentications=publickey";
-//	private static final String SFTP_SERVER = "sftp://{{sftp.url}}:{{sftp.port}}/{{sftp.remoteFilePath}}?username={{sftp.username}}&***passord=gammelt_passord***;
 
 	private final Qdist011Service qdist011Service;
 
 	private final Queue qdist011;
 	private final Queue qdist011FunksjonellFeil;
+	private final Queue tdist005;
 	private final Qdist011MetricsRoutePolicy qdist0011MetricsRoutePolicy;
 	private final DistribuerForsendelseTilDpiMapper distribuerForsendelseTilDpiMapper;
 	private final DokdistStatusUpdater dokdistStatusUpdater;
 
+	private DataFormat digitalpostFormat = new JaxbDataFormat("no.nav.tjeneste.virksomhet.digitalpost.senddigitalpost.v1:no.difi.begrep.sdp.schema_v10");
+
 
 	@Inject
-	public Qdist0011Route(Qdist011Service qdist011Service,
-						  Queue qdist011,
-						  Queue qdist011FunksjonellFeil,
-						  Qdist011MetricsRoutePolicy qdist0011MetricsRoutePolicy,
-						  DistribuerForsendelseTilDpiMapper distribuerForsendelseTilDpiMapper,
-						  DokdistStatusUpdater dokdistStatusUpdater) {
+	public Qdist011Route(Qdist011Service qdist011Service,
+						 Queue qdist011,
+						 Queue qdist011FunksjonellFeil,
+						 Queue tdist005, Qdist011MetricsRoutePolicy qdist0011MetricsRoutePolicy,
+						 DistribuerForsendelseTilDpiMapper distribuerForsendelseTilDpiMapper,
+						 DokdistStatusUpdater dokdistStatusUpdater) {
 		this.qdist011Service = qdist011Service;
 		this.qdist011 = qdist011;
 		this.qdist011FunksjonellFeil = qdist011FunksjonellFeil;
+		this.tdist005 = tdist005;
 		this.qdist0011MetricsRoutePolicy = qdist0011MetricsRoutePolicy;
 		this.distribuerForsendelseTilDpiMapper = distribuerForsendelseTilDpiMapper;
 		this.dokdistStatusUpdater = dokdistStatusUpdater;
@@ -87,13 +88,8 @@ public class Qdist0011Route extends SpringRouteBuilder {
 				.unmarshal(new JaxbDataFormat(JAXBContext.newInstance(DistribuerTilKanal.class)))
 				.bean(distribuerForsendelseTilDpiMapper)
 				.bean(qdist011Service)
-//				.to(SFTP_SERVER fixme
-				//todo: legg på kø til qdist005
-				.process(exchange -> {
-					System.out.println(exchange.getIn().getBody());
-				})
-
-
+				.marshal(digitalpostFormat).convertBodyTo(String.class, Charsets.UTF_8.toString())
+				.to("jms:" + tdist005.getQueueName())
 				.log(LoggingLevel.INFO, log, "qdist011 har lagt forsendelse med " + getIdsForLogging() + " på NFS filshare for distribusjon via DPI")
 				.bean(dokdistStatusUpdater)
 				.log(LoggingLevel.INFO, log, "qdist011 har oppdatert forsendelseStatus i dokdist og avslutter behandling av forsendelse med " + getIdsForLogging());

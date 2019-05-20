@@ -1,7 +1,7 @@
 package no.nav.dokdisteformidling.qdist011;
 
 import static no.nav.dokdisteformidling.constants.DomainConstants.FORSENDELSE_STATUS_EKSPEDERT;
-import static no.nav.dokdisteformidling.qdist011.Qdist0011Route.PROPERTY_FORSENDELSE_ID;
+import static no.nav.dokdisteformidling.qdist011.Qdist011Route.PROPERTY_FORSENDELSE_ID;
 
 import no.nav.dokdisteformidling.consumer.rdist001.AdministrerForsendelse;
 import org.apache.camel.Exchange;

@@ -4,10 +4,11 @@ import static no.nav.dokdisteformidling.constants.BridgeMotSDPMapperConstants.DA
 import static no.nav.dokdisteformidling.constants.BridgeMotSDPMapperConstants.RESERVASJON;
 
 import no.nav.dokdisteformidling.consumer.dki.HentSikkerDigitalPostadresseResponseTo;
-import no.nav.dokdisteformidling.exception.functional.IllegalKontaktInformasjonException;
-import org.apache.camel.Exchange;
-import org.apache.camel.Processor;
+import no.nav.dokdisteformidling.consumer.dokkat.tkat021.VarselInfoTo;
+import no.nav.dokdisteformidling.exception.functional.IllegalKontaktInformasjonFunctionalException;
+import org.apache.camel.Handler;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.stereotype.Component;
 
 import javax.xml.datatype.XMLGregorianCalendar;
 import java.util.GregorianCalendar;
@@ -15,24 +16,32 @@ import java.util.GregorianCalendar;
 /**
  * @author Heidi Elisabeth Sando, Visma Consulting
  */
-public class DigitalKontaktInformasjonValidator implements Processor {
 
-	@Override
-	public void process(Exchange exchange) throws IllegalKontaktInformasjonException{
-		HentSikkerDigitalPostadresseResponseTo hentSikkerDigitalPostadresseResponseTo = exchange.getIn().getBody(HentSikkerDigitalPostadresseResponseTo.class);
+@Component
+public class DigitalKontaktInformasjonValidator {
 
-		hentSikkerDigitalPostadresseResponseTo = validateHentSikkerDigitalPostadresseResponseTo(hentSikkerDigitalPostadresseResponseTo);
+	@Handler
+	public HentSikkerDigitalPostadresseResponseTo validateKontaktinfo(HentSikkerDigitalPostadresseResponseTo hentSikkerDigitalPostadresseResponseTo,
+																	  VarselInfoTo varselInfoTo) throws IllegalKontaktInformasjonFunctionalException {
+		hentSikkerDigitalPostadresseResponseTo = validateHentSikkerDigitalPostadresseResponseTo(hentSikkerDigitalPostadresseResponseTo,
+				varselInfoTo);
 
-		exchange.getIn().setBody(hentSikkerDigitalPostadresseResponseTo);
+		return hentSikkerDigitalPostadresseResponseTo;
 	}
 
-	public HentSikkerDigitalPostadresseResponseTo validateHentSikkerDigitalPostadresseResponseTo(HentSikkerDigitalPostadresseResponseTo hentSikkerDigitalPostadresseResponseTo) throws IllegalKontaktInformasjonException {
+	public HentSikkerDigitalPostadresseResponseTo validateHentSikkerDigitalPostadresseResponseTo(
+			HentSikkerDigitalPostadresseResponseTo hentSikkerDigitalPostadresseResponseTo,
+			VarselInfoTo varselInfoTo) throws IllegalKontaktInformasjonFunctionalException {
 		if (hentSikkerDigitalPostadresseResponseTo.getDigitalKontaktinformasjon().getReservasjon().equals(RESERVASJON)) {
-			throw new IllegalKontaktInformasjonException("Reservert kontaktinformasjon");
+			throw new IllegalKontaktInformasjonFunctionalException("Reservert kontaktinformasjon");
 		}
 
 		if (!verifyAddress(hentSikkerDigitalPostadresseResponseTo)) {
-			throw new IllegalKontaktInformasjonException("Manglende sertifikat, leverandoerAdresse eller brukerAdresse");
+			throw new IllegalKontaktInformasjonFunctionalException("Manglende sertifikat, leverandoerAdresse eller brukerAdresse");
+		}
+
+		if (!varselInfoTo.equals(null)) {
+			hentSikkerDigitalPostadresseResponseTo = verifyEmailAndPhone(hentSikkerDigitalPostadresseResponseTo);
 		}
 
 		return hentSikkerDigitalPostadresseResponseTo;
@@ -67,14 +76,14 @@ public class DigitalKontaktInformasjonValidator implements Processor {
 		return isInvalid(mobiltelefonnummer.getSistVerifisert()) && isInvalid(mobiltelefonnummer.getSistOppdatert());
 	}
 
-	private HentSikkerDigitalPostadresseResponseTo verifyEmailAndPhone(HentSikkerDigitalPostadresseResponseTo hentSikkerDigitalPostadresseResponseTo) throws IllegalKontaktInformasjonException {
+	private HentSikkerDigitalPostadresseResponseTo verifyEmailAndPhone(HentSikkerDigitalPostadresseResponseTo hentSikkerDigitalPostadresseResponseTo) throws IllegalKontaktInformasjonFunctionalException {
 		HentSikkerDigitalPostadresseResponseTo.Epostadresse epost = hentSikkerDigitalPostadresseResponseTo.getDigitalKontaktinformasjon()
 				.getEpostadresse();
 		HentSikkerDigitalPostadresseResponseTo.Mobiltelefonnummer mobil = hentSikkerDigitalPostadresseResponseTo.getDigitalKontaktinformasjon()
 				.getMobiltelefonnummer();
 
 		if (StringUtils.isBlank(epost.getValue()) && StringUtils.isBlank(mobil.getValue())) {
-			throw new IllegalKontaktInformasjonException("Epostadresse and mobiltelefonnummer is empty");
+			throw new IllegalKontaktInformasjonFunctionalException("Epostadresse and mobiltelefonnummer is empty");
 		}
 
 		if (isEpostDateInvalid(epost)) {
@@ -86,7 +95,7 @@ public class DigitalKontaktInformasjonValidator implements Processor {
 		}
 
 		if (isEpostDateInvalid(epost) && isMobilDateInvalid(mobil)) {
-			throw new IllegalKontaktInformasjonException("Epostadresse and mobiltelefonnummer is invalid");
+			throw new IllegalKontaktInformasjonFunctionalException("Epostadresse and mobiltelefonnummer is invalid");
 		}
 
 		return hentSikkerDigitalPostadresseResponseTo;

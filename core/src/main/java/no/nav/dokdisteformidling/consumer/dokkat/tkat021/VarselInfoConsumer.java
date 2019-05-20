@@ -81,7 +81,6 @@ public class VarselInfoConsumer implements VarselInfo {
 		//Todo
 		//Denne er ikke riktig! Skal ikke sjekke distribusjonskanal, men preferert kanal?
 		//Sjekk tdist004/qdist104?
-		//Er ikke dette egenltig riktig? Men feil feilhåndtering?
 		return varselInfoRestTo.getVarselmals().stream()
 				.filter(VarselMalRestTo -> DomainConstants.DISTRIBUSJONS_KANAL.equals(VarselMalRestTo.getKanal()))
 				.findAny()

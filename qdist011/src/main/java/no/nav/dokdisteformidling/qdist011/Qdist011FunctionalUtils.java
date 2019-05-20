@@ -2,7 +2,7 @@ package no.nav.dokdisteformidling.qdist011;
 
 import no.nav.dokdisteformidling.constants.DomainConstants;
 import no.nav.dokdisteformidling.consumer.rdist001.HentForsendelseResponseTo;
-import no.nav.dokdisteformidling.exception.functional.InvalidForsendelseStatusException;
+import no.nav.dokdisteformidling.exception.functional.InvalidForsendelseStatusFunctionalException;
 import no.nav.dokdisteformidling.exception.technical.KunneIkkeHenteDagensDatoTechnicalException;
 
 import javax.xml.datatype.DatatypeConfigurationException;
@@ -22,7 +22,7 @@ public class Qdist011FunctionalUtils {
 
 	public static void validateForsendelseStatus(String forsendelseStatus) {
 		if (!DomainConstants.FORSENDELSE_STATUS_KLAR_FOR_DIST.equals(forsendelseStatus)) {
-			throw new InvalidForsendelseStatusException(String.format("ForsendelseStatus må være %s. Fant forsendelseStatus=%s",
+			throw new InvalidForsendelseStatusFunctionalException(String.format("ForsendelseStatus må være %s. Fant forsendelseStatus=%s",
 					DomainConstants.FORSENDELSE_STATUS_KLAR_FOR_DIST, forsendelseStatus));
 		}
 	}

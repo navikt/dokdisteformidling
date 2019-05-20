@@ -2,17 +2,10 @@ package no.nav.dokdisteformidling.consumer.dki;
 
 import lombok.Builder;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 import lombok.Value;
-import no.nav.dokdisteformidling.exception.functional.IllegalKontaktInformasjonException;
-import no.nav.dokdisteformidling.exception.technical.KunneIkkeHenteDagensDatoTechnicalException;
-import org.apache.commons.lang3.StringUtils;
 
 
-import javax.xml.datatype.DatatypeConfigurationException;
-import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
-import java.util.GregorianCalendar;
 
 /**
  * @author Erik Bråten, Visma Consulting.

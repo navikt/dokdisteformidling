@@ -40,8 +40,8 @@
 		<awaitility.version>3.1.2</awaitility.version>
 		<dokkat-schemas.version>10.4.2</dokkat-schemas.version>
 		<melding-virksomhet-dokdistfordeling.version>2.0.4</melding-virksomhet-dokdistfordeling.version>
-		<sdpkanal-tjenestespesifikasjon.version>1.1.0</sdpkanal-tjenestespesifikasjon.version>
 		<nav-digitalKontaktinformasjon-v1-tjenestespesifikasjon>2.0.0</nav-digitalKontaktinformasjon-v1-tjenestespesifikasjon>
+		<sdpkanal-tjenestespesifikasjon.version>1.1.0</sdpkanal-tjenestespesifikasjon.version>
 	</properties>
 
 	<dependencyManagement>
