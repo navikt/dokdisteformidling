@@ -1,7 +1,6 @@
 package no.nav.dokdisteformidling.consumer.saf.graphql;
 
 import static no.nav.dokdisteformidling.consumer.util.ValidationUtil.assertDokumentFieldNotNullOrEmpty;
-import static no.nav.dokdisteformidling.consumer.util.ValidationUtil.assertJournalpostFieldNotNull;
 
 import no.nav.dokdisteformidling.consumer.saf.journalpost.SafJournalpostTo;
 
@@ -11,7 +10,6 @@ public class JournalpostToValidator {
 
 	public SafJournalpostTo validateAndReturn(SafJournalpostTo safJournalpostTo) {
 
-		assertJournalpostFieldNotNull(SafJournalpostTo.DokumentInfo.class, safJournalpostTo.getDokumenter());
 		validateDokumenter(safJournalpostTo.getDokumenter());
 
 		return safJournalpostTo;

@@ -29,7 +29,8 @@ import no.nav.dokdisteformidling.consumer.dki.HentSikkerDigitalPostadresseRespon
 import no.nav.dokdisteformidling.consumer.dokkat.tkat020.DokumenttypeInfoTo;
 import no.nav.dokdisteformidling.consumer.dokkat.tkat021.VarselInfoTo;
 import no.nav.dokdisteformidling.consumer.rdist001.HentForsendelseResponseTo;
-import no.nav.dokdisteformidling.consumer.saf.journalpost.Journalpost;
+import no.nav.dokdisteformidling.consumer.saf.journalpost.SafJournalpostTo;
+import no.nav.dokdisteformidling.exception.functional.DokumentInfoIdIkkeFunnetFunctionalException;
 import no.nav.tjeneste.virksomhet.digitalpost.senddigitalpost.v1.ObjectFactory;
 import no.nav.tjeneste.virksomhet.digitalpost.senddigitalpost.v1.SendDigitalPost;
 import no.nav.tjeneste.virksomhet.digitalpost.senddigitalpost.v1.meldinger.SendDigitalPostRequest;
@@ -54,7 +55,7 @@ public class BridgeMotSDPMapper {
 	public SendDigitalPost map(HentForsendelseResponseTo hentForsendelseResponsTo,
 							   HentSikkerDigitalPostadresseResponseTo hentSikkerDigitalPostadresseResponseTo,
 							   DokumenttypeInfoTo dokumenttypeInfoTo, VarselInfoTo varselInfoTo,
-							   Journalpost journalpost) {
+							   SafJournalpostTo safJournalpostTo) {
 		ObjectFactory digitalPostOF = new ObjectFactory();
 		SendDigitalPost sendDigitalPost = digitalPostOF.createSendDigitalPost();
 		SendDigitalPostRequest sendDigitalPostRequest = new SendDigitalPostRequest();
@@ -67,7 +68,7 @@ public class BridgeMotSDPMapper {
 				dokumenttypeInfoTo, varselInfoTo));
 
 		sendDigitalPostRequest.setStandardBusinessDocument(standardBusinessDocument);
-		sendDigitalPostRequest.setManifest(mapManifest(hentSikkerDigitalPostadresseResponseTo, hentForsendelseResponsTo, journalpost));
+		sendDigitalPostRequest.setManifest(mapManifest(hentSikkerDigitalPostadresseResponseTo, hentForsendelseResponsTo, safJournalpostTo));
 		sendDigitalPostRequest.setSertifikat(hentSikkerDigitalPostadresseResponseTo.getSertifikat());
 		sendDigitalPostRequest.setErPrioritert(false);
 		sendDigitalPost.setSendDigitalPostRequest(sendDigitalPostRequest);
@@ -90,7 +91,7 @@ public class BridgeMotSDPMapper {
 		scope.setIdentifier(STANDARD);
 		BusinessScope businessScope = new BusinessScope();
 
-		List <Scope> scopeList = businessScope.getScope();
+		List<Scope> scopeList = businessScope.getScope();
 		scopeList.add(scope);
 
 		StandardBusinessDocumentHeader standardBusinessDocumentHeader = new StandardBusinessDocumentHeader();
@@ -128,8 +129,11 @@ public class BridgeMotSDPMapper {
 		forsendelseTittel.setValue(hentForsendelseResponseTo.getForsendelseTittel());
 		digitalPostInfo.setIkkeSensitivTittel(forsendelseTittel);
 
-		Varsler varsler = mapVarsler(varselInfoTo, hentSikkerDigitalPostadresseResponseTo);
-		digitalPostInfo.setVarsler(varsler);
+
+		if (varselInfoTo != null) {
+			Varsler varsler = mapVarsler(varselInfoTo, hentSikkerDigitalPostadresseResponseTo);
+			digitalPostInfo.setVarsler(varsler);
+		}
 
 		digitalPost.setAvsender(mapAvsender());
 		digitalPost.setMottaker(mapMottaker(hentSikkerDigitalPostadresseResponseTo, hentForsendelseResponseTo));
@@ -162,14 +166,14 @@ public class BridgeMotSDPMapper {
 
 	private Manifest mapManifest(HentSikkerDigitalPostadresseResponseTo hentSikkerDigitalPostadresseResponseTo,
 								 HentForsendelseResponseTo hentForsendelseResponseTo,
-								 Journalpost journalpost) {
+								 SafJournalpostTo safJournalpostTo) {
 		Tittel tittelHoveddokument = new Tittel();
 		tittelHoveddokument.setValue(hentForsendelseResponseTo.getForsendelseTittel());
 		Dokument hoveddokument = new Dokument();
 		hoveddokument.setHref(hentForsendelseResponseTo.getDokumenter().stream()
 				.filter(DokumentTo -> DomainConstants.HOVEDDOKUMENT.equals(DokumentTo.getTilknyttetSom()))
 				.findAny()
-				.map(HentForsendelseResponseTo.DokumentTo::getDokumentURI).get());
+				.map(HentForsendelseResponseTo.DokumentTo::getDokumentObjektReferanse).toString().concat(".pdf"));
 		hoveddokument.setMime(DOKUMENT_MIME);
 		hoveddokument.setTittel(tittelHoveddokument);
 
@@ -187,13 +191,16 @@ public class BridgeMotSDPMapper {
 					Tittel tittelVedlegg = new Tittel();
 
 					tittelVedlegg.setValue(
-							journalpost.getDokumenter().stream()
-							.filter(dokumentInfo -> dokumentInfo.getDokumentInfoId().equals(dokumentTo.getArkivDokumentInfoId()))
-							.findFirst()
-							.get().getTittel()
+							safJournalpostTo.getDokumenter().stream()
+									.filter(dokumentInfo -> dokumentInfo.getDokumentInfoId()
+											.equals(dokumentTo.getArkivDokumentInfoId()))
+									.findAny()
+									.orElseThrow(() -> new DokumentInfoIdIkkeFunnetFunctionalException(String.format("DokumentInfoId=%s ikke funnet i journalpost", dokumentTo
+											.getArkivDokumentInfoId())))
+									.getTittel()
 					);
 					dokumentVedlegg.setTittel(tittelVedlegg);
-					dokumentVedlegg.setHref(dokumentTo.getDokumentURI());
+					dokumentVedlegg.setHref(dokumentTo.getDokumentObjektReferanse().concat(".pdf"));
 					dokumentVedlegg.setMime(DOKUMENT_MIME);
 					vedlegg.add(dokumentVedlegg);
 				});
@@ -201,29 +208,19 @@ public class BridgeMotSDPMapper {
 		return manifest;
 	}
 
-	private boolean isPreferertKanalEpost(VarselInfoTo varselInfoTo){
-		return varselInfoTo.getPreferertKanal().stream()
-				.filter(preferertKanal -> EPOST.equals(preferertKanal))
-				.findAny()
-				.isPresent();
-	}
-
-	private boolean isPreferertKanalMobil(VarselInfoTo varselInfoTo){
-		return varselInfoTo.getPreferertKanal().stream()
-				.filter(preferertKanal -> SMS.equals(preferertKanal))
-				.findAny()
-				.isPresent();
-	}
-
 	private Varsler mapVarsler(VarselInfoTo varselInfoTo,
 							   HentSikkerDigitalPostadresseResponseTo hentSikkerDigitalPostadresseResponseTo) {
 
 		Varsler varsler = null;
 
-		boolean isEpostDateInvalid = DigitalKontaktInformasjonValidator.isEpostDateInvalid(hentSikkerDigitalPostadresseResponseTo.getDigitalKontaktinformasjon().getEpostadresse());
-		boolean isMobilDateInvalid = DigitalKontaktInformasjonValidator.isMobilDateInvalid(hentSikkerDigitalPostadresseResponseTo.getDigitalKontaktinformasjon().getMobiltelefonnummer());
+		boolean isEpostDateInvalid = DigitalKontaktInformasjonValidator.isEpostDateInvalid(hentSikkerDigitalPostadresseResponseTo
+				.getDigitalKontaktinformasjon()
+				.getEpostadresse());
+		boolean isMobilDateInvalid = DigitalKontaktInformasjonValidator.isMobilDateInvalid(hentSikkerDigitalPostadresseResponseTo
+				.getDigitalKontaktinformasjon()
+				.getMobiltelefonnummer());
 
-		if ((isPreferertKanalEpost(varselInfoTo) || isMobilDateInvalid) && !isEpostDateInvalid){
+		if ((isPreferertKanalEpost(varselInfoTo) || isMobilDateInvalid) && !isEpostDateInvalid) {
 			varsler = new Varsler();
 			EpostVarsel epostVarsel = new EpostVarsel();
 			EpostVarselTekst epostVarselTekst = new EpostVarselTekst();
@@ -236,7 +233,7 @@ public class BridgeMotSDPMapper {
 		}
 
 		if ((isPreferertKanalMobil(varselInfoTo) || isEpostDateInvalid) && !isMobilDateInvalid) {
-			if(varsler == null){
+			if (varsler == null) {
 				varsler = new Varsler();
 			}
 			SmsVarsel smsVarsel = new SmsVarsel();
@@ -249,5 +246,19 @@ public class BridgeMotSDPMapper {
 			varsler.setSmsVarsel(smsVarsel);
 		}
 		return varsler;
+	}
+
+	private boolean isPreferertKanalEpost(VarselInfoTo varselInfoTo) {
+		return varselInfoTo.getPreferertKanal().stream()
+				.filter(preferertKanal -> EPOST.equals(preferertKanal))
+				.findAny()
+				.isPresent();
+	}
+
+	private boolean isPreferertKanalMobil(VarselInfoTo varselInfoTo) {
+		return varselInfoTo.getPreferertKanal().stream()
+				.filter(preferertKanal -> SMS.equals(preferertKanal))
+				.findAny()
+				.isPresent();
 	}
 }

@@ -15,6 +15,7 @@ import no.nav.dokdisteformidling.consumer.rdist001.AdministrerForsendelse;
 import no.nav.dokdisteformidling.consumer.rdist001.HentForsendelseResponseTo;
 import no.nav.dokdisteformidling.consumer.saf.SafJournalpostQueryService;
 import no.nav.dokdisteformidling.consumer.saf.journalpost.Journalpost;
+import no.nav.dokdisteformidling.consumer.saf.journalpost.SafJournalpostTo;
 import no.nav.dokdisteformidling.exception.functional.KunneIkkeDeserialisereS3JsonPayloadFunctionalException;
 import no.nav.dokdisteformidling.qdist011.domain.DistribuerForsendelseTilDpi;
 import no.nav.dokdisteformidling.storage.DokdistDokument;
@@ -89,16 +90,16 @@ public class Qdist011Service {
 			producer.sendBody(LastOppDokumentRoute.ROUTE, dokdistDokument);
 		}
 
-		Journalpost journalpost = safJournalpostQueryService.hentJournalpost(hentForsendelseResponseTo.getArkivInformasjon().getArkivId());
+		SafJournalpostTo safJournalpostTo = safJournalpostQueryService.hentJournalpost(hentForsendelseResponseTo.getArkivInformasjon().getArkivId());
 
-		return bridgeMotSDPMapper.map(hentForsendelseResponseTo, hentSikkerDigitalPostadresseResponseTo, dokumenttypeInfoTo, varselInfoTo, journalpost);
+		return bridgeMotSDPMapper.map(hentForsendelseResponseTo, hentSikkerDigitalPostadresseResponseTo, dokumenttypeInfoTo, varselInfoTo, safJournalpostTo);
 	}
 
 	private VarselInfoTo getVarselInfoIfVarselTypeIdIsPresent(DokumenttypeInfoTo dokumenttypeInfoTo){
-		if(!(dokumenttypeInfoTo == null)){
-			return varselInfo.getVarselInfo(dokumenttypeInfoTo.getVarselTypeId());
-		}else{
+		if(dokumenttypeInfoTo == null){
 			return null;
+		}else{
+			return varselInfo.getVarselInfo(dokumenttypeInfoTo.getVarselTypeId());
 		}
 	}
 

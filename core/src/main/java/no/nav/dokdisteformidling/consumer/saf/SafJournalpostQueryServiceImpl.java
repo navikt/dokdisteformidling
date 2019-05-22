@@ -1,11 +1,9 @@
 package no.nav.dokdisteformidling.consumer.saf;
 
-
 import no.nav.dokdisteformidling.consumer.saf.graphql.GraphQLRequest;
-import no.nav.dokdisteformidling.consumer.saf.graphql.JournalpostToMapper;
 import no.nav.dokdisteformidling.consumer.saf.graphql.JournalpostToValidator;
 import no.nav.dokdisteformidling.consumer.saf.graphql.SafGraphqlConsumer;
-import no.nav.dokdisteformidling.consumer.saf.journalpost.Journalpost;
+import no.nav.dokdisteformidling.consumer.saf.journalpost.SafJournalpostTo;
 import org.springframework.stereotype.Component;
 
 import java.util.Collections;
@@ -23,23 +21,21 @@ public class SafJournalpostQueryServiceImpl implements SafJournalpostQueryServic
 					"  }\n" +
 					"}\n";
 	private final SafGraphqlConsumer safGraphqlConsumer;
-	private final JournalpostToMapper journalpostMapper = new JournalpostToMapper();
 	private final JournalpostToValidator journalpostToValidator = new JournalpostToValidator();
 
 	public SafJournalpostQueryServiceImpl(SafGraphqlConsumer safGraphqlConsumer) {
 		this.safGraphqlConsumer = safGraphqlConsumer;
 	}
 
-	public Journalpost hentJournalpost(String journalpostid) {
+	public SafJournalpostTo hentJournalpost(String journalpostid) {
 
-		return journalpostMapper.map(
-				journalpostToValidator.validateAndReturn(
-						safGraphqlConsumer.performQuery(GraphQLRequest.builder()
-								.query(JOURNALPOST_QUERY)
-								.operationName("journalpost")
-								.variables(Collections.singletonMap("queryJournalpostId", journalpostid))
-								.build())
-			)
+		return journalpostToValidator.validateAndReturn(
+				safGraphqlConsumer.performQuery(GraphQLRequest.builder()
+						.query(JOURNALPOST_QUERY)
+						.operationName("journalpost")
+						.variables(Collections.singletonMap("queryJournalpostId", journalpostid))
+						.build())
+
 		);
 	}
 }

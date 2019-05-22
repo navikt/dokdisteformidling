@@ -83,7 +83,7 @@ public class Qdist011Route extends SpringRouteBuilder {
 				.bean(qdist011Service)
 				.marshal(digitalpostFormat).convertBodyTo(String.class, Charsets.UTF_8.toString())
 				.to("jms:" + tdist005.getQueueName())
-				.log(LoggingLevel.INFO, log, "qdist011 har lagt forsendelse med " + getIdsForLogging() + " på kø til tdist005for distribusjon via DPI")
+				.log(LoggingLevel.INFO, log, "qdist011 har lagt forsendelse med " + getIdsForLogging() + " på kø til tdist005 for distribusjon via DPI")
 				.bean(dokdistStatusUpdater)
 				.log(LoggingLevel.INFO, log, "qdist011 har oppdatert forsendelseStatus i dokdist og avslutter behandling av forsendelse med " + getIdsForLogging());
 	}

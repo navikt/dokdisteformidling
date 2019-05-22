@@ -55,7 +55,6 @@ public class HentForsendelseResponseTo {
 		private final String dokumentObjektReferanse;
 		private final String arkivDokumentInfoId;
 		private final String dokumenttypeId;
-		private final String dokumentURI;
 	}
 }
 

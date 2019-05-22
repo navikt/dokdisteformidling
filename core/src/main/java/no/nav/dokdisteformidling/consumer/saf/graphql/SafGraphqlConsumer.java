@@ -75,7 +75,7 @@ public class SafGraphqlConsumer {
 	private HttpHeaders createAuthorizationHeader() {
 		HttpHeaders headers = new HttpHeaders();
 		headers.setContentType(MediaType.APPLICATION_JSON);
-		headers.set(HttpHeaders.AUTHORIZATION, "Bearer " + stsRestConsumer.getOidcToken());
+		headers.set(HttpHeaders.AUTHORIZATION, OIDC_TOKEN_PREFIX + " " + stsRestConsumer.getOidcToken());
 		return headers;
 	}
 

@@ -11,7 +11,7 @@ import com.amazonaws.services.s3.model.CryptoConfiguration;
 import com.amazonaws.services.s3.model.CryptoMode;
 import com.amazonaws.services.s3.model.EncryptionMaterials;
 import com.amazonaws.services.s3.model.StaticEncryptionMaterialsProvider;
-import no.nav.dokdisteformidling.exception.functional.ValidationException;
+import no.nav.dokdisteformidling.exception.functional.S3StorageValidationFunctionalException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -67,7 +67,7 @@ public class S3Configuration {
 		if (passphrase.getBytes().length == 32) {
 			return new SecretKeySpec(passphrase.getBytes(), "AES");
 		} else {
-			throw new ValidationException("Passordet for s3Storage sin AES må være 256 bit");
+			throw new S3StorageValidationFunctionalException("Passordet for s3Storage sin AES må være 256 bit");
 		}
 	}
 }

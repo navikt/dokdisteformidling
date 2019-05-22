@@ -27,7 +27,7 @@ public class DigitalKontaktInformasjonValidator {
 	}
 
 	public void validateHentSikkerDigitalPostadresseResponseTo(HentSikkerDigitalPostadresseResponseTo hentSikkerDigitalPostadresseResponseTo,
-																								 VarselInfoTo varselInfoTo) {
+															   VarselInfoTo varselInfoTo) {
 		if (hentSikkerDigitalPostadresseResponseTo.getDigitalKontaktinformasjon().getReservasjon().equals(RESERVASJON)) {
 			throw new IllegalKontaktInformasjonFunctionalException("Reservert kontaktinformasjon");
 		}
@@ -36,7 +36,7 @@ public class DigitalKontaktInformasjonValidator {
 			throw new IllegalKontaktInformasjonFunctionalException("Manglende sertifikat, leverandoerAdresse eller brukerAdresse");
 		}
 
-		if (!(varselInfoTo==null)) {
+		if (!(varselInfoTo == null)) {
 			verifyEmailAndPhone(hentSikkerDigitalPostadresseResponseTo);
 		}
 
@@ -44,14 +44,15 @@ public class DigitalKontaktInformasjonValidator {
 
 	private boolean hasValidSertifikatAndAdresses(HentSikkerDigitalPostadresseResponseTo hentSikkerDigitalPostadresseResponseTo) {
 
-		boolean hasSertifikat = !(hentSikkerDigitalPostadresseResponseTo.getSertifikat() == null) ||
+		boolean hasSertifikat = (hentSikkerDigitalPostadresseResponseTo.getSertifikat() != null) &&
 				(hentSikkerDigitalPostadresseResponseTo.getSertifikat().length > 0);
 
 
-		boolean hasLeverandorAdresse = !(hentSikkerDigitalPostadresseResponseTo.getDigitalKontaktinformasjon() == null) ||
-				StringUtils.isNotBlank(hentSikkerDigitalPostadresseResponseTo.getSikkerDigitalPostkasse().getLeverandoerAdresse());
+		boolean hasLeverandorAdresse = (hentSikkerDigitalPostadresseResponseTo.getDigitalKontaktinformasjon() != null) &&
+				StringUtils.isNotBlank(hentSikkerDigitalPostadresseResponseTo.getSikkerDigitalPostkasse()
+						.getLeverandoerAdresse());
 
-		boolean hasBrukerAdresse = !(hentSikkerDigitalPostadresseResponseTo.getSikkerDigitalPostkasse() == null) ||
+		boolean hasBrukerAdresse = (hentSikkerDigitalPostadresseResponseTo.getSikkerDigitalPostkasse() != null) &&
 				StringUtils.isNotBlank(hentSikkerDigitalPostadresseResponseTo.getSikkerDigitalPostkasse().getBrukerAdresse());
 
 		return (hasSertifikat && hasLeverandorAdresse && hasBrukerAdresse);
@@ -61,7 +62,7 @@ public class DigitalKontaktInformasjonValidator {
 
 		int result = -1;
 
-		if (!(dateTime == null)){
+		if (!(dateTime == null)) {
 			GregorianCalendar calendar = dateTime.toGregorianCalendar();
 			GregorianCalendar today = Qdist011FunctionalUtils.getNow().toGregorianCalendar();
 			calendar.add(today.MONTH, -DATE_VALID_MONTHS);
@@ -86,11 +87,11 @@ public class DigitalKontaktInformasjonValidator {
 				.getMobiltelefonnummer();
 
 		if (StringUtils.isBlank(epost.getValue()) && StringUtils.isBlank(mobil.getValue())) {
-			throw new IllegalKontaktInformasjonFunctionalException("Epostadresse and mobiltelefonnummer is empty");
+			throw new IllegalKontaktInformasjonFunctionalException("Epostadresse og mobiltelefonnummer er tom");
 		}
 
 		if (isEpostDateInvalid(epost) && isMobilDateInvalid(mobil)) {
-			throw new IllegalKontaktInformasjonFunctionalException("Epostadresse and mobiltelefonnummer is invalid");
+			throw new IllegalKontaktInformasjonFunctionalException("Epostadresse og mobiltelefonnummer er invalid");
 		}
 	}
 }
