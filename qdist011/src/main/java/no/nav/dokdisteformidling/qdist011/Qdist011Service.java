@@ -13,13 +13,14 @@ import no.nav.dokdisteformidling.consumer.dokkat.tkat021.VarselInfo;
 import no.nav.dokdisteformidling.consumer.dokkat.tkat021.VarselInfoTo;
 import no.nav.dokdisteformidling.consumer.rdist001.AdministrerForsendelse;
 import no.nav.dokdisteformidling.consumer.rdist001.HentForsendelseResponseTo;
+import no.nav.dokdisteformidling.consumer.saf.SafJournalpostQueryService;
+import no.nav.dokdisteformidling.consumer.saf.journalpost.Journalpost;
 import no.nav.dokdisteformidling.exception.functional.KunneIkkeDeserialisereS3JsonPayloadFunctionalException;
 import no.nav.dokdisteformidling.qdist011.domain.DistribuerForsendelseTilDpi;
 import no.nav.dokdisteformidling.storage.DokdistDokument;
 import no.nav.dokdisteformidling.storage.JsonSerializer;
 import no.nav.dokdisteformidling.storage.Storage;
 import no.nav.tjeneste.virksomhet.digitalpost.senddigitalpost.v1.SendDigitalPost;
-import org.apache.camel.Exchange;
 import org.apache.camel.Handler;
 import org.apache.camel.ProducerTemplate;
 import org.springframework.stereotype.Component;
@@ -43,6 +44,7 @@ public class Qdist011Service {
 	private final ProducerTemplate producer;
 	private final BridgeMotSDPMapper bridgeMotSDPMapper;
 	private final DigitalKontaktInformasjonValidator digitalKontaktInformasjonValidator;
+	private final SafJournalpostQueryService safJournalpostQueryService;
 
 	@Inject
 	public Qdist011Service(DokumentkatalogAdmin dokumentkatalogAdmin,
@@ -51,7 +53,7 @@ public class Qdist011Service {
 						   Storage storage,
 						   DigitalKontaktinformasjonV1 digitalKontaktinformasjonV1,
 						   ProducerTemplate producer, BridgeMotSDPMapper bridgeMotSDPMapper,
-						   DigitalKontaktInformasjonValidator digitalKontaktInformasjonValidator){
+						   DigitalKontaktInformasjonValidator digitalKontaktInformasjonValidator, SafJournalpostQueryService safJournalpostQueryService) {
 		this.dokumentkatalogAdmin = dokumentkatalogAdmin;
 		this.varselInfo = varselInfo;
 		this.administrerForsendelse = administrerForsendelse;
@@ -60,21 +62,25 @@ public class Qdist011Service {
 		this.producer = producer;
 		this.bridgeMotSDPMapper = bridgeMotSDPMapper;
 		this.digitalKontaktInformasjonValidator = digitalKontaktInformasjonValidator;
+		this.safJournalpostQueryService = safJournalpostQueryService;
 	}
 
 	@Handler
-	public SendDigitalPost distribuerForsendelseTilDPIService(DistribuerForsendelseTilDpi distribuerForsendelseTilDpi, Exchange exchange){
+	public SendDigitalPost distribuerForsendelseTilDPIService(DistribuerForsendelseTilDpi distribuerForsendelseTilDpi) {
 
 		HentForsendelseResponseTo hentForsendelseResponseTo = administrerForsendelse.hentForsendelse(distribuerForsendelseTilDpi
 				.getForsendelseId());
+
 		validateForsendelseStatus(hentForsendelseResponseTo.getForsendelseStatus());
 
 		HentSikkerDigitalPostadresseResponseTo hentSikkerDigitalPostadresseResponseTo =
-				digitalKontaktinformasjonV1.hentSikkerDigitalPostadresse(hentForsendelseResponseTo.getMottaker().getMottakerId());
+				digitalKontaktinformasjonV1.hentSikkerDigitalPostadresse(hentForsendelseResponseTo.getMottaker()
+						.getMottakerId());
 
 		DokumenttypeInfoTo dokumenttypeInfoTo = dokumentkatalogAdmin.getDokumenttypeInfo(getDokumenttypeIdHoveddokument(hentForsendelseResponseTo));
 
-		VarselInfoTo varselInfoTo = varselInfo.getVarselInfo(dokumenttypeInfoTo.getVarselTypeId());
+
+		VarselInfoTo varselInfoTo = getVarselInfoIfVarselTypeIdIsPresent(dokumenttypeInfoTo);
 
 		hentSikkerDigitalPostadresseResponseTo = digitalKontaktInformasjonValidator.validateKontaktinfo(hentSikkerDigitalPostadresseResponseTo, varselInfoTo);
 
@@ -83,7 +89,17 @@ public class Qdist011Service {
 			producer.sendBody(LastOppDokumentRoute.ROUTE, dokdistDokument);
 		}
 
-		return bridgeMotSDPMapper.map(hentForsendelseResponseTo, hentSikkerDigitalPostadresseResponseTo, dokumenttypeInfoTo, varselInfoTo);
+		Journalpost journalpost = safJournalpostQueryService.hentJournalpost(hentForsendelseResponseTo.getArkivInformasjon().getArkivId());
+
+		return bridgeMotSDPMapper.map(hentForsendelseResponseTo, hentSikkerDigitalPostadresseResponseTo, dokumenttypeInfoTo, varselInfoTo, journalpost);
+	}
+
+	private VarselInfoTo getVarselInfoIfVarselTypeIdIsPresent(DokumenttypeInfoTo dokumenttypeInfoTo){
+		if(!(dokumenttypeInfoTo == null)){
+			return varselInfo.getVarselInfo(dokumenttypeInfoTo.getVarselTypeId());
+		}else{
+			return null;
+		}
 	}
 
 	private List<DokdistDokument> getDocumentsFromS3(HentForsendelseResponseTo hentForsendelseResponseTo) {

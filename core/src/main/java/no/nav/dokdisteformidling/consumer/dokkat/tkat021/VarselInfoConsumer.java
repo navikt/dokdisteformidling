@@ -2,12 +2,10 @@ package no.nav.dokdisteformidling.consumer.dokkat.tkat021;
 
 import static java.lang.String.format;
 
-
 import no.nav.dokdisteformidling.config.alias.ServiceuserAlias;
 import no.nav.dokdisteformidling.config.cache.LokalCacheConfig;
 import no.nav.dokdisteformidling.constants.DomainConstants;
 import no.nav.dokdisteformidling.constants.RetryConstants;
-import no.nav.dokdisteformidling.exception.functional.Tkat020FunctionalException;
 import no.nav.dokdisteformidling.exception.functional.Tkat021FunctionalException;
 import no.nav.dokdisteformidling.exception.technical.AbstractDokdisteformidlingTechnicalException;
 import no.nav.dokdisteformidling.exception.technical.Tkat021TechnicalException;
@@ -48,7 +46,6 @@ public class VarselInfoConsumer implements VarselInfo {
 				.build();
 	}
 
-
 	@Override
 	@Cacheable(LokalCacheConfig.TKAT021_CACHE)
 	@Retryable(include = AbstractDokdisteformidlingTechnicalException.class, backoff = @Backoff(delay = RetryConstants.DELAY_SHORT, multiplier = RetryConstants.MULTIPLIER_SHORT))
@@ -71,21 +68,17 @@ public class VarselInfoConsumer implements VarselInfo {
 				.varselTypeId(response.getVarseltypeId())
 				.stoppRepeterendeVarsel(response.getRevarslingIntervall() != null)
 				.antallDagerListe(toDagerListe(response))
-				.varslingsTekst(getVarslingsTekst(response).toString())
-				.preferertKanal(response.getPreferertKanal().toString())
+				.varslingsTekst(getVarslingsTekst(response))
+				.preferertKanal(response.getPreferertKanal())
 				.build();
 	}
 
-	private VarselMalRestTo getVarslingsTekst(VarselInfoRestTo varselInfoRestTo){
+	private String getVarslingsTekst(VarselInfoRestTo varselInfoRestTo) {
 
-		//Todo
-		//Denne er ikke riktig! Skal ikke sjekke distribusjonskanal, men preferert kanal?
-		//Sjekk tdist004/qdist104?
 		return varselInfoRestTo.getVarselmals().stream()
-				.filter(VarselMalRestTo -> DomainConstants.DISTRIBUSJONS_KANAL.equals(VarselMalRestTo.getKanal()))
+				.filter(varselMalRestTo -> DomainConstants.DISTRIBUSJONS_KANAL.equals(varselMalRestTo.getKanal()))
 				.findAny()
-				.orElseThrow(() -> new Tkat021FunctionalException(format("Fant ingen distribusjonVarsel med varselForDistribusjonKanal=%s for dokumenttypeId=%s",
-						DomainConstants.DISTRIBUSJONS_KANAL, varselInfoRestTo.getVarseltypeId())));
+				.orElse(new VarselMalRestTo()).getFoerstegangsvarselTekst();
 	}
 
 	private String toDagerListe(VarselInfoRestTo varselInfoRestTo) {

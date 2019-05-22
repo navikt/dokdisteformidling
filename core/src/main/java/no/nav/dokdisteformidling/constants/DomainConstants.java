@@ -3,7 +3,7 @@ package no.nav.dokdisteformidling.constants;
 /**
  * @author Sigurd Midttun, Visma Consulting.
  */
-public class DomainConstants {
+public final class DomainConstants {
 
 	public static final String HOVEDDOKUMENT = "HOVEDDOKUMENT";
 	public static final String VEDLEGG = "VEDLEGG";

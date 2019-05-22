@@ -1,6 +1,5 @@
 package no.nav.dokdisteformidling.qdist011;
 
-import static no.nav.dokdisteformidling.constants.MdcConstants.CALL_ID;
 import static org.apache.camel.LoggingLevel.ERROR;
 
 import com.google.common.base.Charsets;
@@ -12,7 +11,6 @@ import org.apache.camel.ValidationException;
 import org.apache.camel.converter.jaxb.JaxbDataFormat;
 import org.apache.camel.spi.DataFormat;
 import org.apache.camel.spring.SpringRouteBuilder;
-import org.slf4j.MDC;
 import org.springframework.stereotype.Component;
 
 import javax.inject.Inject;
@@ -77,20 +75,15 @@ public class Qdist011Route extends SpringRouteBuilder {
 				.routeId(QDIST011_SERVICE_ID)
 				.routePolicy(qdist0011MetricsRoutePolicy)
 				.setExchangePattern(ExchangePattern.InOnly)
-				.doTry()
-				.setProperty(PROPERTY_BESTILLINGS_ID, simple("${in.header.callId}", String.class))
-				.setProperty(PROPERTY_FORSENDELSE_ID, xpath("//forsendelseId/text()", String.class))
+				.process(new IdsProcessor())
 				.log(LoggingLevel.INFO, log, "qdist011 har mottatt forsendelse med " + getIdsForLogging())
-				.process(exchange -> MDC.put(CALL_ID, (String) exchange.getProperty(PROPERTY_BESTILLINGS_ID)))
-				.doCatch(Exception.class)
-				.end()
 				.to("validator:no/nav/meldinger/virksomhet/dokdistfordeling/xsd/qdist008/out/distribuertilkanal.xsd")
 				.unmarshal(new JaxbDataFormat(JAXBContext.newInstance(DistribuerTilKanal.class)))
 				.bean(distribuerForsendelseTilDpiMapper)
 				.bean(qdist011Service)
 				.marshal(digitalpostFormat).convertBodyTo(String.class, Charsets.UTF_8.toString())
 				.to("jms:" + tdist005.getQueueName())
-				.log(LoggingLevel.INFO, log, "qdist011 har lagt forsendelse med " + getIdsForLogging() + " på NFS filshare for distribusjon via DPI")
+				.log(LoggingLevel.INFO, log, "qdist011 har lagt forsendelse med " + getIdsForLogging() + " på kø til tdist005for distribusjon via DPI")
 				.bean(dokdistStatusUpdater)
 				.log(LoggingLevel.INFO, log, "qdist011 har oppdatert forsendelseStatus i dokdist og avslutter behandling av forsendelse med " + getIdsForLogging());
 	}

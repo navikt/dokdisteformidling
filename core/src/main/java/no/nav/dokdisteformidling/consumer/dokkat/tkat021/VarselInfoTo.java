@@ -3,6 +3,8 @@ package no.nav.dokdisteformidling.consumer.dokkat.tkat021;
 import lombok.Builder;
 import lombok.Value;
 
+import java.util.Set;
+
 /**
  * @author Olav Røstvold Thorsen, Visma Consulting.
  */
@@ -14,5 +16,5 @@ public class VarselInfoTo {
 	private final boolean stoppRepeterendeVarsel;
 	private final String varslingsTekst;
 	private final String antallDagerListe;
-	private final String preferertKanal;
+	private final Set<String> preferertKanal;
 }

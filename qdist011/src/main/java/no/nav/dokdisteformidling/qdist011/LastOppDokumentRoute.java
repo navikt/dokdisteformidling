@@ -17,8 +17,8 @@ public class LastOppDokumentRoute extends SpringRouteBuilder {
 
 	private static final String PROPERTY_FILNAVN = "filnavn";
 	private static final String SFTP_FILE_CONFIG = "binary=true&fileName=${exchangeProperty." + PROPERTY_FILNAVN + "}&";
-	private static final String SFTP_SECURITY_CONFIG = "privateKeyFile={{sftp.privateKeyFile}}&privateKeyPassphrase={{sftp.privateKeyPassphrase}}&preferredAuthentications=publickey";
-	private static final String SFTP_SERVER = "sftp://{{sftp.url}}:{{sftp.port}}/{{sftp.remoteFilePath}}?username={{sftp.username}}&***passord=gammelt_passord***;
+//	private static final String SFTP_SECURITY_CONFIG = "privateKeyFile={{sftp.privateKeyFile}}&privateKeyPassphrase={{sftp.privateKeyPassphrase}}&preferredAuthentications=publickey";
+//	private static final String SFTP_SERVER = "sftp://{{sftp.url}}:{{sftp.port}}/{{sftp.remoteFilePath}}?username={{sftp.username}}&***passord=gammelt_passord***;
 
 	@Override
 	public void configure() {
@@ -27,7 +27,7 @@ public class LastOppDokumentRoute extends SpringRouteBuilder {
 				.setExchangePattern(ExchangePattern.InOnly)
 				.setProperty(PROPERTY_FILNAVN, bodyAs(DokdistDokument.class).method("getDokumentObjektReferanse"))
 				.setBody(bodyAs(DokdistDokument.class).method("getPdf"))
-				.to(SFTP_SERVER)
+//				.to(SFTP_SERVER)
 				.log(LoggingLevel.INFO, log, "qdist011 har lastet opp ${exchangeProperty." + PROPERTY_FILNAVN + "}.pdf til NFS fileshare for distribusjon via DPI");
 	}
 }
