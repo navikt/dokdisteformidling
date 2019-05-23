@@ -1,7 +1,9 @@
 package no.nav.dokdisteformidling.consumer.dki;
 
 import lombok.Builder;
+import lombok.Data;
 import lombok.Value;
+
 
 import javax.xml.datatype.XMLGregorianCalendar;
 
@@ -16,13 +18,13 @@ public class HentSikkerDigitalPostadresseResponseTo {
 	private final DigitalPostkasse sikkerDigitalPostkasse;
 	private final byte[] sertifikat;
 
-	@Value
+	@Data
 	@Builder
 	public static class Kontaktinformasjon {
 		private final String personident;
 		private final String reservasjon;
-		private final Epostadresse epostadresse;
-		private final Mobiltelefonnummer mobiltelefonnummer;
+		private Epostadresse epostadresse;
+		private Mobiltelefonnummer mobiltelefonnummer;
 	}
 
 	@Value
@@ -47,4 +49,5 @@ public class HentSikkerDigitalPostadresseResponseTo {
 		private final String leverandoerAdresse;
 		private final String brukerAdresse;
 	}
+
 }

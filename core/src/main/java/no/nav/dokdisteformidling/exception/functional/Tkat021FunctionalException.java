@@ -8,4 +8,8 @@ public class Tkat021FunctionalException extends AbstractDokdisteformidlingFuncti
 	public Tkat021FunctionalException(String message, Throwable cause) {
 		super(message, cause);
 	}
+
+	public Tkat021FunctionalException(String message) {
+		super(message);
+	}
 }

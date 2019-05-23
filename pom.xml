@@ -41,6 +41,7 @@
 		<dokkat-schemas.version>10.4.2</dokkat-schemas.version>
 		<melding-virksomhet-dokdistfordeling.version>2.0.4</melding-virksomhet-dokdistfordeling.version>
 		<nav-digitalKontaktinformasjon-v1-tjenestespesifikasjon>2.0.0</nav-digitalKontaktinformasjon-v1-tjenestespesifikasjon>
+		<sdpkanal-tjenestespesifikasjon.version>1.1.0</sdpkanal-tjenestespesifikasjon.version>
 	</properties>
 
 	<dependencyManagement>
@@ -64,6 +65,12 @@
 				<groupId>no.nav.dokdisteformidling</groupId>
 				<artifactId>qdist011</artifactId>
 				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>no.nav.tjenester</groupId>
+				<artifactId>nav-sdpkanal-tjenestespesifikasjon</artifactId>
+				<version>${sdpkanal-tjenestespesifikasjon.version}</version>
+				<classifier>jaxws</classifier>
 			</dependency>
 			<dependency>
 				<groupId>javax.inject</groupId>

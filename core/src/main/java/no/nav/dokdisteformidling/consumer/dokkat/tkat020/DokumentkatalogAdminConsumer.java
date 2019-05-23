@@ -81,6 +81,7 @@ class DokumentkatalogAdminConsumer implements DokumentkatalogAdmin {
 
 		return DokumenttypeInfoTo.builder()
 				.varselTypeId(distribusjonVarsel.getVarseltypeId())
+				.sikkerhetsnivaa(response.getDokumentProduksjonsInfo().getDistribusjonInfo().getSikkerhetsnivaa())
 				.build();
 	}
 

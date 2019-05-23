@@ -2,15 +2,16 @@ package no.nav.dokdisteformidling.consumer.dokkat.tkat021;
 
 import static java.lang.String.format;
 
-
 import no.nav.dokdisteformidling.config.alias.ServiceuserAlias;
 import no.nav.dokdisteformidling.config.cache.LokalCacheConfig;
+import no.nav.dokdisteformidling.constants.DomainConstants;
 import no.nav.dokdisteformidling.constants.RetryConstants;
 import no.nav.dokdisteformidling.exception.functional.Tkat021FunctionalException;
 import no.nav.dokdisteformidling.exception.technical.AbstractDokdisteformidlingTechnicalException;
 import no.nav.dokdisteformidling.exception.technical.Tkat021TechnicalException;
 import no.nav.dokdisteformidling.metrics.Monitor;
 import no.nav.dokkat.schemas.tkat021.VarselInfoRestTo;
+import no.nav.dokkat.schemas.tkat021.VarselMalRestTo;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.cache.annotation.Cacheable;
@@ -45,7 +46,6 @@ public class VarselInfoConsumer implements VarselInfo {
 				.build();
 	}
 
-
 	@Override
 	@Cacheable(LokalCacheConfig.TKAT021_CACHE)
 	@Retryable(include = AbstractDokdisteformidlingTechnicalException.class, backoff = @Backoff(delay = RetryConstants.DELAY_SHORT, multiplier = RetryConstants.MULTIPLIER_SHORT))
@@ -67,6 +67,26 @@ public class VarselInfoConsumer implements VarselInfo {
 		return VarselInfoTo.builder()
 				.varselTypeId(response.getVarseltypeId())
 				.stoppRepeterendeVarsel(response.getRevarslingIntervall() != null)
+				.antallDagerListe(toDagerListe(response))
+				.varslingsTekst(getVarslingsTekst(response))
+				.preferertKanal(response.getPreferertKanal())
 				.build();
 	}
+
+	private String getVarslingsTekst(VarselInfoRestTo varselInfoRestTo) {
+
+		return varselInfoRestTo.getVarselmals().stream()
+				.filter(varselMalRestTo -> DomainConstants.DISTRIBUSJONS_KANAL.equals(varselMalRestTo.getKanal()))
+				.findAny()
+				.orElse(new VarselMalRestTo()).getFoerstegangsvarselTekst();
+	}
+
+	private String toDagerListe(VarselInfoRestTo varselInfoRestTo) {
+		StringBuilder sb = new StringBuilder("0");
+		for (int i = 0; i < varselInfoRestTo.getAntallRevarslinger(); i++) {
+			sb.append(',').append(varselInfoRestTo.getRevarslingIntervall() * (i + 1));
+		}
+		return sb.toString();
+	}
+
 }
