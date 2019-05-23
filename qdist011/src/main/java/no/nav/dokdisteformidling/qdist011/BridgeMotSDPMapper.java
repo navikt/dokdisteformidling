@@ -30,7 +30,7 @@ import no.nav.dokdisteformidling.consumer.dokkat.tkat020.DokumenttypeInfoTo;
 import no.nav.dokdisteformidling.consumer.dokkat.tkat021.VarselInfoTo;
 import no.nav.dokdisteformidling.consumer.rdist001.HentForsendelseResponseTo;
 import no.nav.dokdisteformidling.consumer.saf.journalpost.SafJournalpostTo;
-import no.nav.dokdisteformidling.exception.functional.DokumentInfoIdIkkeFunnetFunctionalException;
+import no.nav.dokdisteformidling.exception.functional.TDist005MapperFunctionalException;
 import no.nav.tjeneste.virksomhet.digitalpost.senddigitalpost.v1.ObjectFactory;
 import no.nav.tjeneste.virksomhet.digitalpost.senddigitalpost.v1.SendDigitalPost;
 import no.nav.tjeneste.virksomhet.digitalpost.senddigitalpost.v1.meldinger.SendDigitalPostRequest;
@@ -171,9 +171,13 @@ public class BridgeMotSDPMapper {
 		tittelHoveddokument.setValue(hentForsendelseResponseTo.getForsendelseTittel());
 		Dokument hoveddokument = new Dokument();
 		hoveddokument.setHref(hentForsendelseResponseTo.getDokumenter().stream()
-				.filter(DokumentTo -> DomainConstants.HOVEDDOKUMENT.equals(DokumentTo.getTilknyttetSom()))
+				.filter(dokumentTo -> DomainConstants.HOVEDDOKUMENT.equals(dokumentTo.getTilknyttetSom()))
 				.findAny()
-				.map(HentForsendelseResponseTo.DokumentTo::getDokumentObjektReferanse).toString().concat(".pdf"));
+				.map(HentForsendelseResponseTo.DokumentTo::getDokumentObjektReferanse)
+				.orElseThrow(() -> new TDist005MapperFunctionalException(
+						String.format("Kunne ikke finne hoveddokument for bestilling med bestillingsId=%s",
+								hentForsendelseResponseTo.getBestillingsId())))
+				.concat(".pdf"));
 		hoveddokument.setMime(DOKUMENT_MIME);
 		hoveddokument.setTittel(tittelHoveddokument);
 
@@ -195,8 +199,9 @@ public class BridgeMotSDPMapper {
 									.filter(dokumentInfo -> dokumentInfo.getDokumentInfoId()
 											.equals(dokumentTo.getArkivDokumentInfoId()))
 									.findAny()
-									.orElseThrow(() -> new DokumentInfoIdIkkeFunnetFunctionalException(String.format("DokumentInfoId=%s ikke funnet i journalpost", dokumentTo
-											.getArkivDokumentInfoId())))
+									.orElseThrow(() -> new TDist005MapperFunctionalException(
+											String.format("DokumentInfoId=%s ikke funnet i journalpost",
+													dokumentTo.getArkivDokumentInfoId())))
 									.getTittel()
 					);
 					dokumentVedlegg.setTittel(tittelVedlegg);
