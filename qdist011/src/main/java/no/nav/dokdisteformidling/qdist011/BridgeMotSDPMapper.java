@@ -1,13 +1,17 @@
 package no.nav.dokdisteformidling.qdist011;
 
-import static no.nav.dokdisteformidling.constants.BridgeMotSDPMapperConstants.BUSINESS_SCOPE_TYPE;
-import static no.nav.dokdisteformidling.constants.BridgeMotSDPMapperConstants.DIGITAL_POST;
-import static no.nav.dokdisteformidling.constants.BridgeMotSDPMapperConstants.DOKUMENT_MIME;
-import static no.nav.dokdisteformidling.constants.BridgeMotSDPMapperConstants.EPOST;
-import static no.nav.dokdisteformidling.constants.BridgeMotSDPMapperConstants.ORGANISASJON_IDENTIFIER;
-import static no.nav.dokdisteformidling.constants.BridgeMotSDPMapperConstants.SMS;
-import static no.nav.dokdisteformidling.constants.BridgeMotSDPMapperConstants.STANDARD;
-import static no.nav.dokdisteformidling.constants.BridgeMotSDPMapperConstants.VERSION;
+import static no.nav.dokdisteformidling.qdist011.constants.BridgeMotSDPMapperConstants.AUTHORITY;
+import static no.nav.dokdisteformidling.qdist011.constants.BridgeMotSDPMapperConstants.AUTHORITY_ENUM;
+import static no.nav.dokdisteformidling.qdist011.constants.BridgeMotSDPMapperConstants.BUSINESS_SCOPE_TYPE;
+import static no.nav.dokdisteformidling.qdist011.constants.BridgeMotSDPMapperConstants.DIGITAL_POST;
+import static no.nav.dokdisteformidling.qdist011.constants.BridgeMotSDPMapperConstants.DOKUMENT_MIME;
+import static no.nav.dokdisteformidling.qdist011.constants.BridgeMotSDPMapperConstants.EPOST;
+import static no.nav.dokdisteformidling.qdist011.constants.BridgeMotSDPMapperConstants.ORGNR_NAV;
+import static no.nav.dokdisteformidling.qdist011.constants.BridgeMotSDPMapperConstants.ORG_PREFIX;
+import static no.nav.dokdisteformidling.qdist011.constants.BridgeMotSDPMapperConstants.SMS;
+import static no.nav.dokdisteformidling.qdist011.constants.BridgeMotSDPMapperConstants.SPRAAK_KODE;
+import static no.nav.dokdisteformidling.qdist011.constants.BridgeMotSDPMapperConstants.STANDARD;
+import static no.nav.dokdisteformidling.qdist011.constants.BridgeMotSDPMapperConstants.VERSION;
 import static no.nav.dokdisteformidling.qdist011.Qdist011FunctionalUtils.getNow;
 
 import no.difi.begrep.sdp.schema_v10.Avsender;
@@ -43,6 +47,7 @@ import org.unece.cefact.namespaces.standardbusinessdocumentheader.Scope;
 import org.unece.cefact.namespaces.standardbusinessdocumentheader.StandardBusinessDocument;
 import org.unece.cefact.namespaces.standardbusinessdocumentheader.StandardBusinessDocumentHeader;
 
+import javax.xml.bind.JAXBElement;
 import java.util.List;
 
 /**
@@ -64,8 +69,11 @@ public class BridgeMotSDPMapper {
 		standardBusinessDocument.setStandardBusinessDocumentHeader(mapStandardBusinessDocumentHeader(
 				hentSikkerDigitalPostadresseResponseTo, hentForsendelseResponsTo));
 
-		standardBusinessDocument.setAny(mapDigitalPost(hentSikkerDigitalPostadresseResponseTo, hentForsendelseResponsTo,
-				dokumenttypeInfoTo, varselInfoTo));
+		DigitalPost digitalPost = mapDigitalPost(hentSikkerDigitalPostadresseResponseTo, hentForsendelseResponsTo,
+				dokumenttypeInfoTo, varselInfoTo);
+		// create jaxbwrapper for Digitalpost to avoid needing @XmlRootElement annotation
+		JAXBElement<DigitalPost> jaxbDigitalPost = new no.difi.begrep.sdp.schema_v10.ObjectFactory().createDigitalPost(digitalPost);
+		standardBusinessDocument.setAny(jaxbDigitalPost);
 
 		sendDigitalPostRequest.setStandardBusinessDocument(standardBusinessDocument);
 		sendDigitalPostRequest.setManifest(mapManifest(hentSikkerDigitalPostadresseResponseTo, hentForsendelseResponsTo, safJournalpostTo));
@@ -101,11 +109,18 @@ public class BridgeMotSDPMapper {
 
 		Partner sender = new Partner();
 		PartnerIdentification senderIdentification = new PartnerIdentification();
-		senderIdentification.setValue(ORGANISASJON_IDENTIFIER);
+		senderIdentification.setValue(ORGNR_NAV);
+		senderIdentification.setAuthority(AUTHORITY);
+		sender.setIdentifier(senderIdentification);
 		Partner receiver = new Partner();
 		PartnerIdentification receiverIdentification = new PartnerIdentification();
-		receiverIdentification.setValue(hentSikkerDigitalPostadresseResponseTo.getSikkerDigitalPostkasse()
-				.getLeverandoerAdresse());
+		String leverandoerAdresse = hentSikkerDigitalPostadresseResponseTo.getSikkerDigitalPostkasse().getLeverandoerAdresse();
+		if (leverandoerAdresse != null && !leverandoerAdresse.startsWith(ORG_PREFIX)) {
+			leverandoerAdresse = ORG_PREFIX + leverandoerAdresse;
+		}
+		receiverIdentification.setValue(leverandoerAdresse);
+		receiverIdentification.setAuthority(AUTHORITY);
+		receiver.setIdentifier(receiverIdentification);
 
 		List<Partner> senderList = standardBusinessDocumentHeader.getSender();
 		senderList.add(sender);
@@ -127,6 +142,7 @@ public class BridgeMotSDPMapper {
 
 		Tittel forsendelseTittel = new Tittel();
 		forsendelseTittel.setValue(hentForsendelseResponseTo.getForsendelseTittel());
+		forsendelseTittel.setLang(SPRAAK_KODE);
 		digitalPostInfo.setIkkeSensitivTittel(forsendelseTittel);
 
 
@@ -157,7 +173,8 @@ public class BridgeMotSDPMapper {
 
 	private Avsender mapAvsender() {
 		Organisasjon organisasjon = new Organisasjon();
-		organisasjon.setValue(ORGANISASJON_IDENTIFIER);
+		organisasjon.setValue(ORGNR_NAV);
+		organisasjon.setAuthority(AUTHORITY_ENUM);
 		Avsender avsender = new Avsender();
 		avsender.setOrganisasjon(organisasjon);
 
@@ -169,6 +186,7 @@ public class BridgeMotSDPMapper {
 								 SafJournalpostTo safJournalpostTo) {
 		Tittel tittelHoveddokument = new Tittel();
 		tittelHoveddokument.setValue(hentForsendelseResponseTo.getForsendelseTittel());
+		tittelHoveddokument.setLang(SPRAAK_KODE);
 		Dokument hoveddokument = new Dokument();
 		hoveddokument.setHref(hentForsendelseResponseTo.getDokumenter().stream()
 				.filter(dokumentTo -> DomainConstants.HOVEDDOKUMENT.equals(dokumentTo.getTilknyttetSom()))
@@ -204,6 +222,7 @@ public class BridgeMotSDPMapper {
 													dokumentTo.getArkivDokumentInfoId())))
 									.getTittel()
 					);
+					tittelVedlegg.setLang(SPRAAK_KODE);
 					dokumentVedlegg.setTittel(tittelVedlegg);
 					dokumentVedlegg.setHref(dokumentTo.getDokumentObjektReferanse().concat(".pdf"));
 					dokumentVedlegg.setMime(DOKUMENT_MIME);
@@ -228,11 +247,11 @@ public class BridgeMotSDPMapper {
 		if ((isPreferertKanalEpost(varselInfoTo) || isMobilDateInvalid) && !isEpostDateInvalid) {
 			varsler = new Varsler();
 			EpostVarsel epostVarsel = new EpostVarsel();
-			EpostVarselTekst epostVarselTekst = new EpostVarselTekst();
-			epostVarselTekst.setValue(varselInfoTo.getVarslingsTekst());
 			epostVarsel.setEpostadresse(hentSikkerDigitalPostadresseResponseTo.getDigitalKontaktinformasjon()
-					.getEpostadresse()
-					.toString());
+					.getEpostadresse().getValue());
+			EpostVarselTekst epostVarselTekst = new EpostVarselTekst();
+			epostVarselTekst.setValue(varselInfoTo.getVarslingsTekst().get(EPOST));
+			epostVarselTekst.setLang(SPRAAK_KODE);
 			epostVarsel.setVarslingsTekst(epostVarselTekst);
 			varsler.setEpostVarsel(epostVarsel);
 		}
@@ -243,10 +262,10 @@ public class BridgeMotSDPMapper {
 			}
 			SmsVarsel smsVarsel = new SmsVarsel();
 			smsVarsel.setMobiltelefonnummer(hentSikkerDigitalPostadresseResponseTo.getDigitalKontaktinformasjon()
-					.getMobiltelefonnummer()
-					.toString());
+					.getMobiltelefonnummer().getValue());
 			SmsVarselTekst smsVarselTekst = new SmsVarselTekst();
-			smsVarselTekst.setValue(varselInfoTo.getVarslingsTekst());
+			smsVarselTekst.setValue(varselInfoTo.getVarslingsTekst().get(SMS));
+			smsVarselTekst.setLang(SPRAAK_KODE);
 			smsVarsel.setVarslingsTekst(smsVarselTekst);
 			varsler.setSmsVarsel(smsVarsel);
 		}

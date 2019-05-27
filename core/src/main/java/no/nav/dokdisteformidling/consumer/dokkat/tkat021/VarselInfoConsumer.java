@@ -24,6 +24,8 @@ import org.springframework.web.client.RestTemplate;
 
 import javax.inject.Inject;
 import java.time.Duration;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author Olav Røstvold Thorsen, Visma Consulting.
@@ -73,12 +75,12 @@ public class VarselInfoConsumer implements VarselInfo {
 				.build();
 	}
 
-	private String getVarslingsTekst(VarselInfoRestTo varselInfoRestTo) {
+	private Map<String, String> getVarslingsTekst(VarselInfoRestTo varselInfoRestTo) {
 
-		return varselInfoRestTo.getVarselmals().stream()
-				.filter(varselMalRestTo -> DomainConstants.DISTRIBUSJONS_KANAL.equals(varselMalRestTo.getKanal()))
-				.findAny()
-				.orElse(new VarselMalRestTo()).getFoerstegangsvarselTekst();
+		Map<String, String> varslingsTekst = new HashMap<>();
+		varselInfoRestTo.getVarselmals().stream().forEach(
+				varselMalRestTo -> varslingsTekst.put(varselMalRestTo.getKanal(), varselMalRestTo.getFoerstegangsvarselTekst()));
+		return varslingsTekst;
 	}
 
 	private String toDagerListe(VarselInfoRestTo varselInfoRestTo) {
