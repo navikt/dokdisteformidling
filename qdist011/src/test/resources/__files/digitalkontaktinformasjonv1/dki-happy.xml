@@ -1,0 +1,23 @@
+<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+	<soap:Body>
+		<ns2:HentSikkerDigitalPostadresseResponse xmlns:ns2="http://nav.no/tjeneste/virksomhet/digitalKontaktinformasjon/v1">
+			<response>
+				<sikkerDigitalKontaktinformasjon>
+					<digitalKontaktinformasjon>
+						<personident>***gammelt_fnr***</personident>
+						<reservasjon>NEI</reservasjon>
+						<epostadresse sistVerifisert="insertDateHere"
+									  sistOppdatert="insertDateHere">er@mocked.data</epostadresse>
+						<mobiltelefonnummer sistOppdatert="insertDateHere"
+											sistVerifisert="insertDateHere">54621378</mobiltelefonnummer>
+					</digitalKontaktinformasjon>
+					<sikkerDigitalPostkasse>
+						<leverandoerAdresse>9908:123456789</leverandoerAdresse>
+						<brukerAdresse>bjarnebetjent@digipost.no</brukerAdresse>
+					</sikkerDigitalPostkasse>
+					<sertifikat>dmVsZGlnIGJyYSBzZXJ0aWZpa2F0</sertifikat>
+				</sikkerDigitalKontaktinformasjon>
+			</response>
+		</ns2:HentSikkerDigitalPostadresseResponse>
+	</soap:Body>
+</soap:Envelope>
