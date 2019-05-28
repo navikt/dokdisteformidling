@@ -2,7 +2,6 @@ package no.nav.dokdisteformidling.qdist011;
 
 import static no.nav.dokdisteformidling.qdist011.constants.BridgeMotSDPMapperConstants.DATE_VALID_MONTHS;
 import static no.nav.dokdisteformidling.qdist011.constants.BridgeMotSDPMapperConstants.RESERVASJON;
-import static no.nav.dokdisteformidling.qdist011.constants.BridgeMotSDPMapperConstants.SMS;
 
 import no.nav.dokdisteformidling.consumer.dki.HentSikkerDigitalPostadresseResponseTo;
 import no.nav.dokdisteformidling.consumer.dokkat.tkat021.VarselInfoTo;
@@ -68,16 +67,25 @@ public class DigitalKontaktInformasjonValidator {
 
 	public static boolean isEpostInvalid(HentSikkerDigitalPostadresseResponseTo.Epostadresse epostadresse) {
 
-		boolean isEmailOutdated = isInvalidDate(epostadresse.getSistVerifisert()) && isInvalidDate(epostadresse.getSistOppdatert());
+		if (epostadresse == null) {
+			return true;
+		} else {
+			boolean isEmailOutdated = isInvalidDate(epostadresse.getSistVerifisert()) && isInvalidDate(epostadresse.getSistOppdatert());
 
-		return (epostadresse == null) || StringUtils.isBlank(epostadresse.getValue()) || isEmailOutdated;
+			return StringUtils.isBlank(epostadresse.getValue()) || isEmailOutdated;
+		}
 	}
 
 	public static boolean isMobilInvalid(HentSikkerDigitalPostadresseResponseTo.Mobiltelefonnummer mobiltelefonnummer) {
 
-		boolean isMobilOutdated = isInvalidDate(mobiltelefonnummer.getSistVerifisert()) && isInvalidDate(mobiltelefonnummer.getSistOppdatert());
+		if (mobiltelefonnummer == null) {
+			return true;
+		} else {
 
-		return (mobiltelefonnummer == null) || StringUtils.isBlank(mobiltelefonnummer.getValue()) || isMobilOutdated;
+			boolean isMobilOutdated = isInvalidDate(mobiltelefonnummer.getSistVerifisert()) && isInvalidDate(mobiltelefonnummer.getSistOppdatert());
+
+			return (mobiltelefonnummer == null) || StringUtils.isBlank(mobiltelefonnummer.getValue()) || isMobilOutdated;
+		}
 	}
 
 	private void verifyEmailAndPhone(HentSikkerDigitalPostadresseResponseTo hentSikkerDigitalPostadresseResponseTo) {
