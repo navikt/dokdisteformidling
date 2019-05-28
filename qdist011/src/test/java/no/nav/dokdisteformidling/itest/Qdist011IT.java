@@ -22,6 +22,7 @@ import static org.awaitility.Awaitility.await;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.when;
@@ -64,6 +65,8 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * @author Erik Bråten, Visma Consulting
@@ -82,7 +85,6 @@ public class Qdist011IT {
 	private static final String DOKUMENT_OBJEKT_REFERANSE_HOVEDDOK = "dokumentObjektReferanseHoveddok";
 	private static final String DOKUMENT_OBJEKT_REFERANSE_VEDLEGG1 = "dokumentObjektReferanseVedlegg1";
 	private static final String DOKUMENT_OBJEKT_REFERANSE_VEDLEGG2 = "dokumentObjektReferanseVedlegg2";
-	private static final String DOKUMENT_OBJEKT_REFERANSE_HOVEDDOK_CORRUPT = "dokumentObjektReferanseHoveddokCorrupt";
 	private static final String HOVEDDOK_TEST_CONTENT = "HOVEDDOK_TEST_CONTENT";
 	private static final String VEDLEGG1_TEST_CONTENT = "VEDLEGG1_TEST_CONTENT";
 	private static final String VEDLEGG2_TEST_CONTENT = "VEDLEGG2_TEST_CONTENT";
@@ -149,25 +151,12 @@ public class Qdist011IT {
 	@Test
 	public void shouldProcessForsendelse() throws Exception {
 
-		stubFor(get("/administrerforsendelse/" + FORSENDELSE_ID).willReturn(aResponse().withStatus(HttpStatus.OK.value())
-				.withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE)
-				.withBody(classpathToString("__files/rjoark001/getForsendelse-happy.json")
-						.replace("insertCallIdHere", CALL_ID))));
-		stubFor(post("/digitalkontaktinformasjonv1").willReturn(aResponse().withStatus(HttpStatus.OK.value())
-				.withBody(classpathToString("__files/digitalkontaktinformasjonv1/dki-happy.xml")
-						.replace("insertDateHere", Qdist011FunctionalUtils.getNow().toString()))));
-		stubFor(get(urlMatching("/dokumenttypeinfo/" + DOKUMENTTYPE_ID_HOVEDDOK)).willReturn(aResponse().withStatus(HttpStatus.OK.value())
-				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
-				.withBodyFile("dokumentinfov4/tkat020-happy.json")));
-		stubFor(get(urlMatching("/varselinfo/" + VARSEL_TYPE_ID)).willReturn(aResponse().withStatus(HttpStatus.OK.value())
-				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
-				.withBodyFile("varselinfov1/tkat021-happy.json")));
-		stubFor(post(urlMatching("/safgraphql")).willReturn(aResponse().withStatus(HttpStatus.OK.value())
-				.withHeader(org.springframework.http.HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_UTF8_VALUE)
-				.withBodyFile("saf/safGraphQlResponse-happy.json")));
-		stubFor(get("/securitytoken?grant_type=client_credentials&scope=openid").willReturn(aResponse().withStatus(HttpStatus.OK.value())
-				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
-				.withBodyFile("securitytoken/stsResponse-happy.json")));
+		stubGetForsendelse("__files/rjoark001/getForsendelse-happy.json");
+		stubPostDigitalKontaktInformasjon();
+		stubGetDokumentTypeInfo("dokumentinfov4/tkat020-happy.json");
+		stubGetVarselInfo();
+		stubPostSafJournalpost("saf/safGraphQlResponse-happy.json");
+		stubGetSecurityToken();
 		stubFor(put("/administrerforsendelse?forsendelseId=" + FORSENDELSE_ID + "&forsendelseStatus=OVERSENDT")
 				.willReturn(aResponse().withStatus(HttpStatus.OK.value())));
 
@@ -181,7 +170,7 @@ public class Qdist011IT {
 
 			String response = receive(tdist005);
 			String expected = classpathToString("tdist005/tdist005-happy.xml").replace("insertCallIdHere", CALL_ID);
-			assertEquals(replaceCreationDateAndTime(expected), replaceCreationDateAndTime(response));
+			assertEquals(comparableMessage(expected), comparableMessage(response));
 		});
 
 		String hoveddokContent = fileToString(new File(uploadFilePath + DOKUMENT_OBJEKT_REFERANSE_HOVEDDOK + ".pdf"));
@@ -298,10 +287,7 @@ public class Qdist011IT {
 
 	@Test
 	public void shouldThrowInvalidForsendelseStatusException() throws Exception {
-		stubFor(get("/administrerforsendelse/" + FORSENDELSE_ID).willReturn(aResponse().withStatus(HttpStatus.OK.value())
-				.withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE)
-				.withBody(classpathToString("__files/rjoark001/getForsendelse-oversendtForsendelseStatus.json")
-						.replace("insertCallIdHere", CALL_ID))));
+		stubGetForsendelse("__files/rjoark001/getForsendelse-oversendtForsendelseStatus.json");
 
 		sendStringMessage(qdist011, classpathToString("qdist011/qdist011-happy.xml"));
 
@@ -323,10 +309,7 @@ public class Qdist011IT {
 
 	@Test
 	public void shouldThrowDigitalKontaktinformasjonV1KontaktinformasjonIkkeFunnetFunctionalException() throws Exception {
-		stubFor(get("/administrerforsendelse/" + FORSENDELSE_ID).willReturn(aResponse().withStatus(HttpStatus.OK.value())
-				.withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE)
-				.withBody(classpathToString("__files/rjoark001/getForsendelse-happy.json")
-						.replace("insertCallIdHere", CALL_ID))));
+		stubGetForsendelse("__files/rjoark001/getForsendelse-happy.json");
 		stubFor(post("/digitalkontaktinformasjonv1").willReturn(aResponse().withStatus(HttpStatus.OK.value())
 				.withBody(classpathToString("__files/digitalkontaktinformasjonv1/ikke-funnet.xml"))));
 
@@ -350,10 +333,7 @@ public class Qdist011IT {
 
 	@Test
 	public void shouldThrowDigitalKontaktinformasjonV1PersonIkkeFunnetFunctionalException() throws Exception {
-		stubFor(get("/administrerforsendelse/" + FORSENDELSE_ID).willReturn(aResponse().withStatus(HttpStatus.OK.value())
-				.withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE)
-				.withBody(classpathToString("__files/rjoark001/getForsendelse-happy.json")
-						.replace("insertCallIdHere", CALL_ID))));
+		stubGetForsendelse("__files/rjoark001/getForsendelse-happy.json");
 		stubFor(post("/digitalkontaktinformasjonv1").willReturn(aResponse().withStatus(HttpStatus.OK.value())
 				.withBody(classpathToString("__files/digitalkontaktinformasjonv1/person-ikke-funnet.xml"))));
 
@@ -377,10 +357,7 @@ public class Qdist011IT {
 
 	@Test
 	public void shouldThrowDigitalKontaktinformasjonV1SikkerhetsbegrensingFunctionalException() throws Exception {
-		stubFor(get("/administrerforsendelse/" + FORSENDELSE_ID).willReturn(aResponse().withStatus(HttpStatus.OK.value())
-				.withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE)
-				.withBody(classpathToString("__files/rjoark001/getForsendelse-happy.json")
-						.replace("insertCallIdHere", CALL_ID))));
+		stubGetForsendelse("__files/rjoark001/getForsendelse-happy.json");
 		stubFor(post("/digitalkontaktinformasjonv1").willReturn(aResponse().withStatus(HttpStatus.OK.value())
 				.withBody(classpathToString("__files/digitalkontaktinformasjonv1/sikkerhet.xml"))));
 
@@ -404,10 +381,7 @@ public class Qdist011IT {
 
 	@Test
 	public void shouldThrowDigitalKontaktinformasjonV1HentSikkerDigitalPostadresseTechnicalException() throws Exception {
-		stubFor(get("/administrerforsendelse/" + FORSENDELSE_ID).willReturn(aResponse().withStatus(HttpStatus.OK.value())
-				.withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE)
-				.withBody(classpathToString("__files/rjoark001/getForsendelse-happy.json")
-						.replace("insertCallIdHere", CALL_ID))));
+		stubGetForsendelse("__files/rjoark001/getForsendelse-happy.json");
 		stubFor(post("/digitalkontaktinformasjonv1").willReturn(aResponse().withStatus(HttpStatus.OK.value())
 				.withBody(classpathToString("__files/digitalkontaktinformasjonv1/securityError.xml"))));
 
@@ -431,13 +405,8 @@ public class Qdist011IT {
 
 	@Test
 	public void shouldThrowTkat020FunctionalException() throws Exception {
-		stubFor(get("/administrerforsendelse/" + FORSENDELSE_ID).willReturn(aResponse().withStatus(HttpStatus.OK.value())
-				.withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE)
-				.withBody(classpathToString("__files/rjoark001/getForsendelse-happy.json")
-						.replace("insertCallIdHere", CALL_ID))));
-		stubFor(post("/digitalkontaktinformasjonv1").willReturn(aResponse().withStatus(HttpStatus.OK.value())
-				.withBody(classpathToString("__files/digitalkontaktinformasjonv1/dki-happy.xml")
-						.replace("insertDateHere", Qdist011FunctionalUtils.getNow().toString()))));
+		stubGetForsendelse("__files/rjoark001/getForsendelse-happy.json");
+		stubPostDigitalKontaktInformasjon();
 		stubFor(get(urlMatching("/dokumenttypeinfo/" + DOKUMENTTYPE_ID_HOVEDDOK))
 				.willReturn(aResponse().withStatus(HttpStatus.NOT_FOUND.value())));
 
@@ -461,16 +430,9 @@ public class Qdist011IT {
 
 	@Test
 	public void shouldThrowTkat020FunctionalExceptionUtenDokumentProduksjonsInfo() throws Exception {
-		stubFor(get("/administrerforsendelse/" + FORSENDELSE_ID).willReturn(aResponse().withStatus(HttpStatus.OK.value())
-				.withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE)
-				.withBody(classpathToString("__files/rjoark001/getForsendelse-happy.json")
-						.replace("insertCallIdHere", CALL_ID))));
-		stubFor(post("/digitalkontaktinformasjonv1").willReturn(aResponse().withStatus(HttpStatus.OK.value())
-				.withBody(classpathToString("__files/digitalkontaktinformasjonv1/dki-happy.xml")
-						.replace("insertDateHere", Qdist011FunctionalUtils.getNow().toString()))));
-		stubFor(get(urlMatching("/dokumenttypeinfo/" + DOKUMENTTYPE_ID_HOVEDDOK)).willReturn(aResponse().withStatus(HttpStatus.OK.value())
-				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
-				.withBodyFile("dokumentinfov4/tkat020-utenDokumentProduksjonsInfo.json")));
+		stubGetForsendelse("__files/rjoark001/getForsendelse-happy.json");
+		stubPostDigitalKontaktInformasjon();
+		stubGetDokumentTypeInfo("dokumentinfov4/tkat020-utenDokumentProduksjonsInfo.json");
 
 		sendStringMessage(qdist011, classpathToString("qdist011/qdist011-happy.xml"));
 
@@ -492,16 +454,9 @@ public class Qdist011IT {
 
 	@Test
 	public void shouldThrowTkat020FunctionalExceptionUtenDistribusjonInfo() throws Exception {
-		stubFor(get("/administrerforsendelse/" + FORSENDELSE_ID).willReturn(aResponse().withStatus(HttpStatus.OK.value())
-				.withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE)
-				.withBody(classpathToString("__files/rjoark001/getForsendelse-happy.json")
-						.replace("insertCallIdHere", CALL_ID))));
-		stubFor(post("/digitalkontaktinformasjonv1").willReturn(aResponse().withStatus(HttpStatus.OK.value())
-				.withBody(classpathToString("__files/digitalkontaktinformasjonv1/dki-happy.xml")
-						.replace("insertDateHere", Qdist011FunctionalUtils.getNow().toString()))));
-		stubFor(get(urlMatching("/dokumenttypeinfo/" + DOKUMENTTYPE_ID_HOVEDDOK)).willReturn(aResponse().withStatus(HttpStatus.OK.value())
-				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
-				.withBodyFile("dokumentinfov4/tkat020-utenDistribusjonInfo.json")));
+		stubGetForsendelse("__files/rjoark001/getForsendelse-happy.json");
+		stubPostDigitalKontaktInformasjon();
+		stubGetDokumentTypeInfo("dokumentinfov4/tkat020-utenDistribusjonInfo.json");
 
 		sendStringMessage(qdist011, classpathToString("qdist011/qdist011-happy.xml"));
 
@@ -523,16 +478,9 @@ public class Qdist011IT {
 
 	@Test
 	public void shouldThrowTkat020FunctionalExceptionUtenSDPDistribusjonVarsel() throws Exception {
-		stubFor(get("/administrerforsendelse/" + FORSENDELSE_ID).willReturn(aResponse().withStatus(HttpStatus.OK.value())
-				.withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE)
-				.withBody(classpathToString("__files/rjoark001/getForsendelse-happy.json")
-						.replace("insertCallIdHere", CALL_ID))));
-		stubFor(post("/digitalkontaktinformasjonv1").willReturn(aResponse().withStatus(HttpStatus.OK.value())
-				.withBody(classpathToString("__files/digitalkontaktinformasjonv1/dki-happy.xml")
-						.replace("insertDateHere", Qdist011FunctionalUtils.getNow().toString()))));
-		stubFor(get(urlMatching("/dokumenttypeinfo/" + DOKUMENTTYPE_ID_HOVEDDOK)).willReturn(aResponse().withStatus(HttpStatus.OK.value())
-				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
-				.withBodyFile("dokumentinfov4/tkat020-utenSDPDistribusjonVarsel.json")));
+		stubGetForsendelse("__files/rjoark001/getForsendelse-happy.json");
+		stubPostDigitalKontaktInformasjon();
+		stubGetDokumentTypeInfo("dokumentinfov4/tkat020-utenSDPDistribusjonVarsel.json");
 
 		sendStringMessage(qdist011, classpathToString("qdist011/qdist011-happy.xml"));
 
@@ -554,13 +502,8 @@ public class Qdist011IT {
 
 	@Test
 	public void shouldThrowTkat020TechicalException() throws Exception {
-		stubFor(get("/administrerforsendelse/" + FORSENDELSE_ID).willReturn(aResponse().withStatus(HttpStatus.OK.value())
-				.withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE)
-				.withBody(classpathToString("__files/rjoark001/getForsendelse-happy.json")
-						.replace("insertCallIdHere", CALL_ID))));
-		stubFor(post("/digitalkontaktinformasjonv1").willReturn(aResponse().withStatus(HttpStatus.OK.value())
-				.withBody(classpathToString("__files/digitalkontaktinformasjonv1/dki-happy.xml")
-						.replace("insertDateHere", Qdist011FunctionalUtils.getNow().toString()))));
+		stubGetForsendelse("__files/rjoark001/getForsendelse-happy.json");
+		stubPostDigitalKontaktInformasjon();
 		stubFor(get(urlMatching("/dokumenttypeinfo/" + DOKUMENTTYPE_ID_HOVEDDOK))
 				.willReturn(aResponse().withStatus(HttpStatus.INTERNAL_SERVER_ERROR.value())));
 
@@ -584,16 +527,9 @@ public class Qdist011IT {
 
 	@Test
 	public void shouldThrowTkat021FunctionalException() throws Exception {
-		stubFor(get("/administrerforsendelse/" + FORSENDELSE_ID).willReturn(aResponse().withStatus(HttpStatus.OK.value())
-				.withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE)
-				.withBody(classpathToString("__files/rjoark001/getForsendelse-happy.json")
-						.replace("insertCallIdHere", CALL_ID))));
-		stubFor(post("/digitalkontaktinformasjonv1").willReturn(aResponse().withStatus(HttpStatus.OK.value())
-				.withBody(classpathToString("__files/digitalkontaktinformasjonv1/dki-happy.xml")
-						.replace("insertDateHere", Qdist011FunctionalUtils.getNow().toString()))));
-		stubFor(get(urlMatching("/dokumenttypeinfo/" + DOKUMENTTYPE_ID_HOVEDDOK)).willReturn(aResponse().withStatus(HttpStatus.OK.value())
-				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
-				.withBodyFile("dokumentinfov4/tkat020-happy.json")));
+		stubGetForsendelse("__files/rjoark001/getForsendelse-happy.json");
+		stubPostDigitalKontaktInformasjon();
+		stubGetDokumentTypeInfo("dokumentinfov4/tkat020-happy.json");
 		stubFor(get(urlMatching("/varselinfo/" + VARSEL_TYPE_ID))
 				.willReturn(aResponse().withStatus(HttpStatus.NOT_FOUND.value())));
 
@@ -617,16 +553,9 @@ public class Qdist011IT {
 
 	@Test
 	public void shouldThrowTkat021TechnicalException() throws Exception {
-		stubFor(get("/administrerforsendelse/" + FORSENDELSE_ID).willReturn(aResponse().withStatus(HttpStatus.OK.value())
-				.withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE)
-				.withBody(classpathToString("__files/rjoark001/getForsendelse-happy.json")
-						.replace("insertCallIdHere", CALL_ID))));
-		stubFor(post("/digitalkontaktinformasjonv1").willReturn(aResponse().withStatus(HttpStatus.OK.value())
-				.withBody(classpathToString("__files/digitalkontaktinformasjonv1/dki-happy.xml")
-						.replace("insertDateHere", Qdist011FunctionalUtils.getNow().toString()))));
-		stubFor(get(urlMatching("/dokumenttypeinfo/" + DOKUMENTTYPE_ID_HOVEDDOK)).willReturn(aResponse().withStatus(HttpStatus.OK.value())
-				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
-				.withBodyFile("dokumentinfov4/tkat020-happy.json")));
+		stubGetForsendelse("__files/rjoark001/getForsendelse-happy.json");
+		stubPostDigitalKontaktInformasjon();
+		stubGetDokumentTypeInfo("dokumentinfov4/tkat020-happy.json");
 		stubFor(get(urlMatching("/varselinfo/" + VARSEL_TYPE_ID))
 				.willReturn(aResponse().withStatus(HttpStatus.INTERNAL_SERVER_ERROR.value())));
 
@@ -652,19 +581,10 @@ public class Qdist011IT {
 	public void shouldThrowKunneIkkeDeserialisereS3PayloadFunctionalException() throws Exception {
 		when(amazonS3.getObjectAsString(eq(BUCKET_NAME), eq(DOKUMENT_OBJEKT_REFERANSE_VEDLEGG2))).thenReturn("notJsonSerializedString");
 
-		stubFor(get("/administrerforsendelse/" + FORSENDELSE_ID).willReturn(aResponse().withStatus(HttpStatus.OK.value())
-				.withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE)
-				.withBody(classpathToString("__files/rjoark001/getForsendelse-happy.json")
-						.replace("insertCallIdHere", CALL_ID))));
-		stubFor(post("/digitalkontaktinformasjonv1").willReturn(aResponse().withStatus(HttpStatus.OK.value())
-				.withBody(classpathToString("__files/digitalkontaktinformasjonv1/dki-happy.xml")
-						.replace("insertDateHere", Qdist011FunctionalUtils.getNow().toString()))));
-		stubFor(get(urlMatching("/dokumenttypeinfo/" + DOKUMENTTYPE_ID_HOVEDDOK)).willReturn(aResponse().withStatus(HttpStatus.OK.value())
-				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
-				.withBodyFile("dokumentinfov4/tkat020-happy.json")));
-		stubFor(get(urlMatching("/varselinfo/" + VARSEL_TYPE_ID)).willReturn(aResponse().withStatus(HttpStatus.OK.value())
-				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
-				.withBodyFile("varselinfov1/tkat021-happy.json")));
+		stubGetForsendelse("__files/rjoark001/getForsendelse-happy.json");
+		stubPostDigitalKontaktInformasjon();
+		stubGetDokumentTypeInfo("dokumentinfov4/tkat020-happy.json");
+		stubGetVarselInfo();
 
 		sendStringMessage(qdist011, classpathToString("qdist011/qdist011-happy.xml"));
 
@@ -688,19 +608,10 @@ public class Qdist011IT {
 	public void shouldThrowS3FailedToGetDocumentTechnicalExceptionVedSdkClientException() throws Exception {
 		when(amazonS3.getObjectAsString(eq(BUCKET_NAME), eq(DOKUMENT_OBJEKT_REFERANSE_HOVEDDOK))).thenThrow(new SdkClientException("SdkClientException"));
 
-		stubFor(get("/administrerforsendelse/" + FORSENDELSE_ID).willReturn(aResponse().withStatus(HttpStatus.OK.value())
-				.withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE)
-				.withBody(classpathToString("__files/rjoark001/getForsendelse-happy.json")
-						.replace("insertCallIdHere", CALL_ID))));
-		stubFor(post("/digitalkontaktinformasjonv1").willReturn(aResponse().withStatus(HttpStatus.OK.value())
-				.withBody(classpathToString("__files/digitalkontaktinformasjonv1/dki-happy.xml")
-						.replace("insertDateHere", Qdist011FunctionalUtils.getNow().toString()))));
-		stubFor(get(urlMatching("/dokumenttypeinfo/" + DOKUMENTTYPE_ID_HOVEDDOK)).willReturn(aResponse().withStatus(HttpStatus.OK.value())
-				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
-				.withBodyFile("dokumentinfov4/tkat020-happy.json")));
-		stubFor(get(urlMatching("/varselinfo/" + VARSEL_TYPE_ID)).willReturn(aResponse().withStatus(HttpStatus.OK.value())
-				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
-				.withBodyFile("varselinfov1/tkat021-happy.json")));
+		stubGetForsendelse("__files/rjoark001/getForsendelse-happy.json");
+		stubPostDigitalKontaktInformasjon();
+		stubGetDokumentTypeInfo("dokumentinfov4/tkat020-happy.json");
+		stubGetVarselInfo();
 
 		sendStringMessage(qdist011, classpathToString("qdist011/qdist011-happy.xml"));
 
@@ -724,19 +635,10 @@ public class Qdist011IT {
 	public void shouldThrowS3FailedToGetDocumentTechnicalExceptionVedSecurityException() throws Exception {
 		when(amazonS3.getObjectAsString(eq(BUCKET_NAME), eq(DOKUMENT_OBJEKT_REFERANSE_HOVEDDOK))).thenThrow(new SecurityException("SecurityException"));
 
-		stubFor(get("/administrerforsendelse/" + FORSENDELSE_ID).willReturn(aResponse().withStatus(HttpStatus.OK.value())
-				.withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE)
-				.withBody(classpathToString("__files/rjoark001/getForsendelse-happy.json")
-						.replace("insertCallIdHere", CALL_ID))));
-		stubFor(post("/digitalkontaktinformasjonv1").willReturn(aResponse().withStatus(HttpStatus.OK.value())
-				.withBody(classpathToString("__files/digitalkontaktinformasjonv1/dki-happy.xml")
-						.replace("insertDateHere", Qdist011FunctionalUtils.getNow().toString()))));
-		stubFor(get(urlMatching("/dokumenttypeinfo/" + DOKUMENTTYPE_ID_HOVEDDOK)).willReturn(aResponse().withStatus(HttpStatus.OK.value())
-				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
-				.withBodyFile("dokumentinfov4/tkat020-happy.json")));
-		stubFor(get(urlMatching("/varselinfo/" + VARSEL_TYPE_ID)).willReturn(aResponse().withStatus(HttpStatus.OK.value())
-				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
-				.withBodyFile("varselinfov1/tkat021-happy.json")));
+		stubGetForsendelse("__files/rjoark001/getForsendelse-happy.json");
+		stubPostDigitalKontaktInformasjon();
+		stubGetDokumentTypeInfo("dokumentinfov4/tkat020-happy.json");
+		stubGetVarselInfo();
 
 		sendStringMessage(qdist011, classpathToString("qdist011/qdist011-happy.xml"));
 
@@ -760,19 +662,10 @@ public class Qdist011IT {
 	public void shouldGetErrorWhenSFTPNotAvailable() throws Exception {
 		stopServer();
 
-		stubFor(get("/administrerforsendelse/" + FORSENDELSE_ID).willReturn(aResponse().withStatus(HttpStatus.OK.value())
-				.withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE)
-				.withBody(classpathToString("__files/rjoark001/getForsendelse-happy.json")
-						.replace("insertCallIdHere", CALL_ID))));
-		stubFor(post("/digitalkontaktinformasjonv1").willReturn(aResponse().withStatus(HttpStatus.OK.value())
-				.withBody(classpathToString("__files/digitalkontaktinformasjonv1/dki-happy.xml")
-						.replace("insertDateHere", Qdist011FunctionalUtils.getNow().toString()))));
-		stubFor(get(urlMatching("/dokumenttypeinfo/" + DOKUMENTTYPE_ID_HOVEDDOK)).willReturn(aResponse().withStatus(HttpStatus.OK.value())
-				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
-				.withBodyFile("dokumentinfov4/tkat020-happy.json")));
-		stubFor(get(urlMatching("/varselinfo/" + VARSEL_TYPE_ID)).willReturn(aResponse().withStatus(HttpStatus.OK.value())
-				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
-				.withBodyFile("varselinfov1/tkat021-happy.json")));
+		stubGetForsendelse("__files/rjoark001/getForsendelse-happy.json");
+		stubPostDigitalKontaktInformasjon();
+		stubGetDokumentTypeInfo("dokumentinfov4/tkat020-happy.json");
+		stubGetVarselInfo();
 
 		sendStringMessage(qdist011, classpathToString("qdist011/qdist011-happy.xml"));
 
@@ -794,24 +687,13 @@ public class Qdist011IT {
 
 	@Test
 	public void shouldThrowSafFunctionalException() throws Exception {
-		stubFor(get("/administrerforsendelse/" + FORSENDELSE_ID).willReturn(aResponse().withStatus(HttpStatus.OK.value())
-				.withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE)
-				.withBody(classpathToString("__files/rjoark001/getForsendelse-happy.json")
-						.replace("insertCallIdHere", CALL_ID))));
-		stubFor(post("/digitalkontaktinformasjonv1").willReturn(aResponse().withStatus(HttpStatus.OK.value())
-				.withBody(classpathToString("__files/digitalkontaktinformasjonv1/dki-happy.xml")
-						.replace("insertDateHere", Qdist011FunctionalUtils.getNow().toString()))));
-		stubFor(get(urlMatching("/dokumenttypeinfo/" + DOKUMENTTYPE_ID_HOVEDDOK)).willReturn(aResponse().withStatus(HttpStatus.OK.value())
-				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
-				.withBodyFile("dokumentinfov4/tkat020-happy.json")));
-		stubFor(get(urlMatching("/varselinfo/" + VARSEL_TYPE_ID)).willReturn(aResponse().withStatus(HttpStatus.OK.value())
-				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
-				.withBodyFile("varselinfov1/tkat021-happy.json")));
+		stubGetForsendelse("__files/rjoark001/getForsendelse-happy.json");
+		stubPostDigitalKontaktInformasjon();
+		stubGetDokumentTypeInfo("dokumentinfov4/tkat020-happy.json");
+		stubGetVarselInfo();
 		stubFor(post(urlMatching("/safgraphql"))
 				.willReturn(aResponse().withStatus(HttpStatus.NOT_FOUND.value())));
-		stubFor(get("/securitytoken?grant_type=client_credentials&scope=openid").willReturn(aResponse().withStatus(HttpStatus.OK.value())
-				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
-				.withBodyFile("securitytoken/stsResponse-happy.json")));
+		stubGetSecurityToken();
 
 		sendStringMessage(qdist011, classpathToString("qdist011/qdist011-happy.xml"));
 
@@ -833,25 +715,14 @@ public class Qdist011IT {
 
 	@Test
 	public void shouldThrowSafJournalpostIkkeFunnetFunctionalException() throws Exception {
-		stubFor(get("/administrerforsendelse/" + FORSENDELSE_ID).willReturn(aResponse().withStatus(HttpStatus.OK.value())
-				.withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE)
-				.withBody(classpathToString("__files/rjoark001/getForsendelse-happy.json")
-						.replace("insertCallIdHere", CALL_ID))));
-		stubFor(post("/digitalkontaktinformasjonv1").willReturn(aResponse().withStatus(HttpStatus.OK.value())
-				.withBody(classpathToString("__files/digitalkontaktinformasjonv1/dki-happy.xml")
-						.replace("insertDateHere", Qdist011FunctionalUtils.getNow().toString()))));
-		stubFor(get(urlMatching("/dokumenttypeinfo/" + DOKUMENTTYPE_ID_HOVEDDOK)).willReturn(aResponse().withStatus(HttpStatus.OK.value())
-				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
-				.withBodyFile("dokumentinfov4/tkat020-happy.json")));
-		stubFor(get(urlMatching("/varselinfo/" + VARSEL_TYPE_ID)).willReturn(aResponse().withStatus(HttpStatus.OK.value())
-				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
-				.withBodyFile("varselinfov1/tkat021-happy.json")));
+		stubGetForsendelse("__files/rjoark001/getForsendelse-happy.json");
+		stubPostDigitalKontaktInformasjon();
+		stubGetDokumentTypeInfo("dokumentinfov4/tkat020-happy.json");
+		stubGetVarselInfo();
 		stubFor(post(urlMatching("/safgraphql")).willReturn(aResponse().withStatus(HttpStatus.OK.value())
 				.withHeader(org.springframework.http.HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_UTF8_VALUE)
 				.withBody("")));
-		stubFor(get("/securitytoken?grant_type=client_credentials&scope=openid").willReturn(aResponse().withStatus(HttpStatus.OK.value())
-				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
-				.withBodyFile("securitytoken/stsResponse-happy.json")));
+		stubGetSecurityToken();
 
 		sendStringMessage(qdist011, classpathToString("qdist011/qdist011-happy.xml"));
 
@@ -873,25 +744,12 @@ public class Qdist011IT {
 
 	@Test
 	public void shouldThrowSafJournalpostValidationException() throws Exception {
-		stubFor(get("/administrerforsendelse/" + FORSENDELSE_ID).willReturn(aResponse().withStatus(HttpStatus.OK.value())
-				.withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE)
-				.withBody(classpathToString("__files/rjoark001/getForsendelse-happy.json")
-						.replace("insertCallIdHere", CALL_ID))));
-		stubFor(post("/digitalkontaktinformasjonv1").willReturn(aResponse().withStatus(HttpStatus.OK.value())
-				.withBody(classpathToString("__files/digitalkontaktinformasjonv1/dki-happy.xml")
-						.replace("insertDateHere", Qdist011FunctionalUtils.getNow().toString()))));
-		stubFor(get(urlMatching("/dokumenttypeinfo/" + DOKUMENTTYPE_ID_HOVEDDOK)).willReturn(aResponse().withStatus(HttpStatus.OK.value())
-				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
-				.withBodyFile("dokumentinfov4/tkat020-happy.json")));
-		stubFor(get(urlMatching("/varselinfo/" + VARSEL_TYPE_ID)).willReturn(aResponse().withStatus(HttpStatus.OK.value())
-				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
-				.withBodyFile("varselinfov1/tkat021-happy.json")));
-		stubFor(post(urlMatching("/safgraphql")).willReturn(aResponse().withStatus(HttpStatus.OK.value())
-				.withHeader(org.springframework.http.HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_UTF8_VALUE)
-				.withBodyFile("saf/safGraphQlResponse-tommeTitler.json")));
-		stubFor(get("/securitytoken?grant_type=client_credentials&scope=openid").willReturn(aResponse().withStatus(HttpStatus.OK.value())
-				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
-				.withBodyFile("securitytoken/stsResponse-happy.json")));
+		stubGetForsendelse("__files/rjoark001/getForsendelse-happy.json");
+		stubPostDigitalKontaktInformasjon();
+		stubGetDokumentTypeInfo("dokumentinfov4/tkat020-happy.json");
+		stubGetVarselInfo();
+		stubPostSafJournalpost("saf/safGraphQlResponse-tommeTitler.json");
+		stubGetSecurityToken();
 
 		sendStringMessage(qdist011, classpathToString("qdist011/qdist011-happy.xml"));
 
@@ -913,24 +771,13 @@ public class Qdist011IT {
 
 	@Test
 	public void shouldThrowSafTechnicalException() throws Exception {
-		stubFor(get("/administrerforsendelse/" + FORSENDELSE_ID).willReturn(aResponse().withStatus(HttpStatus.OK.value())
-				.withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE)
-				.withBody(classpathToString("__files/rjoark001/getForsendelse-happy.json")
-						.replace("insertCallIdHere", CALL_ID))));
-		stubFor(post("/digitalkontaktinformasjonv1").willReturn(aResponse().withStatus(HttpStatus.OK.value())
-				.withBody(classpathToString("__files/digitalkontaktinformasjonv1/dki-happy.xml")
-						.replace("insertDateHere", Qdist011FunctionalUtils.getNow().toString()))));
-		stubFor(get(urlMatching("/dokumenttypeinfo/" + DOKUMENTTYPE_ID_HOVEDDOK)).willReturn(aResponse().withStatus(HttpStatus.OK.value())
-				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
-				.withBodyFile("dokumentinfov4/tkat020-happy.json")));
-		stubFor(get(urlMatching("/varselinfo/" + VARSEL_TYPE_ID)).willReturn(aResponse().withStatus(HttpStatus.OK.value())
-				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
-				.withBodyFile("varselinfov1/tkat021-happy.json")));
+		stubGetForsendelse("__files/rjoark001/getForsendelse-happy.json");
+		stubPostDigitalKontaktInformasjon();
+		stubGetDokumentTypeInfo("dokumentinfov4/tkat020-happy.json");
+		stubGetVarselInfo();
 		stubFor(post(urlMatching("/safgraphql"))
 				.willReturn(aResponse().withStatus(HttpStatus.INTERNAL_SERVER_ERROR.value())));
-		stubFor(get("/securitytoken?grant_type=client_credentials&scope=openid").willReturn(aResponse().withStatus(HttpStatus.OK.value())
-				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
-				.withBodyFile("securitytoken/stsResponse-happy.json")));
+		stubGetSecurityToken();
 
 		sendStringMessage(qdist011, classpathToString("qdist011/qdist011-happy.xml"));
 
@@ -952,22 +799,11 @@ public class Qdist011IT {
 
 	@Test
 	public void shouldThrowStsTechnicalException() throws Exception {
-		stubFor(get("/administrerforsendelse/" + FORSENDELSE_ID).willReturn(aResponse().withStatus(HttpStatus.OK.value())
-				.withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE)
-				.withBody(classpathToString("__files/rjoark001/getForsendelse-happy.json")
-						.replace("insertCallIdHere", CALL_ID))));
-		stubFor(post("/digitalkontaktinformasjonv1").willReturn(aResponse().withStatus(HttpStatus.OK.value())
-				.withBody(classpathToString("__files/digitalkontaktinformasjonv1/dki-happy.xml")
-						.replace("insertDateHere", Qdist011FunctionalUtils.getNow().toString()))));
-		stubFor(get(urlMatching("/dokumenttypeinfo/" + DOKUMENTTYPE_ID_HOVEDDOK)).willReturn(aResponse().withStatus(HttpStatus.OK.value())
-				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
-				.withBodyFile("dokumentinfov4/tkat020-happy.json")));
-		stubFor(get(urlMatching("/varselinfo/" + VARSEL_TYPE_ID)).willReturn(aResponse().withStatus(HttpStatus.OK.value())
-				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
-				.withBodyFile("varselinfov1/tkat021-happy.json")));
-		stubFor(post(urlMatching("/safgraphql")).willReturn(aResponse().withStatus(HttpStatus.OK.value())
-				.withHeader(org.springframework.http.HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_UTF8_VALUE)
-				.withBodyFile("saf/safGraphQlResponse-happy.json")));
+		stubGetForsendelse("__files/rjoark001/getForsendelse-happy.json");
+		stubPostDigitalKontaktInformasjon();
+		stubGetDokumentTypeInfo("dokumentinfov4/tkat020-happy.json");
+		stubGetVarselInfo();
+		stubPostSafJournalpost("saf/safGraphQlResponse-happy.json");
 		stubFor(get("/securitytoken?grant_type=client_credentials&scope=openid")
 				.willReturn(aResponse().withStatus(HttpStatus.INTERNAL_SERVER_ERROR.value())));
 
@@ -991,25 +827,12 @@ public class Qdist011IT {
 
 	@Test
 	public void shouldThrowRdist001OppdaterForsendelseStatusFunctionalException() throws Exception {
-		stubFor(get("/administrerforsendelse/" + FORSENDELSE_ID).willReturn(aResponse().withStatus(HttpStatus.OK.value())
-				.withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE)
-				.withBody(classpathToString("__files/rjoark001/getForsendelse-happy.json")
-						.replace("insertCallIdHere", CALL_ID))));
-		stubFor(post("/digitalkontaktinformasjonv1").willReturn(aResponse().withStatus(HttpStatus.OK.value())
-				.withBody(classpathToString("__files/digitalkontaktinformasjonv1/dki-happy.xml")
-						.replace("insertDateHere", Qdist011FunctionalUtils.getNow().toString()))));
-		stubFor(get(urlMatching("/dokumenttypeinfo/" + DOKUMENTTYPE_ID_HOVEDDOK)).willReturn(aResponse().withStatus(HttpStatus.OK.value())
-				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
-				.withBodyFile("dokumentinfov4/tkat020-happy.json")));
-		stubFor(get(urlMatching("/varselinfo/" + VARSEL_TYPE_ID)).willReturn(aResponse().withStatus(HttpStatus.OK.value())
-				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
-				.withBodyFile("varselinfov1/tkat021-happy.json")));
-		stubFor(post(urlMatching("/safgraphql")).willReturn(aResponse().withStatus(HttpStatus.OK.value())
-				.withHeader(org.springframework.http.HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_UTF8_VALUE)
-				.withBodyFile("saf/safGraphQlResponse-happy.json")));
-		stubFor(get("/securitytoken?grant_type=client_credentials&scope=openid").willReturn(aResponse().withStatus(HttpStatus.OK.value())
-				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
-				.withBodyFile("securitytoken/stsResponse-happy.json")));
+		stubGetForsendelse("__files/rjoark001/getForsendelse-happy.json");
+		stubPostDigitalKontaktInformasjon();
+		stubGetDokumentTypeInfo("dokumentinfov4/tkat020-happy.json");
+		stubGetVarselInfo();
+		stubPostSafJournalpost("saf/safGraphQlResponse-happy.json");
+		stubGetSecurityToken();
 		stubFor(put("/administrerforsendelse?forsendelseId=" + FORSENDELSE_ID + "&forsendelseStatus=OVERSENDT")
 				.willReturn(aResponse().withStatus(HttpStatus.NOT_FOUND.value())));
 
@@ -1026,25 +849,12 @@ public class Qdist011IT {
 
 	@Test
 	public void shouldThrowRdist001OppdaterForsendelseStatusTechnicalException() throws Exception {
-		stubFor(get("/administrerforsendelse/" + FORSENDELSE_ID).willReturn(aResponse().withStatus(HttpStatus.OK.value())
-				.withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE)
-				.withBody(classpathToString("__files/rjoark001/getForsendelse-happy.json")
-						.replace("insertCallIdHere", CALL_ID))));
-		stubFor(post("/digitalkontaktinformasjonv1").willReturn(aResponse().withStatus(HttpStatus.OK.value())
-				.withBody(classpathToString("__files/digitalkontaktinformasjonv1/dki-happy.xml")
-						.replace("insertDateHere", Qdist011FunctionalUtils.getNow().toString()))));
-		stubFor(get(urlMatching("/dokumenttypeinfo/" + DOKUMENTTYPE_ID_HOVEDDOK)).willReturn(aResponse().withStatus(HttpStatus.OK.value())
-				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
-				.withBodyFile("dokumentinfov4/tkat020-happy.json")));
-		stubFor(get(urlMatching("/varselinfo/" + VARSEL_TYPE_ID)).willReturn(aResponse().withStatus(HttpStatus.OK.value())
-				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
-				.withBodyFile("varselinfov1/tkat021-happy.json")));
-		stubFor(post(urlMatching("/safgraphql")).willReturn(aResponse().withStatus(HttpStatus.OK.value())
-				.withHeader(org.springframework.http.HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_UTF8_VALUE)
-				.withBodyFile("saf/safGraphQlResponse-happy.json")));
-		stubFor(get("/securitytoken?grant_type=client_credentials&scope=openid").willReturn(aResponse().withStatus(HttpStatus.OK.value())
-				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
-				.withBodyFile("securitytoken/stsResponse-happy.json")));
+		stubGetForsendelse("__files/rjoark001/getForsendelse-happy.json");
+		stubPostDigitalKontaktInformasjon();
+		stubGetDokumentTypeInfo("dokumentinfov4/tkat020-happy.json");
+		stubGetVarselInfo();
+		stubPostSafJournalpost("saf/safGraphQlResponse-happy.json");
+		stubGetSecurityToken();
 		stubFor(put("/administrerforsendelse?forsendelseId=" + FORSENDELSE_ID + "&forsendelseStatus=OVERSENDT")
 				.willReturn(aResponse().withStatus(HttpStatus.INTERNAL_SERVER_ERROR.value())));
 
@@ -1064,6 +874,42 @@ public class Qdist011IT {
 		verify(1, postRequestedFor(urlEqualTo("/safgraphql")));
 		verify(MAX_ATTEMPTS_SHORT, putRequestedFor(
 				urlEqualTo("/administrerforsendelse?forsendelseId=" + FORSENDELSE_ID + "&forsendelseStatus=OVERSENDT")));
+	}
+
+	private void stubGetSecurityToken() {
+		stubFor(get("/securitytoken?grant_type=client_credentials&scope=openid").willReturn(aResponse().withStatus(HttpStatus.OK.value())
+				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
+				.withBodyFile("securitytoken/stsResponse-happy.json")));
+	}
+
+	private void stubPostSafJournalpost(String bodyFileName) {
+		stubFor(post(urlMatching("/safgraphql")).willReturn(aResponse().withStatus(HttpStatus.OK.value())
+				.withHeader(org.springframework.http.HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_UTF8_VALUE)
+				.withBodyFile(bodyFileName)));
+	}
+
+	private void stubGetVarselInfo() {
+		stubFor(get(urlMatching("/varselinfo/" + VARSEL_TYPE_ID)).willReturn(aResponse().withStatus(HttpStatus.OK.value())
+				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
+				.withBodyFile("varselinfov1/tkat021-happy.json")));
+	}
+
+	private void stubGetDokumentTypeInfo(String bodyFileName) {
+		stubFor(get(urlMatching("/dokumenttypeinfo/" + DOKUMENTTYPE_ID_HOVEDDOK)).willReturn(aResponse().withStatus(HttpStatus.OK.value())
+				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
+				.withBodyFile(bodyFileName)));
+	}
+
+	private void stubPostDigitalKontaktInformasjon() throws IOException {
+		stubFor(post("/digitalkontaktinformasjonv1").willReturn(aResponse().withStatus(HttpStatus.OK.value())
+				.withBody(classpathToString("__files/digitalkontaktinformasjonv1/dki-happy.xml")
+						.replace("insertDateHere", Qdist011FunctionalUtils.getNow().toString()))));
+	}
+
+	private void stubGetForsendelse(String bodyClasspath) throws IOException {
+		stubFor(get("/administrerforsendelse/" + FORSENDELSE_ID).willReturn(aResponse().withStatus(HttpStatus.OK.value())
+				.withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE)
+				.withBody(classpathToString(bodyClasspath).replace("insertCallIdHere", CALL_ID))));
 	}
 
 	private void sendStringMessage(Queue queue, final String message) {
@@ -1100,9 +946,25 @@ public class Qdist011IT {
 				urlEqualTo("/administrerforsendelse?forsendelseId=" + FORSENDELSE_ID + "&forsendelseStatus=OVERSENDT")));
 	}
 
-	private String replaceCreationDateAndTime(String melding) {
-		// erstatt dato (forventes å inneholde bindestrek) med tom streng
-		return melding.replaceAll("[\t\r\n ]", "").replaceFirst("(?<=CreationDateAndTime>).+(?=</)", "");
+	private String comparableMessage(String melding) {
+		Pattern pattern = Pattern.compile("(?<=ns[0-9]:sendDigitalPost).+(?=>)");
+		Matcher matcher = pattern.matcher(melding);
+		if (matcher.find()) {
+			String namespaces = matcher.group();
+			assertTrue(namespaces.contains("http://www.unece.org/cefact/namespaces/StandardBusinessDocumentHeader"));
+			assertTrue(namespaces.contains("http://begrep.difi.no/sdp/schema_v10"));
+			assertTrue(namespaces.contains("http://nav.no/tjeneste/virksomhet/digitalpost/sendDigitalPost/v1"));
+			assertTrue(namespaces.contains("http://www.w3.org/2000/09/xmldsig#"));
+		} else {
+			fail("Melding mangler sendDigitalPost element med namespaces");
+		}
+
+		// tøm CreationDateAndTime
+		// fjern namespaces siden rekkefølgen kan variere
+		return melding.replaceFirst("(?<=CreationDateAndTime>).+(?=</)", "")
+				.replaceAll("ns[0-9]:", "")
+				.replaceFirst("(?<=<sendDigitalPost).+(?=>)", "")
+				.replaceAll("[\t\r\n ]", "");
 	}
 }
 

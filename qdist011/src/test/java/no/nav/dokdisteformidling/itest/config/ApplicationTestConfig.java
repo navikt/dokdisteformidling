@@ -3,7 +3,6 @@ package no.nav.dokdisteformidling.itest.config;
 import static org.mockito.Mockito.mock;
 
 import com.amazonaws.services.s3.AmazonS3;
-import no.nav.dokdisteformidling.CoreConfig;
 import no.nav.dokdisteformidling.config.alias.DigitalKontaktinformasjonV1Alias;
 import no.nav.dokdisteformidling.config.alias.MqGatewayAlias;
 import no.nav.dokdisteformidling.config.alias.ServiceuserAlias;
@@ -13,6 +12,7 @@ import no.nav.dokdisteformidling.storage.S3Storage;
 import no.nav.dokdisteformidling.storage.Storage;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Profile;
@@ -30,8 +30,8 @@ import org.springframework.retry.annotation.EnableRetry;
 		DigitalKontaktinformasjonV1Alias.class})
 @Import({JmsItestConfig.class,
 		LokalCacheConfig.class,
-		STSTestConfig.class,
-		CoreConfig.class})
+		STSTestConfig.class})
+@ComponentScan(basePackages = "no.nav.dokdisteformidling")
 public class ApplicationTestConfig {
 
 	@Bean
