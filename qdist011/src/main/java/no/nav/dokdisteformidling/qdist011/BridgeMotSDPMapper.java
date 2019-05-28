@@ -36,7 +36,7 @@ import no.nav.dokdisteformidling.consumer.dokkat.tkat020.DokumenttypeInfoTo;
 import no.nav.dokdisteformidling.consumer.dokkat.tkat021.VarselInfoTo;
 import no.nav.dokdisteformidling.consumer.rdist001.HentForsendelseResponseTo;
 import no.nav.dokdisteformidling.consumer.saf.journalpost.SafJournalpostTo;
-import no.nav.dokdisteformidling.exception.functional.TDist005MapperFunctionalException;
+import no.nav.dokdisteformidling.exception.functional.Tdist005MapperFunctionalException;
 import no.nav.tjeneste.virksomhet.digitalpost.senddigitalpost.v1.ObjectFactory;
 import no.nav.tjeneste.virksomhet.digitalpost.senddigitalpost.v1.SendDigitalPost;
 import no.nav.tjeneste.virksomhet.digitalpost.senddigitalpost.v1.meldinger.SendDigitalPostRequest;
@@ -86,7 +86,7 @@ public class BridgeMotSDPMapper {
 
 			return sendDigitalPost;
 		} catch (IllegalArgumentException e) {
-			throw new TDist005MapperFunctionalException(format("Kunne ikke mappe qdist011 input mot SDP. Feilmelding=%s",
+			throw new Tdist005MapperFunctionalException(format("Kunne ikke mappe qdist011 output mot tdist005. Feilmelding=%s",
 					e.getMessage()), e);
 		}
 	}
@@ -195,7 +195,7 @@ public class BridgeMotSDPMapper {
 				.filter(dokumentTo -> DomainConstants.HOVEDDOKUMENT.equals(dokumentTo.getTilknyttetSom()))
 				.findAny()
 				.map(HentForsendelseResponseTo.DokumentTo::getDokumentObjektReferanse)
-				.orElseThrow(() -> new TDist005MapperFunctionalException(
+				.orElseThrow(() -> new Tdist005MapperFunctionalException(
 						format("Kunne ikke finne hoveddokument for bestilling med bestillingsId=%s",
 								hentForsendelseResponseTo.getBestillingsId())))
 				.concat(".pdf"));
@@ -218,7 +218,7 @@ public class BridgeMotSDPMapper {
 									.filter(dokumentInfo -> dokumentInfo.getDokumentInfoId()
 											.equals(dokumentTo.getArkivDokumentInfoId()))
 									.findAny()
-									.orElseThrow(() -> new TDist005MapperFunctionalException(
+									.orElseThrow(() -> new Tdist005MapperFunctionalException(
 											String.format("DokumentInfoId=%s ikke funnet i journalpost",
 													dokumentTo.getArkivDokumentInfoId())))
 									.getTittel()
@@ -238,26 +238,12 @@ public class BridgeMotSDPMapper {
 		Varsler varsler = null;
 		Repetisjoner repitisjoner = null;
 
-		if (varselInfoTo.getAntallDagerListe() != null) {
+		if (varselInfoTo.getAntallDagerListe().isEmpty()) {
 			repitisjoner = new Repetisjoner();
-			repitisjoner.getDagerEtter().add(Integer.valueOf(varselInfoTo.getAntallDagerListe()));
+			repitisjoner.getDagerEtter().addAll(varselInfoTo.getAntallDagerListe());
 		}
 
-		boolean isEpostDateInvalid = true;
-		if (hentSikkerDigitalPostadresseResponseTo.getDigitalKontaktinformasjon().getEpostadresse() != null) {
-			isEpostDateInvalid = DigitalKontaktInformasjonValidator.isEpostDateInvalid(hentSikkerDigitalPostadresseResponseTo
-					.getDigitalKontaktinformasjon()
-					.getEpostadresse());
-		}
-
-		boolean isMobilDateInvalid = true;
-		if (hentSikkerDigitalPostadresseResponseTo.getDigitalKontaktinformasjon().getMobiltelefonnummer() != null) {
-			isMobilDateInvalid = DigitalKontaktInformasjonValidator.isMobilDateInvalid(hentSikkerDigitalPostadresseResponseTo
-					.getDigitalKontaktinformasjon()
-					.getMobiltelefonnummer());
-		}
-
-		if ((isPreferertKanalEpost(varselInfoTo) || isMobilDateInvalid) && !isEpostDateInvalid) {
+		if (sendSMSVarsel(varselInfoTo, hentSikkerDigitalPostadresseResponseTo)) {
 			varsler = new Varsler();
 			EpostVarsel epostVarsel = new EpostVarsel();
 			epostVarsel.setEpostadresse(hentSikkerDigitalPostadresseResponseTo.getDigitalKontaktinformasjon()
@@ -271,7 +257,7 @@ public class BridgeMotSDPMapper {
 			varsler.setEpostVarsel(epostVarsel);
 		}
 
-		if ((isPreferertKanalMobil(varselInfoTo) || isEpostDateInvalid) && !isMobilDateInvalid) {
+		if (sendEpostVarsel(varselInfoTo, hentSikkerDigitalPostadresseResponseTo)) {
 			if (varsler == null) {
 				varsler = new Varsler();
 			}
@@ -287,6 +273,32 @@ public class BridgeMotSDPMapper {
 			varsler.setSmsVarsel(smsVarsel);
 		}
 		return varsler;
+	}
+
+	private boolean sendSMSVarsel(VarselInfoTo varselInfoTo, HentSikkerDigitalPostadresseResponseTo hentSikkerDigitalPostadresseResponseTo){
+
+		boolean isEpostInvalid = DigitalKontaktInformasjonValidator.isEpostInvalid(hentSikkerDigitalPostadresseResponseTo
+				.getDigitalKontaktinformasjon()
+				.getEpostadresse());
+
+		boolean isMobilInvalid = DigitalKontaktInformasjonValidator.isMobilInvalid(hentSikkerDigitalPostadresseResponseTo
+				.getDigitalKontaktinformasjon()
+				.getMobiltelefonnummer());
+
+		return (isPreferertKanalEpost(varselInfoTo) || isMobilInvalid) && !isEpostInvalid;
+	}
+
+	private boolean sendEpostVarsel(VarselInfoTo varselInfoTo, HentSikkerDigitalPostadresseResponseTo hentSikkerDigitalPostadresseResponseTo){
+
+		boolean isEpostInvalid = DigitalKontaktInformasjonValidator.isEpostInvalid(hentSikkerDigitalPostadresseResponseTo
+				.getDigitalKontaktinformasjon()
+				.getEpostadresse());
+
+		boolean isMobilInvalid = DigitalKontaktInformasjonValidator.isMobilInvalid(hentSikkerDigitalPostadresseResponseTo
+				.getDigitalKontaktinformasjon()
+				.getMobiltelefonnummer());
+
+		return (isPreferertKanalMobil(varselInfoTo) || isEpostInvalid) && !isMobilInvalid;
 	}
 
 	private boolean isPreferertKanalEpost(VarselInfoTo varselInfoTo) {

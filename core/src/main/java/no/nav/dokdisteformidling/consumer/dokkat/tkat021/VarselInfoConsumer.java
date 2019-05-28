@@ -24,7 +24,9 @@ import org.springframework.web.client.RestTemplate;
 
 import javax.inject.Inject;
 import java.time.Duration;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -83,12 +85,12 @@ public class VarselInfoConsumer implements VarselInfo {
 		return varslingsTekst;
 	}
 
-	private String toDagerListe(VarselInfoRestTo varselInfoRestTo) {
-		StringBuilder sb = new StringBuilder("0");
-		for (int i = 0; i < varselInfoRestTo.getAntallRevarslinger(); i++) {
-			sb.append(',').append(varselInfoRestTo.getRevarslingIntervall() * (i + 1));
+	private List<Integer> toDagerListe(VarselInfoRestTo varselInfoRestTo) {
+		List<Integer> antallDagerListe = new ArrayList<Integer>();
+		for(int i = 0; i < varselInfoRestTo.getAntallRevarslinger(); i++){
+			antallDagerListe.add(varselInfoRestTo.getRevarslingIntervall() * (i + 1));
 		}
-		return sb.toString();
+		return antallDagerListe;
 	}
 
 }

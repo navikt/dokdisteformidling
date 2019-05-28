@@ -1,18 +1,21 @@
-package no.nav.dokdisteformidling.qdist011;
+package no.nav.dokdisteformidling;
 
 import static no.nav.dokdisteformidling.qdist011.Qdist011FunctionalUtils.getNowDate;
-import static no.nav.dokdisteformidling.qdist011.Qdist011FunctionalUtils.makePreferertKanalSet;
-import static no.nav.dokdisteformidling.qdist011.Qdist011FunctionalUtils.makeUgyldigDate;
-import static no.nav.dokdisteformidling.qdist011.Qdist011FunctionalUtils.varslingsTekst;
+import static no.nav.dokdisteformidling.testUtils.makePreferertKanalSet;
+import static no.nav.dokdisteformidling.testUtils.makeUgyldigDate;
+import static no.nav.dokdisteformidling.testUtils.varslingsTekster;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import no.nav.dokdisteformidling.consumer.dki.HentSikkerDigitalPostadresseResponseTo;
 import no.nav.dokdisteformidling.consumer.dokkat.tkat021.VarselInfoTo;
 import no.nav.dokdisteformidling.exception.functional.AbstractDokdisteformidlingFunctionalException;
+import no.nav.dokdisteformidling.qdist011.DigitalKontaktInformasjonValidator;
 import org.junit.jupiter.api.Test;
 
 import javax.xml.datatype.XMLGregorianCalendar;
+import java.util.Arrays;
+import java.util.List;
 
 class DigitalKontaktInformasjonValidatorTest {
 
@@ -20,10 +23,10 @@ class DigitalKontaktInformasjonValidatorTest {
 	private static final boolean STOPP_REPETERENDE_VARSEL = false;
 	private static final String EPOST_VARSLINGS_TEKST = "epostVarslingsTekst";
 	private static final String SMS_VARSLINGS_TEKST = "smsVarslingsTekst";
-	private static final String ANTALL_DAGER_LISTE = "antallDagerListe";
+	private static final List<Integer> ANTALL_DAGER_LISTE = Arrays.asList(1, 2, 3);
 	private static final String PREFERERT_KANAL_SMS = "SMS";
 	private static final String PREFERERT_KANAL_EPOST = "EPOST";
-	private static final byte[] SERTIFIKAT = {0, 0, 0};
+	private static final byte[] SERTIFIKAT = "testSertifikat".getBytes();
 	private static final String PERSONIDENT = "personident";
 	private static final String RESERVASJON = "NEI";
 	private static final String EPOST_VALUE = "epostValue";
@@ -306,7 +309,7 @@ class DigitalKontaktInformasjonValidatorTest {
 		return VarselInfoTo.builder()
 				.varselTypeId(VARSEL_TYPE_ID)
 				.stoppRepeterendeVarsel(STOPP_REPETERENDE_VARSEL)
-				.varslingsTekst(varslingsTekst(EPOST_VARSLINGS_TEKST, SMS_VARSLINGS_TEKST))
+				.varslingsTekst(varslingsTekster(EPOST_VARSLINGS_TEKST, SMS_VARSLINGS_TEKST))
 				.antallDagerListe(ANTALL_DAGER_LISTE)
 				.preferertKanal(makePreferertKanalSet(PREFERERT_KANAL_EPOST, PREFERERT_KANAL_SMS));
 	}
