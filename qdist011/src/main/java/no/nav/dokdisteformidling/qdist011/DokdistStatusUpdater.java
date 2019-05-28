@@ -1,6 +1,6 @@
 package no.nav.dokdisteformidling.qdist011;
 
-import static no.nav.dokdisteformidling.constants.DomainConstants.FORSENDELSE_STATUS_EKSPEDERT;
+import static no.nav.dokdisteformidling.constants.DomainConstants.FORSENDELSE_STATUS_OVERSENDT;
 import static no.nav.dokdisteformidling.qdist011.Qdist011Route.PROPERTY_FORSENDELSE_ID;
 
 import no.nav.dokdisteformidling.consumer.rdist001.AdministrerForsendelse;
@@ -23,7 +23,7 @@ public class DokdistStatusUpdater {
 	@Handler
 	public void doUpdate(Exchange exchange) {
 		final String forsendelseId = exchange.getProperty(PROPERTY_FORSENDELSE_ID, String.class);
-		administrerForsendelse.oppdaterForsendelseStatus(forsendelseId, FORSENDELSE_STATUS_EKSPEDERT);
+		administrerForsendelse.oppdaterForsendelseStatus(forsendelseId, FORSENDELSE_STATUS_OVERSENDT);
 	}
 
 }

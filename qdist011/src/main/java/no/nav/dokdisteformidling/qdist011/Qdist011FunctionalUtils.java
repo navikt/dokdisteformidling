@@ -1,6 +1,8 @@
 package no.nav.dokdisteformidling.qdist011;
 
-import static no.nav.dokdisteformidling.constants.BridgeMotSDPMapperConstants.DATE_VALID_MONTHS;
+import static no.nav.dokdisteformidling.qdist011.constants.BridgeMotSDPMapperConstants.DATE_VALID_MONTHS;
+import static no.nav.dokdisteformidling.qdist011.constants.BridgeMotSDPMapperConstants.EPOST;
+import static no.nav.dokdisteformidling.qdist011.constants.BridgeMotSDPMapperConstants.SMS;
 import static org.apache.xml.security.stax.ext.XMLSecurityConstants.datatypeFactory;
 
 import no.nav.dokdisteformidling.constants.DomainConstants;
@@ -16,7 +18,9 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -84,6 +88,13 @@ public class Qdist011FunctionalUtils {
 			set.add(kanal);
 		}
 		return set;
+	}
+
+	public static java.util.Map<String, String> varslingsTekst(String epostVarslingsTekst, String smsVarslingsTekst) {
+		Map<String, String> varslingsMap = new HashMap<String, String>();
+		varslingsMap.put(EPOST, epostVarslingsTekst);
+		varslingsMap.put(SMS, smsVarslingsTekst);
+		return varslingsMap;
 	}
 
 }
