@@ -238,7 +238,7 @@ public class BridgeMotSDPMapper {
 		Varsler varsler = null;
 		Repetisjoner repitisjoner = null;
 
-		if (varselInfoTo.getAntallDagerListe().isEmpty()) {
+		if (varselInfoTo.getAntallDagerListe() != null) {
 			repitisjoner = new Repetisjoner();
 			repitisjoner.getDagerEtter().addAll(varselInfoTo.getAntallDagerListe());
 		}

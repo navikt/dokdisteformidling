@@ -443,37 +443,22 @@ public class BridgeMotSDPMapperTest {
 
 		if (preferertKanalEpost && !preferertKanalSMS) {
 			assertNull(varsler.getSmsVarsel());
-			assertEquals(varsler.getEpostVarsel().getRepetisjoner().getDagerEtter().stream()
-							.findFirst()
-							.get()
-							.toString(),
-					ANTALL_DAGER_LISTE);
+			assertTrue(varsler.getEpostVarsel().getRepetisjoner().getDagerEtter().equals(ANTALL_DAGER_LISTE));
 			assertEquals(varsler.getEpostVarsel().getVarslingsTekst().getValue(), EPOST_VARSLINGS_TEKST);
 			assertEquals(varsler.getEpostVarsel().getVarslingsTekst().getLang(), SPRAAK_KODE);
 			assertEquals(varsler.getEpostVarsel().getEpostadresse(), EPOST_VALUE);
 		} else if (!preferertKanalEpost && preferertKanalSMS) {
 			assertNull(varsler.getEpostVarsel());
-			assertEquals(varsler.getSmsVarsel().getRepetisjoner().getDagerEtter().stream()
-					.findFirst()
-					.get()
-					.toString(), ANTALL_DAGER_LISTE);
+			assertTrue(varsler.getSmsVarsel().getRepetisjoner().getDagerEtter().equals(ANTALL_DAGER_LISTE));
 			assertEquals(varsler.getSmsVarsel().getVarslingsTekst().getValue(), SMS_VARSLINGS_TEKST);
 			assertEquals(varsler.getSmsVarsel().getVarslingsTekst().getLang(), SPRAAK_KODE);
 			assertEquals(varsler.getSmsVarsel().getMobiltelefonnummer(), MOBIL_VALUE);
 		} else if (preferertKanalEpost && preferertKanalSMS) {
-			assertEquals(varsler.getSmsVarsel().getRepetisjoner().getDagerEtter().stream()
-							.findFirst()
-							.get()
-							.toString(),
-					ANTALL_DAGER_LISTE);
+			assertTrue(varsler.getSmsVarsel().getRepetisjoner().getDagerEtter().equals(ANTALL_DAGER_LISTE));
 			assertEquals(varsler.getSmsVarsel().getVarslingsTekst().getValue(), SMS_VARSLINGS_TEKST);
 			assertEquals(varsler.getSmsVarsel().getVarslingsTekst().getLang(), SPRAAK_KODE);
 			assertEquals(varsler.getSmsVarsel().getMobiltelefonnummer(), MOBIL_VALUE);
-			assertEquals(varsler.getEpostVarsel().getRepetisjoner().getDagerEtter().stream()
-							.findFirst()
-							.get()
-							.toString(),
-					ANTALL_DAGER_LISTE);
+			assertTrue(varsler.getEpostVarsel().getRepetisjoner().getDagerEtter().equals(ANTALL_DAGER_LISTE));
 			assertEquals(varsler.getEpostVarsel().getVarslingsTekst().getValue(), EPOST_VARSLINGS_TEKST);
 			assertEquals(varsler.getEpostVarsel().getVarslingsTekst().getLang(), SPRAAK_KODE);
 			assertEquals(varsler.getEpostVarsel().getEpostadresse(), EPOST_VALUE);
