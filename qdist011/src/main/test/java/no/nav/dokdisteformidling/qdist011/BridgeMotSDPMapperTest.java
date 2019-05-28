@@ -1,14 +1,19 @@
 package no.nav.dokdisteformidling.qdist011;
 
-import static no.nav.dokdisteformidling.constants.BridgeMotSDPMapperConstants.BUSINESS_SCOPE_TYPE;
-import static no.nav.dokdisteformidling.constants.BridgeMotSDPMapperConstants.DIGITAL_POST;
-import static no.nav.dokdisteformidling.constants.BridgeMotSDPMapperConstants.DOKUMENT_MIME;
-import static no.nav.dokdisteformidling.constants.BridgeMotSDPMapperConstants.ORGANISASJON_IDENTIFIER;
-import static no.nav.dokdisteformidling.constants.BridgeMotSDPMapperConstants.STANDARD;
-import static no.nav.dokdisteformidling.constants.BridgeMotSDPMapperConstants.VERSION;
 import static no.nav.dokdisteformidling.qdist011.Qdist011FunctionalUtils.getNowDate;
 import static no.nav.dokdisteformidling.qdist011.Qdist011FunctionalUtils.makePreferertKanalSet;
 import static no.nav.dokdisteformidling.qdist011.Qdist011FunctionalUtils.makeUgyldigDate;
+import static no.nav.dokdisteformidling.qdist011.Qdist011FunctionalUtils.varslingsTekst;
+import static no.nav.dokdisteformidling.qdist011.constants.BridgeMotSDPMapperConstants.AUTHORITY;
+import static no.nav.dokdisteformidling.qdist011.constants.BridgeMotSDPMapperConstants.AUTHORITY_ENUM;
+import static no.nav.dokdisteformidling.qdist011.constants.BridgeMotSDPMapperConstants.BUSINESS_SCOPE_TYPE;
+import static no.nav.dokdisteformidling.qdist011.constants.BridgeMotSDPMapperConstants.DIGITAL_POST;
+import static no.nav.dokdisteformidling.qdist011.constants.BridgeMotSDPMapperConstants.DOKUMENT_MIME;
+import static no.nav.dokdisteformidling.qdist011.constants.BridgeMotSDPMapperConstants.ORGNR_NAV;
+import static no.nav.dokdisteformidling.qdist011.constants.BridgeMotSDPMapperConstants.ORG_PREFIX;
+import static no.nav.dokdisteformidling.qdist011.constants.BridgeMotSDPMapperConstants.SPRAAK_KODE;
+import static no.nav.dokdisteformidling.qdist011.constants.BridgeMotSDPMapperConstants.STANDARD;
+import static no.nav.dokdisteformidling.qdist011.constants.BridgeMotSDPMapperConstants.VERSION;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -32,6 +37,7 @@ import org.unece.cefact.namespaces.standardbusinessdocumentheader.Scope;
 import org.unece.cefact.namespaces.standardbusinessdocumentheader.StandardBusinessDocument;
 import org.unece.cefact.namespaces.standardbusinessdocumentheader.StandardBusinessDocumentHeader;
 
+import javax.xml.bind.JAXBElement;
 import javax.xml.datatype.XMLGregorianCalendar;
 import java.util.Arrays;
 
@@ -70,19 +76,20 @@ public class BridgeMotSDPMapperTest {
 	private static final String DOKUMENT_OBJEKT_REFERANSE_3 = "objektReferanse3";
 	private static final byte[] SERTIFIKAT = {0, 0, 0};
 	private static final String PERSONIDENT = "personident";
-	private static final String RESERVASJON = "NEI";
+	private static final String INGEN_RESERVASJON = "NEI";
 	private static final String EPOST_VALUE = "epostValue";
 	private static final XMLGregorianCalendar GYLDIG_SIST_VERIFISERT = getNowDate();
 	private static final XMLGregorianCalendar GYLDIG_SIST_OPPDATERT = getNowDate();
 	private static final XMLGregorianCalendar UGYLDIG_SIST_VERIFISERT = makeUgyldigDate();
 	private static final XMLGregorianCalendar UGYLDIG_SIST_OPPDATERT = makeUgyldigDate();
 	private static final String MOBIL_VALUE = "mobilValue";
-	private static final String LEVERANDOER_ADRESSE = "leverandoerAdresse";
+	private static final String LEVERANDOER_ADRESSE = ORG_PREFIX + "leverandoerAdresse";
 	private static final String BRUKER_ADRESSE = "brukerAdresse";
 	private static final String VARSEL_TYPE_ID = "varselTypeId";
 	private static final int SIKKERHETSNIVAA = 0;
 	private static final boolean STOPP_REPETERENDE_VARSEL = false;
-	private static final String VARSLINGS_TEKST = "varslingsTekst";
+	private static final String EPOST_VARSLINGS_TEKST = "epostVarslingsTekst";
+	private static final String SMS_VARSLINGS_TEKST = "smsVarslingsTekst";
 	private static final String ANTALL_DAGER_LISTE = "1";
 	private static final String PREFERERT_KANAL_SMS = "SMS";
 	private static final String PREFERERT_KANAL_EPOST = "EPOST";
@@ -141,14 +148,13 @@ public class BridgeMotSDPMapperTest {
 		assertNull(sendDigitalPost.getSendDigitalPostRequest().getSertifikat());
 		assertFalse(sendDigitalPost.getSendDigitalPostRequest().getManifest().getVedlegg().stream().findFirst().isPresent());
 
-		DigitalPost digitalPost = (DigitalPost) sendDigitalPost.getSendDigitalPostRequest()
-				.getStandardBusinessDocument()
-				.getAny();
-		Varsler varsler = digitalPost.getDigitalPostInfo().getVarsler();
+		JAXBElement<DigitalPost> jaxbDigitalPost = (JAXBElement<DigitalPost>) sendDigitalPost.getSendDigitalPostRequest()
+				.getStandardBusinessDocument().getAny();
+		Varsler varsler = jaxbDigitalPost.getValue().getDigitalPostInfo().getVarsler();
 
 		assertNull(varsler.getSmsVarsel());
 		assertNull(varsler.getEpostVarsel().getRepetisjoner());
-		assertEquals(varsler.getEpostVarsel().getVarslingsTekst().getValue(), VARSLINGS_TEKST);
+		assertEquals(varsler.getEpostVarsel().getVarslingsTekst().getValue(), EPOST_VARSLINGS_TEKST);
 		assertEquals(varsler.getEpostVarsel().getEpostadresse(), EPOST_VALUE);
 	}
 
@@ -420,18 +426,16 @@ public class BridgeMotSDPMapperTest {
 
 		assertSendDigitalPost(sendDigitalPost);
 
-		DigitalPost digitalPost = (DigitalPost) sendDigitalPost.getSendDigitalPostRequest()
-				.getStandardBusinessDocument()
-				.getAny();
-		assertNull(digitalPost.getDigitalPostInfo().getVarsler());
+		JAXBElement<DigitalPost> jaxbDigitalPost = (JAXBElement<DigitalPost>) sendDigitalPost.getSendDigitalPostRequest()
+				.getStandardBusinessDocument().getAny();
+		assertNull(jaxbDigitalPost.getValue().getDigitalPostInfo().getVarsler());
 	}
 
 	private void assertEpostAndSMSVarsel(SendDigitalPost sendDigitalPost, boolean preferertKanalEpost, boolean preferertKanalSMS) {
 
-		DigitalPost digitalPost = (DigitalPost) sendDigitalPost.getSendDigitalPostRequest()
+		JAXBElement<DigitalPost> jaxbDigitalPost = (JAXBElement<DigitalPost>) sendDigitalPost.getSendDigitalPostRequest()
 				.getStandardBusinessDocument().getAny();
-		Varsler varsler = digitalPost.getDigitalPostInfo().getVarsler();
-
+		Varsler varsler = jaxbDigitalPost.getValue().getDigitalPostInfo().getVarsler();
 
 		if (preferertKanalEpost && !preferertKanalSMS) {
 			assertNull(varsler.getSmsVarsel());
@@ -440,7 +444,8 @@ public class BridgeMotSDPMapperTest {
 							.get()
 							.toString(),
 					ANTALL_DAGER_LISTE);
-			assertEquals(varsler.getEpostVarsel().getVarslingsTekst().getValue(), VARSLINGS_TEKST);
+			assertEquals(varsler.getEpostVarsel().getVarslingsTekst().getValue(), EPOST_VARSLINGS_TEKST);
+			assertEquals(varsler.getEpostVarsel().getVarslingsTekst().getLang(), SPRAAK_KODE);
 			assertEquals(varsler.getEpostVarsel().getEpostadresse(), EPOST_VALUE);
 		} else if (!preferertKanalEpost && preferertKanalSMS) {
 			assertNull(varsler.getEpostVarsel());
@@ -448,7 +453,8 @@ public class BridgeMotSDPMapperTest {
 					.findFirst()
 					.get()
 					.toString(), ANTALL_DAGER_LISTE);
-			assertEquals(varsler.getSmsVarsel().getVarslingsTekst().getValue(), VARSLINGS_TEKST);
+			assertEquals(varsler.getSmsVarsel().getVarslingsTekst().getValue(), SMS_VARSLINGS_TEKST);
+			assertEquals(varsler.getSmsVarsel().getVarslingsTekst().getLang(), SPRAAK_KODE);
 			assertEquals(varsler.getSmsVarsel().getMobiltelefonnummer(), MOBIL_VALUE);
 		} else if (preferertKanalEpost && preferertKanalSMS) {
 			assertEquals(varsler.getSmsVarsel().getRepetisjoner().getDagerEtter().stream()
@@ -456,19 +462,22 @@ public class BridgeMotSDPMapperTest {
 							.get()
 							.toString(),
 					ANTALL_DAGER_LISTE);
-			assertEquals(varsler.getSmsVarsel().getVarslingsTekst().getValue(), VARSLINGS_TEKST);
+			assertEquals(varsler.getSmsVarsel().getVarslingsTekst().getValue(), SMS_VARSLINGS_TEKST);
+			assertEquals(varsler.getSmsVarsel().getVarslingsTekst().getLang(), SPRAAK_KODE);
 			assertEquals(varsler.getSmsVarsel().getMobiltelefonnummer(), MOBIL_VALUE);
 			assertEquals(varsler.getEpostVarsel().getRepetisjoner().getDagerEtter().stream()
 							.findFirst()
 							.get()
 							.toString(),
 					ANTALL_DAGER_LISTE);
-			assertEquals(varsler.getEpostVarsel().getVarslingsTekst().getValue(), VARSLINGS_TEKST);
+			assertEquals(varsler.getEpostVarsel().getVarslingsTekst().getValue(), EPOST_VARSLINGS_TEKST);
+			assertEquals(varsler.getEpostVarsel().getVarslingsTekst().getLang(), SPRAAK_KODE);
 			assertEquals(varsler.getEpostVarsel().getEpostadresse(), EPOST_VALUE);
 		}
 	}
 
 	private void assertSendDigitalPost(SendDigitalPost sendDigitalPost) {
+
 		assertNotNull(sendDigitalPost);
 	}
 
@@ -485,16 +494,18 @@ public class BridgeMotSDPMapperTest {
 
 		//Assert Manifest
 		final Manifest manifest = sendDigitalPostRequest.getManifest();
-		assertEquals(manifest.getAvsender().getOrganisasjon().getValue(), ORGANISASJON_IDENTIFIER);
+		assertEquals(manifest.getAvsender().getOrganisasjon().getValue(), ORGNR_NAV);
 		assertEquals(manifest.getMottaker().getPerson().getPersonidentifikator(), MOTTAKER_ID);
 		assertEquals(manifest.getMottaker().getPerson().getPostkasseadresse(), BRUKER_ADRESSE);
 		assertEquals(manifest.getHoveddokument().getMime(), DOKUMENT_MIME);
 		assertEquals(manifest.getHoveddokument().getHref(), DOKUMENT_OBJEKT_REFERANSE_1 + ".pdf");
 		assertEquals(manifest.getHoveddokument().getTittel().getValue(), FORSENDELSE_TITTEL);
+		assertEquals(manifest.getHoveddokument().getTittel().getLang(), SPRAAK_KODE);
 
 		manifest.getVedlegg().stream().forEach(
 				vedlegg -> {
 					assertEquals(vedlegg.getMime(), DOKUMENT_MIME);
+					assertEquals(vedlegg.getTittel().getLang(), SPRAAK_KODE);
 					assertTrue(vedlegg.getHref().equals(DOKUMENT_OBJEKT_REFERANSE_2 + ".pdf") ||
 							vedlegg.getHref().equals(DOKUMENT_OBJEKT_REFERANSE_3 + ".pdf"));
 					assertTrue(vedlegg.getTittel().getValue().equals(TITTEL_VEDLEGG_1) ||
@@ -513,13 +524,25 @@ public class BridgeMotSDPMapperTest {
 				.findAny()
 				.get()
 				.getIdentifier()
-				.getValue(), ORGANISASJON_IDENTIFIER);
+				.getValue(), ORGNR_NAV);
+		assertEquals(standardBusinessDocumentHeader.getSender()
+				.stream()
+				.findAny()
+				.get()
+				.getIdentifier()
+				.getAuthority(), AUTHORITY);
 		assertEquals(standardBusinessDocumentHeader.getReceiver()
 				.stream()
 				.findAny()
 				.get()
 				.getIdentifier()
 				.getValue(), LEVERANDOER_ADRESSE);
+		assertEquals(standardBusinessDocumentHeader.getReceiver()
+				.stream()
+				.findAny()
+				.get()
+				.getIdentifier()
+				.getAuthority(), AUTHORITY);
 
 		//Assert DocumentIdentification
 		final DocumentIdentification documentIdentification = standardBusinessDocumentHeader.getDocumentIdentification();
@@ -538,16 +561,18 @@ public class BridgeMotSDPMapperTest {
 		assertEquals(scope.getIdentifier(), STANDARD);
 
 		//Assert DigitalPost
-		final DigitalPost digitalPost = (DigitalPost) standardBusinessDocument.getAny();
-		assertNotNull(digitalPost);
-		assertEquals(digitalPost.getAvsender().getOrganisasjon().getValue(), ORGANISASJON_IDENTIFIER);
-		assertEquals(digitalPost.getMottaker().getPerson().getPersonidentifikator(), MOTTAKER_ID);
-		assertEquals(digitalPost.getMottaker().getPerson().getPostkasseadresse(), BRUKER_ADRESSE);
+		final JAXBElement<DigitalPost> jaxbDigitalPost = (JAXBElement<DigitalPost>) standardBusinessDocument.getAny();
+		assertNotNull(jaxbDigitalPost);
+		assertEquals(jaxbDigitalPost.getValue().getAvsender().getOrganisasjon().getValue(), ORGNR_NAV);
+		assertEquals(jaxbDigitalPost.getValue().getAvsender().getOrganisasjon().getAuthority(), AUTHORITY_ENUM);
+		assertEquals(jaxbDigitalPost.getValue().getMottaker().getPerson().getPersonidentifikator(), MOTTAKER_ID);
+		assertEquals(jaxbDigitalPost.getValue().getMottaker().getPerson().getPostkasseadresse(), BRUKER_ADRESSE);
 
 		//Assert DigitalPostInfo
-		final DigitalPostInfo digitalPostInfo = digitalPost.getDigitalPostInfo();
+		final DigitalPostInfo digitalPostInfo = jaxbDigitalPost.getValue().getDigitalPostInfo();
 		assertNotNull(digitalPostInfo);
 		assertEquals(digitalPostInfo.getIkkeSensitivTittel().getValue(), FORSENDELSE_TITTEL);
+		assertEquals(digitalPostInfo.getIkkeSensitivTittel().getLang(), SPRAAK_KODE);
 		assertEquals(digitalPostInfo.getSikkerhetsnivaa(), Integer.toString(SIKKERHETSNIVAA));
 		assertFalse(digitalPostInfo.isAapningskvittering());
 
@@ -574,7 +599,7 @@ public class BridgeMotSDPMapperTest {
 		return VarselInfoTo.builder()
 				.varselTypeId(VARSEL_TYPE_ID)
 				.stoppRepeterendeVarsel(STOPP_REPETERENDE_VARSEL)
-				.varslingsTekst(VARSLINGS_TEKST)
+				.varslingsTekst(varslingsTekst(EPOST_VARSLINGS_TEKST, SMS_VARSLINGS_TEKST))
 				.antallDagerListe(ANTALL_DAGER_LISTE)
 				.preferertKanal(makePreferertKanalSet(PREFERERT_KANAL_EPOST, PREFERERT_KANAL_SMS));
 	}
@@ -590,7 +615,7 @@ public class BridgeMotSDPMapperTest {
 		return HentSikkerDigitalPostadresseResponseTo.builder()
 				.digitalKontaktinformasjon(HentSikkerDigitalPostadresseResponseTo.Kontaktinformasjon.builder()
 						.personident(PERSONIDENT)
-						.reservasjon(RESERVASJON)
+						.reservasjon(INGEN_RESERVASJON)
 						.epostadresse(HentSikkerDigitalPostadresseResponseTo.Epostadresse.builder()
 								.value(EPOST_VALUE)
 								.sistOppdatert(GYLDIG_SIST_OPPDATERT)

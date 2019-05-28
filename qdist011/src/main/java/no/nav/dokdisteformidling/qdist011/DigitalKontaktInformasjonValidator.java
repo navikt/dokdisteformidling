@@ -1,7 +1,7 @@
 package no.nav.dokdisteformidling.qdist011;
 
-import static no.nav.dokdisteformidling.constants.BridgeMotSDPMapperConstants.DATE_VALID_MONTHS;
-import static no.nav.dokdisteformidling.constants.BridgeMotSDPMapperConstants.RESERVASJON;
+import static no.nav.dokdisteformidling.qdist011.constants.BridgeMotSDPMapperConstants.DATE_VALID_MONTHS;
+import static no.nav.dokdisteformidling.qdist011.constants.BridgeMotSDPMapperConstants.RESERVASJON;
 
 import no.nav.dokdisteformidling.consumer.dki.HentSikkerDigitalPostadresseResponseTo;
 import no.nav.dokdisteformidling.consumer.dokkat.tkat021.VarselInfoTo;
@@ -61,9 +61,9 @@ public class DigitalKontaktInformasjonValidator {
 
 		if (!(dateTime == null)) {
 			GregorianCalendar calendar = dateTime.toGregorianCalendar();
-			GregorianCalendar today = Qdist011FunctionalUtils.getNow().toGregorianCalendar();
-			today.add(today.MONTH, -DATE_VALID_MONTHS);
-			result = calendar.compareTo(today);        //If result is positive: calendar is later than (today - DATE_VALID_MONTHS):
+			GregorianCalendar outdated = Qdist011FunctionalUtils.getNow().toGregorianCalendar();
+			outdated.add(GregorianCalendar.MONTH, -DATE_VALID_MONTHS);
+			result = calendar.compareTo(outdated);        //If result is positive: calendar is later than (today - DATE_VALID_MONTHS):
 		}
 
 		return result < 0;

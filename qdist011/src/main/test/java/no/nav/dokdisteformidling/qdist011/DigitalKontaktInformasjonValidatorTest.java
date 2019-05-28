@@ -3,6 +3,7 @@ package no.nav.dokdisteformidling.qdist011;
 import static no.nav.dokdisteformidling.qdist011.Qdist011FunctionalUtils.getNowDate;
 import static no.nav.dokdisteformidling.qdist011.Qdist011FunctionalUtils.makePreferertKanalSet;
 import static no.nav.dokdisteformidling.qdist011.Qdist011FunctionalUtils.makeUgyldigDate;
+import static no.nav.dokdisteformidling.qdist011.Qdist011FunctionalUtils.varslingsTekst;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -17,7 +18,8 @@ class DigitalKontaktInformasjonValidatorTest {
 
 	private static final String VARSEL_TYPE_ID = "varselTypeId";
 	private static final boolean STOPP_REPETERENDE_VARSEL = false;
-	private static final String VARSLINGS_TEKST = "varslingsTekst";
+	private static final String EPOST_VARSLINGS_TEKST = "epostVarslingsTekst";
+	private static final String SMS_VARSLINGS_TEKST = "smsVarslingsTekst";
 	private static final String ANTALL_DAGER_LISTE = "antallDagerListe";
 	private static final String PREFERERT_KANAL_SMS = "SMS";
 	private static final String PREFERERT_KANAL_EPOST = "EPOST";
@@ -304,7 +306,7 @@ class DigitalKontaktInformasjonValidatorTest {
 		return VarselInfoTo.builder()
 				.varselTypeId(VARSEL_TYPE_ID)
 				.stoppRepeterendeVarsel(STOPP_REPETERENDE_VARSEL)
-				.varslingsTekst(VARSLINGS_TEKST)
+				.varslingsTekst(varslingsTekst(EPOST_VARSLINGS_TEKST, SMS_VARSLINGS_TEKST))
 				.antallDagerListe(ANTALL_DAGER_LISTE)
 				.preferertKanal(makePreferertKanalSet(PREFERERT_KANAL_EPOST, PREFERERT_KANAL_SMS));
 	}
