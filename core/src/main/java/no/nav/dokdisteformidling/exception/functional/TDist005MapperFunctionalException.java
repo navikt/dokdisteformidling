@@ -5,4 +5,8 @@ public class TDist005MapperFunctionalException extends AbstractDokdisteformidlin
 	public TDist005MapperFunctionalException(String message) {
 		super(message);
 	}
+
+	public TDist005MapperFunctionalException(String message, Throwable cause) {
+		super(message, cause);
+	}
 }

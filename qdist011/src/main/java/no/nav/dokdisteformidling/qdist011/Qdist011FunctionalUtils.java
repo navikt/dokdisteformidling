@@ -1,5 +1,8 @@
 package no.nav.dokdisteformidling.qdist011;
 
+import static no.nav.dokdisteformidling.constants.BridgeMotSDPMapperConstants.DATE_VALID_MONTHS;
+import static org.apache.xml.security.stax.ext.XMLSecurityConstants.datatypeFactory;
+
 import no.nav.dokdisteformidling.constants.DomainConstants;
 import no.nav.dokdisteformidling.consumer.rdist001.HentForsendelseResponseTo;
 import no.nav.dokdisteformidling.exception.functional.InvalidForsendelseStatusFunctionalException;
@@ -8,7 +11,13 @@ import no.nav.dokdisteformidling.exception.technical.KunneIkkeHenteDagensDatoTec
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -43,6 +52,38 @@ public class Qdist011FunctionalUtils {
 			throw new KunneIkkeHenteDagensDatoTechnicalException("qdist011 kunne ikke hente dagens dato", e);
 		}
 		return now;
+	}
+
+	public static XMLGregorianCalendar getNowDate() {
+		XMLGregorianCalendar now;
+
+		String formater = "yyyy-MM-dd";
+		DateFormat format = new SimpleDateFormat(formater);
+		Date date = new Date();
+
+		try {
+			now = DatatypeFactory.newInstance().newXMLGregorianCalendar(format.format(date));
+		} catch (DatatypeConfigurationException e) {
+			throw new KunneIkkeHenteDagensDatoTechnicalException("qdist011 kunne ikke hente dagens dato", e);
+		}
+		return now;
+	}
+
+	public static XMLGregorianCalendar makeUgyldigDate() {
+		XMLGregorianCalendar calendar = getNowDate();
+		GregorianCalendar gregorianCalendar = calendar.toGregorianCalendar();
+		gregorianCalendar.add(Calendar.MONTH, -(DATE_VALID_MONTHS + 1));
+
+		return datatypeFactory.newXMLGregorianCalendar(gregorianCalendar);
+	}
+
+	public static Set<String> makePreferertKanalSet(String... preferertKanal) {
+		Set<String> set = new HashSet<String>();
+
+		for (String kanal : preferertKanal) {
+			set.add(kanal);
+		}
+		return set;
 	}
 
 }
