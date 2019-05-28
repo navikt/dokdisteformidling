@@ -1,9 +1,6 @@
-package no.nav.dokdisteformidling.qdist011;
+package no.nav.dokdisteformidling;
 
 import static no.nav.dokdisteformidling.qdist011.Qdist011FunctionalUtils.getNowDate;
-import static no.nav.dokdisteformidling.qdist011.Qdist011FunctionalUtils.makePreferertKanalSet;
-import static no.nav.dokdisteformidling.qdist011.Qdist011FunctionalUtils.makeUgyldigDate;
-import static no.nav.dokdisteformidling.qdist011.Qdist011FunctionalUtils.varslingsTekst;
 import static no.nav.dokdisteformidling.qdist011.constants.BridgeMotSDPMapperConstants.AUTHORITY;
 import static no.nav.dokdisteformidling.qdist011.constants.BridgeMotSDPMapperConstants.AUTHORITY_ENUM;
 import static no.nav.dokdisteformidling.qdist011.constants.BridgeMotSDPMapperConstants.BUSINESS_SCOPE_TYPE;
@@ -14,6 +11,9 @@ import static no.nav.dokdisteformidling.qdist011.constants.BridgeMotSDPMapperCon
 import static no.nav.dokdisteformidling.qdist011.constants.BridgeMotSDPMapperConstants.SPRAAK_KODE;
 import static no.nav.dokdisteformidling.qdist011.constants.BridgeMotSDPMapperConstants.STANDARD;
 import static no.nav.dokdisteformidling.qdist011.constants.BridgeMotSDPMapperConstants.VERSION;
+import static no.nav.dokdisteformidling.testUtils.makePreferertKanalSet;
+import static no.nav.dokdisteformidling.testUtils.makeUgyldigDate;
+import static no.nav.dokdisteformidling.testUtils.varslingsTekster;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -29,8 +29,11 @@ import no.nav.dokdisteformidling.consumer.dokkat.tkat020.DokumenttypeInfoTo;
 import no.nav.dokdisteformidling.consumer.dokkat.tkat021.VarselInfoTo;
 import no.nav.dokdisteformidling.consumer.rdist001.HentForsendelseResponseTo;
 import no.nav.dokdisteformidling.consumer.saf.journalpost.SafJournalpostTo;
+import no.nav.dokdisteformidling.qdist011.BridgeMotSDPMapper;
+import no.nav.dokdisteformidling.qdist011.Qdist011FunctionalUtils;
 import no.nav.tjeneste.virksomhet.digitalpost.senddigitalpost.v1.SendDigitalPost;
 import no.nav.tjeneste.virksomhet.digitalpost.senddigitalpost.v1.meldinger.SendDigitalPostRequest;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.unece.cefact.namespaces.standardbusinessdocumentheader.DocumentIdentification;
 import org.unece.cefact.namespaces.standardbusinessdocumentheader.Scope;
@@ -40,6 +43,7 @@ import org.unece.cefact.namespaces.standardbusinessdocumentheader.StandardBusine
 import javax.xml.bind.JAXBElement;
 import javax.xml.datatype.XMLGregorianCalendar;
 import java.util.Arrays;
+import java.util.List;
 
 /**
  * @author Heidi Elisabeth Sando, Visma Consulting.
@@ -74,7 +78,7 @@ public class BridgeMotSDPMapperTest {
 	private static final String DOKUMENT_OBJEKT_REFERANSE_1 = "objektReferanse1";
 	private static final String DOKUMENT_OBJEKT_REFERANSE_2 = "objektReferanse2";
 	private static final String DOKUMENT_OBJEKT_REFERANSE_3 = "objektReferanse3";
-	private static final byte[] SERTIFIKAT = {0, 0, 0};
+	private static final byte[] SERTIFIKAT = "testSertifikat".getBytes();
 	private static final String PERSONIDENT = "personident";
 	private static final String INGEN_RESERVASJON = "NEI";
 	private static final String EPOST_VALUE = "epostValue";
@@ -90,7 +94,7 @@ public class BridgeMotSDPMapperTest {
 	private static final boolean STOPP_REPETERENDE_VARSEL = false;
 	private static final String EPOST_VARSLINGS_TEKST = "epostVarslingsTekst";
 	private static final String SMS_VARSLINGS_TEKST = "smsVarslingsTekst";
-	private static final String ANTALL_DAGER_LISTE = "1";
+	private static final List<Integer> ANTALL_DAGER_LISTE = Arrays.asList(1, 2, 3);
 	private static final String PREFERERT_KANAL_SMS = "SMS";
 	private static final String PREFERERT_KANAL_EPOST = "EPOST";
 	private static final String TITTEL_VEDLEGG_1 = "tittelVedlegg1";
@@ -551,7 +555,7 @@ public class BridgeMotSDPMapperTest {
 		assertEquals(documentIdentification.getTypeVersion(), VERSION);
 		assertEquals(documentIdentification.getInstanceIdentifier(), BESTILLINGS_ID);
 		assertEquals(documentIdentification.getType(), DIGITAL_POST);
-		assertEquals(documentIdentification.getCreationDateAndTime(), Qdist011FunctionalUtils.getNowDate());
+		Assertions.assertEquals(documentIdentification.getCreationDateAndTime(), Qdist011FunctionalUtils.getNowDate());
 
 		//Assert Scope
 		final Scope scope = standardBusinessDocumentHeader.getBusinessScope().getScope().stream().findFirst().get();
@@ -599,7 +603,7 @@ public class BridgeMotSDPMapperTest {
 		return VarselInfoTo.builder()
 				.varselTypeId(VARSEL_TYPE_ID)
 				.stoppRepeterendeVarsel(STOPP_REPETERENDE_VARSEL)
-				.varslingsTekst(varslingsTekst(EPOST_VARSLINGS_TEKST, SMS_VARSLINGS_TEKST))
+				.varslingsTekst(varslingsTekster(EPOST_VARSLINGS_TEKST, SMS_VARSLINGS_TEKST))
 				.antallDagerListe(ANTALL_DAGER_LISTE)
 				.preferertKanal(makePreferertKanalSet(PREFERERT_KANAL_EPOST, PREFERERT_KANAL_SMS));
 	}

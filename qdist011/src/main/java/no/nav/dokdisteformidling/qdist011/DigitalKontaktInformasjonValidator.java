@@ -2,6 +2,7 @@ package no.nav.dokdisteformidling.qdist011;
 
 import static no.nav.dokdisteformidling.qdist011.constants.BridgeMotSDPMapperConstants.DATE_VALID_MONTHS;
 import static no.nav.dokdisteformidling.qdist011.constants.BridgeMotSDPMapperConstants.RESERVASJON;
+import static no.nav.dokdisteformidling.qdist011.constants.BridgeMotSDPMapperConstants.SMS;
 
 import no.nav.dokdisteformidling.consumer.dki.HentSikkerDigitalPostadresseResponseTo;
 import no.nav.dokdisteformidling.consumer.dokkat.tkat021.VarselInfoTo;
@@ -20,12 +21,8 @@ import java.util.GregorianCalendar;
 public class DigitalKontaktInformasjonValidator {
 
 	public void validateKontaktinfo(HentSikkerDigitalPostadresseResponseTo hentSikkerDigitalPostadresseResponseTo, VarselInfoTo varselInfoTo) {
-		validateHentSikkerDigitalPostadresseResponseTo(hentSikkerDigitalPostadresseResponseTo, varselInfoTo);
-	}
 
-	public void validateHentSikkerDigitalPostadresseResponseTo(HentSikkerDigitalPostadresseResponseTo hentSikkerDigitalPostadresseResponseTo,
-															   VarselInfoTo varselInfoTo) {
-		if (hentSikkerDigitalPostadresseResponseTo.getDigitalKontaktinformasjon().getReservasjon().equals(RESERVASJON)) {
+		if (RESERVASJON.equals(hentSikkerDigitalPostadresseResponseTo.getDigitalKontaktinformasjon().getReservasjon())) {
 			throw new IllegalKontaktInformasjonFunctionalException("Reservert kontaktinformasjon");
 		}
 
@@ -61,22 +58,26 @@ public class DigitalKontaktInformasjonValidator {
 
 		if (!(dateTime == null)) {
 			GregorianCalendar calendar = dateTime.toGregorianCalendar();
-			GregorianCalendar outdated = Qdist011FunctionalUtils.getNow().toGregorianCalendar();
-			outdated.add(GregorianCalendar.MONTH, -DATE_VALID_MONTHS);
-			result = calendar.compareTo(outdated);        //If result is positive: calendar is later than (today - DATE_VALID_MONTHS):
+			GregorianCalendar today = Qdist011FunctionalUtils.getNow().toGregorianCalendar();
+			today.add(GregorianCalendar.MONTH, -DATE_VALID_MONTHS);
+			result = calendar.compareTo(today);        //If result is positive: calendar is later than (today - DATE_VALID_MONTHS):
 		}
 
 		return result < 0;
 	}
 
-	public static boolean isEpostDateInvalid(HentSikkerDigitalPostadresseResponseTo.Epostadresse epostadresse) {
-		return (epostadresse == null) || StringUtils.isBlank(epostadresse.getValue()) ||
-				(isInvalidDate(epostadresse.getSistVerifisert()) && isInvalidDate(epostadresse.getSistOppdatert()));
+	public static boolean isEpostInvalid(HentSikkerDigitalPostadresseResponseTo.Epostadresse epostadresse) {
+
+		boolean isEmailOutdated = isInvalidDate(epostadresse.getSistVerifisert()) && isInvalidDate(epostadresse.getSistOppdatert());
+
+		return (epostadresse == null) || StringUtils.isBlank(epostadresse.getValue()) || isEmailOutdated;
 	}
 
-	public static boolean isMobilDateInvalid(HentSikkerDigitalPostadresseResponseTo.Mobiltelefonnummer mobiltelefonnummer) {
-		return (mobiltelefonnummer == null) || StringUtils.isBlank(mobiltelefonnummer.getValue()) ||
-				(isInvalidDate(mobiltelefonnummer.getSistVerifisert()) && isInvalidDate(mobiltelefonnummer.getSistOppdatert()));
+	public static boolean isMobilInvalid(HentSikkerDigitalPostadresseResponseTo.Mobiltelefonnummer mobiltelefonnummer) {
+
+		boolean isMobilOutdated = isInvalidDate(mobiltelefonnummer.getSistVerifisert()) && isInvalidDate(mobiltelefonnummer.getSistOppdatert());
+
+		return (mobiltelefonnummer == null) || StringUtils.isBlank(mobiltelefonnummer.getValue()) || isMobilOutdated;
 	}
 
 	private void verifyEmailAndPhone(HentSikkerDigitalPostadresseResponseTo hentSikkerDigitalPostadresseResponseTo) {
@@ -85,7 +86,7 @@ public class DigitalKontaktInformasjonValidator {
 		HentSikkerDigitalPostadresseResponseTo.Mobiltelefonnummer mobil = hentSikkerDigitalPostadresseResponseTo.getDigitalKontaktinformasjon()
 				.getMobiltelefonnummer();
 
-		if (isMobilDateInvalid(mobil) && isEpostDateInvalid(epost)) {
+		if (isMobilInvalid(mobil) && isEpostInvalid(epost)) {
 			throw new IllegalKontaktInformasjonFunctionalException("Epostadresse og mobiltelefonnummer er invalid");
 		}
 	}

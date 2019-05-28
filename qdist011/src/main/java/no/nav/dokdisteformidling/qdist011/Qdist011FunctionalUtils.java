@@ -73,28 +73,4 @@ public class Qdist011FunctionalUtils {
 		return now;
 	}
 
-	public static XMLGregorianCalendar makeUgyldigDate() {
-		XMLGregorianCalendar calendar = getNowDate();
-		GregorianCalendar gregorianCalendar = calendar.toGregorianCalendar();
-		gregorianCalendar.add(Calendar.MONTH, -(DATE_VALID_MONTHS + 1));
-
-		return datatypeFactory.newXMLGregorianCalendar(gregorianCalendar);
-	}
-
-	public static Set<String> makePreferertKanalSet(String... preferertKanal) {
-		Set<String> set = new HashSet<String>();
-
-		for (String kanal : preferertKanal) {
-			set.add(kanal);
-		}
-		return set;
-	}
-
-	public static java.util.Map<String, String> varslingsTekst(String epostVarslingsTekst, String smsVarslingsTekst) {
-		Map<String, String> varslingsMap = new HashMap<String, String>();
-		varslingsMap.put(EPOST, epostVarslingsTekst);
-		varslingsMap.put(SMS, smsVarslingsTekst);
-		return varslingsMap;
-	}
-
 }
