@@ -43,10 +43,16 @@
 						<ns3:epostVarsel>
 							<ns3:epostadresse>er@mocked.data</ns3:epostadresse>
 							<ns3:varslingsTekst lang="no">Varslingstekst epost</ns3:varslingsTekst>
+							<ns3:repetisjoner>
+								<ns3:dagerEtter>7</ns3:dagerEtter>
+							</ns3:repetisjoner>
 						</ns3:epostVarsel>
 						<ns3:smsVarsel>
 							<ns3:mobiltelefonnummer>54621378</ns3:mobiltelefonnummer>
 							<ns3:varslingsTekst lang="no">Varslingstekst SMS</ns3:varslingsTekst>
+							<ns3:repetisjoner>
+								<ns3:dagerEtter>7</ns3:dagerEtter>
+							</ns3:repetisjoner>
 						</ns3:smsVarsel>
 					</ns3:varsler>
 				</ns3:digitalPostInfo>
