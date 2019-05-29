@@ -1,6 +1,6 @@
 package no.nav.dokdisteformidling;
 
-import static no.nav.dokdisteformidling.qdist011.Qdist011FunctionalUtils.getNowDate;
+import static no.nav.dokdisteformidling.qdist011.Qdist011FunctionalUtils.getNow;
 import static no.nav.dokdisteformidling.qdist011.constants.BridgeMotSDPMapperConstants.AUTHORITY;
 import static no.nav.dokdisteformidling.qdist011.constants.BridgeMotSDPMapperConstants.AUTHORITY_ENUM;
 import static no.nav.dokdisteformidling.qdist011.constants.BridgeMotSDPMapperConstants.BUSINESS_SCOPE_TYPE;
@@ -11,6 +11,7 @@ import static no.nav.dokdisteformidling.qdist011.constants.BridgeMotSDPMapperCon
 import static no.nav.dokdisteformidling.qdist011.constants.BridgeMotSDPMapperConstants.SPRAAK_KODE;
 import static no.nav.dokdisteformidling.qdist011.constants.BridgeMotSDPMapperConstants.STANDARD;
 import static no.nav.dokdisteformidling.qdist011.constants.BridgeMotSDPMapperConstants.VERSION;
+import static no.nav.dokdisteformidling.testUtils.getDateOnly;
 import static no.nav.dokdisteformidling.testUtils.makePreferertKanalSet;
 import static no.nav.dokdisteformidling.testUtils.makeUgyldigDate;
 import static no.nav.dokdisteformidling.testUtils.varslingsTekster;
@@ -30,7 +31,6 @@ import no.nav.dokdisteformidling.consumer.dokkat.tkat021.VarselInfoTo;
 import no.nav.dokdisteformidling.consumer.rdist001.HentForsendelseResponseTo;
 import no.nav.dokdisteformidling.consumer.saf.journalpost.SafJournalpostTo;
 import no.nav.dokdisteformidling.qdist011.BridgeMotSDPMapper;
-import no.nav.dokdisteformidling.qdist011.Qdist011FunctionalUtils;
 import no.nav.tjeneste.virksomhet.digitalpost.senddigitalpost.v1.SendDigitalPost;
 import no.nav.tjeneste.virksomhet.digitalpost.senddigitalpost.v1.meldinger.SendDigitalPostRequest;
 import org.junit.jupiter.api.Assertions;
@@ -82,8 +82,8 @@ public class BridgeMotSDPMapperTest {
 	private static final String PERSONIDENT = "personident";
 	private static final String INGEN_RESERVASJON = "NEI";
 	private static final String EPOST_VALUE = "epostValue";
-	private static final XMLGregorianCalendar GYLDIG_SIST_VERIFISERT = getNowDate();
-	private static final XMLGregorianCalendar GYLDIG_SIST_OPPDATERT = getNowDate();
+	private static final XMLGregorianCalendar GYLDIG_SIST_VERIFISERT = getNow();
+	private static final XMLGregorianCalendar GYLDIG_SIST_OPPDATERT = getNow();
 	private static final XMLGregorianCalendar UGYLDIG_SIST_VERIFISERT = makeUgyldigDate();
 	private static final XMLGregorianCalendar UGYLDIG_SIST_OPPDATERT = makeUgyldigDate();
 	private static final String MOBIL_VALUE = "mobilValue";
@@ -540,7 +540,7 @@ public class BridgeMotSDPMapperTest {
 		assertEquals(documentIdentification.getTypeVersion(), VERSION);
 		assertEquals(documentIdentification.getInstanceIdentifier(), BESTILLINGS_ID);
 		assertEquals(documentIdentification.getType(), DIGITAL_POST);
-		Assertions.assertEquals(documentIdentification.getCreationDateAndTime(), Qdist011FunctionalUtils.getNowDate());
+		Assertions.assertEquals(getDateOnly(documentIdentification.getCreationDateAndTime()), getDateOnly(getNow()));
 
 		//Assert Scope
 		final Scope scope = standardBusinessDocumentHeader.getBusinessScope().getScope().stream().findFirst().get();

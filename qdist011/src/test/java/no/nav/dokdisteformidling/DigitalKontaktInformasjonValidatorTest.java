@@ -1,6 +1,6 @@
 package no.nav.dokdisteformidling;
 
-import static no.nav.dokdisteformidling.qdist011.Qdist011FunctionalUtils.getNowDate;
+import static no.nav.dokdisteformidling.qdist011.Qdist011FunctionalUtils.getNow;
 import static no.nav.dokdisteformidling.testUtils.makePreferertKanalSet;
 import static no.nav.dokdisteformidling.testUtils.makeUgyldigDate;
 import static no.nav.dokdisteformidling.testUtils.varslingsTekster;
@@ -31,8 +31,8 @@ class DigitalKontaktInformasjonValidatorTest {
 	private static final String RESERVASJON = "NEI";
 	private static final String EPOST_VALUE = "epostValue";
 	private static final String MOBIL_VALUE = "mobilValue";
-	private static final XMLGregorianCalendar GYLDIG_SIST_VERIFISERT = getNowDate();
-	private static final XMLGregorianCalendar GYLDIG_SIST_OPPDATERT = getNowDate();
+	private static final XMLGregorianCalendar GYLDIG_SIST_VERIFISERT = getNow();
+	private static final XMLGregorianCalendar GYLDIG_SIST_OPPDATERT = getNow();
 	private static final XMLGregorianCalendar UGYLDIG_SIST_VERIFISERT = makeUgyldigDate();
 	private static final XMLGregorianCalendar UGYLDIG_SIST_OPPDATERT = makeUgyldigDate();
 	private static final String LEVERANDOER_ADRESSE = "leverandoerAdresse";

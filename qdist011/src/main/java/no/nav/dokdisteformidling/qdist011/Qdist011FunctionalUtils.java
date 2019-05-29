@@ -1,10 +1,5 @@
 package no.nav.dokdisteformidling.qdist011;
 
-import static no.nav.dokdisteformidling.qdist011.constants.BridgeMotSDPMapperConstants.DATE_VALID_MONTHS;
-import static no.nav.dokdisteformidling.qdist011.constants.BridgeMotSDPMapperConstants.EPOST;
-import static no.nav.dokdisteformidling.qdist011.constants.BridgeMotSDPMapperConstants.SMS;
-import static org.apache.xml.security.stax.ext.XMLSecurityConstants.datatypeFactory;
-
 import no.nav.dokdisteformidling.constants.DomainConstants;
 import no.nav.dokdisteformidling.consumer.rdist001.HentForsendelseResponseTo;
 import no.nav.dokdisteformidling.exception.functional.InvalidForsendelseStatusFunctionalException;
@@ -13,15 +8,7 @@ import no.nav.dokdisteformidling.exception.technical.KunneIkkeHenteDagensDatoTec
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.GregorianCalendar;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -57,20 +44,4 @@ public class Qdist011FunctionalUtils {
 		}
 		return now;
 	}
-
-	public static XMLGregorianCalendar getNowDate() {
-		XMLGregorianCalendar now;
-
-		String formater = "yyyy-MM-dd";
-		DateFormat format = new SimpleDateFormat(formater);
-		Date date = new Date();
-
-		try {
-			now = DatatypeFactory.newInstance().newXMLGregorianCalendar(format.format(date));
-		} catch (DatatypeConfigurationException e) {
-			throw new KunneIkkeHenteDagensDatoTechnicalException("qdist011 kunne ikke hente dagens dato", e);
-		}
-		return now;
-	}
-
 }
