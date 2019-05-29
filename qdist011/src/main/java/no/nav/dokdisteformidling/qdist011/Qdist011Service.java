@@ -82,7 +82,7 @@ public class Qdist011Service {
 
 		VarselInfoTo varselInfoTo = getVarselInfoIfVarselTypeIdIsPresent(dokumenttypeInfoTo);
 
-		hentSikkerDigitalPostadresseResponseTo = digitalKontaktInformasjonValidator.validateKontaktinfo(hentSikkerDigitalPostadresseResponseTo, varselInfoTo);
+		digitalKontaktInformasjonValidator.validateKontaktinfo(hentSikkerDigitalPostadresseResponseTo, varselInfoTo);
 
 		List<DokdistDokument> dokdistDokumentList = getDocumentsFromS3(hentForsendelseResponseTo);
 		for (DokdistDokument dokdistDokument : dokdistDokumentList) {

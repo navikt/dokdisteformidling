@@ -47,6 +47,8 @@ fasitResources:
       resourceType: restservice
     - alias: securityTokenService
       resourceType: baseurl
+    - alias: security-token-service-token
+      resourceType: restservice
     - alias: dokdisteformidling_channel
       resourceType: channel
       propertyMap:

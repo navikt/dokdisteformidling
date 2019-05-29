@@ -44,5 +44,4 @@ public class Qdist011FunctionalUtils {
 		}
 		return now;
 	}
-
 }
