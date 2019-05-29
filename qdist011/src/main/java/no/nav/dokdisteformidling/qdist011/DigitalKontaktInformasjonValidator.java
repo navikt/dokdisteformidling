@@ -1,7 +1,7 @@
 package no.nav.dokdisteformidling.qdist011;
 
-import static no.nav.dokdisteformidling.constants.BridgeMotSDPMapperConstants.DATE_VALID_MONTHS;
-import static no.nav.dokdisteformidling.constants.BridgeMotSDPMapperConstants.RESERVASJON;
+import static no.nav.dokdisteformidling.qdist011.constants.BridgeMotSDPMapperConstants.DATE_VALID_MONTHS;
+import static no.nav.dokdisteformidling.qdist011.constants.BridgeMotSDPMapperConstants.RESERVASJON;
 
 import no.nav.dokdisteformidling.consumer.dki.HentSikkerDigitalPostadresseResponseTo;
 import no.nav.dokdisteformidling.consumer.dokkat.tkat021.VarselInfoTo;
@@ -19,16 +19,9 @@ import java.util.GregorianCalendar;
 @Component
 public class DigitalKontaktInformasjonValidator {
 
-	public HentSikkerDigitalPostadresseResponseTo validateKontaktinfo(HentSikkerDigitalPostadresseResponseTo hentSikkerDigitalPostadresseResponseTo,
-																	  VarselInfoTo varselInfoTo) {
-		validateHentSikkerDigitalPostadresseResponseTo(hentSikkerDigitalPostadresseResponseTo, varselInfoTo);
+	public void validateKontaktinfo(HentSikkerDigitalPostadresseResponseTo hentSikkerDigitalPostadresseResponseTo, VarselInfoTo varselInfoTo) {
 
-		return hentSikkerDigitalPostadresseResponseTo;
-	}
-
-	public void validateHentSikkerDigitalPostadresseResponseTo(HentSikkerDigitalPostadresseResponseTo hentSikkerDigitalPostadresseResponseTo,
-															   VarselInfoTo varselInfoTo) {
-		if (hentSikkerDigitalPostadresseResponseTo.getDigitalKontaktinformasjon().getReservasjon().equals(RESERVASJON)) {
+		if (RESERVASJON.equals(hentSikkerDigitalPostadresseResponseTo.getDigitalKontaktinformasjon().getReservasjon())) {
 			throw new IllegalKontaktInformasjonFunctionalException("Reservert kontaktinformasjon");
 		}
 
@@ -65,19 +58,34 @@ public class DigitalKontaktInformasjonValidator {
 		if (!(dateTime == null)) {
 			GregorianCalendar calendar = dateTime.toGregorianCalendar();
 			GregorianCalendar today = Qdist011FunctionalUtils.getNow().toGregorianCalendar();
-			calendar.add(today.MONTH, -DATE_VALID_MONTHS);
+			today.add(GregorianCalendar.MONTH, -DATE_VALID_MONTHS);
 			result = calendar.compareTo(today);        //If result is positive: calendar is later than (today - DATE_VALID_MONTHS):
 		}
 
 		return result < 0;
 	}
 
-	public static boolean isEpostDateInvalid(HentSikkerDigitalPostadresseResponseTo.Epostadresse epostadresse) {
-		return isInvalidDate(epostadresse.getSistVerifisert()) && isInvalidDate(epostadresse.getSistOppdatert());
+	public static boolean isEpostInvalid(HentSikkerDigitalPostadresseResponseTo.Epostadresse epostadresse) {
+
+		if (epostadresse == null) {
+			return true;
+		} else {
+			boolean isEmailOutdated = isInvalidDate(epostadresse.getSistVerifisert()) && isInvalidDate(epostadresse.getSistOppdatert());
+
+			return isEmailOutdated || StringUtils.isBlank(epostadresse.getValue());
+		}
 	}
 
-	public static boolean isMobilDateInvalid(HentSikkerDigitalPostadresseResponseTo.Mobiltelefonnummer mobiltelefonnummer) {
-		return isInvalidDate(mobiltelefonnummer.getSistVerifisert()) && isInvalidDate(mobiltelefonnummer.getSistOppdatert());
+	public static boolean isMobilInvalid(HentSikkerDigitalPostadresseResponseTo.Mobiltelefonnummer mobiltelefonnummer) {
+
+		if (mobiltelefonnummer == null) {
+			return true;
+		} else {
+
+			boolean isMobilOutdated = isInvalidDate(mobiltelefonnummer.getSistVerifisert()) && isInvalidDate(mobiltelefonnummer.getSistOppdatert());
+
+			return isMobilOutdated || StringUtils.isBlank(mobiltelefonnummer.getValue());
+		}
 	}
 
 	private void verifyEmailAndPhone(HentSikkerDigitalPostadresseResponseTo hentSikkerDigitalPostadresseResponseTo) {
@@ -86,11 +94,7 @@ public class DigitalKontaktInformasjonValidator {
 		HentSikkerDigitalPostadresseResponseTo.Mobiltelefonnummer mobil = hentSikkerDigitalPostadresseResponseTo.getDigitalKontaktinformasjon()
 				.getMobiltelefonnummer();
 
-		if (StringUtils.isBlank(epost.getValue()) && StringUtils.isBlank(mobil.getValue())) {
-			throw new IllegalKontaktInformasjonFunctionalException("Epostadresse og mobiltelefonnummer er tom");
-		}
-
-		if (isEpostDateInvalid(epost) && isMobilDateInvalid(mobil)) {
+		if (isMobilInvalid(mobil) && isEpostInvalid(epost)) {
 			throw new IllegalKontaktInformasjonFunctionalException("Epostadresse og mobiltelefonnummer er invalid");
 		}
 	}
