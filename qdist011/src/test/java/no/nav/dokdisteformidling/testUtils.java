@@ -53,7 +53,7 @@ public final class testUtils {
 	public static XMLGregorianCalendar makeUgyldigDate() {
 		XMLGregorianCalendar calendar = getNow();
 		GregorianCalendar gregorianCalendar = calendar.toGregorianCalendar();
-		gregorianCalendar.add(Calendar.MONTH, - (DATE_VALID_MONTHS + 1));
+		gregorianCalendar.add(Calendar.MONTH, -(DATE_VALID_MONTHS + 1));
 
 		return datatypeFactory.newXMLGregorianCalendar(gregorianCalendar);
 	}
@@ -65,7 +65,7 @@ public final class testUtils {
 
 		try {
 			dateTime = DatatypeFactory.newInstance().newXMLGregorianCalendar(format.format(date));
-		}catch(DatatypeConfigurationException e){
+		} catch (DatatypeConfigurationException e) {
 			throw new KunneIkkeHenteDagensDatoTechnicalException("Kunne ikke gjøre om dagens dato og tid til kun dato", e);
 		}
 		return dateTime;

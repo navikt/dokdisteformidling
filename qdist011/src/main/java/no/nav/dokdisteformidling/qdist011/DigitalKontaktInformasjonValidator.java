@@ -58,7 +58,7 @@ public class DigitalKontaktInformasjonValidator {
 		if (!(dateTime == null)) {
 			GregorianCalendar calendar = dateTime.toGregorianCalendar();
 			GregorianCalendar today = Qdist011FunctionalUtils.getNow().toGregorianCalendar();
-			today.add(GregorianCalendar.MONTH, - DATE_VALID_MONTHS);
+			today.add(GregorianCalendar.MONTH, -DATE_VALID_MONTHS);
 			result = calendar.compareTo(today);        //If result is positive: calendar is later than (today - DATE_VALID_MONTHS):
 		}
 
@@ -72,7 +72,7 @@ public class DigitalKontaktInformasjonValidator {
 		} else {
 			boolean isEmailOutdated = isInvalidDate(epostadresse.getSistVerifisert()) && isInvalidDate(epostadresse.getSistOppdatert());
 
-			return StringUtils.isBlank(epostadresse.getValue()) || isEmailOutdated;
+			return isEmailOutdated || StringUtils.isBlank(epostadresse.getValue());
 		}
 	}
 
@@ -84,7 +84,7 @@ public class DigitalKontaktInformasjonValidator {
 
 			boolean isMobilOutdated = isInvalidDate(mobiltelefonnummer.getSistVerifisert()) && isInvalidDate(mobiltelefonnummer.getSistOppdatert());
 
-			return (mobiltelefonnummer == null) || StringUtils.isBlank(mobiltelefonnummer.getValue()) || isMobilOutdated;
+			return isMobilOutdated || StringUtils.isBlank(mobiltelefonnummer.getValue());
 		}
 	}
 

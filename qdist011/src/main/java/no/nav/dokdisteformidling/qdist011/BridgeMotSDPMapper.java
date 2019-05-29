@@ -85,7 +85,7 @@ public class BridgeMotSDPMapper {
 			sendDigitalPost.setSendDigitalPostRequest(sendDigitalPostRequest);
 
 			return sendDigitalPost;
-		} catch (IllegalArgumentException e) {
+		} catch (Exception e) {
 			throw new Tdist005MapperFunctionalException(format("Kunne ikke mappe qdist011 output mot tdist005. Feilmelding=%s",
 					e.getMessage()), e);
 		}
@@ -236,43 +236,58 @@ public class BridgeMotSDPMapper {
 	private Varsler mapVarsler(VarselInfoTo varselInfoTo, HentSikkerDigitalPostadresseResponseTo hentSikkerDigitalPostadresseResponseTo) {
 
 		Varsler varsler = null;
+
+		if (sendEpostVarsel(varselInfoTo, hentSikkerDigitalPostadresseResponseTo)) {
+			varsler = new Varsler();
+			varsler.setEpostVarsel(createEpostVarsler(varselInfoTo, hentSikkerDigitalPostadresseResponseTo));
+		}
+
+		if (sendSMSVarsel(varselInfoTo, hentSikkerDigitalPostadresseResponseTo)) {
+			if (varsler == null) {
+				varsler = new Varsler();
+			}
+			varsler.setSmsVarsel(createSMSVarsler(varselInfoTo, hentSikkerDigitalPostadresseResponseTo));
+		}
+		return varsler;
+	}
+
+	private EpostVarsel createEpostVarsler(VarselInfoTo varselInfoTo, HentSikkerDigitalPostadresseResponseTo hentSikkerDigitalPostadresseResponseTo) {
+		EpostVarsel epostVarsel = new EpostVarsel();
+
+		epostVarsel.setEpostadresse(hentSikkerDigitalPostadresseResponseTo.getDigitalKontaktinformasjon()
+				.getEpostadresse()
+				.getValue());
+		EpostVarselTekst epostVarselTekst = new EpostVarselTekst();
+		epostVarselTekst.setValue(varselInfoTo.getVarslingsTekst().get(EPOST));
+		epostVarselTekst.setLang(SPRAAK_KODE);
+		epostVarsel.setVarslingsTekst(epostVarselTekst);
+		epostVarsel.setRepetisjoner(createRepetisjoner(varselInfoTo));
+
+		return epostVarsel;
+	}
+
+	private SmsVarsel createSMSVarsler(VarselInfoTo varselInfoTo, HentSikkerDigitalPostadresseResponseTo hentSikkerDigitalPostadresseResponseTo) {
+		SmsVarsel smsVarsel = new SmsVarsel();
+		smsVarsel.setMobiltelefonnummer(hentSikkerDigitalPostadresseResponseTo.getDigitalKontaktinformasjon()
+				.getMobiltelefonnummer()
+				.getValue());
+		SmsVarselTekst smsVarselTekst = new SmsVarselTekst();
+		smsVarselTekst.setValue(varselInfoTo.getVarslingsTekst().get(SMS));
+		smsVarselTekst.setLang(SPRAAK_KODE);
+		smsVarsel.setVarslingsTekst(smsVarselTekst);
+		smsVarsel.setRepetisjoner(createRepetisjoner(varselInfoTo));
+
+		return smsVarsel;
+	}
+
+	private Repetisjoner createRepetisjoner(VarselInfoTo varselInfoTo) {
 		Repetisjoner repitisjoner = null;
 
 		if (varselInfoTo.getAntallDagerListe() != null) {
 			repitisjoner = new Repetisjoner();
 			repitisjoner.getDagerEtter().addAll(varselInfoTo.getAntallDagerListe());
 		}
-
-		if (sendSMSVarsel(varselInfoTo, hentSikkerDigitalPostadresseResponseTo)) {
-			varsler = new Varsler();
-			EpostVarsel epostVarsel = new EpostVarsel();
-			epostVarsel.setEpostadresse(hentSikkerDigitalPostadresseResponseTo.getDigitalKontaktinformasjon()
-					.getEpostadresse()
-					.getValue());
-			EpostVarselTekst epostVarselTekst = new EpostVarselTekst();
-			epostVarselTekst.setValue(varselInfoTo.getVarslingsTekst().get(EPOST));
-			epostVarselTekst.setLang(SPRAAK_KODE);
-			epostVarsel.setVarslingsTekst(epostVarselTekst);
-			epostVarsel.setRepetisjoner(repitisjoner);
-			varsler.setEpostVarsel(epostVarsel);
-		}
-
-		if (sendEpostVarsel(varselInfoTo, hentSikkerDigitalPostadresseResponseTo)) {
-			if (varsler == null) {
-				varsler = new Varsler();
-			}
-			SmsVarsel smsVarsel = new SmsVarsel();
-			smsVarsel.setMobiltelefonnummer(hentSikkerDigitalPostadresseResponseTo.getDigitalKontaktinformasjon()
-					.getMobiltelefonnummer()
-					.getValue());
-			SmsVarselTekst smsVarselTekst = new SmsVarselTekst();
-			smsVarselTekst.setValue(varselInfoTo.getVarslingsTekst().get(SMS));
-			smsVarselTekst.setLang(SPRAAK_KODE);
-			smsVarsel.setVarslingsTekst(smsVarselTekst);
-			smsVarsel.setRepetisjoner(repitisjoner);
-			varsler.setSmsVarsel(smsVarsel);
-		}
-		return varsler;
+		return repitisjoner;
 	}
 
 	private boolean sendSMSVarsel(VarselInfoTo varselInfoTo, HentSikkerDigitalPostadresseResponseTo hentSikkerDigitalPostadresseResponseTo) {
@@ -285,7 +300,7 @@ public class BridgeMotSDPMapper {
 				.getDigitalKontaktinformasjon()
 				.getMobiltelefonnummer());
 
-		return (isPreferertKanalEpost(varselInfoTo) || isMobilInvalid) && !isEpostInvalid;
+		return (isPreferertKanalMobil(varselInfoTo) || isEpostInvalid) && !isMobilInvalid;
 	}
 
 	private boolean sendEpostVarsel(VarselInfoTo varselInfoTo, HentSikkerDigitalPostadresseResponseTo hentSikkerDigitalPostadresseResponseTo) {
@@ -298,7 +313,7 @@ public class BridgeMotSDPMapper {
 				.getDigitalKontaktinformasjon()
 				.getMobiltelefonnummer());
 
-		return (isPreferertKanalMobil(varselInfoTo) || isEpostInvalid) && !isMobilInvalid;
+		return (isPreferertKanalEpost(varselInfoTo) || isMobilInvalid) && !isEpostInvalid;
 	}
 
 	private boolean isPreferertKanalEpost(VarselInfoTo varselInfoTo) {
