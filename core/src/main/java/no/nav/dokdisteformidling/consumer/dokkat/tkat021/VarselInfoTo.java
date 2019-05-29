@@ -3,6 +3,8 @@ package no.nav.dokdisteformidling.consumer.dokkat.tkat021;
 import lombok.Builder;
 import lombok.Value;
 
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -14,7 +16,7 @@ public class VarselInfoTo {
 
 	private final String varselTypeId;
 	private final boolean stoppRepeterendeVarsel;
-	private final String varslingsTekst;
-	private final String antallDagerListe;
+	private final Map<String, String> varslingsTekst;
+	private final List<Integer> antallDagerListe;
 	private final Set<String> preferertKanal;
 }
