@@ -1,7 +1,7 @@
 package no.nav.dokdisteformidling.qdist011;
 
 import static java.lang.String.format;
-import static no.nav.dokdisteformidling.qdist011.Qdist011FunctionalUtils.getNowDate;
+import static no.nav.dokdisteformidling.qdist011.Qdist011FunctionalUtils.getNow;
 import static no.nav.dokdisteformidling.qdist011.constants.BridgeMotSDPMapperConstants.AUTHORITY;
 import static no.nav.dokdisteformidling.qdist011.constants.BridgeMotSDPMapperConstants.AUTHORITY_ENUM;
 import static no.nav.dokdisteformidling.qdist011.constants.BridgeMotSDPMapperConstants.BUSINESS_SCOPE_TYPE;
@@ -98,7 +98,7 @@ public class BridgeMotSDPMapper {
 		dokumentIdentificator.setTypeVersion(VERSION);
 		dokumentIdentificator.setInstanceIdentifier(hentForsendelseResponseTo.getBestillingsId());
 		dokumentIdentificator.setType(DIGITAL_POST);
-		dokumentIdentificator.setCreationDateAndTime(getNowDate());
+		dokumentIdentificator.setCreationDateAndTime(getNow());
 
 		Scope scope = new Scope();
 		scope.setType(BUSINESS_SCOPE_TYPE);
@@ -275,7 +275,7 @@ public class BridgeMotSDPMapper {
 		return varsler;
 	}
 
-	private boolean sendSMSVarsel(VarselInfoTo varselInfoTo, HentSikkerDigitalPostadresseResponseTo hentSikkerDigitalPostadresseResponseTo){
+	private boolean sendSMSVarsel(VarselInfoTo varselInfoTo, HentSikkerDigitalPostadresseResponseTo hentSikkerDigitalPostadresseResponseTo) {
 
 		boolean isEpostInvalid = DigitalKontaktInformasjonValidator.isEpostInvalid(hentSikkerDigitalPostadresseResponseTo
 				.getDigitalKontaktinformasjon()
@@ -288,7 +288,7 @@ public class BridgeMotSDPMapper {
 		return (isPreferertKanalEpost(varselInfoTo) || isMobilInvalid) && !isEpostInvalid;
 	}
 
-	private boolean sendEpostVarsel(VarselInfoTo varselInfoTo, HentSikkerDigitalPostadresseResponseTo hentSikkerDigitalPostadresseResponseTo){
+	private boolean sendEpostVarsel(VarselInfoTo varselInfoTo, HentSikkerDigitalPostadresseResponseTo hentSikkerDigitalPostadresseResponseTo) {
 
 		boolean isEpostInvalid = DigitalKontaktInformasjonValidator.isEpostInvalid(hentSikkerDigitalPostadresseResponseTo
 				.getDigitalKontaktinformasjon()
