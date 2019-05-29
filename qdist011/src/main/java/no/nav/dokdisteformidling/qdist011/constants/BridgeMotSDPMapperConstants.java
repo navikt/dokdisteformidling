@@ -20,7 +20,7 @@ public final class BridgeMotSDPMapperConstants {
 	public static final String EPOST = "EPOST";
 	public static final String SMS = "SMS";
 	public static final String RESERVASJON = "JA";
-	public static final String SPRAAK_KODE = "no";
+	public static final String SPRAAK_KODE = "NO";
 	public static final int DATE_VALID_MONTHS = 18;
 
 	private BridgeMotSDPMapperConstants() {
