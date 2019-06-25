@@ -11,6 +11,7 @@ import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlMatching;
 import static com.github.tomakehurst.wiremock.client.WireMock.verify;
+import static no.nav.dokdisteformidling.common.FunctionalUtils.getNow;
 import static no.nav.dokdisteformidling.config.cache.LokalCacheConfig.TKAT020_CACHE;
 import static no.nav.dokdisteformidling.config.cache.LokalCacheConfig.TKAT021_CACHE;
 import static no.nav.dokdisteformidling.constants.RetryConstants.MAX_ATTEMPTS_SHORT;
@@ -33,7 +34,6 @@ import com.amazonaws.SdkClientException;
 import com.amazonaws.services.s3.AmazonS3;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import no.nav.dokdisteformidling.itest.config.ApplicationTestConfig;
-import no.nav.dokdisteformidling.qdist011.Qdist011FunctionalUtils;
 import no.nav.dokdisteformidling.storage.DokdistDokument;
 import no.nav.dokdisteformidling.storage.JsonSerializer;
 import org.apache.activemq.command.ActiveMQTextMessage;
@@ -877,7 +877,8 @@ public class Qdist011IT {
 	}
 
 	private void stubGetSecurityToken() {
-		stubFor(get("/securitytoken?grant_type=client_credentials&scope=openid").willReturn(aResponse().withStatus(HttpStatus.OK.value())
+		stubFor(get("/securitytoken?grant_type=client_credentials&scope=openid").willReturn(aResponse().withStatus(HttpStatus.OK
+				.value())
 				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
 				.withBodyFile("securitytoken/stsResponse-happy.json")));
 	}
@@ -895,7 +896,8 @@ public class Qdist011IT {
 	}
 
 	private void stubGetDokumentTypeInfo(String bodyFileName) {
-		stubFor(get(urlMatching("/dokumenttypeinfo/" + DOKUMENTTYPE_ID_HOVEDDOK)).willReturn(aResponse().withStatus(HttpStatus.OK.value())
+		stubFor(get(urlMatching("/dokumenttypeinfo/" + DOKUMENTTYPE_ID_HOVEDDOK)).willReturn(aResponse().withStatus(HttpStatus.OK
+				.value())
 				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
 				.withBodyFile(bodyFileName)));
 	}
@@ -903,7 +905,7 @@ public class Qdist011IT {
 	private void stubPostDigitalKontaktInformasjon() throws IOException {
 		stubFor(post("/digitalkontaktinformasjonv1").willReturn(aResponse().withStatus(HttpStatus.OK.value())
 				.withBody(classpathToString("__files/digitalkontaktinformasjonv1/dki-happy.xml")
-						.replace("insertDateHere", Qdist011FunctionalUtils.getNow().toString()))));
+						.replace("insertDateHere", getNow().toString()))));
 	}
 
 	private void stubGetForsendelse(String bodyClasspath) throws IOException {
@@ -920,8 +922,9 @@ public class Qdist011IT {
 		jmsTemplate.send(queue, session -> {
 			TextMessage msg = new ActiveMQTextMessage();
 			msg.setText(message);
-			if (callId != null)
+			if (callId != null) {
 				msg.setStringProperty("callId", callId);
+			}
 			return msg;
 		});
 	}

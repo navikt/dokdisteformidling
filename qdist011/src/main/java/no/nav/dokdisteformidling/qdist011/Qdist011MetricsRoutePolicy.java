@@ -1,11 +1,11 @@
 package no.nav.dokdisteformidling.qdist011;
 
+import static no.nav.dokdisteformidling.constants.RouteConstants.QDIST011_SERVICE_ID;
 import static no.nav.dokdisteformidling.metrics.MetricLabels.LABEL_ERROR_TYPE;
 import static no.nav.dokdisteformidling.metrics.MetricLabels.LABEL_EXCEPTION_NAME;
 import static no.nav.dokdisteformidling.metrics.MetricLabels.LABEL_PROCESS;
 import static no.nav.dokdisteformidling.metrics.MetricLabels.TYPE_FUNCTIONAL_EXCEPTION;
 import static no.nav.dokdisteformidling.metrics.MetricLabels.TYPE_TECHNICAL_EXCEPTION;
-import static no.nav.dokdisteformidling.qdist011.Qdist011Route.QDIST011_SERVICE_ID;
 
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Timer;
