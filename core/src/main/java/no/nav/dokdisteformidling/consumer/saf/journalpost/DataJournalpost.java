@@ -3,13 +3,13 @@ package no.nav.dokdisteformidling.consumer.saf.journalpost;
 import java.io.Serializable;
 
 public class DataJournalpost implements Serializable {
-	private SafJournalpostTo journalpost;
+	private SafJournalpost journalpost;
 
-	public SafJournalpostTo getJournalpost() {
+	public SafJournalpost getJournalpost() {
 		return journalpost;
 	}
 
-	public void setJournalpost(SafJournalpostTo journalpost) {
+	public void setJournalpost(SafJournalpost journalpost) {
 		this.journalpost = journalpost;
 	}
 }

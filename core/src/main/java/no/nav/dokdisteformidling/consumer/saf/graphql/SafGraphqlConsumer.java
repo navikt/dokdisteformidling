@@ -6,7 +6,7 @@ import static no.nav.dokdisteformidling.constants.RetryConstants.MAX_ATTEMPTS_SH
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
-import no.nav.dokdisteformidling.consumer.saf.journalpost.SafJournalpostTo;
+import no.nav.dokdisteformidling.consumer.saf.journalpost.SafJournalpost;
 import no.nav.dokdisteformidling.consumer.saf.journalpost.SafJsonJournalpost;
 import no.nav.dokdisteformidling.consumer.sts.StsRestConsumer;
 import no.nav.dokdisteformidling.exception.functional.SafJournalpostIkkeFunnetFunctionalException;
@@ -54,7 +54,7 @@ public class SafGraphqlConsumer {
 
 	@Monitor(value = "dok_metric", extraTags = {"process", "safJournalpostquery"}, histogram = true)
 	@Retryable(include = SafJournalpostQueryTechnicalException.class, maxAttempts = MAX_ATTEMPTS_SHORT, backoff = @Backoff(delay = DELAY_SHORT))
-	public SafJournalpostTo performQuery(GraphQLRequest graphQLRequest) {
+	public SafJournalpost performQuery(GraphQLRequest graphQLRequest) {
 
 		try {
 			ResponseEntity<SafJsonJournalpost> responseEntity = restTemplate.exchange(graphQLurl, HttpMethod.POST, new HttpEntity<>(requestToJson(graphQLRequest), createAuthorizationHeader()), SafJsonJournalpost.class);

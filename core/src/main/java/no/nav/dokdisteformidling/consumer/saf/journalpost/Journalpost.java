@@ -1,22 +1,4 @@
 package no.nav.dokdisteformidling.consumer.saf.journalpost;
 
-import lombok.Builder;
-import lombok.Value;
-
-import java.util.ArrayList;
-import java.util.List;
-
-@Value
-@Builder
-public class Journalpost {
-
-	@Builder.Default
-	private final List<DokumentInfo> dokumenter = new ArrayList<>();
-
-	@Value
-	@Builder
-	public static class DokumentInfo {
-		private final String dokumentInfoId;
-		private final String tittel;
-	}
+public interface Journalpost {
 }

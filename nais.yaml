@@ -43,6 +43,8 @@ fasitResources:
       resourceType: restservice
     - alias: VarselInfo_v1
       resourceType: restservice
+    - alias: LagreJuridiskLogg_Rest
+      resourceType: restservice
     - alias: administrerforsendelse_v1
       resourceType: restservice
     - alias: securityTokenService
@@ -58,6 +60,10 @@ fasitResources:
     - alias: dokdisteformidling_qdist011_dist_til_dpi
       resourceType: queue
     - alias: dokdisteformidling_qdist011_funk_feil
+      resourceType: queue
+    - alias: dokdisteformidling_qdist013_dist_trygderetten
+      resourceType: queue
+    - alias: dokdisteformidling_qdist013_funk_feil
       resourceType: queue
     - alias: dokdistSdpBatchIntern
       resourceType: queue

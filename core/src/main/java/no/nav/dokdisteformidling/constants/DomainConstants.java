@@ -5,6 +5,7 @@ package no.nav.dokdisteformidling.constants;
  */
 public final class DomainConstants {
 
+	public static final String APP_NAME = "dokdisteformidling";
 	public static final String HOVEDDOKUMENT = "HOVEDDOKUMENT";
 	public static final String VEDLEGG = "VEDLEGG";
 	public static final String FORSENDELSE_STATUS_KLAR_FOR_DIST = "KLAR_FOR_DIST";

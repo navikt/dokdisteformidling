@@ -1,6 +1,6 @@
-package no.nav.dokdisteformidling.qdist011;
+package no.nav.dokdisteformidling.qdist013;
 
-import static no.nav.dokdisteformidling.constants.RouteConstants.QDIST011_SERVICE_ID;
+import static no.nav.dokdisteformidling.constants.RouteConstants.QDIST013_SERVICE_ID;
 import static no.nav.dokdisteformidling.metrics.MetricLabels.LABEL_ERROR_TYPE;
 import static no.nav.dokdisteformidling.metrics.MetricLabels.LABEL_EXCEPTION_NAME;
 import static no.nav.dokdisteformidling.metrics.MetricLabels.LABEL_PROCESS;
@@ -22,17 +22,17 @@ import javax.inject.Inject;
  * @author Ugur Alpay Cenar, Visma Consulting.
  */
 @Component
-public class Qdist011MetricsRoutePolicy extends RoutePolicySupport {
+public class Qdist013MetricsRoutePolicy extends RoutePolicySupport {
 
 	private final MeterRegistry registry;
 	private Timer.Sample timer;
 
-	private static final String QDIST011_PROCESS_TIMER = "dok_request_latency";
-	private static final String QDIST011_PROCESS_TIMER_DESCRIPTION = "prosesseringstid for kall inn til qdist011";
-	private static final String QDIST011_EXCEPTION = "request_exception_total";
+	private static final String QDIST013_PROCESS_TIMER = "dok_request_latency";
+	private static final String QDIST013_PROCESS_TIMER_DESCRIPTION = "prosesseringstid for kall inn til qdist013";
+	private static final String QDIST013_EXCEPTION = "request_exception_total";
 
 	@Inject
-	public Qdist011MetricsRoutePolicy(MeterRegistry registry) {
+	public Qdist013MetricsRoutePolicy(MeterRegistry registry) {
 		this.registry = registry;
 	}
 
@@ -45,23 +45,23 @@ public class Qdist011MetricsRoutePolicy extends RoutePolicySupport {
 	public void onExchangeDone(Route route, Exchange exchange) {
 		Exception exception = getException(exchange);
 
-		timer.stop(Timer.builder(QDIST011_PROCESS_TIMER)
-				.description(QDIST011_PROCESS_TIMER_DESCRIPTION)
-				.tags(LABEL_PROCESS, QDIST011_SERVICE_ID)
+		timer.stop(Timer.builder(QDIST013_PROCESS_TIMER)
+				.description(QDIST013_PROCESS_TIMER_DESCRIPTION)
+				.tags(LABEL_PROCESS, QDIST013_SERVICE_ID)
 				.publishPercentileHistogram(true)
 				.register(registry));
 
 		if (exception != null) {
 			if (isFunctionalException(exception)) {
-				registry.counter(QDIST011_EXCEPTION,
+				registry.counter(QDIST013_EXCEPTION,
 						LABEL_ERROR_TYPE, TYPE_FUNCTIONAL_EXCEPTION,
 						LABEL_EXCEPTION_NAME, exception.getClass().getSimpleName(),
-						LABEL_PROCESS, QDIST011_SERVICE_ID).increment();
+						LABEL_PROCESS, QDIST013_SERVICE_ID).increment();
 			} else {
-				registry.counter(QDIST011_EXCEPTION,
+				registry.counter(QDIST013_EXCEPTION,
 						LABEL_ERROR_TYPE, TYPE_TECHNICAL_EXCEPTION,
 						LABEL_EXCEPTION_NAME, exception.getClass().getCanonicalName(),
-						LABEL_PROCESS, QDIST011_SERVICE_ID).increment();
+						LABEL_PROCESS, QDIST013_SERVICE_ID).increment();
 			}
 		}
 	}

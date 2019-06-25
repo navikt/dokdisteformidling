@@ -1,14 +1,15 @@
-package no.nav.dokdisteformidling.consumer.saf.journalpost;
+package no.nav.dokdisteformidling.qdist011.saf;
 
 import lombok.Builder;
 import lombok.Value;
+import no.nav.dokdisteformidling.consumer.saf.journalpost.Journalpost;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Value
 @Builder
-public class SafJournalpostTo {
+public class JournalpostQdist011 implements Journalpost {
 
 	@Builder.Default
 	private final List<DokumentInfo> dokumenter = new ArrayList<>();
@@ -19,5 +20,4 @@ public class SafJournalpostTo {
 		private final String dokumentInfoId;
 		private final String tittel;
 	}
-
 }
