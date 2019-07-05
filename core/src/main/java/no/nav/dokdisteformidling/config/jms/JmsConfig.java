@@ -21,7 +21,7 @@ import javax.jms.Queue;
  * @author Sigurd Midttun, Visma Consulting AS
  */
 @Configuration
-@Profile("nais")
+@Profile({"nais", "local"})
 public class JmsConfig {
 
 	private static final int UTF_8_WITH_PUA = 1208;
@@ -32,8 +32,18 @@ public class JmsConfig {
 	}
 
 	@Bean
+	public Queue qdist013(@Value("${dokdisteformidling_qdist013_dist_trygderetten.queuename}") String qdist013QueueName) throws JMSException {
+		return new MQQueue(qdist013QueueName);
+	}
+
+	@Bean
 	public Queue qdist011FunksjonellFeil(@Value("${dokdisteformidling_qdist011_funk_feil.queuename}") String qdist011FunksjonellFeil) throws JMSException {
 		return new MQQueue(qdist011FunksjonellFeil);
+	}
+
+	@Bean
+	public Queue qdist013FunksjonellFeil(@Value("${dokdisteformidling_qdist013_funk_feil.queuename}") String qdist013FunksjonellFeil) throws JMSException {
+		return new MQQueue(qdist013FunksjonellFeil);
 	}
 
 	@Bean

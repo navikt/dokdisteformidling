@@ -22,7 +22,7 @@ import javax.crypto.spec.SecretKeySpec;
 
 
 @Configuration
-@Profile("nais")
+@Profile({"nais", "local"})
 public class S3Configuration {
 
 	private static final String REGION_TO_USE_FOR_S3_TO_WORK_ONPREM = Regions.US_EAST_1.getName();

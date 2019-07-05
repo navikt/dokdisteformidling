@@ -1,6 +1,6 @@
 package no.nav.dokdisteformidling;
 
-import static no.nav.dokdisteformidling.qdist011.Qdist011FunctionalUtils.getNow;
+import static no.nav.dokdisteformidling.common.FunctionalUtils.getNow;
 import static no.nav.dokdisteformidling.qdist011.constants.BridgeMotSDPMapperConstants.AUTHORITY;
 import static no.nav.dokdisteformidling.qdist011.constants.BridgeMotSDPMapperConstants.AUTHORITY_ENUM;
 import static no.nav.dokdisteformidling.qdist011.constants.BridgeMotSDPMapperConstants.BUSINESS_SCOPE_TYPE;
@@ -29,8 +29,8 @@ import no.nav.dokdisteformidling.consumer.dki.HentSikkerDigitalPostadresseRespon
 import no.nav.dokdisteformidling.consumer.dokkat.tkat020.DokumenttypeInfoTo;
 import no.nav.dokdisteformidling.consumer.dokkat.tkat021.VarselInfoTo;
 import no.nav.dokdisteformidling.consumer.rdist001.HentForsendelseResponseTo;
-import no.nav.dokdisteformidling.consumer.saf.journalpost.SafJournalpostTo;
 import no.nav.dokdisteformidling.qdist011.BridgeMotSDPMapper;
+import no.nav.dokdisteformidling.qdist011.saf.JournalpostQdist011;
 import no.nav.tjeneste.virksomhet.digitalpost.senddigitalpost.v1.SendDigitalPost;
 import no.nav.tjeneste.virksomhet.digitalpost.senddigitalpost.v1.meldinger.SendDigitalPostRequest;
 import org.junit.jupiter.api.Assertions;
@@ -571,13 +571,13 @@ public class BridgeMotSDPMapperTest {
 		assertEpostAndSMSVarsel(sendDigitalPost, true, true);
 	}
 
-	private SafJournalpostTo createSafJournalpostTo() {
-		return SafJournalpostTo.builder()
-				.dokumenter(Arrays.asList(SafJournalpostTo.DokumentInfo.builder()
+	private JournalpostQdist011 createSafJournalpostTo() {
+		return JournalpostQdist011.builder()
+				.dokumenter(Arrays.asList(JournalpostQdist011.DokumentInfo.builder()
 								.dokumentInfoId(ARKIV_DOKUMENTINFO_ID_2)
 								.tittel(TITTEL_VEDLEGG_1)
 								.build(),
-						SafJournalpostTo.DokumentInfo.builder()
+						JournalpostQdist011.DokumentInfo.builder()
 								.dokumentInfoId(ARKIV_DOKUMENTINFO_ID_3)
 								.tittel(TITTEL_VEDLEGG_2)
 								.build()))

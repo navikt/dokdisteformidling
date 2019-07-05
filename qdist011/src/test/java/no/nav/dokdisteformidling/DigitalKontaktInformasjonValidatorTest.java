@@ -1,6 +1,6 @@
 package no.nav.dokdisteformidling;
 
-import static no.nav.dokdisteformidling.qdist011.Qdist011FunctionalUtils.getNow;
+import static no.nav.dokdisteformidling.common.FunctionalUtils.getNow;
 import static no.nav.dokdisteformidling.testUtils.makePreferertKanalSet;
 import static no.nav.dokdisteformidling.testUtils.makeUgyldigDate;
 import static no.nav.dokdisteformidling.testUtils.varslingsTekster;

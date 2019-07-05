@@ -1,7 +1,7 @@
-package no.nav.dokdisteformidling.qdist011;
+package no.nav.dokdisteformidling.common;
 
 import static no.nav.dokdisteformidling.constants.DomainConstants.FORSENDELSE_STATUS_OVERSENDT;
-import static no.nav.dokdisteformidling.qdist011.Qdist011Route.PROPERTY_FORSENDELSE_ID;
+import static no.nav.dokdisteformidling.constants.RouteConstants.PROPERTY_FORSENDELSE_ID;
 
 import no.nav.dokdisteformidling.consumer.rdist001.AdministrerForsendelse;
 import org.apache.camel.Exchange;
@@ -21,7 +21,7 @@ public class DokdistStatusUpdater {
 	}
 
 	@Handler
-	public void doUpdate(Exchange exchange) {
+	public void updateStatus(Exchange exchange) {
 		final String forsendelseId = exchange.getProperty(PROPERTY_FORSENDELSE_ID, String.class);
 		administrerForsendelse.oppdaterForsendelseStatus(forsendelseId, FORSENDELSE_STATUS_OVERSENDT);
 	}

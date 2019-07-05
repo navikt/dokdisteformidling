@@ -31,6 +31,16 @@ public class JmsItestConfig {
 	}
 
 	@Bean
+	public Queue qdist013(@Value("${dokdisteformidling_qdist013_dist_trygderetten.queuename}") String qdist013QueueName) {
+		return new ActiveMQQueue(qdist013QueueName);
+	}
+
+	@Bean
+	public Queue qdist013FunksjonellFeil(@Value("${dokdisteformidling_qdist013_funk_feil.queuename}") String qdist013FunksjonellFeil) {
+		return new ActiveMQQueue(qdist013FunksjonellFeil);
+	}
+
+	@Bean
 	public Queue tdist005(@Value("${dokdistSdpBatchIntern.queuename}") String tdist005QueueName) {
 		return new ActiveMQQueue(tdist005QueueName);
 	}
