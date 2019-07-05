@@ -1,8 +1,13 @@
 package no.nav.dokdisteformidling.qdist011;
 
+import static no.nav.dokdisteformidling.constants.RouteConstants.PROPERTY_BESTILLINGS_ID;
+import static no.nav.dokdisteformidling.constants.RouteConstants.PROPERTY_FORSENDELSE_ID;
+import static no.nav.dokdisteformidling.constants.RouteConstants.QDIST011_SERVICE_ID;
 import static org.apache.camel.LoggingLevel.ERROR;
 
 import com.google.common.base.Charsets;
+import no.nav.dokdisteformidling.common.DokdistStatusUpdater;
+import no.nav.dokdisteformidling.common.IdsProcessor;
 import no.nav.dokdisteformidling.exception.functional.AbstractDokdisteformidlingFunctionalException;
 import no.nav.meldinger.virksomhet.dokdistfordeling.qdist008.out.DistribuerTilKanal;
 import org.apache.camel.ExchangePattern;
@@ -24,12 +29,7 @@ import javax.xml.bind.JAXBContext;
 @Component
 public class Qdist011Route extends SpringRouteBuilder {
 
-	public static final String QDIST011_SERVICE_ID = "qdist011";
-	static final String PROPERTY_BESTILLINGS_ID = "bestillingsId";
-	static final String PROPERTY_FORSENDELSE_ID = "forsendelseId";
-
 	private final Qdist011Service qdist011Service;
-
 	private final Queue qdist011;
 	private final Queue qdist011FunksjonellFeil;
 	private final Queue tdist005;
@@ -85,7 +85,7 @@ public class Qdist011Route extends SpringRouteBuilder {
 				.to("jms:" + tdist005.getQueueName())
 				.log(LoggingLevel.INFO, log, "qdist011 har lagt forsendelse med " + getIdsForLogging() + " på kø til tdist005 for distribusjon via DPI")
 				.bean(dokdistStatusUpdater)
-				.log(LoggingLevel.INFO, log, "qdist011 har oppdatert forsendelseStatus i dokdist og avslutter behandling av forsendelse med " + getIdsForLogging());
+				.log(LoggingLevel.INFO, log, "qdist011 har oppdatert forsendelseStatus i dokdist til OVERSENDT og avslutter behandling av forsendelse med " + getIdsForLogging());
 	}
 
 	public static String getIdsForLogging() {

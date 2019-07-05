@@ -10,8 +10,9 @@
 	<version>1.0-SNAPSHOT</version>
 	<modules>
 		<module>app</module>
-		<module>qdist011</module>
 		<module>core</module>
+		<module>qdist011</module>
+		<module>qdist013</module>
 	</modules>
 	<parent>
 		<groupId>org.springframework.boot</groupId>
@@ -47,16 +48,6 @@
 	<dependencyManagement>
 		<dependencies>
 			<dependency>
-				<groupId>no.nav.meldinger.virksomhet</groupId>
-				<artifactId>melding-virksomhet-dokdistfordeling</artifactId>
-				<version>${melding-virksomhet-dokdistfordeling.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>no.nav.dokkat</groupId>
-				<artifactId>dokkat-schemas</artifactId>
-				<version>${dokkat-schemas.version}</version>
-			</dependency>
-			<dependency>
 				<groupId>no.nav.dokdisteformidling</groupId>
 				<artifactId>core</artifactId>
 				<version>${project.version}</version>
@@ -65,6 +56,21 @@
 				<groupId>no.nav.dokdisteformidling</groupId>
 				<artifactId>qdist011</artifactId>
 				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>no.nav.dokdisteformidling</groupId>
+				<artifactId>qdist013</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>no.nav.meldinger.virksomhet</groupId>
+				<artifactId>melding-virksomhet-dokdistfordeling</artifactId>
+				<version>${melding-virksomhet-dokdistfordeling.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>no.nav.dokkat</groupId>
+				<artifactId>dokkat-schemas</artifactId>
+				<version>${dokkat-schemas.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>no.nav.tjenester</groupId>

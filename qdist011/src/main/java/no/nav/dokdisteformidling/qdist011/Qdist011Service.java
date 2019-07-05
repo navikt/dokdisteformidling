@@ -1,10 +1,9 @@
 package no.nav.dokdisteformidling.qdist011;
 
-import static java.lang.String.format;
-import static no.nav.dokdisteformidling.qdist011.Qdist011FunctionalUtils.getDokumenttypeIdHoveddokument;
-import static no.nav.dokdisteformidling.qdist011.Qdist011FunctionalUtils.validateForsendelseStatus;
+import static no.nav.dokdisteformidling.common.FunctionalUtils.deserializeS3JsonPayloadToDokdistDokument;
+import static no.nav.dokdisteformidling.common.FunctionalUtils.getDokumenttypeIdHoveddokument;
+import static no.nav.dokdisteformidling.common.FunctionalUtils.validateThatForsendelseStatusIsKlarForDist;
 
-import com.amazonaws.SdkClientException;
 import no.nav.dokdisteformidling.consumer.dki.DigitalKontaktinformasjonV1;
 import no.nav.dokdisteformidling.consumer.dki.HentSikkerDigitalPostadresseResponseTo;
 import no.nav.dokdisteformidling.consumer.dokkat.tkat020.DokumentkatalogAdmin;
@@ -14,15 +13,14 @@ import no.nav.dokdisteformidling.consumer.dokkat.tkat021.VarselInfoTo;
 import no.nav.dokdisteformidling.consumer.rdist001.AdministrerForsendelse;
 import no.nav.dokdisteformidling.consumer.rdist001.HentForsendelseResponseTo;
 import no.nav.dokdisteformidling.consumer.saf.SafJournalpostQueryService;
-import no.nav.dokdisteformidling.consumer.saf.journalpost.SafJournalpostTo;
-import no.nav.dokdisteformidling.exception.functional.KunneIkkeDeserialisereS3JsonPayloadFunctionalException;
 import no.nav.dokdisteformidling.qdist011.domain.DistribuerForsendelseTilDpi;
+import no.nav.dokdisteformidling.qdist011.saf.JournalpostQdist011;
 import no.nav.dokdisteformidling.storage.DokdistDokument;
-import no.nav.dokdisteformidling.storage.JsonSerializer;
 import no.nav.dokdisteformidling.storage.Storage;
 import no.nav.tjeneste.virksomhet.digitalpost.senddigitalpost.v1.SendDigitalPost;
 import org.apache.camel.Handler;
 import org.apache.camel.ProducerTemplate;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 import javax.inject.Inject;
@@ -53,7 +51,8 @@ public class Qdist011Service {
 						   Storage storage,
 						   DigitalKontaktinformasjonV1 digitalKontaktinformasjonV1,
 						   ProducerTemplate producer, BridgeMotSDPMapper bridgeMotSDPMapper,
-						   DigitalKontaktInformasjonValidator digitalKontaktInformasjonValidator, SafJournalpostQueryService safJournalpostQueryService) {
+						   DigitalKontaktInformasjonValidator digitalKontaktInformasjonValidator,
+						   @Qualifier("SafJournalpostQueryServiceQdist011") SafJournalpostQueryService safJournalpostQueryService) {
 		this.dokumentkatalogAdmin = dokumentkatalogAdmin;
 		this.varselInfo = varselInfo;
 		this.administrerForsendelse = administrerForsendelse;
@@ -71,7 +70,7 @@ public class Qdist011Service {
 		HentForsendelseResponseTo hentForsendelseResponseTo = administrerForsendelse.hentForsendelse(distribuerForsendelseTilDpi
 				.getForsendelseId());
 
-		validateForsendelseStatus(hentForsendelseResponseTo.getForsendelseStatus());
+		validateThatForsendelseStatusIsKlarForDist(hentForsendelseResponseTo.getForsendelseStatus());
 
 		HentSikkerDigitalPostadresseResponseTo hentSikkerDigitalPostadresseResponseTo =
 				digitalKontaktinformasjonV1.hentSikkerDigitalPostadresse(hentForsendelseResponseTo.getMottaker()
@@ -89,10 +88,10 @@ public class Qdist011Service {
 			producer.sendBody(LastOppDokumentRoute.ROUTE, dokdistDokument);
 		}
 
-		SafJournalpostTo safJournalpostTo = safJournalpostQueryService.hentJournalpost(hentForsendelseResponseTo.getArkivInformasjon()
+		JournalpostQdist011 journalpostQdist011 = safJournalpostQueryService.hentJournalpost(hentForsendelseResponseTo.getArkivInformasjon()
 				.getArkivId());
 
-		return bridgeMotSDPMapper.map(hentForsendelseResponseTo, hentSikkerDigitalPostadresseResponseTo, dokumenttypeInfoTo, varselInfoTo, safJournalpostTo);
+		return bridgeMotSDPMapper.map(hentForsendelseResponseTo, hentSikkerDigitalPostadresseResponseTo, dokumenttypeInfoTo, varselInfoTo, journalpostQdist011);
 	}
 
 	private VarselInfoTo getVarselInfoIfVarselTypeIdIsPresent(DokumenttypeInfoTo dokumenttypeInfoTo) {
@@ -112,14 +111,4 @@ public class Qdist011Service {
 				.collect(Collectors.toList());
 	}
 
-	private DokdistDokument deserializeS3JsonPayloadToDokdistDokument(String jsonPayload, String objektReferanse) {
-		DokdistDokument dokdistDokument;
-		try {
-			dokdistDokument = JsonSerializer.deserialize(jsonPayload, DokdistDokument.class);
-			dokdistDokument.setDokumentObjektReferanse(objektReferanse);
-		} catch (SdkClientException e) {
-			throw new KunneIkkeDeserialisereS3JsonPayloadFunctionalException(format("Kunne ikke deserialisere jsonPayload fra s3 bucket for dokument med dokumentobjektreferanse=%s. Dokumentet er ikke persistert til s3 med korrekt format!", objektReferanse));
-		}
-		return dokdistDokument;
-	}
 }

@@ -1,7 +1,7 @@
 package no.nav.dokdisteformidling.qdist011;
 
 import static java.lang.String.format;
-import static no.nav.dokdisteformidling.qdist011.Qdist011FunctionalUtils.getNow;
+import static no.nav.dokdisteformidling.common.FunctionalUtils.getNow;
 import static no.nav.dokdisteformidling.qdist011.constants.BridgeMotSDPMapperConstants.AUTHORITY;
 import static no.nav.dokdisteformidling.qdist011.constants.BridgeMotSDPMapperConstants.AUTHORITY_ENUM;
 import static no.nav.dokdisteformidling.qdist011.constants.BridgeMotSDPMapperConstants.BUSINESS_SCOPE_TYPE;
@@ -35,8 +35,8 @@ import no.nav.dokdisteformidling.consumer.dki.HentSikkerDigitalPostadresseRespon
 import no.nav.dokdisteformidling.consumer.dokkat.tkat020.DokumenttypeInfoTo;
 import no.nav.dokdisteformidling.consumer.dokkat.tkat021.VarselInfoTo;
 import no.nav.dokdisteformidling.consumer.rdist001.HentForsendelseResponseTo;
-import no.nav.dokdisteformidling.consumer.saf.journalpost.SafJournalpostTo;
 import no.nav.dokdisteformidling.exception.functional.Tdist005MapperFunctionalException;
+import no.nav.dokdisteformidling.qdist011.saf.JournalpostQdist011;
 import no.nav.tjeneste.virksomhet.digitalpost.senddigitalpost.v1.ObjectFactory;
 import no.nav.tjeneste.virksomhet.digitalpost.senddigitalpost.v1.SendDigitalPost;
 import no.nav.tjeneste.virksomhet.digitalpost.senddigitalpost.v1.meldinger.SendDigitalPostRequest;
@@ -62,7 +62,7 @@ public class BridgeMotSDPMapper {
 	public SendDigitalPost map(HentForsendelseResponseTo hentForsendelseResponsTo,
 							   HentSikkerDigitalPostadresseResponseTo hentSikkerDigitalPostadresseResponseTo,
 							   DokumenttypeInfoTo dokumenttypeInfoTo, VarselInfoTo varselInfoTo,
-							   SafJournalpostTo safJournalpostTo) {
+							   JournalpostQdist011 journalpostQdist011) {
 		try {
 			ObjectFactory digitalPostOF = new ObjectFactory();
 			SendDigitalPost sendDigitalPost = digitalPostOF.createSendDigitalPost();
@@ -79,7 +79,7 @@ public class BridgeMotSDPMapper {
 			standardBusinessDocument.setAny(jaxbDigitalPost);
 
 			sendDigitalPostRequest.setStandardBusinessDocument(standardBusinessDocument);
-			sendDigitalPostRequest.setManifest(mapManifest(hentSikkerDigitalPostadresseResponseTo, hentForsendelseResponsTo, safJournalpostTo));
+			sendDigitalPostRequest.setManifest(mapManifest(hentSikkerDigitalPostadresseResponseTo, hentForsendelseResponsTo, journalpostQdist011));
 			sendDigitalPostRequest.setSertifikat(hentSikkerDigitalPostadresseResponseTo.getSertifikat());
 			sendDigitalPostRequest.setErPrioritert(false);
 			sendDigitalPost.setSendDigitalPostRequest(sendDigitalPostRequest);
@@ -186,7 +186,7 @@ public class BridgeMotSDPMapper {
 
 	private Manifest mapManifest(HentSikkerDigitalPostadresseResponseTo hentSikkerDigitalPostadresseResponseTo,
 								 HentForsendelseResponseTo hentForsendelseResponseTo,
-								 SafJournalpostTo safJournalpostTo) {
+								 JournalpostQdist011 journalpostQdist011) {
 		Tittel tittelHoveddokument = new Tittel();
 		tittelHoveddokument.setValue(hentForsendelseResponseTo.getForsendelseTittel());
 		tittelHoveddokument.setLang(SPRAAK_KODE);
@@ -214,7 +214,7 @@ public class BridgeMotSDPMapper {
 					Tittel tittelVedlegg = new Tittel();
 
 					tittelVedlegg.setValue(
-							safJournalpostTo.getDokumenter().stream()
+							journalpostQdist011.getDokumenter().stream()
 									.filter(dokumentInfo -> dokumentInfo.getDokumentInfoId()
 											.equals(dokumentTo.getArkivDokumentInfoId()))
 									.findAny()
@@ -318,15 +318,11 @@ public class BridgeMotSDPMapper {
 
 	private boolean isPreferertKanalEpost(VarselInfoTo varselInfoTo) {
 		return varselInfoTo.getPreferertKanal().stream()
-				.filter(preferertKanal -> EPOST.equals(preferertKanal))
-				.findAny()
-				.isPresent();
+				.anyMatch(EPOST::equals);
 	}
 
 	private boolean isPreferertKanalMobil(VarselInfoTo varselInfoTo) {
 		return varselInfoTo.getPreferertKanal().stream()
-				.filter(preferertKanal -> SMS.equals(preferertKanal))
-				.findAny()
-				.isPresent();
+				.anyMatch(SMS::equals);
 	}
 }

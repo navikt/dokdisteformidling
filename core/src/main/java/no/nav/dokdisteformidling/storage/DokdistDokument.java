@@ -11,5 +11,5 @@ import lombok.Data;
 public class DokdistDokument {
 	private byte[] pdf;
 	private String dokumentObjektReferanse;
-
+	private String dokumentInfoId;
 }
