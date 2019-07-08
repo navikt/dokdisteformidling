@@ -8,13 +8,17 @@ import no.nav.dokdisteformidling.consumer.rdist001.HentForsendelseResponseTo;
 import no.nav.dokdisteformidling.exception.functional.InvalidForsendelseStatusFunctionalException;
 import no.nav.dokdisteformidling.exception.functional.KunneIkkeDeserialisereS3JsonPayloadFunctionalException;
 import no.nav.dokdisteformidling.exception.technical.KunneIkkeHenteDagensDatoTechnicalException;
+import no.nav.dokdisteformidling.exception.technical.KunneIkkeKonvertereTilXmlGregorianCalendarTechnicalException;
 import no.nav.dokdisteformidling.storage.DokdistDokument;
 import no.nav.dokdisteformidling.storage.JsonSerializer;
 
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.GregorianCalendar;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 /**
@@ -57,8 +61,23 @@ public class FunctionalUtils {
 		try {
 			now = DatatypeFactory.newInstance().newXMLGregorianCalendar(new GregorianCalendar());
 		} catch (DatatypeConfigurationException e) {
-			throw new KunneIkkeHenteDagensDatoTechnicalException("qdist011 kunne ikke hente dagens dato", e);
+			throw new KunneIkkeHenteDagensDatoTechnicalException("Kunne ikke hente dagens dato", e);
 		}
 		return now;
+	}
+
+	public static XMLGregorianCalendar convertLocalDateTimeToXmlGregorianCalendar(LocalDateTime localDateTime) {
+		try {
+			return DatatypeFactory.newInstance()
+					.newXMLGregorianCalendar(localDateTime.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
+		} catch (DatatypeConfigurationException e) {
+			throw new KunneIkkeKonvertereTilXmlGregorianCalendarTechnicalException(format("Kunne ikke konvertere fra localDateTime til XmlGregorianCalendar. Forsøkte å konvertere localDateTime=%s", localDateTime == null ? null : localDateTime
+					.toString()), e);
+		}
+	}
+
+
+	public static String generateRandomUUID() {
+		return UUID.randomUUID().toString();
 	}
 }
