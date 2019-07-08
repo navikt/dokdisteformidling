@@ -3,10 +3,12 @@ package no.nav.dokdisteformidling.qdist013;
 import static no.nav.dokdisteformidling.common.FunctionalUtils.deserializeS3JsonPayloadToDokdistDokument;
 import static no.nav.dokdisteformidling.common.FunctionalUtils.validateThatForsendelseStatusIsKlarForDist;
 
+import no.arkivverket.standarder.noark5.arkivmelding.Arkivmelding;
 import no.nav.dokdisteformidling.consumer.juridisklogg.JuridiskLogg;
 import no.nav.dokdisteformidling.consumer.rdist001.AdministrerForsendelse;
 import no.nav.dokdisteformidling.consumer.rdist001.HentForsendelseResponseTo;
 import no.nav.dokdisteformidling.consumer.saf.SafJournalpostQueryService;
+import no.nav.dokdisteformidling.exception.technical.KunneIkkeMarshalleArkivmeldingTechnicalException;
 import no.nav.dokdisteformidling.qdist013.saf.JournalpostQdist013;
 import no.nav.dokdisteformidling.storage.DokdistDokument;
 import no.nav.dokdisteformidling.storage.S3Storage;
@@ -14,6 +16,11 @@ import org.apache.camel.Handler;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBElement;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
+import java.io.StringWriter;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -28,17 +35,20 @@ public class Qdist013Service {
 	private final SafJournalpostQueryService safJournalpostQueryService;
 	private final JuridiskLogg juridiskLogg;
 	private final LagreJuridiskLoggMapper lagreJuridiskLoggMapper;
+	private final ArkivmeldingMapper arkivmeldingMapper;
 
 	public Qdist013Service(S3Storage s3Storage,
 						   AdministrerForsendelse administrerForsendelse,
 						   @Qualifier("SafJournalpostQueryServiceQdist013") SafJournalpostQueryService safJournalpostQueryService,
 						   JuridiskLogg juridiskLogg,
-						   LagreJuridiskLoggMapper lagreJuridiskLoggMapper) {
+						   LagreJuridiskLoggMapper lagreJuridiskLoggMapper,
+						   ArkivmeldingMapper arkivmeldingMapper) {
 		this.s3Storage = s3Storage;
 		this.administrerForsendelse = administrerForsendelse;
 		this.safJournalpostQueryService = safJournalpostQueryService;
 		this.juridiskLogg = juridiskLogg;
 		this.lagreJuridiskLoggMapper = lagreJuridiskLoggMapper;
+		this.arkivmeldingMapper = arkivmeldingMapper;
 	}
 
 	@Handler
@@ -52,9 +62,13 @@ public class Qdist013Service {
 		final JournalpostQdist013 journalpostQdist013 = safJournalpostQueryService.hentJournalpost(hentForsendelseResponseTo.getArkivInformasjon()
 				.getArkivId());
 
-		//TODO produser arkivmelding og send til trygderetten gjennom restkall
+		JAXBElement<Arkivmelding> arkivmeldingJAXBElement = arkivmeldingMapper.createArkivMelding(hentForsendelseResponseTo, journalpostQdist013);
+		String arkivmeldingXmlString = marshalArkivmeldingToXmlString(arkivmeldingJAXBElement);
 
-		juridiskLogg.lagreJuridiskLogg(lagreJuridiskLoggMapper.map(hentForsendelseResponseTo, "Implement me".getBytes())); //todo: meldingsInnhold = arkivmeldingen, men ikke dokumentene
+		//TODO Send til trygderetten gjennom restkall
+
+
+		juridiskLogg.lagreJuridiskLogg(lagreJuridiskLoggMapper.map(hentForsendelseResponseTo, arkivmeldingXmlString.getBytes()));
 	}
 
 	private List<DokdistDokument> getDocumentsFromS3(HentForsendelseResponseTo hentForsendelseResponseTo) {
@@ -66,5 +80,18 @@ public class Qdist013Service {
 					return dokdistDokument;
 				})
 				.collect(Collectors.toList());
+	}
+
+	private String marshalArkivmeldingToXmlString(JAXBElement<Arkivmelding> arkivmeldingJAXBElement) {
+		try {
+			JAXBContext jaxbContext = JAXBContext.newInstance(Arkivmelding.class);
+			Marshaller marshaller = jaxbContext.createMarshaller();
+
+			StringWriter sw = new StringWriter();
+			marshaller.marshal(arkivmeldingJAXBElement, sw);
+			return sw.toString();
+		} catch (JAXBException e) {
+			throw new KunneIkkeMarshalleArkivmeldingTechnicalException("Kunne ikke marshalle Arkivmelding til xmlString", e);
+		}
 	}
 }
