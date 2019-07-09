@@ -3,6 +3,10 @@ package no.nav.dokdisteformidling.qdist013;
 import static no.nav.dokdisteformidling.common.FunctionalUtils.convertLocalDateTimeToXmlGregorianCalendar;
 import static no.nav.dokdisteformidling.common.FunctionalUtils.generateRandomUUID;
 import static no.nav.dokdisteformidling.common.FunctionalUtils.getNow;
+import static no.nav.dokdisteformidling.constants.DomainConstants.APP_NAME;
+import static no.nav.dokdisteformidling.qdist013.util.ArkivMapperUtil.brukerTypeIsAktoerId;
+import static no.nav.dokdisteformidling.qdist013.util.ArkivMapperUtil.brukerTypeIsOrgnr;
+import static no.nav.dokdisteformidling.qdist013.util.ArkivMapperUtil.isHoveddokument;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 
 import no.arkivverket.standarder.noark5.arkivmelding.Arkivmelding;
@@ -16,9 +20,13 @@ import no.arkivverket.standarder.noark5.arkivmelding.Sakspart;
 import no.arkivverket.standarder.noark5.metadatakatalog.Dokumentstatus;
 import no.arkivverket.standarder.noark5.metadatakatalog.Journalposttype;
 import no.arkivverket.standarder.noark5.metadatakatalog.Journalstatus;
+import no.arkivverket.standarder.noark5.metadatakatalog.Korrespondanseparttype;
 import no.arkivverket.standarder.noark5.metadatakatalog.Saksstatus;
 import no.arkivverket.standarder.noark5.metadatakatalog.TilknyttetRegistreringSom;
+import no.nav.dokdisteformidling.consumer.aktoerregister.Aktoerregister;
+import no.nav.dokdisteformidling.consumer.ereg.Ereg;
 import no.nav.dokdisteformidling.consumer.rdist001.HentForsendelseResponseTo;
+import no.nav.dokdisteformidling.consumer.tps.Tps;
 import no.nav.dokdisteformidling.qdist013.saf.JournalpostQdist013;
 import org.springframework.stereotype.Component;
 
@@ -34,10 +42,20 @@ import java.util.stream.IntStream;
 @Component
 public class ArkivmeldingMapper {
 
-	public static final String SYSTEM_DOKDISTEFORMIDLING = "dokdisteformidling";
-	public static final String NAV_KLAGEINSTANS = "NAV Klageinstans";
-	public static final String SAKSPART_ROLLE_DAP = "DAP";
-	public static final String SAKSPART_ROLLE_AMP = "AMP";
+	private static final String NAV_KLAGEINSTANS = "NAV Klageinstans";
+	private static final String TRYGDERETTEN = "TRYGDERETTEN";
+	private static final String SAKSPART_ROLLE_DAP = "DAP";
+	private static final String SAKSPART_ROLLE_AMP = "AMP";
+
+	private final Aktoerregister aktoerregister;
+	private final Ereg ereg;
+	private final Tps tps;
+
+	public ArkivmeldingMapper(Aktoerregister aktoerregister, Ereg ereg, Tps tps) {
+		this.aktoerregister = aktoerregister;
+		this.ereg = ereg;
+		this.tps = tps;
+	}
 
 	public JAXBElement<Arkivmelding> createArkivMelding(HentForsendelseResponseTo hentForsendelseResponseTo, JournalpostQdist013 journalpostQdist013) {
 		ObjectFactory objectFactory = new ObjectFactory();
@@ -45,7 +63,7 @@ public class ArkivmeldingMapper {
 		final XMLGregorianCalendar datoArkivmeldingOpprettet = getNow();
 
 		Arkivmelding arkivmelding = objectFactory.createArkivmelding();
-		arkivmelding.setSystem(SYSTEM_DOKDISTEFORMIDLING);
+		arkivmelding.setSystem(APP_NAME);
 		arkivmelding.setMeldingId(hentForsendelseResponseTo.getBestillingsId());
 		arkivmelding.setTidspunkt(datoArkivmeldingOpprettet);
 		arkivmelding.setAntallFiler(hentForsendelseResponseTo.getDokumenter().size());
@@ -62,7 +80,7 @@ public class ArkivmeldingMapper {
 												 ObjectFactory objectFactory) {
 		Saksmappe saksmappe = objectFactory.createSaksmappe();
 		saksmappe.setSystemID(systemId);
-//		saksmappe.setTittel(); Todo Dette skal vøre tema decoded
+//		saksmappe.setTittel(); Todo Dette skal vøre tema decoded. Dette må støttes av saf
 		saksmappe.setOpprettetDato(convertLocalDateTimeToXmlGregorianCalendar(journalpostQdist013.getSak().getDatoOpprettet()));
 		saksmappe.setOpprettetAv(journalpostQdist013.getOpprettetAvNavn());
 		saksmappe.getBasisregistrering()
@@ -89,10 +107,8 @@ public class ArkivmeldingMapper {
 		journalpost.setJournalposttype(Journalposttype.UTGÅENDE_DOKUMENT);
 		journalpost.setJournalstatus(Journalstatus.EKSPEDERT);
 		journalpost.setJournaldato(convertLocalDateTimeToXmlGregorianCalendar(journalpostQdist013.getDatoJournalfoert()));
-		journalpost.getKorrespondansepart()
-				.add(createAndPolpulateKorrespondanspartMottaker(journalpostQdist013, systemId, objectFactory));
-		journalpost.getKorrespondansepart()
-				.add(createAndPolpulateKorrespondanspartAvsender(journalpostQdist013, systemId, objectFactory));
+		journalpost.getKorrespondansepart().add(createAndPolpulateKorrespondanspartMottaker(objectFactory));
+		journalpost.getKorrespondansepart().add(createAndPolpulateKorrespondanspartAvsender(objectFactory));
 		return journalpost;
 	}
 
@@ -127,12 +143,8 @@ public class ArkivmeldingMapper {
 		dokumentbeskrivelse.setTilknyttetDato(datoArkivmeldingOpprettet);
 		dokumentbeskrivelse.setTilknyttetAv(journalpostQdist013.getJournalfortAvNavn());
 		dokumentbeskrivelse.getDokumentobjekt()
-				.add(createAndPopulateDokumentObjekt(journalpostQdist013, dokumentInfo, systemId, isHoveddokument(rekkefolge), objectFactory));
+				.add(createAndPopulateDokumentObjekt(journalpostQdist013, dokumentInfo, isHoveddokument(rekkefolge), objectFactory));
 		return dokumentbeskrivelse;
-	}
-
-	private boolean isHoveddokument(int rekkefolge) {
-		return rekkefolge == 0;
 	}
 
 	private String getDokumentOpprettetAv(boolean isHoveddok, JournalpostQdist013 journalpostQdist013, JournalpostQdist013.DokumentInfo dokumentInfo) {
@@ -146,7 +158,6 @@ public class ArkivmeldingMapper {
 
 	private Dokumentobjekt createAndPopulateDokumentObjekt(JournalpostQdist013 journalpostQdist013,
 														   JournalpostQdist013.DokumentInfo dokumentInfo,
-														   String systemId,
 														   boolean isHoveddokument,
 														   ObjectFactory objectFactory) {
 		Dokumentobjekt dokumentobjekt = objectFactory.createDokumentobjekt();
@@ -161,40 +172,56 @@ public class ArkivmeldingMapper {
 	private String getReferanseDokumentFil(JournalpostQdist013 journalpostQdist013, JournalpostQdist013.DokumentInfo dokumentInfo) {
 		return null;
 //		TODO Implement: journalpost.journalpostId + "-" + journalpost.dokumenter.dokumentInfoId + "-" + journalpost.dokumenter.dokumentvariant + "." + journalpost.dokumenter.dokumentvariant.filtype
+//		TODO Filtype må legges til i saf
 	}
 
-	private Korrespondansepart createAndPolpulateKorrespondanspartMottaker(JournalpostQdist013 journalpostQdist013, String systemId, ObjectFactory objectFactory) {
-		Korrespondansepart korrespondansepart = objectFactory.createKorrespondansepart();
-		//TODO
-		return korrespondansepart;
+	private Korrespondansepart createAndPolpulateKorrespondanspartMottaker(ObjectFactory objectFactory) {
+		Korrespondansepart korrespondansepartMottaker = objectFactory.createKorrespondansepart();
+		korrespondansepartMottaker.setKorrespondanseparttype(Korrespondanseparttype.AVSENDER);
+		korrespondansepartMottaker.setKorrespondansepartNavn(NAV_KLAGEINSTANS); //TODO Må avklares. Skal kanskje bare være "NAV"
+		return korrespondansepartMottaker;
 	}
 
-	private Korrespondansepart createAndPolpulateKorrespondanspartAvsender(JournalpostQdist013 journalpostQdist013, String systemId, ObjectFactory objectFactory) {
-		Korrespondansepart korrespondansepart = objectFactory.createKorrespondansepart();
-		//TODO
-		return korrespondansepart;
+	private Korrespondansepart createAndPolpulateKorrespondanspartAvsender(ObjectFactory objectFactory) {
+		Korrespondansepart korrespondansepartAvsender = objectFactory.createKorrespondansepart();
+		korrespondansepartAvsender.setKorrespondanseparttype(Korrespondanseparttype.MOTTAKER);
+		korrespondansepartAvsender.setKorrespondansepartNavn(TRYGDERETTEN);
+		return korrespondansepartAvsender;
 	}
 
 	private Sakspart createAndPopulateSakspartDAP(JournalpostQdist013 journalpostQdist013, ObjectFactory objectFactory) {
 		Sakspart sakspartDAP = objectFactory.createSakspart();
-		sakspartDAP.setSakspartID(getSakspartIdDAP(journalpostQdist013));
-		sakspartDAP.setSakspartNavn(getSakspartNavnDAP(journalpostQdist013));
+		final String fnrObtainedFromAktoerId = getFnrIfBrukerTypeIsAktoerIdElseReturnNull(journalpostQdist013);
+		sakspartDAP.setSakspartID(getSakspartIdDAP(journalpostQdist013, fnrObtainedFromAktoerId));
+		sakspartDAP.setSakspartNavn(getSakspartNavnDAP(journalpostQdist013, fnrObtainedFromAktoerId));
 		sakspartDAP.setSakspartRolle(SAKSPART_ROLLE_DAP);
 		return sakspartDAP;
 	}
 
-	private String getSakspartIdDAP(JournalpostQdist013 journalpostQdist013) {
-		return "TODO";
-//		TODO
-//		HVIS journalpost.bruker.bruker.type = AKTOERID SÅ sett fødselsnummer hentet fra Aktoer
-//		ELLERS sett journalpost.bruker.id
+	private String getFnrIfBrukerTypeIsAktoerIdElseReturnNull(JournalpostQdist013 journalpostQdist013) {
+		if (brukerTypeIsAktoerId(journalpostQdist013)) {
+			return aktoerregister.hentIdentForAktoerId(journalpostQdist013.getBruker().getId());
+		} else {
+			return null;
+		}
 	}
 
-	private String getSakspartNavnDAP(JournalpostQdist013 journalpostQdist013) {
-		return "TODO";
-//		TODO
-//		HVIS journalpost.bruker.type = ORGNR SÅ hent organisasjonens navn fra Enhetsregisteret og sett dette
-//		ELLERS hent brukers navn fra TPS og sett dette
+	private String getSakspartIdDAP(JournalpostQdist013 journalpostQdist013, String fnrObtainedFromAktoerId) {
+		if (brukerTypeIsAktoerId(journalpostQdist013)) {
+			return fnrObtainedFromAktoerId;
+		} else {
+			return journalpostQdist013.getBruker().getId();
+		}
+	}
+
+	private String getSakspartNavnDAP(JournalpostQdist013 journalpostQdist013, String fnrObtainedFromAktoerId) {
+		if (brukerTypeIsOrgnr(journalpostQdist013)) {
+			return ereg.hentNavn(journalpostQdist013.getBruker().getId());
+		} else if (brukerTypeIsAktoerId(journalpostQdist013)) {
+			return tps.hentNavn(fnrObtainedFromAktoerId);
+		} else {
+			return tps.hentNavn(journalpostQdist013.getBruker().getId());
+		}
 	}
 
 	private Sakspart createAndPopulateSakspartAMP(JournalpostQdist013 journalpostQdist013, ObjectFactory objectFactory) {

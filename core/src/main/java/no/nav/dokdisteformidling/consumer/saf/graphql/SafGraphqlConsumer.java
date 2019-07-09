@@ -1,5 +1,6 @@
 package no.nav.dokdisteformidling.consumer.saf.graphql;
 
+import static no.nav.dokdisteformidling.constants.DomainConstants.BEARER_PREFIX;
 import static no.nav.dokdisteformidling.constants.RetryConstants.DELAY_SHORT;
 import static no.nav.dokdisteformidling.constants.RetryConstants.MAX_ATTEMPTS_SHORT;
 
@@ -35,7 +36,6 @@ import java.time.Duration;
 @Slf4j
 public class SafGraphqlConsumer {
 
-	private static final String OIDC_TOKEN_PREFIX = "Bearer";
 	private final RestTemplate restTemplate;
 	private final String graphQLurl;
 	private final StsRestConsumer stsRestConsumer;
@@ -59,23 +59,26 @@ public class SafGraphqlConsumer {
 		try {
 			ResponseEntity<SafJsonJournalpost> responseEntity = restTemplate.exchange(graphQLurl, HttpMethod.POST, new HttpEntity<>(requestToJson(graphQLRequest), createAuthorizationHeader()), SafJsonJournalpost.class);
 
-			if (responseEntity.getBody() == null || responseEntity.getBody().getData() == null || responseEntity.getBody().getData().getJournalpost() == null) {
+			if (responseEntity.getBody() == null || responseEntity.getBody().getData() == null || responseEntity.getBody()
+					.getData().getJournalpost() == null) {
 				throw new SafJournalpostIkkeFunnetFunctionalException("Ingen journalpost ble funnet");
 			}
 
 			return responseEntity.getBody().getJournalpost();
 
 		} catch (HttpClientErrorException e) {
-			throw new SafJournalpostQueryUnauthorizedException(String.format("Henting av journalpost feilet med status: %s, feilmelding: %s", e.getStatusCode(), e.getMessage()), e);
+			throw new SafJournalpostQueryUnauthorizedException(String.format("Henting av journalpost feilet med status: %s, feilmelding: %s", e
+					.getStatusCode(), e.getMessage()), e);
 		} catch (HttpServerErrorException e) {
-			throw new SafJournalpostQueryTechnicalException(String.format("Tjenesten SAF (graphQL) feilet med status: %s, feilmelding: %s", e.getStatusCode(), e.getMessage()), e);
+			throw new SafJournalpostQueryTechnicalException(String.format("Tjenesten SAF (graphQL) feilet med status: %s, feilmelding: %s", e
+					.getStatusCode(), e.getMessage()), e);
 		}
 	}
 
 	private HttpHeaders createAuthorizationHeader() {
 		HttpHeaders headers = new HttpHeaders();
 		headers.setContentType(MediaType.APPLICATION_JSON);
-		headers.set(HttpHeaders.AUTHORIZATION, OIDC_TOKEN_PREFIX + " " + stsRestConsumer.getOidcToken());
+		headers.set(HttpHeaders.AUTHORIZATION, BEARER_PREFIX + stsRestConsumer.getOidcToken());
 		return headers;
 	}
 
@@ -83,7 +86,8 @@ public class SafGraphqlConsumer {
 		try {
 			return new ObjectMapper().writeValueAsString(graphQLRequest);
 		} catch (JsonProcessingException e) {
-			throw new MarshalGraphqlRequestToJsonTechnicalException(String.format("Kunne ikke konvertere graphQlRequest til json, feilmelding=%s", e.getMessage()), e);
+			throw new MarshalGraphqlRequestToJsonTechnicalException(String.format("Kunne ikke konvertere graphQlRequest til json, feilmelding=%s", e
+					.getMessage()), e);
 		}
 	}
 }
