@@ -3,8 +3,8 @@ package no.nav.dokdisteformidling.consumer.sts;
 import static no.nav.dokdisteformidling.constants.RetryConstants.DELAY_SHORT;
 import static no.nav.dokdisteformidling.constants.RetryConstants.MULTIPLIER_SHORT;
 
-import no.nav.dokdisteformidling.exception.technical.AbstractDokdisteformidlingTechnicalException;
 import no.nav.dokdisteformidling.config.alias.ServiceuserAlias;
+import no.nav.dokdisteformidling.exception.technical.AbstractDokdisteformidlingTechnicalException;
 import no.nav.dokdisteformidling.exception.technical.StsTechnicalException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
@@ -38,6 +38,7 @@ public class StsRestConsumer {
 				.build();
 	}
 
+	//Todo: Do not call sts unless the token obtained from the last call is null or is about to expire
 	@Retryable(include = AbstractDokdisteformidlingTechnicalException.class, backoff = @Backoff(delay = DELAY_SHORT, multiplier = MULTIPLIER_SHORT))
 	public String getOidcToken() {
 		try {
