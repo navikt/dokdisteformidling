@@ -1,4 +1,4 @@
-package no.nav.dokdisteformidling.qdist013.saf;
+package no.nav.dokdisteformidling.qdist013.saf.main;
 
 import lombok.Builder;
 import lombok.Value;
@@ -20,7 +20,7 @@ public class JournalpostQdist013 implements Journalpost {
 	private final String tittel;
 	private final String kategori; //TODO: Add support in saf
 	private final String journalfortAvNavn;
-
+	private final String temanavn;
 
 	@Builder.Default
 	private final List<RelevantDato> relevanteDatoer = new ArrayList<>();
@@ -57,12 +57,7 @@ public class JournalpostQdist013 implements Journalpost {
 		private final String originalJournalpostId;
 	}
 
-	private enum Datotype {
-		DATO_DOKUMENT,
-		DATO_AVS_RETUR,
-		DATO_EKSPEDERT,
-		DATO_REGISTRERT,
-		DATO_SENDT_PRINT,
+	public enum Datotype {
 		DATO_JOURNALFOERT
 	}
 

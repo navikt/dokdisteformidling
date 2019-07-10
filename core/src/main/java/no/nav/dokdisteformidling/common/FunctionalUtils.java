@@ -76,8 +76,8 @@ public class FunctionalUtils {
 		}
 	}
 
-
 	public static String generateRandomUUID() {
 		return UUID.randomUUID().toString();
 	}
+
 }

@@ -1,6 +1,6 @@
 package no.nav.dokdisteformidling.qdist013.util;
 
-import no.nav.dokdisteformidling.qdist013.saf.JournalpostQdist013;
+import no.nav.dokdisteformidling.qdist013.saf.main.JournalpostQdist013;
 
 /**
  * @author Sigurd Midttun, Visma Consulting.

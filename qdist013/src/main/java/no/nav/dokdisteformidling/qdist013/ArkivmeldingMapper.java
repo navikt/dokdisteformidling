@@ -25,11 +25,13 @@ import no.arkivverket.standarder.noark5.metadatakatalog.Saksstatus;
 import no.arkivverket.standarder.noark5.metadatakatalog.TilknyttetRegistreringSom;
 import no.nav.dokdisteformidling.consumer.aktoerregister.Aktoerregister;
 import no.nav.dokdisteformidling.consumer.ereg.Ereg;
-import no.nav.dokdisteformidling.consumer.rdist001.HentForsendelseResponseTo;
+import no.nav.dokdisteformidling.consumer.saf.SafJournalpostQueryService;
 import no.nav.dokdisteformidling.consumer.tps.Tps;
-import no.nav.dokdisteformidling.qdist013.saf.JournalpostQdist013;
+import no.nav.dokdisteformidling.qdist013.saf.lightweight.LightweightSafJournalpostQdist013;
+import no.nav.dokdisteformidling.qdist013.saf.main.JournalpostQdist013;
 import org.springframework.stereotype.Component;
 
+import javax.inject.Named;
 import javax.xml.bind.JAXBElement;
 import javax.xml.datatype.XMLGregorianCalendar;
 import java.math.BigInteger;
@@ -50,37 +52,41 @@ public class ArkivmeldingMapper {
 	private final Aktoerregister aktoerregister;
 	private final Ereg ereg;
 	private final Tps tps;
+	private final SafJournalpostQueryService<LightweightSafJournalpostQdist013> safJournalpostQueryService;
 
-	public ArkivmeldingMapper(Aktoerregister aktoerregister, Ereg ereg, Tps tps) {
+	public ArkivmeldingMapper(@Named("LightweightSafJournalpostQueryServiceQdist013") SafJournalpostQueryService<LightweightSafJournalpostQdist013> safJournalpostQueryService,
+							  Aktoerregister aktoerregister,
+							  Ereg ereg,
+							  Tps tps) {
+		this.safJournalpostQueryService = safJournalpostQueryService;
 		this.aktoerregister = aktoerregister;
 		this.ereg = ereg;
 		this.tps = tps;
 	}
 
-	public JAXBElement<Arkivmelding> createArkivMelding(HentForsendelseResponseTo hentForsendelseResponseTo, JournalpostQdist013 journalpostQdist013) {
+	public JAXBElement<Arkivmelding> createArkivMelding(JournalpostQdist013 journalpostQdist013, String bestillingsId) {
 		ObjectFactory objectFactory = new ObjectFactory();
 		final String systemId = generateRandomUUID(); //TODO: Korrekt å bruke samme systemId over alt?
 		final XMLGregorianCalendar datoArkivmeldingOpprettet = getNow();
 
 		Arkivmelding arkivmelding = objectFactory.createArkivmelding();
 		arkivmelding.setSystem(APP_NAME);
-		arkivmelding.setMeldingId(hentForsendelseResponseTo.getBestillingsId());
+		arkivmelding.setMeldingId(bestillingsId);
 		arkivmelding.setTidspunkt(datoArkivmeldingOpprettet);
-		arkivmelding.setAntallFiler(hentForsendelseResponseTo.getDokumenter().size());
+		arkivmelding.setAntallFiler(journalpostQdist013.getDokumenter().size());
 		arkivmelding.getMappe()
-				.add(createAndPopulateSaksmappe(hentForsendelseResponseTo, journalpostQdist013, systemId, datoArkivmeldingOpprettet, objectFactory));
+				.add(createAndPopulateSaksmappe(journalpostQdist013, systemId, datoArkivmeldingOpprettet, objectFactory));
 
 		return objectFactory.createArkivmelding(arkivmelding);
 	}
 
-	private Saksmappe createAndPopulateSaksmappe(HentForsendelseResponseTo hentForsendelseResponseTo,
-												 JournalpostQdist013 journalpostQdist013,
+	private Saksmappe createAndPopulateSaksmappe(JournalpostQdist013 journalpostQdist013,
 												 String systemId,
 												 XMLGregorianCalendar datoArkivmeldingOpprettet,
 												 ObjectFactory objectFactory) {
 		Saksmappe saksmappe = objectFactory.createSaksmappe();
 		saksmappe.setSystemID(systemId);
-//		saksmappe.setTittel(); Todo Dette skal vøre tema decoded. Dette må støttes av saf
+		saksmappe.setTittel(journalpostQdist013.getTemanavn());
 		saksmappe.setOpprettetDato(convertLocalDateTimeToXmlGregorianCalendar(journalpostQdist013.getSak().getDatoOpprettet()));
 		saksmappe.setOpprettetAv(journalpostQdist013.getOpprettetAvNavn());
 		saksmappe.getBasisregistrering()
@@ -151,8 +157,9 @@ public class ArkivmeldingMapper {
 		if (isHoveddok || isEmpty(dokumentInfo.getOriginalJournalpostId())) {
 			return journalpostQdist013.getJournalfortAvNavn();
 		} else {
-			//todo: call Saf to get journalpost.dokumenter.originalJournalpostId→journalfortAvNavn
-			return null;
+			LightweightSafJournalpostQdist013 lightweightSafJournalpostQdist013 = safJournalpostQueryService.hentJournalpost(dokumentInfo
+					.getOriginalJournalpostId());
+			return lightweightSafJournalpostQdist013.getJournalfortAvNavn();
 		}
 	}
 
