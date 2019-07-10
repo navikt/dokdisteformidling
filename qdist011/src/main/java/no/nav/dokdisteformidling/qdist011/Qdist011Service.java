@@ -42,7 +42,7 @@ public class Qdist011Service {
 	private final ProducerTemplate producer;
 	private final BridgeMotSDPMapper bridgeMotSDPMapper;
 	private final DigitalKontaktInformasjonValidator digitalKontaktInformasjonValidator;
-	private final SafJournalpostQueryService safJournalpostQueryService;
+	private final SafJournalpostQueryService<JournalpostQdist011> safJournalpostQueryService;
 
 	@Inject
 	public Qdist011Service(DokumentkatalogAdmin dokumentkatalogAdmin,
@@ -52,7 +52,7 @@ public class Qdist011Service {
 						   DigitalKontaktinformasjonV1 digitalKontaktinformasjonV1,
 						   ProducerTemplate producer, BridgeMotSDPMapper bridgeMotSDPMapper,
 						   DigitalKontaktInformasjonValidator digitalKontaktInformasjonValidator,
-						   @Qualifier("SafJournalpostQueryServiceQdist011") SafJournalpostQueryService safJournalpostQueryService) {
+						   @Qualifier("SafJournalpostQueryServiceQdist011") SafJournalpostQueryService<JournalpostQdist011> safJournalpostQueryService) {
 		this.dokumentkatalogAdmin = dokumentkatalogAdmin;
 		this.varselInfo = varselInfo;
 		this.administrerForsendelse = administrerForsendelse;

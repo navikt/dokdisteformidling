@@ -3,6 +3,7 @@ package no.nav.dokdisteformidling.consumer.saf.journalpost;
 import lombok.Builder;
 import lombok.Value;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -10,14 +11,50 @@ import java.util.List;
 @Builder
 public class SafJournalpost {
 
+	private final String journalpostId;
+	private final Sak sak;
+	private final String opprettetAvNavn;
+	private final Bruker bruker;
+	private final LocalDateTime datoOpprettet;
+	private final String tittel;
+	private final String kategori; //TODO: Add support in saf
+	private final String journalfortAvNavn;
+	private final String temanavn;
+
+	@Builder.Default
+	private final List<RelevantDato> relevanteDatoer = new ArrayList<>();
+
 	@Builder.Default
 	private final List<DokumentInfo> dokumenter = new ArrayList<>();
+
+	@Value
+	@Builder
+	public static class Sak {
+		private final LocalDateTime datoOpprettet;
+	}
+
+	@Value
+	@Builder
+	public static class RelevantDato {
+		private final LocalDateTime dato;
+		private final String datotype;
+	}
+
+	@Value
+	@Builder
+	public static class Bruker {
+		private final String id;
+		private final String type;
+	}
 
 	@Value
 	@Builder
 	public static class DokumentInfo {
 		private final String dokumentInfoId;
 		private final String tittel;
+		private final LocalDateTime datoFerdigstilt;
+		private final String originalJournalpostId;
 	}
+
 
 }

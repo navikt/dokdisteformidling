@@ -1,32 +1,20 @@
 package no.nav.dokdisteformidling.qdist011.saf;
 
-import static java.lang.String.format;
+import static no.nav.dokdisteformidling.common.SafAssertionUtils.assertFieldOnSafDokumenterNotNullOrEmpty;
 
 import no.nav.dokdisteformidling.consumer.saf.journalpost.SafJournalpost;
-import no.nav.dokdisteformidling.exception.functional.SafJournalpostValidationException;
 import org.springframework.stereotype.Component;
-
-import java.util.List;
 
 @Component
 public class SafJournalpostValidatorQdist011 {
 
-	public void validate(SafJournalpost safJournalpost) {
-		validateDokumenter(safJournalpost.getDokumenter());
+	public void validate(SafJournalpost safJournalpost, String journalpostid) {
+		safJournalpost.getDokumenter().forEach(dokumentInfo -> validateDokument(dokumentInfo, journalpostid));
 	}
 
-	private void validateDokumenter(List<SafJournalpost.DokumentInfo> dokumenter) {
-		dokumenter.forEach(this::validateDokument);
-	}
-
-	private void validateDokument(SafJournalpost.DokumentInfo dokumentInfo) {
-		assertDokumentFieldNotNullOrEmpty("tittel", dokumentInfo.getTittel());
-		assertDokumentFieldNotNullOrEmpty("dokumentInfoId", dokumentInfo.getDokumentInfoId());
-	}
-
-	public static void assertDokumentFieldNotNullOrEmpty(String field, String value) {
-		if (value == null || value.isEmpty()) {
-			throw new SafJournalpostValidationException(format("For dokumenter kan feltet %s ikke være null eller tomt. Fikk %s=%s", field, field, value));
-		}
+	private void validateDokument(SafJournalpost.DokumentInfo dokumentInfo, String journalpostId) {
+		assertFieldOnSafDokumenterNotNullOrEmpty("dokumentInfo.tittel", dokumentInfo.getTittel(), journalpostId, dokumentInfo.getDokumentInfoId());
+		assertFieldOnSafDokumenterNotNullOrEmpty("dokumentInfo.dokumentInfoId", dokumentInfo.getDokumentInfoId(), journalpostId, dokumentInfo
+				.getDokumentInfoId());
 	}
 }

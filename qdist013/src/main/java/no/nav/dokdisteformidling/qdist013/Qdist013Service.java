@@ -9,13 +9,13 @@ import no.nav.dokdisteformidling.consumer.rdist001.AdministrerForsendelse;
 import no.nav.dokdisteformidling.consumer.rdist001.HentForsendelseResponseTo;
 import no.nav.dokdisteformidling.consumer.saf.SafJournalpostQueryService;
 import no.nav.dokdisteformidling.exception.technical.KunneIkkeMarshalleArkivmeldingTechnicalException;
-import no.nav.dokdisteformidling.qdist013.saf.JournalpostQdist013;
+import no.nav.dokdisteformidling.qdist013.saf.main.JournalpostQdist013;
 import no.nav.dokdisteformidling.storage.DokdistDokument;
 import no.nav.dokdisteformidling.storage.S3Storage;
 import org.apache.camel.Handler;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
+import javax.inject.Named;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
@@ -32,14 +32,14 @@ public class Qdist013Service {
 
 	private final S3Storage s3Storage;
 	private final AdministrerForsendelse administrerForsendelse;
-	private final SafJournalpostQueryService safJournalpostQueryService;
+	private final SafJournalpostQueryService<JournalpostQdist013> safJournalpostQueryService;
 	private final JuridiskLogg juridiskLogg;
 	private final LagreJuridiskLoggMapper lagreJuridiskLoggMapper;
 	private final ArkivmeldingMapper arkivmeldingMapper;
 
 	public Qdist013Service(S3Storage s3Storage,
 						   AdministrerForsendelse administrerForsendelse,
-						   @Qualifier("SafJournalpostQueryServiceQdist013") SafJournalpostQueryService safJournalpostQueryService,
+						   @Named("SafJournalpostQueryServiceQdist013") SafJournalpostQueryService<JournalpostQdist013> safJournalpostQueryService,
 						   JuridiskLogg juridiskLogg,
 						   LagreJuridiskLoggMapper lagreJuridiskLoggMapper,
 						   ArkivmeldingMapper arkivmeldingMapper) {
@@ -62,7 +62,8 @@ public class Qdist013Service {
 		final JournalpostQdist013 journalpostQdist013 = safJournalpostQueryService.hentJournalpost(hentForsendelseResponseTo.getArkivInformasjon()
 				.getArkivId());
 
-		JAXBElement<Arkivmelding> arkivmeldingJAXBElement = arkivmeldingMapper.createArkivMelding(hentForsendelseResponseTo, journalpostQdist013);
+		JAXBElement<Arkivmelding> arkivmeldingJAXBElement = arkivmeldingMapper.createArkivMelding(journalpostQdist013, hentForsendelseResponseTo
+				.getBestillingsId());
 		String arkivmeldingXmlString = marshalArkivmeldingToXmlString(arkivmeldingJAXBElement);
 
 		//TODO Send til trygderetten gjennom restkall

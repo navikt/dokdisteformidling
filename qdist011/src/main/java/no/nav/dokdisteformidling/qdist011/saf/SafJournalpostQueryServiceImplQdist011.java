@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 import java.util.Collections;
 
 @Component("SafJournalpostQueryServiceQdist011")
-public class SafJournalpostQueryServiceImplQdist011 implements SafJournalpostQueryService {
+public class SafJournalpostQueryServiceImplQdist011 implements SafJournalpostQueryService<JournalpostQdist011> {
 
 	private static final String JOURNALPOST_QUERY =
 			"query journalpost($queryJournalpostId: String!) {\n" +
@@ -39,7 +39,7 @@ public class SafJournalpostQueryServiceImplQdist011 implements SafJournalpostQue
 				.variables(Collections.singletonMap("queryJournalpostId", journalpostid))
 				.build());
 
-		safJournalpostValidatorQdist011.validate(safJournalpost);
+		safJournalpostValidatorQdist011.validate(safJournalpost, journalpostid);
 		return journalpostQdist011Mapper.map(safJournalpost);
 	}
 }
