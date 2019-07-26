@@ -25,7 +25,7 @@ import java.util.stream.Collectors;
  * @author Heidi Elisabeth Sando, Visma Consulting.
  */
 
-public class FunctionalUtils {
+public final class FunctionalUtils {
 
 	private FunctionalUtils() {
 	}

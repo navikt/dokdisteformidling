@@ -33,29 +33,29 @@ import java.time.Duration;
 public class EregConsumer implements Ereg {
 
 	private final RestTemplate restTemplate;
-	private final String tpsProxyUrl;
+	private final String eregApiUrl;
 
 	public EregConsumer(RestTemplateBuilder restTemplateBuilder,
-						@Value("${tpsproxy.api.url}") String tpsProxyUrl) {
+						@Value("${ereg.api}") String eregApiUrl) {
 		this.restTemplate = restTemplateBuilder
 				.setReadTimeout(Duration.ofSeconds(20))
 				.setConnectTimeout(Duration.ofSeconds(5))
 				.build();
-		this.tpsProxyUrl = tpsProxyUrl;
+		this.eregApiUrl = eregApiUrl;
 	}
 
-	@Monitor(value = "dok_metric", extraTags = {"process", "hentNavn"}, histogram = true, percentiles = {0.5, 0.95})
+	@Monitor(value = "dok_metric", extraTags = {"process", "hentNavn"}, percentiles = {0.5, 0.95}, histogram = true)
 	@Retryable(include = EregHentNoekkelinfoTechnicalException.class, backoff = @Backoff(delay = DELAY_SHORT))
 	public String hentNavn(String orgnr) {
 		try {
 			final String orgnrTrimmed = orgnr.trim();
 			HttpHeaders headers = createHeaders();
-			EregHentNoekkelInfoResponse response = restTemplate.exchange(tpsProxyUrl + "/v1/organisasjon/" + orgnrTrimmed + "/noekkelinfo",
+			EregHentNoekkelInfoResponse response = restTemplate.exchange(eregApiUrl + "/v1/organisasjon/" + orgnrTrimmed + "/noekkelinfo",
 					HttpMethod.GET, new HttpEntity<>(headers), EregHentNoekkelInfoResponse.class).getBody();
 			assertResponse(response, orgnrTrimmed);
 			return getFullName(response.getNavn());
 		} catch (HttpClientErrorException e) {
-			throw new EregHentNoekkelinfoFunctionalException(format("Funkjsonell feil ved kall mot ereg:hentNoekkelinfo for organisasjonsnummer=%s. feilmelding=%s",
+			throw new EregHentNoekkelinfoFunctionalException(format("Funksjonell feil ved kall mot ereg:hentNoekkelinfo for organisasjonsnummer=%s. feilmelding=%s",
 					orgnr, e.getMessage()), e);
 		} catch (HttpServerErrorException e) {
 			throw new EregHentNoekkelinfoTechnicalException(format("Teknisk feil ved kall mot ereg:hentNoekkelinfo for organisasjonsnummer=%s. Feilmelding=%s",
@@ -73,10 +73,9 @@ public class EregConsumer implements Ereg {
 
 	private void assertResponse(EregHentNoekkelInfoResponse eregHentNoekkelInfoResponse, String orgnr) {
 		if (eregHentNoekkelInfoResponse == null) {
-			throw new EregHentNoekkelinfoFunctionalException(String.format("Fikk ingen resons fra ereg:hentNoekkelinfo for organisasjonsnummer=%s.", orgnr));
+			throw new EregHentNoekkelinfoFunctionalException(String.format("Fikk ingen respons fra ereg:hentNoekkelinfo for organisasjonsnummer=%s.", orgnr));
 		} else if (eregHentNoekkelInfoResponse.getNavn() == null) {
-			throw new EregHentNoekkelinfoFunctionalException(String.format("Resons fra ereg:hentNoekkelinfo for organisasjonsnummer=%s mangler navn", orgnr));
-
+			throw new EregHentNoekkelinfoFunctionalException(String.format("Respons fra ereg:hentNoekkelinfo for organisasjonsnummer=%s mangler navn", orgnr));
 		}
 	}
 

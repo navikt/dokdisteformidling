@@ -52,7 +52,7 @@ public class AktoerregisterConsumer implements Aktoerregister {
 		this.stsRestConsumer = stsRestConsumer;
 	}
 
-	@Monitor(value = "dok_metric", extraTags = {"process", "hentIdentForAktoerId"}, histogram = true, percentiles = {0.5, 0.95})
+	@Monitor(value = "dok_metric", extraTags = {"process", "hentIdentForAktoerId"}, percentiles = {0.5, 0.95}, histogram = true)
 	@Retryable(include = AktoerHentIdentForAktoerIdTechnicalException.class, backoff = @Backoff(delay = DELAY_SHORT))
 	public String hentIdentForAktoerId(String aktoerId) {
 		try {

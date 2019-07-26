@@ -51,7 +51,7 @@ public class TpsConsumer implements Tps {
 		this.stsRestConsumer = stsRestConsumer;
 	}
 
-	@Monitor(value = "dok_metric", extraTags = {"process", "hentNavn"}, histogram = true, percentiles = {0.5, 0.95})
+	@Monitor(value = "dok_metric", extraTags = {"process", "hentNavn"}, percentiles = {0.5, 0.95}, histogram = true)
 	@Retryable(include = TpsHentNavnTechnicalException.class, backoff = @Backoff(delay = DELAY_SHORT))
 	public String hentNavn(String fnr) {
 		try {
@@ -62,7 +62,7 @@ public class TpsConsumer implements Tps {
 					.getBody();
 			return getFullName(response);
 		} catch (HttpClientErrorException e) {
-			throw new TpsHentNavnFunctionalException(format("Funkjsonell feil ved kall mot tpsProxy:hentnavn. feilmelding==%s", e
+			throw new TpsHentNavnFunctionalException(format("Funksjonell feil ved kall mot tpsProxy:hentnavn. feilmelding==%s", e
 					.getMessage()), e);
 		} catch (HttpServerErrorException e) {
 			throw new TpsHentNavnTechnicalException(format("Teknisk feil ved kall mot tpsProxy:hentNavn. Feilmelding=%s", e.getMessage()), e);
