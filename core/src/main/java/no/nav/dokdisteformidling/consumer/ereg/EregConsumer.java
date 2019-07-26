@@ -36,7 +36,7 @@ public class EregConsumer implements Ereg {
 	private final String eregApiUrl;
 
 	public EregConsumer(RestTemplateBuilder restTemplateBuilder,
-						@Value("${ereg.api}") String eregApiUrl) {
+						@Value("${ereg.api.url}") String eregApiUrl) {
 		this.restTemplate = restTemplateBuilder
 				.setReadTimeout(Duration.ofSeconds(20))
 				.setConnectTimeout(Duration.ofSeconds(5))
