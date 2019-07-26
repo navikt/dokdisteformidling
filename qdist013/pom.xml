@@ -20,6 +20,15 @@
 			<groupId>no.nav.meldinger.virksomhet</groupId>
 			<artifactId>melding-virksomhet-dokdistfordeling</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>no.nav.tjenester</groupId>
+			<artifactId>nav-sdpkanal-tjenestespesifikasjon</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>no.digipost</groupId>
+			<artifactId>sdp-xsd</artifactId>
+			<version>1.1.2</version>
+		</dependency>
 	</dependencies>
 
 </project>
