@@ -71,5 +71,13 @@ fasitResources:
       resourceType: webserviceendpoint
       propertyMap:
         endpointUrl: virksomhet.digitalkontakinformasjon.v1.endpointurl
+    - alias: "aktoerregister.api.v1"
+      resourceType: restservice
+    - alias: "tps-proxy.api"
+      resourceType: restservice
+      propertyMap:
+        url: "tpsproxy.api.url"
+    - alias: "ereg.api"
+      resourceType: restservice
     - alias: "integrasjonspunkt.api.url"
       resourceType: restservice
