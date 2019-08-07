@@ -25,6 +25,10 @@
 			<groupId>no.nav.dokdisteformidling</groupId>
 			<artifactId>qdist013</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>no.nav.dokdisteformidling</groupId>
+			<artifactId>sdist001</artifactId>
+		</dependency>
 	</dependencies>
 
 	<build>
