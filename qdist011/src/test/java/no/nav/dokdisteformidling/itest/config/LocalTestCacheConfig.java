@@ -20,6 +20,7 @@ public class LocalTestCacheConfig {
 
 	public static final String TKAT020_CACHE = "tkat020Cache";
 	public static final String TKAT021_CACHE = "tkat021Cache";
+	public static final String STS_CACHE = "stsCache";
 
 	@Bean
 	CacheManager cacheManager() {
@@ -32,6 +33,9 @@ public class LocalTestCacheConfig {
 				new CaffeineCache(TKAT021_CACHE, Caffeine.newBuilder()
 						.expireAfterWrite(0, TimeUnit.MINUTES)
 						.maximumSize(0)
+						.build()),
+				new CaffeineCache(STS_CACHE, Caffeine.newBuilder()
+						.expireAfterWrite(0, TimeUnit.MINUTES)
 						.build())
 		));
 		return manager;
