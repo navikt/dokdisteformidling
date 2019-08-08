@@ -21,6 +21,7 @@ public class JournalpostQdist013 implements Journalpost {
 	private final String kategori; //TODO: Add support in saf
 	private final String journalfortAvNavn;
 	private final String temanavn;
+	private final String journalposttype;
 
 	@Builder.Default
 	private final List<RelevantDato> relevanteDatoer = new ArrayList<>();

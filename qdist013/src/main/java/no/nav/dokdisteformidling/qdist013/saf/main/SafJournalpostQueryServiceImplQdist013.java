@@ -24,6 +24,7 @@ public class SafJournalpostQueryServiceImplQdist013 implements SafJournalpostQue
 							"datoOpprettet\n" +
 						"}\n" +
 						"opprettetAvNavn\n" +
+						"journalposttype\n" +
 						"bruker{\n" +
 							"id\n" +
 							"type\n" +

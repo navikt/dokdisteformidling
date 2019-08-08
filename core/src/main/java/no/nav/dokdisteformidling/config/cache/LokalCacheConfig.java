@@ -22,6 +22,7 @@ public class LokalCacheConfig {
 
 	public static final String TKAT020_CACHE = "tkat020Cache";
 	public static final String TKAT021_CACHE = "tkat021Cache";
+	public static final String STS_CACHE = "stsCache";
 
 	@Bean
 	@Primary
@@ -34,6 +35,9 @@ public class LokalCacheConfig {
 						.build()),
 				new CaffeineCache(TKAT021_CACHE, Caffeine.newBuilder()
 						.expireAfterWrite(1, TimeUnit.DAYS)
+						.build()),
+				new CaffeineCache(STS_CACHE, Caffeine.newBuilder()
+						.expireAfterWrite(55, TimeUnit.MINUTES)
 						.build())
 		));
 		return manager;

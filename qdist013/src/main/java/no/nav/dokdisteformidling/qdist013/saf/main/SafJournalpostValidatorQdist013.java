@@ -30,6 +30,7 @@ public class SafJournalpostValidatorQdist013 {
 		assertFieldOnSafJournalpostBodyNotNullOrEmpty("jounalpost.kategori", safJournalpost.getKategori(), journalpostId);
 		assertFieldOnSafJournalpostBodyNotNullOrEmpty("jounalpost.journalfortAvNavn", safJournalpost.getJournalfortAvNavn(), journalpostId);
 		assertFieldOnSafJournalpostBodyNotNullOrEmpty("jounalpost.temanavn", safJournalpost.getTemanavn(), journalpostId);
+		assertFieldOnSafJournalpostBodyNotNullOrEmpty("jounalpost.journalposttype", safJournalpost.getJournalposttype(), journalpostId);
 		assertThatRelevanteDatoerContainsDatoJournalfoert(safJournalpost, journalpostId);
 
 	}
