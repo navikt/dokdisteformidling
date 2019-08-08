@@ -37,6 +37,7 @@ public class JournalpostQdist013Mapper {
 						)
 						.findAny()
 						.get())) //This is Ok. Validation is done prior to mapping
+				.journalposttype(safJournalpost.getJournalposttype())
 				.dokumenter(safJournalpost.getDokumenter().stream()
 						.map(dokumentInfo -> JournalpostQdist013.DokumentInfo.builder()
 								.dokumentInfoId(dokumentInfo.getDokumentInfoId())

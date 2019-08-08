@@ -1,5 +1,6 @@
 package no.nav.dokdisteformidling.qdist013;
 
+import static java.lang.String.format;
 import static no.nav.dokdisteformidling.common.FunctionalUtils.convertLocalDateTimeToXmlGregorianCalendar;
 import static no.nav.dokdisteformidling.common.FunctionalUtils.generateRandomUUID;
 import static no.nav.dokdisteformidling.common.FunctionalUtils.getNow;
@@ -48,6 +49,8 @@ public class ArkivmeldingMapper {
 	private static final String TRYGDERETTEN = "TRYGDERETTEN";
 	private static final String SAKSPART_ROLLE_DAP = "DAP";
 	private static final String SAKSPART_ROLLE_AMP = "AMP";
+	private static final String INNGAAENDE = "I";
+	private static final String UTGAAENDE = "U";
 
 	private final Aktoerregister aktoerregister;
 	private final Ereg ereg;
@@ -141,7 +144,7 @@ public class ArkivmeldingMapper {
 		dokumentbeskrivelse.setSystemID(systemId);
 		dokumentbeskrivelse.setDokumenttype(journalpostQdist013.getKategori());
 		dokumentbeskrivelse.setDokumentstatus(Dokumentstatus.DOKUMENTET_ER_FERDIGSTILT);
-//		dokumentbeskrivelse.setTittel(); TODO: Må avklares
+		dokumentbeskrivelse.setTittel(getDokumentbeskrivelseTittel(journalpostQdist013, dokumentInfo, isHoveddokument(rekkefolge)));
 		dokumentbeskrivelse.setOpprettetDato(convertLocalDateTimeToXmlGregorianCalendar(dokumentInfo.getDatoFerdigstilt()));
 		dokumentbeskrivelse.setOpprettetAv(getDokumentOpprettetAv(isHoveddokument(rekkefolge), journalpostQdist013, dokumentInfo));
 		dokumentbeskrivelse.setTilknyttetRegistreringSom(isHoveddokument(rekkefolge) ? TilknyttetRegistreringSom.HOVEDDOKUMENT : TilknyttetRegistreringSom.VEDLEGG);
@@ -151,6 +154,25 @@ public class ArkivmeldingMapper {
 		dokumentbeskrivelse.getDokumentobjekt()
 				.add(createAndPopulateDokumentObjekt(journalpostQdist013, dokumentInfo, isHoveddokument(rekkefolge), objectFactory));
 		return dokumentbeskrivelse;
+	}
+
+	private String getDokumentbeskrivelseTittel(JournalpostQdist013 journalpostQdist013, JournalpostQdist013.DokumentInfo dokumentInfo, boolean isHoveddok) {
+		if (isHoveddok || dokumentInfo.getOriginalJournalpostId() == null) {
+			return dokumentInfo.getTittel();
+		} else {
+			if (INNGAAENDE.equals(journalpostQdist013.getJournalposttype())) {
+				return format("%s, Fra %s", dokumentInfo.getTittel(), getAvsenderMottakerNavn(dokumentInfo.getOriginalJournalpostId()));
+			} else if (UTGAAENDE.equals(journalpostQdist013.getJournalposttype())) {
+				return format("%s, Til %s", dokumentInfo.getTittel(), getAvsenderMottakerNavn(dokumentInfo.getOriginalJournalpostId()));
+			} else {
+				return dokumentInfo.getTittel();
+			}
+		}
+	}
+
+	private String getAvsenderMottakerNavn(String jounalpostId) {
+		return safJournalpostQueryService.hentJournalpost(jounalpostId).getAvsenderMottakerNavn();
+
 	}
 
 	private String getDokumentOpprettetAv(boolean isHoveddok, JournalpostQdist013 journalpostQdist013, JournalpostQdist013.DokumentInfo dokumentInfo) {
@@ -182,18 +204,18 @@ public class ArkivmeldingMapper {
 //		TODO Filtype må legges til i saf
 	}
 
-	private Korrespondansepart createAndPolpulateKorrespondanspartMottaker(ObjectFactory objectFactory) {
-		Korrespondansepart korrespondansepartMottaker = objectFactory.createKorrespondansepart();
-		korrespondansepartMottaker.setKorrespondanseparttype(Korrespondanseparttype.AVSENDER);
-		korrespondansepartMottaker.setKorrespondansepartNavn(NAV_KLAGEINSTANS); //TODO Må avklares. Skal kanskje bare være "NAV"
-		return korrespondansepartMottaker;
-	}
-
 	private Korrespondansepart createAndPolpulateKorrespondanspartAvsender(ObjectFactory objectFactory) {
 		Korrespondansepart korrespondansepartAvsender = objectFactory.createKorrespondansepart();
-		korrespondansepartAvsender.setKorrespondanseparttype(Korrespondanseparttype.MOTTAKER);
-		korrespondansepartAvsender.setKorrespondansepartNavn(TRYGDERETTEN);
+		korrespondansepartAvsender.setKorrespondanseparttype(Korrespondanseparttype.AVSENDER);
+		korrespondansepartAvsender.setKorrespondansepartNavn(NAV_KLAGEINSTANS); //TODO Må avklares. Skal kanskje bare være "NAV"
 		return korrespondansepartAvsender;
+	}
+
+	private Korrespondansepart createAndPolpulateKorrespondanspartMottaker(ObjectFactory objectFactory) {
+		Korrespondansepart korrespondansepartMottaker = objectFactory.createKorrespondansepart();
+		korrespondansepartMottaker.setKorrespondanseparttype(Korrespondanseparttype.MOTTAKER);
+		korrespondansepartMottaker.setKorrespondansepartNavn(TRYGDERETTEN);
+		return korrespondansepartMottaker;
 	}
 
 	private Sakspart createAndPopulateSakspartDAP(JournalpostQdist013 journalpostQdist013, ObjectFactory objectFactory) {

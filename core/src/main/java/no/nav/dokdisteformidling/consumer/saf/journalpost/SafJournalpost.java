@@ -20,12 +20,20 @@ public class SafJournalpost {
 	private final String kategori; //TODO: Add support in saf
 	private final String journalfortAvNavn;
 	private final String temanavn;
+	private final String journalposttype;
+	private final AvsenderMottaker AvsenderMottaker;
 
 	@Builder.Default
 	private final List<RelevantDato> relevanteDatoer = new ArrayList<>();
 
 	@Builder.Default
 	private final List<DokumentInfo> dokumenter = new ArrayList<>();
+
+	@Value
+	@Builder
+	public static class AvsenderMottaker {
+		private final String navn;
+	}
 
 	@Value
 	@Builder
