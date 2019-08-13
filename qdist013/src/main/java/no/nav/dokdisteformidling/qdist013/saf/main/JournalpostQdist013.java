@@ -1,7 +1,9 @@
-package no.nav.dokdisteformidling.consumer.saf.journalpost;
+package no.nav.dokdisteformidling.qdist013.saf.main;
 
 import lombok.Builder;
 import lombok.Value;
+import no.nav.dokdisteformidling.consumer.saf.journalpost.Journalpost;
+import no.nav.dokdisteformidling.exception.functional.SafJournalpostValidationException;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -9,9 +11,8 @@ import java.util.List;
 
 @Value
 @Builder
-public class SafJournalpost {
+public class JournalpostQdist013 implements Journalpost {
 
-	private final String journalpostId;
 	private final Sak sak;
 	private final String opprettetAvNavn;
 	private final Bruker bruker;
@@ -21,19 +22,12 @@ public class SafJournalpost {
 	private final String journalfortAvNavn;
 	private final String temanavn;
 	private final String journalposttype;
-	private final AvsenderMottaker AvsenderMottaker;
 
 	@Builder.Default
 	private final List<RelevantDato> relevanteDatoer = new ArrayList<>();
 
 	@Builder.Default
 	private final List<DokumentInfo> dokumenter = new ArrayList<>();
-
-	@Value
-	@Builder
-	public static class AvsenderMottaker {
-		private final String navn;
-	}
 
 	@Value
 	@Builder
@@ -45,7 +39,7 @@ public class SafJournalpost {
 	@Builder
 	public static class RelevantDato {
 		private final LocalDateTime dato;
-		private final String datotype;
+		private final Datotype datotype;
 	}
 
 	@Value
@@ -64,5 +58,15 @@ public class SafJournalpost {
 		private final String originalJournalpostId;
 	}
 
+	public enum Datotype {
+		DATO_JOURNALFOERT
+	}
 
+	public LocalDateTime getDatoJournalfoert() {
+		return this.relevanteDatoer.stream()
+				.filter(relevantDato -> Datotype.DATO_JOURNALFOERT.equals(relevantDato.getDatotype()))
+				.map(RelevantDato::getDato)
+				.findAny()
+				.orElseThrow(() -> new SafJournalpostValidationException("Kan ikke finne dato journalført for journalpost"));
+	}
 }

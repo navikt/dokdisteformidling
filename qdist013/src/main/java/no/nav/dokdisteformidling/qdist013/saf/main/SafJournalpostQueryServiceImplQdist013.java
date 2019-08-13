@@ -1,4 +1,4 @@
-package no.nav.dokdisteformidling.qdist013.saf;
+package no.nav.dokdisteformidling.qdist013.saf.main;
 
 import no.nav.dokdisteformidling.consumer.saf.SafJournalpostQueryService;
 import no.nav.dokdisteformidling.consumer.saf.graphql.GraphQLRequest;
@@ -8,20 +8,42 @@ import org.springframework.stereotype.Component;
 
 import java.util.Collections;
 
+/**
+ * @author Sigurd Midttun, Visma Consulting.
+ * <p>
+ * This is the main Saf service from which all information needed about the journalpost being distributed is obtained
+ */
 @Component("SafJournalpostQueryServiceQdist013")
-public class SafJournalpostQueryServiceImplQdist013 implements SafJournalpostQueryService {
+public class SafJournalpostQueryServiceImplQdist013 implements SafJournalpostQueryService<JournalpostQdist013> {
 
+	//TODO: Add kategori, filtype and variantformat
 	private static final String JOURNALPOST_QUERY =
-			//TODO Endre spørring til de attributtene vi ønsker!
-
 			"query journalpost($queryJournalpostId: String!) {\n" +
-					"  journalpost(journalpostId: $queryJournalpostId) {\n" +
-					"    dokumenter {\n" +
-					"      dokumentInfoId\n" +
-					"      tittel\n" +
-					"    }\n" +
-					"  }\n" +
-					"}\n";
+					"journalpost(journalpostId: $queryJournalpostId) {\n" +
+						"sak {\n" +
+							"datoOpprettet\n" +
+						"}\n" +
+						"opprettetAvNavn\n" +
+						"journalposttype\n" +
+						"bruker{\n" +
+							"id\n" +
+							"type\n" +
+						"}\n" +
+						"tittel\n" +
+						"journalfortAvNavn\n" +
+						"temanavn\n" +
+						"relevanteDatoer {\n" +
+							"dato\n" +
+							"datotype\n" +
+						"}\n" +
+						"dokumenter {\n" +
+							"dokumentInfoId\n" +
+							"tittel\n" +
+							"datoFerdigstilt\n" +
+							"originalJournalpostId\n" +
+					"}\n" +
+			"}";
+
 	private final SafGraphqlConsumer safGraphqlConsumer;
 	private final SafJournalpostValidatorQdist013 safJournalpostValidatorQdist013;
 	private final JournalpostQdist013Mapper journalpostQdist013Mapper;
@@ -41,7 +63,7 @@ public class SafJournalpostQueryServiceImplQdist013 implements SafJournalpostQue
 				.variables(Collections.singletonMap("queryJournalpostId", journalpostid))
 				.build());
 
-		safJournalpostValidatorQdist013.validate(safJournalpost);
+		safJournalpostValidatorQdist013.validate(safJournalpost, journalpostid);
 		return journalpostQdist013Mapper.map(safJournalpost);
 	}
 }

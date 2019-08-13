@@ -15,6 +15,8 @@ public final class DomainConstants {
 	public static final String FORSENDELSE_STATUS_FEILET = "FEILET";
 	public static final String DISTRIBUSJONS_KANAL = "SDP";
 
+	public static final String BEARER_PREFIX = "Bearer ";
+
 	private DomainConstants() {
 	}
 
