@@ -14,6 +14,7 @@
 		<module>qdist011</module>
 		<module>qdist013</module>
 		<module>sdist001</module>
+		<module>schemas</module>
 	</modules>
 	<parent>
 		<groupId>org.springframework.boot</groupId>
@@ -66,6 +67,11 @@
 			<dependency>
 				<groupId>no.nav.dokdisteformidling</groupId>
 				<artifactId>sdist001</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>no.nav.dokdisteformidling</groupId>
+				<artifactId>schemas</artifactId>
 				<version>${project.version}</version>
 			</dependency>
 			<dependency>
