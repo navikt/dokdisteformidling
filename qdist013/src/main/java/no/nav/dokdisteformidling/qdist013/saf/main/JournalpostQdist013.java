@@ -13,12 +13,12 @@ import java.util.List;
 @Builder
 public class JournalpostQdist013 implements Journalpost {
 
+	private final String journalpostId;
 	private final Sak sak;
 	private final String opprettetAvNavn;
 	private final Bruker bruker;
 	private final LocalDateTime datoOpprettet;
 	private final String tittel;
-	private final String kategori; //TODO: Add support in saf
 	private final String journalfortAvNavn;
 	private final String temanavn;
 	private final String journalposttype;
@@ -56,6 +56,15 @@ public class JournalpostQdist013 implements Journalpost {
 		private final String tittel;
 		private final LocalDateTime datoFerdigstilt;
 		private final String originalJournalpostId;
+		@Builder.Default
+		private final List<Dokumentvariant> dokumentvarianter = new ArrayList<>();
+
+		@Value
+		@Builder
+		public static class Dokumentvariant {
+			private final String variantformat;
+			private final String filtype;
+		}
 	}
 
 	public enum Datotype {
