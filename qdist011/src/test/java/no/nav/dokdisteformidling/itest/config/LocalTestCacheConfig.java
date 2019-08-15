@@ -1,5 +1,7 @@
 package no.nav.dokdisteformidling.itest.config;
 
+import static no.nav.dokdisteformidling.config.cache.LokalCacheConfig.LIGHTWEIGHT_SAF_JOURNALPOST_QDIST013_CACHE;
+
 import com.github.benmanes.caffeine.cache.Caffeine;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.caffeine.CaffeineCache;
@@ -35,6 +37,9 @@ public class LocalTestCacheConfig {
 						.maximumSize(0)
 						.build()),
 				new CaffeineCache(STS_CACHE, Caffeine.newBuilder()
+						.expireAfterWrite(0, TimeUnit.MINUTES)
+						.build()),
+				new CaffeineCache(LIGHTWEIGHT_SAF_JOURNALPOST_QDIST013_CACHE, Caffeine.newBuilder()
 						.expireAfterWrite(0, TimeUnit.MINUTES)
 						.build())
 		));

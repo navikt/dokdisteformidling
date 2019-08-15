@@ -29,6 +29,7 @@ public class SafJournalpostQueryServiceImplQdist013 implements SafJournalpostQue
 							"id\n" +
 							"type\n" +
 						"}\n" +
+						"datoOpprettet\n" +
 						"tittel\n" +
 						"journalfortAvNavn\n" +
 						"temanavn\n" +
@@ -45,6 +46,7 @@ public class SafJournalpostQueryServiceImplQdist013 implements SafJournalpostQue
 								"variantformat\n" +
 								"filtype\n" +
 							"}\n" +
+						"}\n" +
 					"}\n" +
 			"}";
 
