@@ -1,9 +1,11 @@
 package no.nav.dokdisteformidling.qdist013;
 
 import static no.nav.dokdisteformidling.common.FunctionalUtils.deserializeS3JsonPayloadToDokdistDokument;
+import static no.nav.dokdisteformidling.common.FunctionalUtils.generateRandomUUID;
 import static no.nav.dokdisteformidling.common.FunctionalUtils.validateThatForsendelseStatusIsKlarForDist;
 
 import no.arkivverket.standarder.noark5.arkivmelding.Arkivmelding;
+import no.nav.dokdisteformidling.consumer.integrasjonspunkt.Integrasjonspunkt;
 import no.nav.dokdisteformidling.consumer.juridisklogg.JuridiskLogg;
 import no.nav.dokdisteformidling.consumer.rdist001.AdministrerForsendelse;
 import no.nav.dokdisteformidling.consumer.rdist001.HentForsendelseResponseTo;
@@ -34,25 +36,32 @@ public class Qdist013Service {
 	private final AdministrerForsendelse administrerForsendelse;
 	private final SafJournalpostQueryService<JournalpostQdist013> safJournalpostQueryService;
 	private final JuridiskLogg juridiskLogg;
+	private final Integrasjonspunkt integrasjonspunkt;
 	private final LagreJuridiskLoggMapper lagreJuridiskLoggMapper;
 	private final ArkivmeldingMapper arkivmeldingMapper;
+	private final CreateMessageRequestMapper createMessageRequestMapper;
 
 	public Qdist013Service(S3Storage s3Storage,
 						   AdministrerForsendelse administrerForsendelse,
 						   @Named("SafJournalpostQueryServiceQdist013") SafJournalpostQueryService<JournalpostQdist013> safJournalpostQueryService,
 						   JuridiskLogg juridiskLogg,
+						   Integrasjonspunkt integrasjonspunkt,
 						   LagreJuridiskLoggMapper lagreJuridiskLoggMapper,
-						   ArkivmeldingMapper arkivmeldingMapper) {
+						   ArkivmeldingMapper arkivmeldingMapper,
+						   CreateMessageRequestMapper createMessageRequestMapper) {
 		this.s3Storage = s3Storage;
 		this.administrerForsendelse = administrerForsendelse;
 		this.safJournalpostQueryService = safJournalpostQueryService;
 		this.juridiskLogg = juridiskLogg;
+		this.integrasjonspunkt = integrasjonspunkt;
 		this.lagreJuridiskLoggMapper = lagreJuridiskLoggMapper;
 		this.arkivmeldingMapper = arkivmeldingMapper;
+		this.createMessageRequestMapper = createMessageRequestMapper;
 	}
 
 	@Handler
 	public void processForsendelse(DistribuerForsendelseTilTrygderetten distribuerForsendelseTilTrygderetten) {
+		final String conversationId = generateRandomUUID(); //TODO Add as camelProp and logg?
 		final HentForsendelseResponseTo hentForsendelseResponseTo = administrerForsendelse.hentForsendelse(distribuerForsendelseTilTrygderetten
 				.getForsendelseId());
 		validateThatForsendelseStatusIsKlarForDist(hentForsendelseResponseTo.getForsendelseStatus());
@@ -66,8 +75,9 @@ public class Qdist013Service {
 				.getBestillingsId());
 		String arkivmeldingXmlString = marshalArkivmeldingToXmlString(arkivmeldingJAXBElement);
 
-		//TODO Send til trygderetten gjennom restkall
-
+		integrasjonspunkt.opprettMelding(createMessageRequestMapper.map(conversationId, hentForsendelseResponseTo), conversationId);
+		dokdistDokumentList.forEach(dokdistDokument -> integrasjonspunkt.lastOppFil(dokdistDokument, conversationId));
+		integrasjonspunkt.sendMelding(conversationId);
 
 		juridiskLogg.lagreJuridiskLogg(lagreJuridiskLoggMapper.map(hentForsendelseResponseTo, arkivmeldingXmlString.getBytes()));
 	}

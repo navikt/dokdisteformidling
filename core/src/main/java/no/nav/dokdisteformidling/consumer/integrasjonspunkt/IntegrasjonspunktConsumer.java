@@ -10,7 +10,6 @@ import no.nav.dokdisteformidling.exception.functional.IntegrasjonspunktRequestFu
 import no.nav.dokdisteformidling.exception.technical.IntegrasjonspunktRequestTechnicalException;
 import no.nav.dokdisteformidling.metrics.Monitor;
 import no.nav.dokdisteformidling.storage.DokdistDokument;
-import org.apache.http.protocol.HTTP;
 import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
@@ -25,7 +24,6 @@ import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import java.time.Duration;
-import java.util.List;
 
 /**
  * @author Heidi Elisabeth Sando, Visma Consulting
@@ -47,40 +45,32 @@ public class IntegrasjonspunktConsumer implements Integrasjonspunkt {
 
 	@Monitor(value = "dok_metric", extraTags = {"process", "integrasjonspunktOpprettForsendelse"}, histogram = true, percentiles = {0.5, 0.95})
 	@Retryable(include = IntegrasjonspunktRequestTechnicalException.class, backoff = @Backoff(delay = DELAY_SHORT))
-	public void opprettForsendelse(IntegrasjonspunktRequestTo integrasjonspunktRequestTo) {
-		String forsendelsesBestillingsId = integrasjonspunktRequestTo.standardBusinessDocumentHeader.getDocumentIdentification()
-				.getInstanceIdentifier();
-		//TODO: Tok bare denne med for å ha noe sporingsinformasjon. Noe annet som skulle være brukt?
-
+	public void opprettMelding(CreateMessageRequest createMessageRequest, String conversationId) {
 		try {
-			restTemplate.postForObject(this.integrasjonspunktUrl + "/createMessageUsingPOST", integrasjonspunktRequestTo, HTTP.class);
-			//TODO: Skal det være noe respons? Og skal det være HTTP.class?
-
+			restTemplate.postForObject(this.integrasjonspunktUrl, createMessageRequest, Object.class);
 		} catch (HttpClientErrorException e) {
-			throw new IntegrasjonspunktRequestFunctionalException(String.format("Funkjsonell feil ved kall på opprettforsendelse " +
-					"mot integrasjonspunkt til Difi for bestillingsId=%s: %s", forsendelsesBestillingsId, e.getMessage()), e);
+			throw new IntegrasjonspunktRequestFunctionalException(String.format("Funkjsonell feil ved kall mot tjensten opprettMelding på integrasjonspunktet til Difi. ConversationId=%s. Feilmelding=%s",
+					conversationId, e.getMessage()), e);
 		} catch (HttpServerErrorException e) {
-			throw new IntegrasjonspunktRequestTechnicalException(String.format("Teknisk feil ved kall på opprettforsendelse " +
-					"mot integrasjonspunkt til Difi for bestillingsId=%s: %s", forsendelsesBestillingsId, e.getMessage()), e);
+			throw new IntegrasjonspunktRequestTechnicalException(String.format("Teknisk feil ved kall opprettMelding på integrasjonspunktet til Difi.  ConversationId=%s  Feilmelding=%s",
+					conversationId, e.getMessage()), e);
 		}
 	}
 
 	@Monitor(value = "dok_metric", extraTags = {"process", "integrasjonspunktLastOppFiler"}, histogram = true, percentiles = {0.5, 0.95})
 	@Retryable(include = IntegrasjonspunktRequestTechnicalException.class, backoff = @Backoff(delay = DELAY_SHORT))
-	public void lastOppFiler(List<DokdistDokument> dokumenter, String arkivmeldingXMLString, String conversationId) {
+	public void lastOppFil(DokdistDokument dokument, String conversationId) {
 		try {
 			HttpHeaders headers = createHeaders();
 
-			String tittle = null;        //TODO: Hvor kommer tittel fra?
-			//TODO
-			restTemplate.exchange(this.integrasjonspunktUrl + "/uploadFileUsingPut/" + conversationId + "?" + tittle, HttpMethod.PUT, null, HTTP.class);
-
+			//TODO: Request inn skal være en MultipartFile. Vi må se nærmere på dette api'et
+			restTemplate.exchange(this.integrasjonspunktUrl + "/" + conversationId, HttpMethod.PUT, null, Object.class);
 		} catch (HttpClientErrorException e) {
-			throw new IntegrasjonspunktRequestFunctionalException(String.format("Funkjsonell feil ved kall til lastOppFiler " +
-					"mot integrasjonspunkt til Difi for conversationId=%s: %s", conversationId, e.getMessage()), e);
+			throw new IntegrasjonspunktRequestFunctionalException(String.format("Funkjsonell feil ved kall til lastOppFil " +
+					"mot integrasjonspunkt til Difi for conversationId=%s. Feilmelding=%s", conversationId, e.getMessage()), e);
 		} catch (HttpServerErrorException e) {
-			throw new IntegrasjonspunktRequestTechnicalException(String.format("Teknisk feil ved kall på lastOppFiler " +
-					"mot integrasjonspunkt til Difi for conversationId=%s: %s", conversationId, e.getMessage()), e);
+			throw new IntegrasjonspunktRequestTechnicalException(String.format("Teknisk feil ved kall på lastOppFil " +
+					"mot integrasjonspunkt til Difi for conversationId=%s. Feilmelding=%s", conversationId, e.getMessage()), e);
 		}
 	}
 
@@ -88,14 +78,13 @@ public class IntegrasjonspunktConsumer implements Integrasjonspunkt {
 	@Retryable(include = IntegrasjonspunktRequestTechnicalException.class, backoff = @Backoff(delay = DELAY_SHORT))
 	public void sendMelding(String conversationId) {
 		try {
-			//TODO
-			restTemplate.postForObject(this.integrasjonspunktUrl + "/sendMessageUsingPost/" + conversationId, null, HTTP.class);
+			restTemplate.postForObject(this.integrasjonspunktUrl + "/" + conversationId, null, Object.class);
 		} catch (HttpClientErrorException e) {
-			throw new IntegrasjonspunktRequestFunctionalException(String.format("Funkjsonell feil ved kall til lastOppFiler " +
-					"mot integrasjonspunkt til Difi for conversationId=%s: %s", conversationId, e.getMessage()), e);
+			throw new IntegrasjonspunktRequestFunctionalException(String.format("Funkjsonell feil ved kall til sendMelding " +
+					"mot integrasjonspunkt til Difi for conversationId=%s. Feilmelding=%s", conversationId, e.getMessage()), e);
 		} catch (HttpServerErrorException e) {
-			throw new IntegrasjonspunktRequestTechnicalException(String.format("Teknisk feil ved kall på lastOppFiler " +
-					"mot integrasjonspunkt til Difi for conversationId=%s: %s", conversationId, e.getMessage()), e);
+			throw new IntegrasjonspunktRequestTechnicalException(String.format("Teknisk feil ved kall på sendMelding " +
+					"mot integrasjonspunkt til Difi for conversationId=%s. Feilmelding=%s", conversationId, e.getMessage()), e);
 		}
 	}
 
