@@ -14,6 +14,7 @@ public class JournalpostQdist013Mapper {
 	public JournalpostQdist013 map(SafJournalpost safJournalpost) {
 
 		return JournalpostQdist013.builder()
+				.journalpostId(safJournalpost.getJournalpostId())
 				.sak(JournalpostQdist013.Sak.builder()
 						.datoOpprettet(safJournalpost.getDatoOpprettet())
 						.build())
@@ -24,7 +25,6 @@ public class JournalpostQdist013Mapper {
 						.build())
 				.datoOpprettet(safJournalpost.getDatoOpprettet())
 				.tittel(safJournalpost.getTittel())
-				.kategori(safJournalpost.getKategori())
 				.journalfortAvNavn(safJournalpost.getJournalfortAvNavn())
 				.temanavn(safJournalpost.getTemanavn())
 				.relevanteDatoer(Arrays.asList(safJournalpost.getRelevanteDatoer().stream()
@@ -37,12 +37,19 @@ public class JournalpostQdist013Mapper {
 						)
 						.findAny()
 						.get())) //This is Ok. Validation is done prior to mapping
+				.journalposttype(safJournalpost.getJournalposttype())
 				.dokumenter(safJournalpost.getDokumenter().stream()
 						.map(dokumentInfo -> JournalpostQdist013.DokumentInfo.builder()
 								.dokumentInfoId(dokumentInfo.getDokumentInfoId())
 								.tittel(dokumentInfo.getTittel())
 								.datoFerdigstilt(dokumentInfo.getDatoFerdigstilt())
 								.originalJournalpostId(dokumentInfo.getOriginalJournalpostId())
+								.dokumentvarianter(dokumentInfo.getDokumentvarianter().stream()
+										.map(dokumentvariant -> JournalpostQdist013.DokumentInfo.Dokumentvariant.builder()
+												.filtype(dokumentvariant.getFiltype())
+												.variantformat(dokumentvariant.getVariantformat())
+												.build())
+										.collect(Collectors.toList()))
 								.build())
 						.collect(Collectors.toList()))
 				.build();

@@ -14,6 +14,10 @@ public final class DomainConstants {
 
 	public static final String BEARER_PREFIX = "Bearer ";
 
+	public static final String VARIANTFORMAT_SLADDET = "SLADDET";
+	public static final String VARIANTFORMAT_ARKIV = "ARKIV";
+	public static final String VARIANTFORMAT_PRODUKSJON = "PRODUKSJON";
+
 	private DomainConstants() {
 	}
 

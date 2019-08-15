@@ -9,5 +9,6 @@ import no.nav.dokdisteformidling.consumer.saf.journalpost.Journalpost;
 public class LightweightSafJournalpostQdist013 implements Journalpost {
 
 	private final String journalfortAvNavn;
+	private final String avsenderMottakerNavn;
 
 }
