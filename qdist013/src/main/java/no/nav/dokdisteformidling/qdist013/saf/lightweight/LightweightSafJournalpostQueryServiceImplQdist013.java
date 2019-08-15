@@ -1,6 +1,7 @@
 package no.nav.dokdisteformidling.qdist013.saf.lightweight;
 
 import static java.lang.String.format;
+import static no.nav.dokdisteformidling.config.cache.LokalCacheConfig.LIGHTWEIGHT_SAF_JOURNALPOST_QDIST013_CACHE;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 
 import lombok.extern.slf4j.Slf4j;
@@ -9,6 +10,7 @@ import no.nav.dokdisteformidling.consumer.saf.graphql.GraphQLRequest;
 import no.nav.dokdisteformidling.consumer.saf.graphql.SafGraphqlConsumer;
 import no.nav.dokdisteformidling.consumer.saf.journalpost.SafJournalpost;
 import no.nav.dokdisteformidling.exception.functional.SafJournalpostValidationException;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Component;
 
 import java.util.Collections;
@@ -39,6 +41,7 @@ public class LightweightSafJournalpostQueryServiceImplQdist013 implements SafJou
 		this.safGraphqlConsumer = safGraphqlConsumer;
 	}
 
+	@Cacheable(LIGHTWEIGHT_SAF_JOURNALPOST_QDIST013_CACHE)
 	public LightweightSafJournalpostQdist013 hentJournalpost(String journalpostId) {
 		SafJournalpost safJournalpost = safGraphqlConsumer.performQuery(GraphQLRequest.builder()
 				.query(JOURNALPOST_QUERY)
