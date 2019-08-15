@@ -5,6 +5,8 @@ import static no.nav.dokdisteformidling.common.SafAssertionUtils.assertFieldOnSa
 import static no.nav.dokdisteformidling.common.SafAssertionUtils.assertFieldOnSafJournalpostBodyNotNullOrEmpty;
 import static no.nav.dokdisteformidling.common.SafAssertionUtils.assertObjectOnSafDokumenterNotNull;
 import static no.nav.dokdisteformidling.common.SafAssertionUtils.assertObjectOnSafJournalpostBodyNotNull;
+import static no.nav.dokdisteformidling.constants.DomainConstants.VARIANTFORMAT_ARKIV;
+import static no.nav.dokdisteformidling.constants.DomainConstants.VARIANTFORMAT_SLADDET;
 import static no.nav.dokdisteformidling.qdist013.saf.main.JournalpostQdist013.Datotype.DATO_JOURNALFOERT;
 
 import no.nav.dokdisteformidling.consumer.saf.journalpost.SafJournalpost;
@@ -24,12 +26,13 @@ public class SafJournalpostValidatorQdist013 {
 	}
 
 	private void assertJournalpostBody(SafJournalpost safJournalpost, String journalpostId) {
+		assertFieldOnSafJournalpostBodyNotNullOrEmpty("journalpost.journalpostId", safJournalpost.getJournalpostId(), journalpostId);
 		assertFieldOnSafJournalpostBodyNotNullOrEmpty("journalpost.opprettetAvNavn", safJournalpost.getOpprettetAvNavn(), journalpostId);
 		assertObjectOnSafJournalpostBodyNotNull("jounalpost.datoOpprettet", safJournalpost.getDatoOpprettet(), journalpostId);
 		assertFieldOnSafJournalpostBodyNotNullOrEmpty("jounalpost.tittel", safJournalpost.getTittel(), journalpostId);
-		assertFieldOnSafJournalpostBodyNotNullOrEmpty("jounalpost.kategori", safJournalpost.getKategori(), journalpostId);
 		assertFieldOnSafJournalpostBodyNotNullOrEmpty("jounalpost.journalfortAvNavn", safJournalpost.getJournalfortAvNavn(), journalpostId);
 		assertFieldOnSafJournalpostBodyNotNullOrEmpty("jounalpost.temanavn", safJournalpost.getTemanavn(), journalpostId);
+		assertFieldOnSafJournalpostBodyNotNullOrEmpty("jounalpost.journalposttype", safJournalpost.getJournalposttype(), journalpostId);
 		assertThatRelevanteDatoerContainsDatoJournalfoert(safJournalpost, journalpostId);
 
 	}
@@ -55,15 +58,29 @@ public class SafJournalpostValidatorQdist013 {
 	}
 
 	private void assertDokumenter(List<SafJournalpost.DokumentInfo> dokumenter, String journalpostId) {
-		dokumenter.stream().forEach(dokumentInfo -> {
+		dokumenter.forEach(dokumentInfo -> {
 					assertFieldOnSafDokumenterNotNullOrEmpty("dokumentInfo.dokumentInfoid", dokumentInfo.getDokumentInfoId(), journalpostId, dokumentInfo
 							.getDokumentInfoId());
 					assertFieldOnSafDokumenterNotNullOrEmpty("dokumentInfo.tittel", dokumentInfo.getTittel(), journalpostId, dokumentInfo
 							.getDokumentInfoId());
 					assertObjectOnSafDokumenterNotNull("dokumentInfo.datoFerdigstilt", dokumentInfo.getDatoFerdigstilt(), journalpostId, dokumentInfo
 							.getDokumentInfoId());
+					assertObjectOnSafDokumenterNotNull("dokumentInfo.dokumentvarianter", dokumentInfo.getDokumentvarianter(), journalpostId, dokumentInfo
+							.getDokumentInfoId());
+					if (!dokumentInfoContainsDokumentvariantSladdetOrArkiv(dokumentInfo)) {
+						throw new SafJournalpostValidationException(format("DokumentInfo-objekt med dokumentInfoId=%s har ikke tilknyttede dokumentvarianter ARKIV eller SLADDET. journalpostId=%s.", dokumentInfo
+								.getDokumentInfoId(), journalpostId));
+
+					}
 				}
 		);
+	}
+
+	private boolean dokumentInfoContainsDokumentvariantSladdetOrArkiv(SafJournalpost.DokumentInfo dokumentInfo) {
+		return dokumentInfo.getDokumentvarianter()
+				.stream()
+				.anyMatch(dokumentvariant -> (VARIANTFORMAT_SLADDET.equals(dokumentvariant.getVariantformat())
+						|| VARIANTFORMAT_ARKIV.equals(dokumentvariant.getVariantformat())));
 	}
 
 }
