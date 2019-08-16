@@ -33,5 +33,20 @@
 			<artifactId>junit-jupiter-api</artifactId>
 			<scope>test</scope>
 		</dependency>
+		<dependency>
+			<groupId>com.github.tomakehurst</groupId>
+			<artifactId>wiremock-standalone</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-contract-wiremock</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>commons-io</groupId>
+			<artifactId>commons-io</artifactId>
+			<scope>test</scope>
+		</dependency>
 	</dependencies>
 </project>

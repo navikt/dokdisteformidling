@@ -1,0 +1,16 @@
+{
+  "forsendelser": [
+    {
+      "forsendelseId": 1,
+      "forsendelseStatus": "BEKREFTET",
+      "distribusjonKanal": "TRYGDERETTEN",
+      "konversasjonId": "101"
+    },
+    {
+      "forsendelseId": 2,
+      "forsendelseStatus": "BEKREFTET",
+      "distribusjonKanal": "TRYGDERETTEN",
+      "konversasjonId": "102"
+    }
+  ]
+}

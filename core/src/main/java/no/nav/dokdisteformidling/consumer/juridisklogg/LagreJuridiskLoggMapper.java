@@ -1,8 +1,7 @@
-package no.nav.dokdisteformidling.qdist013;
+package no.nav.dokdisteformidling.consumer.juridisklogg;
 
 import static no.nav.dokdisteformidling.constants.DomainConstants.APP_NAME;
 
-import no.nav.dokdisteformidling.consumer.juridisklogg.LoggMeldingRequest;
 import no.nav.dokdisteformidling.consumer.rdist001.HentForsendelseResponseTo;
 import org.springframework.stereotype.Component;
 

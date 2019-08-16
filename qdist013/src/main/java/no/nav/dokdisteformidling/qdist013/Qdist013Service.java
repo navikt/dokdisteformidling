@@ -5,6 +5,7 @@ import static no.nav.dokdisteformidling.common.FunctionalUtils.validateThatForse
 
 import no.arkivverket.standarder.noark5.arkivmelding.Arkivmelding;
 import no.nav.dokdisteformidling.consumer.juridisklogg.JuridiskLogg;
+import no.nav.dokdisteformidling.consumer.juridisklogg.LagreJuridiskLoggMapper;
 import no.nav.dokdisteformidling.consumer.rdist001.AdministrerForsendelse;
 import no.nav.dokdisteformidling.consumer.rdist001.HentForsendelseResponseTo;
 import no.nav.dokdisteformidling.consumer.saf.SafJournalpostQueryService;
