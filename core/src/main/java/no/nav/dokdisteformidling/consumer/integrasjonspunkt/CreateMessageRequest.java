@@ -1,7 +1,9 @@
 package no.nav.dokdisteformidling.consumer.integrasjonspunkt;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.Value;
 
 import java.time.OffsetDateTime;
@@ -33,15 +35,17 @@ public class CreateMessageRequest {
 		private final DocumentIdentification documentIdentification;
 		private final BusinessScope businessScope;
 
-		@Value
+		@AllArgsConstructor
+		@EqualsAndHashCode
+		@Getter
 		public abstract static class Partner {
 			protected final PartnerIdentification identifier;
 
 			@Value
 			@Builder
 			public static class PartnerIdentification {
-				private final String value;
 				private final String authority;
+				private final String value;
 			}
 		}
 
