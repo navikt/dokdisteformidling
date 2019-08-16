@@ -17,7 +17,7 @@ import java.util.HashSet;
 @Component
 public class CreateMessageRequestMapper {
 
-	private static final String NAV_ORGNR = "";        //TODO Hva er Navs organisasjonsnummer? Kanskje 889640782?
+	private static final String NAV_ORGNR = "889640782";        //TODO Hva er Navs organisasjonsnummer? Kanskje 889640782?
 	private static final String HEADER_VERSION = "1.0";
 	private static final String TYPE_VERSION = "1.0";
 	private static final String IDENTIFIER_AUTHORITY = "iso6523-actorid-upis";
@@ -26,8 +26,8 @@ public class CreateMessageRequestMapper {
 	private static final String ARKIVMELDING = "arkivmelding";
 	private static final String CONVERSATION_ID_SCOPE_IDENTIFIER = "urn:no:difi:profile:arkivmelding:administrasjon:ver1.0";
 	private static final String CONVERSATION_ID = "ConversationId";
-	private static final String SENDER_REF = "senderRef";
-	private static final String RECEIVER_REF = "receiverRef";
+	private static final String SENDER_REF = "SenderRef";
+	private static final String RECEIVER_REF = "ReceiverRef";
 
 	public CreateMessageRequest map(String conversationId, HentForsendelseResponseTo hentForsendelseResponseTo) {
 		return CreateMessageRequest.builder()
