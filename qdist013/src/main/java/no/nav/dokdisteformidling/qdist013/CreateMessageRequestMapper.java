@@ -28,7 +28,6 @@ public class CreateMessageRequestMapper {
 	private static final String CONVERSATION_ID = "ConversationId";
 	private static final String SENDER_REF = "SenderRef";
 	private static final String RECEIVER_REF = "ReceiverRef";
-	private static final OffsetDateTime NOW = OffsetDateTime.now();
 
 	public CreateMessageRequest map(String conversationId, HentForsendelseResponseTo hentForsendelseResponseTo) {
 		return CreateMessageRequest.builder()
@@ -48,7 +47,7 @@ public class CreateMessageRequestMapper {
 										.instanceIdentifier(konversasjonsId)
 										.scopeInformation(new HashSet<>(Collections.singletonList(CreateMessageRequest.StandardBusinessDocumentHeader.BusinessScope.Scope.CorrelationInformation
 												.builder()
-												.expectedResponseDateTime(NOW.plus(4, HOURS))
+												.expectedResponseDateTime(OffsetDateTime.now().plus(4, HOURS))
 												.build())))
 										.type(CONVERSATION_ID)
 										.build(),
@@ -63,7 +62,7 @@ public class CreateMessageRequestMapper {
 						)))
 						.build())
 				.documentIdentification(CreateMessageRequest.StandardBusinessDocumentHeader.DocumentIdentification.builder()
-						.creationDateAndTime(NOW)
+						.creationDateAndTime(OffsetDateTime.now())
 						.instanceIdentifier(hentForsendelseResponseTo.getBestillingsId())
 						.multipleType(Boolean.TRUE)
 						.standard(DOCUMENT_IDENTIFICATOR_STANDARD)
