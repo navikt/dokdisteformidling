@@ -79,3 +79,5 @@ fasitResources:
         url: "tpsproxy.api.url"
     - alias: "ereg.api"
       resourceType: restservice
+    - alias: "norg2.api.v1"
+      resourceType: restservice

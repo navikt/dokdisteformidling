@@ -17,7 +17,6 @@ import java.util.HashSet;
 @Component
 public class CreateMessageRequestMapper {
 
-	private static final String NAV_ORGNR = "889640782";        //TODO Hva er Navs organisasjonsnummer? Kanskje 889640782?
 	private static final String HEADER_VERSION = "1.0";
 	private static final String TYPE_VERSION = "1.0";
 	private static final String IDENTIFIER_AUTHORITY = "iso6523-actorid-upis";
@@ -29,17 +28,17 @@ public class CreateMessageRequestMapper {
 	private static final String SENDER_REF = "SenderRef";
 	private static final String RECEIVER_REF = "ReceiverRef";
 
-	public CreateMessageRequest map(String conversationId, HentForsendelseResponseTo hentForsendelseResponseTo) {
+	public CreateMessageRequest map(String conversationId, String orgnrForEnhet, HentForsendelseResponseTo hentForsendelseResponseTo) {
 		return CreateMessageRequest.builder()
 				.arkivmelding(CreateMessageRequest.Arkivmelding.builder()
 //						.hoveddokument()       TODO Må avklares
 //						.sikkerhetsnivaa()     TODO Må avklares
 						.build())
-				.standardBusinessDocumentHeader(mapStandardBusinessDocumentHeader(conversationId, hentForsendelseResponseTo))
+				.standardBusinessDocumentHeader(mapStandardBusinessDocumentHeader(conversationId, orgnrForEnhet, hentForsendelseResponseTo))
 				.build();
 	}
 
-	private CreateMessageRequest.StandardBusinessDocumentHeader mapStandardBusinessDocumentHeader(String konversasjonsId, HentForsendelseResponseTo hentForsendelseResponseTo) {
+	private CreateMessageRequest.StandardBusinessDocumentHeader mapStandardBusinessDocumentHeader(String konversasjonsId, String orgnrForEnhet, HentForsendelseResponseTo hentForsendelseResponseTo) {
 		return CreateMessageRequest.StandardBusinessDocumentHeader.builder()
 				.businessScope(CreateMessageRequest.StandardBusinessDocumentHeader.BusinessScope.builder()
 						.scope(new HashSet<>(asList(CreateMessageRequest.StandardBusinessDocumentHeader.BusinessScope.Scope.builder()
@@ -79,7 +78,7 @@ public class CreateMessageRequestMapper {
 				.sender(new HashSet<>(Collections.singletonList(CreateMessageRequest.StandardBusinessDocumentHeader.Sender.builder()
 						.identifier(CreateMessageRequest.StandardBusinessDocumentHeader.Partner.PartnerIdentification.builder()
 								.authority(IDENTIFIER_AUTHORITY)
-								.value(PREFIX_IDENTIFIER_VALUE + NAV_ORGNR)
+								.value(PREFIX_IDENTIFIER_VALUE + orgnrForEnhet)
 								.build())
 						.build())))
 				.build();

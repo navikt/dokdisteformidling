@@ -19,7 +19,7 @@ class CreateMessageRequestMapperTest {
 
 	private final static String CONVERSATION_ID = "convId";
 	private final static String CONVERSATION_ID_TYPE = "ConversationId";
-	private final static String NAV_ORGNR = "889640782";        //TODO Skal gjøre oppslag i norg
+	private final static String ORGNR_FOR_ENHET = "889640782";
 	private final static String HEADER_VERSION = "1.0";
 	private final static String TYPE_VERSION = "1.0";
 	private final static String IDENTIFIER_AUTHORITY = "iso6523-actorid-upis";
@@ -38,7 +38,7 @@ class CreateMessageRequestMapperTest {
 
 	@Test
 	void shouldMap() {
-		CreateMessageRequest createMessageRequest = createMessageRequestMapper.map(CONVERSATION_ID, createHentforsendelseResponse());
+		CreateMessageRequest createMessageRequest = createMessageRequestMapper.map(CONVERSATION_ID, ORGNR_FOR_ENHET, createHentforsendelseResponse());
 		assertCreateMessageRequest(createMessageRequest);
 	}
 
@@ -76,7 +76,7 @@ class CreateMessageRequestMapperTest {
 		assertTrue(senders != null && senders.size() == 1);
 		assertNotNull(senders.iterator().next());
 		assertEquals(IDENTIFIER_AUTHORITY, senders.iterator().next().getIdentifier().getAuthority());
-		assertEquals(PREFIX_IDENTIFIER_VALUE + NAV_ORGNR, senders.iterator().next().getIdentifier().getValue());
+		assertEquals(PREFIX_IDENTIFIER_VALUE + ORGNR_FOR_ENHET, senders.iterator().next().getIdentifier().getValue());
 	}
 
 	private void assertDocumentIdentification(CreateMessageRequest.StandardBusinessDocumentHeader.DocumentIdentification documentIdentification) {
