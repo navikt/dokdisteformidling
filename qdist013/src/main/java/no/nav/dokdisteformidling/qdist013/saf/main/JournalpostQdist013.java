@@ -22,6 +22,7 @@ public class JournalpostQdist013 implements Journalpost {
 	private final String journalfortAvNavn;
 	private final String temanavn;
 	private final String journalposttype;
+	private final String journalfoerendeEnhet;
 
 	@Builder.Default
 	private final List<RelevantDato> relevanteDatoer = new ArrayList<>();
