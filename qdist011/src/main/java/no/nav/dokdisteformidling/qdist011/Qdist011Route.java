@@ -6,7 +6,7 @@ import static no.nav.dokdisteformidling.constants.RouteConstants.QDIST011_SERVIC
 import static org.apache.camel.LoggingLevel.ERROR;
 
 import com.google.common.base.Charsets;
-import no.nav.dokdisteformidling.common.DokdistStatusUpdater;
+import no.nav.dokdisteformidling.common.DokdistAdministrerForsendelseUpdater;
 import no.nav.dokdisteformidling.common.IdsProcessor;
 import no.nav.dokdisteformidling.exception.functional.AbstractDokdisteformidlingFunctionalException;
 import no.nav.meldinger.virksomhet.dokdistfordeling.qdist008.out.DistribuerTilKanal;
@@ -35,7 +35,7 @@ public class Qdist011Route extends SpringRouteBuilder {
 	private final Queue tdist005;
 	private final Qdist011MetricsRoutePolicy qdist0011MetricsRoutePolicy;
 	private final DistribuerForsendelseTilDpiMapper distribuerForsendelseTilDpiMapper;
-	private final DokdistStatusUpdater dokdistStatusUpdater;
+	private final DokdistAdministrerForsendelseUpdater dokdistAdministrerForsendelseUpdater;
 
 	private DataFormat digitalpostFormat = new JaxbDataFormat("no.nav.tjeneste.virksomhet.digitalpost.senddigitalpost.v1:no.difi.begrep.sdp.schema_v10");
 
@@ -46,14 +46,14 @@ public class Qdist011Route extends SpringRouteBuilder {
 						 Queue qdist011FunksjonellFeil,
 						 Queue tdist005, Qdist011MetricsRoutePolicy qdist0011MetricsRoutePolicy,
 						 DistribuerForsendelseTilDpiMapper distribuerForsendelseTilDpiMapper,
-						 DokdistStatusUpdater dokdistStatusUpdater) {
+						 DokdistAdministrerForsendelseUpdater dokdistAdministrerForsendelseUpdater) {
 		this.qdist011Service = qdist011Service;
 		this.qdist011 = qdist011;
 		this.qdist011FunksjonellFeil = qdist011FunksjonellFeil;
 		this.tdist005 = tdist005;
 		this.qdist0011MetricsRoutePolicy = qdist0011MetricsRoutePolicy;
 		this.distribuerForsendelseTilDpiMapper = distribuerForsendelseTilDpiMapper;
-		this.dokdistStatusUpdater = dokdistStatusUpdater;
+		this.dokdistAdministrerForsendelseUpdater = dokdistAdministrerForsendelseUpdater;
 	}
 
 	@Override
@@ -84,7 +84,7 @@ public class Qdist011Route extends SpringRouteBuilder {
 				.marshal(digitalpostFormat).convertBodyTo(String.class, Charsets.UTF_8.toString())
 				.to("jms:" + tdist005.getQueueName())
 				.log(LoggingLevel.INFO, log, "qdist011 har lagt forsendelse med " + getIdsForLogging() + " på kø til tdist005 for distribusjon via DPI")
-				.bean(dokdistStatusUpdater)
+				.bean(dokdistAdministrerForsendelseUpdater, "updateStatus")
 				.log(LoggingLevel.INFO, log, "qdist011 har oppdatert forsendelseStatus i dokdist til OVERSENDT og avslutter behandling av forsendelse med " + getIdsForLogging());
 	}
 

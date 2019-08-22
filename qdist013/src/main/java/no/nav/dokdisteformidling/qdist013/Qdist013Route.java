@@ -1,11 +1,12 @@
 package no.nav.dokdisteformidling.qdist013;
 
 import static no.nav.dokdisteformidling.constants.RouteConstants.PROPERTY_BESTILLINGS_ID;
+import static no.nav.dokdisteformidling.constants.RouteConstants.PROPERTY_CONVERSATION_ID;
 import static no.nav.dokdisteformidling.constants.RouteConstants.PROPERTY_FORSENDELSE_ID;
 import static no.nav.dokdisteformidling.constants.RouteConstants.QDIST013_SERVICE_ID;
 import static org.apache.camel.LoggingLevel.ERROR;
 
-import no.nav.dokdisteformidling.common.DokdistStatusUpdater;
+import no.nav.dokdisteformidling.common.DokdistAdministrerForsendelseUpdater;
 import no.nav.dokdisteformidling.common.IdsProcessor;
 import no.nav.dokdisteformidling.exception.functional.AbstractDokdisteformidlingFunctionalException;
 import no.nav.meldinger.virksomhet.dokdistfordeling.qdist008.out.DistribuerTilKanal;
@@ -32,7 +33,7 @@ public class Qdist013Route extends SpringRouteBuilder {
 	private final Queue qdist013FunksjonellFeil;
 	private final Qdist013MetricsRoutePolicy qdist0013MetricsRoutePolicy;
 	private final DistribuerForsendelseTilTrygderettenMapper distribuerForsendelseTilTrygderettenMapper;
-	private final DokdistStatusUpdater dokdistStatusUpdater;
+	private final DokdistAdministrerForsendelseUpdater dokdistAdministrerforsendelseUpdater;
 
 
 	@Inject
@@ -41,13 +42,13 @@ public class Qdist013Route extends SpringRouteBuilder {
 						 Queue qdist013FunksjonellFeil,
 						 Qdist013MetricsRoutePolicy qdist0013MetricsRoutePolicy,
 						 DistribuerForsendelseTilTrygderettenMapper distribuerForsendelseTilTrygderettenMapper,
-						 DokdistStatusUpdater dokdistStatusUpdater) {
+						 DokdistAdministrerForsendelseUpdater dokdistAdministrerforsendelseUpdater) {
 		this.qdist013Service = qdist013Service;
 		this.qdist013 = qdist013;
 		this.qdist013FunksjonellFeil = qdist013FunksjonellFeil;
 		this.qdist0013MetricsRoutePolicy = qdist0013MetricsRoutePolicy;
 		this.distribuerForsendelseTilTrygderettenMapper = distribuerForsendelseTilTrygderettenMapper;
-		this.dokdistStatusUpdater = dokdistStatusUpdater;
+		this.dokdistAdministrerforsendelseUpdater = dokdistAdministrerforsendelseUpdater;
 	}
 
 	@Override
@@ -76,13 +77,14 @@ public class Qdist013Route extends SpringRouteBuilder {
 				.bean(distribuerForsendelseTilTrygderettenMapper)
 				.bean(qdist013Service)
 				.log(LoggingLevel.INFO, log, "qdist013 har videresendt forsendelse med " + getIdsForLogging() + " til DIFI for distribusjon via TRYGDERETTEN")
-				.bean(dokdistStatusUpdater) //TODO Vi må også mest sannsynlig sette konversasjonsId gjennom denne tjenesten. Må avklares
-				.log(LoggingLevel.INFO, log, "qdist013 har oppdatert forsendelseStatus i dokdist til OVERSENDT og avslutter behandling av forsendelse med " + getIdsForLogging())
+				.bean(dokdistAdministrerforsendelseUpdater, "updateStatusAndConversationId")
+				.log(LoggingLevel.INFO, log, "qdist013 har oppdatert dokdistDb med konversasjonsId og forsendelseStatus=OVERSENDT og avslutter behandling av forsendelse med " + getIdsForLogging())
 				.end();
 	}
 
 	public static String getIdsForLogging() {
-		return "bestillingsId=${exchangeProperty." + PROPERTY_BESTILLINGS_ID + "} og " +
-				"forsendelseId=${exchangeProperty." + PROPERTY_FORSENDELSE_ID + "}";
+		return "bestillingsId=${exchangeProperty." + PROPERTY_BESTILLINGS_ID + "}, " +
+				"forsendelseId=${exchangeProperty." + PROPERTY_FORSENDELSE_ID + "} og " +
+				"conversationId=${exchangeProperty." + PROPERTY_CONVERSATION_ID + "}";
 	}
 }

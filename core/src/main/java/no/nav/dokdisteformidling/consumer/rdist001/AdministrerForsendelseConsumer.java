@@ -5,11 +5,11 @@ import no.nav.dokdisteformidling.constants.MdcConstants;
 import no.nav.dokdisteformidling.constants.RetryConstants;
 import no.nav.dokdisteformidling.exception.functional.Rdist001HentEformidlingforsendelserFunctionalException;
 import no.nav.dokdisteformidling.exception.functional.Rdist001HentForsendelseFunctionalException;
-import no.nav.dokdisteformidling.exception.functional.Rdist001OppdaterForsendelseStatusFunctionalException;
+import no.nav.dokdisteformidling.exception.functional.Rdist001OppdaterForsendelseFunctionalException;
 import no.nav.dokdisteformidling.exception.technical.AbstractDokdisteformidlingTechnicalException;
 import no.nav.dokdisteformidling.exception.technical.Rdist001HentEformidlingforsendelserTechnicalException;
 import no.nav.dokdisteformidling.exception.technical.Rdist001HentForsendelseTechnicalException;
-import no.nav.dokdisteformidling.exception.technical.Rdist001OppdaterForsendelseStatusTechnicalException;
+import no.nav.dokdisteformidling.exception.technical.Rdist001OppdaterForsendelseTechnicalException;
 import no.nav.dokdisteformidling.metrics.Monitor;
 import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Value;
@@ -67,22 +67,35 @@ public class AdministrerForsendelseConsumer implements AdministrerForsendelse {
 		}
 	}
 
-	@Override
 	@Retryable(include = AbstractDokdisteformidlingTechnicalException.class, backoff = @Backoff(delay = RetryConstants.DELAY_SHORT, multiplier = RetryConstants.MULTIPLIER_SHORT))
-	@Monitor(value = "dok_consumer", extraTags = {"process", "oppdaterForsendelseStatus"}, histogram = true)
 	public void oppdaterForsendelseStatus(String forsendelseId, String forsendelseStatus) {
+		String uri = UriComponentsBuilder.fromHttpUrl(administrerforsendelseV1Url)
+				.queryParam("forsendelseId", forsendelseId)
+				.queryParam("forsendelseStatus", forsendelseStatus)
+				.toUriString();
+		oppdaterForsendelse(uri);
+	}
+
+	@Retryable(include = AbstractDokdisteformidlingTechnicalException.class, backoff = @Backoff(delay = RetryConstants.DELAY_SHORT, multiplier = RetryConstants.MULTIPLIER_SHORT))
+	public void oppdaterForsendelseStatusOgKonversasjonsId(String forsendelseId, String forsendelseStatus, String konversasjonsId) {
+		String uri = UriComponentsBuilder.fromHttpUrl(administrerforsendelseV1Url)
+				.queryParam("forsendelseId", forsendelseId)
+				.queryParam("forsendelseStatus", forsendelseStatus)
+				.queryParam("konversasjonsId", konversasjonsId)
+				.toUriString();
+		oppdaterForsendelse(uri);
+	}
+
+	@Monitor(value = "dok_consumer", extraTags = {"process", "oppdaterForsendelse"}, histogram = true)
+	private void oppdaterForsendelse(String uri) {
 		try {
 			HttpEntity entity = new HttpEntity<>(createHeaders());
-			String uri = UriComponentsBuilder.fromHttpUrl(administrerforsendelseV1Url)
-					.queryParam("forsendelseId", forsendelseId)
-					.queryParam("forsendelseStatus", forsendelseStatus)
-					.toUriString();
 			restTemplate.exchange(uri, HttpMethod.PUT, entity, Object.class);
 		} catch (HttpClientErrorException e) {
-			throw new Rdist001OppdaterForsendelseStatusFunctionalException(String.format("Kall mot rdist001 - oppdaterForsendelseStatus feilet funksjonelt med statusKode=%s, feilmelding=%s", e
+			throw new Rdist001OppdaterForsendelseFunctionalException(String.format("Kall mot rdist001 - oppdaterForsendelse feilet funksjonelt med statusKode=%s, feilmelding=%s", e
 					.getStatusCode(), e.getMessage()), e);
 		} catch (HttpServerErrorException e) {
-			throw new Rdist001OppdaterForsendelseStatusTechnicalException(String.format("Kall mot rdist001 - oppdaterForsendelseStatus feilet teknisk med statusKode=%s, feilmelding=%s", e
+			throw new Rdist001OppdaterForsendelseTechnicalException(String.format("Kall mot rdist001 - oppdaterForsendelse feilet teknisk med statusKode=%s, feilmelding=%s", e
 					.getStatusCode(), e.getMessage()), e);
 		}
 	}
