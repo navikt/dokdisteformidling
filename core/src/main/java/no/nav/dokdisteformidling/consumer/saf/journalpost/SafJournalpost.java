@@ -20,6 +20,7 @@ public class SafJournalpost {
 	private final String journalfortAvNavn;
 	private final String temanavn;
 	private final String journalposttype;
+	private final String journalfoerendeEnhet;
 	private final AvsenderMottaker avsenderMottaker;
 
 	@Builder.Default

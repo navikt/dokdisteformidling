@@ -33,6 +33,7 @@ public class SafJournalpostQueryServiceImplQdist013 implements SafJournalpostQue
 						"tittel\n" +
 						"journalfortAvNavn\n" +
 						"temanavn\n" +
+						"journalfoerendeEnhet\n" +
 						"relevanteDatoer {\n" +
 							"dato\n" +
 							"datotype\n" +
