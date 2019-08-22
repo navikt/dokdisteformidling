@@ -66,7 +66,7 @@ public class AktoerregisterConsumer implements Aktoerregister {
 			assertResponse(response, aktoerIdTrimmed);
 			return response.get(aktoerIdTrimmed).getIdenter().get(0).getIdent();
 		} catch (HttpClientErrorException e) {
-			throw new AktoerHentIdentForAktoerIdFunctionalException(String.format("Funkjsonell feil ved kall mot Aktoerregister:hentIdentForAktoerId for aktørId=%s: %s",
+			throw new AktoerHentIdentForAktoerIdFunctionalException(String.format("Funksjonell feil ved kall mot Aktoerregister:hentIdentForAktoerId for aktørId=%s: %s",
 					aktoerId, e.getMessage()), e);
 		} catch (HttpServerErrorException e) {
 			throw new AktoerHentIdentForAktoerIdTechnicalException(String.format("Teknisk feil ved kall mot Aktoerregister:hentIdentForAktoerId for aktørId=%s: %s",

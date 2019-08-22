@@ -45,7 +45,7 @@ public class IntegrasjonspunktConsumer implements Integrasjonspunkt {
 		try {
 			restTemplate.postForObject(this.integrasjonspunktUrl, createMessageRequest, Object.class);
 		} catch (HttpClientErrorException e) {
-			throw new IntegrasjonspunktRequestFunctionalException(format("Funkjsonell feil ved kall mot tjensten opprettMelding på integrasjonspunktet til Difi. ConversationId=%s. Feilmelding=%s",
+			throw new IntegrasjonspunktRequestFunctionalException(format("Funksjonell feil ved kall mot tjensten opprettMelding på integrasjonspunktet til Difi. ConversationId=%s. Feilmelding=%s",
 					conversationId, e.getMessage()), e);
 		} catch (HttpServerErrorException e) {
 			throw new IntegrasjonspunktRequestTechnicalException(format("Teknisk feil ved kall opprettMelding på integrasjonspunktet til Difi.  ConversationId=%s  Feilmelding=%s",
@@ -60,7 +60,7 @@ public class IntegrasjonspunktConsumer implements Integrasjonspunkt {
 			HttpHeaders headers = createContentDispositionHeader(title, filename);
 			restTemplate.exchange(this.integrasjonspunktUrl + "/" + conversationId, HttpMethod.PUT, new HttpEntity<>(dokument.getPdf(), headers), Object.class);
 		} catch (HttpClientErrorException e) {
-			throw new IntegrasjonspunktRequestFunctionalException(format("Funkjsonell feil ved kall til lastOppFil " +
+			throw new IntegrasjonspunktRequestFunctionalException(format("Funksjonell feil ved kall til lastOppFil " +
 					"mot integrasjonspunkt til Difi. Feilmelding=%s", e.getMessage()), e);
 		} catch (HttpServerErrorException e) {
 			throw new IntegrasjonspunktRequestTechnicalException(format("Teknisk feil ved kall på lastOppFil " +
@@ -74,7 +74,7 @@ public class IntegrasjonspunktConsumer implements Integrasjonspunkt {
 		try {
 			restTemplate.postForObject(this.integrasjonspunktUrl + "/" + conversationId, null, Object.class);
 		} catch (HttpClientErrorException e) {
-			throw new IntegrasjonspunktRequestFunctionalException(format("Funkjsonell feil ved kall til sendMelding " +
+			throw new IntegrasjonspunktRequestFunctionalException(format("Funksjonell feil ved kall til sendMelding " +
 					"mot integrasjonspunkt til Difi. Feilmelding=%s", e.getMessage()), e);
 		} catch (HttpServerErrorException e) {
 			throw new IntegrasjonspunktRequestTechnicalException(format("Teknisk feil ved kall på sendMelding " +
