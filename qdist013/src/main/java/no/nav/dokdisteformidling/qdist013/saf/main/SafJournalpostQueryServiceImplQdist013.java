@@ -16,10 +16,10 @@ import java.util.Collections;
 @Component("SafJournalpostQueryServiceQdist013")
 public class SafJournalpostQueryServiceImplQdist013 implements SafJournalpostQueryService<JournalpostQdist013> {
 
-	//TODO: Add kategori, filtype and variantformat
 	private static final String JOURNALPOST_QUERY =
 			"query journalpost($queryJournalpostId: String!) {\n" +
 					"journalpost(journalpostId: $queryJournalpostId) {\n" +
+						"journalpostId\n" +
 						"sak {\n" +
 							"datoOpprettet\n" +
 						"}\n" +
@@ -29,9 +29,11 @@ public class SafJournalpostQueryServiceImplQdist013 implements SafJournalpostQue
 							"id\n" +
 							"type\n" +
 						"}\n" +
+						"datoOpprettet\n" +
 						"tittel\n" +
 						"journalfortAvNavn\n" +
 						"temanavn\n" +
+						"journalfoerendeEnhet\n" +
 						"relevanteDatoer {\n" +
 							"dato\n" +
 							"datotype\n" +
@@ -41,6 +43,11 @@ public class SafJournalpostQueryServiceImplQdist013 implements SafJournalpostQue
 							"tittel\n" +
 							"datoFerdigstilt\n" +
 							"originalJournalpostId\n" +
+							"dokumentvarianter {\n" +
+								"variantformat\n" +
+								"filtype\n" +
+							"}\n" +
+						"}\n" +
 					"}\n" +
 			"}";
 

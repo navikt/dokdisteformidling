@@ -1,16 +1,12 @@
 package no.nav.dokdisteformidling.consumer.integrasjonspunkt;
 
-import static no.nav.dokdisteformidling.constants.DomainConstants.APP_NAME;
-import static no.nav.dokdisteformidling.constants.MdcConstants.NAV_CALL_ID;
-import static no.nav.dokdisteformidling.constants.MdcConstants.NAV_CONSUMER_ID;
+import static java.lang.String.format;
 import static no.nav.dokdisteformidling.constants.RetryConstants.DELAY_SHORT;
 
-import no.nav.dokdisteformidling.constants.MdcConstants;
 import no.nav.dokdisteformidling.exception.functional.IntegrasjonspunktRequestFunctionalException;
 import no.nav.dokdisteformidling.exception.technical.IntegrasjonspunktRequestTechnicalException;
 import no.nav.dokdisteformidling.metrics.Monitor;
 import no.nav.dokdisteformidling.storage.DokdistDokument;
-import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.core.ParameterizedTypeReference;
@@ -51,28 +47,26 @@ public class IntegrasjonspunktConsumer implements Integrasjonspunkt {
 		try {
 			restTemplate.postForObject(this.integrasjonspunktUrl, createMessageRequest, Object.class);
 		} catch (HttpClientErrorException e) {
-			throw new IntegrasjonspunktRequestFunctionalException(String.format("Funkjsonell feil ved kall mot tjensten opprettMelding på integrasjonspunktet til Difi. ConversationId=%s. Feilmelding=%s",
+			throw new IntegrasjonspunktRequestFunctionalException(format("Funksjonell feil ved kall mot tjensten opprettMelding på integrasjonspunktet til Difi. ConversationId=%s. Feilmelding=%s",
 					conversationId, e.getMessage()), e);
 		} catch (HttpServerErrorException e) {
-			throw new IntegrasjonspunktRequestTechnicalException(String.format("Teknisk feil ved kall opprettMelding på integrasjonspunktet til Difi.  ConversationId=%s  Feilmelding=%s",
+			throw new IntegrasjonspunktRequestTechnicalException(format("Teknisk feil ved kall opprettMelding på integrasjonspunktet til Difi.  ConversationId=%s  Feilmelding=%s",
 					conversationId, e.getMessage()), e);
 		}
 	}
 
 	@Monitor(value = "dok_metric", extraTags = {"process", "integrasjonspunktLastOppFiler"}, histogram = true, percentiles = {0.5, 0.95})
 	@Retryable(include = IntegrasjonspunktRequestTechnicalException.class, backoff = @Backoff(delay = DELAY_SHORT))
-	public void lastOppFil(DokdistDokument dokument, String conversationId) {
+	public void lastOppFil(DokdistDokument dokument, String title, String filename, String conversationId) {
 		try {
-			HttpHeaders headers = createHeaders();
-
-			//TODO: Request inn skal være en MultipartFile. Vi må se nærmere på dette api'et
-			restTemplate.exchange(this.integrasjonspunktUrl + "/" + conversationId, HttpMethod.PUT, null, Object.class);
+			HttpHeaders headers = createContentDispositionHeader(title, filename);
+			restTemplate.exchange(this.integrasjonspunktUrl + "/" + conversationId, HttpMethod.PUT, new HttpEntity<>(dokument.getPdf(), headers), Object.class);
 		} catch (HttpClientErrorException e) {
-			throw new IntegrasjonspunktRequestFunctionalException(String.format("Funkjsonell feil ved kall til lastOppFil " +
-					"mot integrasjonspunkt til Difi for conversationId=%s. Feilmelding=%s", conversationId, e.getMessage()), e);
+			throw new IntegrasjonspunktRequestFunctionalException(format("Funksjonell feil ved kall til lastOppFil " +
+					"mot integrasjonspunkt til Difi. Feilmelding=%s", e.getMessage()), e);
 		} catch (HttpServerErrorException e) {
-			throw new IntegrasjonspunktRequestTechnicalException(String.format("Teknisk feil ved kall på lastOppFil " +
-					"mot integrasjonspunkt til Difi for conversationId=%s. Feilmelding=%s", conversationId, e.getMessage()), e);
+			throw new IntegrasjonspunktRequestTechnicalException(format("Teknisk feil ved kall på lastOppFil " +
+					"mot integrasjonspunkt til Difi. Feilmelding=%s", e.getMessage()), e);
 		}
 	}
 
@@ -82,11 +76,11 @@ public class IntegrasjonspunktConsumer implements Integrasjonspunkt {
 		try {
 			restTemplate.postForObject(this.integrasjonspunktUrl + "/" + conversationId, null, Object.class);
 		} catch (HttpClientErrorException e) {
-			throw new IntegrasjonspunktRequestFunctionalException(String.format("Funkjsonell feil ved kall til sendMelding " +
-					"mot integrasjonspunkt til Difi for conversationId=%s. Feilmelding=%s", conversationId, e.getMessage()), e);
+			throw new IntegrasjonspunktRequestFunctionalException(format("Funksjonell feil ved kall til sendMelding " +
+					"mot integrasjonspunkt til Difi. Feilmelding=%s", e.getMessage()), e);
 		} catch (HttpServerErrorException e) {
-			throw new IntegrasjonspunktRequestTechnicalException(String.format("Teknisk feil ved kall på sendMelding " +
-					"mot integrasjonspunkt til Difi for conversationId=%s. Feilmelding=%s", conversationId, e.getMessage()), e);
+			throw new IntegrasjonspunktRequestTechnicalException(format("Teknisk feil ved kall på sendMelding " +
+					"mot integrasjonspunkt til Difi. Feilmelding=%s", e.getMessage()), e);
 		}
 	}
 
@@ -96,7 +90,7 @@ public class IntegrasjonspunktConsumer implements Integrasjonspunkt {
 		try {
 			Page<MessageStatus> response = restTemplate.exchange(
 					this.integrasjonspunktUrl + "/api/statuses?conversationId=" + conversationId, HttpMethod.GET,
-					new HttpEntity<>(createHeaders()), new ParameterizedTypeReference<Page<MessageStatus>>() {}).getBody();
+					new HttpEntity<>(createContentTypeHeader()), new ParameterizedTypeReference<Page<MessageStatus>>() {}).getBody();
 			return MessageStatus.findLatestStatus(response.getContent());
 		} catch (HttpClientErrorException e) {
 			throw new IntegrasjonspunktRequestFunctionalException(String.format("Funksjonell feil ved kall til getStatus " +
@@ -107,12 +101,17 @@ public class IntegrasjonspunktConsumer implements Integrasjonspunkt {
 		}
 	}
 
-	//TODO: Hvilke headere skal med her? {Content-disposition} og {content-type}?
-	private HttpHeaders createHeaders() {
+	private HttpHeaders createContentDispositionHeader(String title, String filename) {
+		String contentDispositionHeader = format("attachment; name=%s; filename=%s", title, filename);
 		HttpHeaders headers = new HttpHeaders();
-		headers.setContentType(MediaType.APPLICATION_JSON);
-		headers.add(NAV_CONSUMER_ID, APP_NAME);
-		headers.add(NAV_CALL_ID, MDC.get(MdcConstants.CALL_ID));
+		headers.add(HttpHeaders.CONTENT_DISPOSITION, contentDispositionHeader);
 		return headers;
 	}
+
+	private HttpHeaders createContentTypeHeader() {
+		HttpHeaders headers = new HttpHeaders();
+		headers.setContentType(MediaType.APPLICATION_JSON);
+		return headers;
+	}
+
 }

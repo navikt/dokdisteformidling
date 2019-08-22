@@ -66,7 +66,7 @@ public class AktoerregisterConsumer implements Aktoerregister {
 			assertResponse(response, aktoerIdTrimmed);
 			return response.get(aktoerIdTrimmed).getIdenter().get(0).getIdent();
 		} catch (HttpClientErrorException e) {
-			throw new AktoerHentIdentForAktoerIdFunctionalException(String.format("Funkjsonell feil ved kall mot Aktoerregister:hentIdentForAktoerId for aktørId=%s: %s",
+			throw new AktoerHentIdentForAktoerIdFunctionalException(String.format("Funksjonell feil ved kall mot Aktoerregister:hentIdentForAktoerId for aktørId=%s: %s",
 					aktoerId, e.getMessage()), e);
 		} catch (HttpServerErrorException e) {
 			throw new AktoerHentIdentForAktoerIdTechnicalException(String.format("Teknisk feil ved kall mot Aktoerregister:hentIdentForAktoerId for aktørId=%s: %s",
@@ -86,8 +86,8 @@ public class AktoerregisterConsumer implements Aktoerregister {
 	private void assertResponse(Map<String, IdentInfoForAktoer> response, String aktoerId) {
 		assertResponseNotNull(response, aktoerId);
 		IdentInfoForAktoer identInfoForAktoer = response.get(aktoerId);
-		assertIdenter(identInfoForAktoer, aktoerId);
 		assertNoFeilmelding(identInfoForAktoer, aktoerId);
+		assertIdenter(identInfoForAktoer, aktoerId);
 	}
 
 	private void assertResponseNotNull(Map<String, IdentInfoForAktoer> response, String aktoerId) {
@@ -96,18 +96,18 @@ public class AktoerregisterConsumer implements Aktoerregister {
 		}
 	}
 
+	private void assertNoFeilmelding(IdentInfoForAktoer identInfoForAktoer, String aktoerId) {
+		if (identInfoForAktoer.getFeilmelding() != null) {
+			throw new AktoerHentIdentForAktoerIdFunctionalException(String.format("Feil ved respons fra Aktoerregister:hentIdentForAktoerId på aktørId=%s. Feilmelding=%s",
+					aktoerId, identInfoForAktoer.getFeilmelding()));
+		}
+	}
+
 	private void assertIdenter(IdentInfoForAktoer identInfoForAktoer, String aktoerId) {
 		if (identInfoForAktoer.getIdenter() == null || identInfoForAktoer.getIdenter().size() != 1) {
 			throw new AktoerHentIdentForAktoerIdFunctionalException(String.format("Feil ved respons fra Aktoerregister:hentIdentForAktoerId på aktørId=%s. Forventet å få tilbake identliste med ett innslag ved forespørsel om gjeldende norskIdent. " +
 							"Fikk identliste med %s innslag. Sannsynligvis en feil i aktørregisteret. Aktørregisteret ryddes ved batchjobb hver natt kl 03.00.", aktoerId,
 					identInfoForAktoer.getIdenter() == null ? "null" : identInfoForAktoer.getIdenter().size()));
-		}
-	}
-
-	private void assertNoFeilmelding(IdentInfoForAktoer identInfoForAktoer, String aktoerId) {
-		if (identInfoForAktoer.getFeilmelding() != null) {
-			throw new AktoerHentIdentForAktoerIdFunctionalException(String.format("Feil ved respons fra Aktoerregister:hentIdentForAktoerId på aktørId=%s. Feilmelding=%s",
-					aktoerId, identInfoForAktoer.getFeilmelding()));
 		}
 	}
 }
