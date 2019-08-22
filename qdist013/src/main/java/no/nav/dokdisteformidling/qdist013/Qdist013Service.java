@@ -5,6 +5,7 @@ import static no.nav.dokdisteformidling.common.FunctionalUtils.deserializeS3Json
 import static no.nav.dokdisteformidling.common.FunctionalUtils.generateRandomUUID;
 import static no.nav.dokdisteformidling.common.FunctionalUtils.validateThatForsendelseStatusIsKlarForDist;
 import static no.nav.dokdisteformidling.constants.RouteConstants.PROPERTY_CONVERSATION_ID;
+import static org.apache.commons.lang3.StringUtils.isEmpty;
 
 import no.arkivverket.standarder.noark5.arkivmelding.Arkivmelding;
 import no.arkivverket.standarder.noark5.arkivmelding.Dokumentbeskrivelse;
@@ -12,9 +13,12 @@ import no.arkivverket.standarder.noark5.arkivmelding.Journalpost;
 import no.nav.dokdisteformidling.consumer.integrasjonspunkt.CreateMessageRequest;
 import no.nav.dokdisteformidling.consumer.integrasjonspunkt.Integrasjonspunkt;
 import no.nav.dokdisteformidling.consumer.juridisklogg.JuridiskLogg;
+import no.nav.dokdisteformidling.consumer.norg2.HentEnhetsInfoResponse;
+import no.nav.dokdisteformidling.consumer.norg2.Norg2;
 import no.nav.dokdisteformidling.consumer.rdist001.AdministrerForsendelse;
 import no.nav.dokdisteformidling.consumer.rdist001.HentForsendelseResponseTo;
 import no.nav.dokdisteformidling.consumer.saf.SafJournalpostQueryService;
+import no.nav.dokdisteformidling.exception.functional.ManglendeOrgnrForEnhetFunctionalException;
 import no.nav.dokdisteformidling.exception.technical.KunneIkkeMarshalleArkivmeldingTechnicalException;
 import no.nav.dokdisteformidling.qdist013.saf.main.JournalpostQdist013;
 import no.nav.dokdisteformidling.storage.DokdistDokument;
@@ -46,6 +50,7 @@ public class Qdist013Service {
 	private final SafJournalpostQueryService<JournalpostQdist013> safJournalpostQueryService;
 	private final JuridiskLogg juridiskLogg;
 	private final Integrasjonspunkt integrasjonspunkt;
+	private final Norg2 norg2;
 	private final LagreJuridiskLoggMapper lagreJuridiskLoggMapper;
 	private final ArkivmeldingMapper arkivmeldingMapper;
 	private final CreateMessageRequestMapper createMessageRequestMapper;
@@ -55,6 +60,7 @@ public class Qdist013Service {
 						   @Named("SafJournalpostQueryServiceQdist013") SafJournalpostQueryService<JournalpostQdist013> safJournalpostQueryService,
 						   JuridiskLogg juridiskLogg,
 						   Integrasjonspunkt integrasjonspunkt,
+						   Norg2 norg2,
 						   LagreJuridiskLoggMapper lagreJuridiskLoggMapper,
 						   ArkivmeldingMapper arkivmeldingMapper,
 						   CreateMessageRequestMapper createMessageRequestMapper) {
@@ -63,6 +69,7 @@ public class Qdist013Service {
 		this.safJournalpostQueryService = safJournalpostQueryService;
 		this.juridiskLogg = juridiskLogg;
 		this.integrasjonspunkt = integrasjonspunkt;
+		this.norg2 = norg2;
 		this.lagreJuridiskLoggMapper = lagreJuridiskLoggMapper;
 		this.arkivmeldingMapper = arkivmeldingMapper;
 		this.createMessageRequestMapper = createMessageRequestMapper;
@@ -82,7 +89,8 @@ public class Qdist013Service {
 		final JAXBElement<Arkivmelding> arkivmeldingJAXBElement = arkivmeldingMapper.createArkivMelding(journalpostQdist013, hentForsendelseResponseTo
 				.getBestillingsId());
 		final String arkivmeldingXmlString = marshalArkivmeldingToXmlString(arkivmeldingJAXBElement);
-		final CreateMessageRequest createMessageRequest = createMessageRequestMapper.map(conversationId, hentForsendelseResponseTo);
+		final String orgnrForEnhet = getOrgnrForEnhet(journalpostQdist013.getJournalfoerendeEnhet());
+		final CreateMessageRequest createMessageRequest = createMessageRequestMapper.map(conversationId, orgnrForEnhet, hentForsendelseResponseTo);
 
 		integrasjonspunkt.opprettMelding(createMessageRequest, conversationId);
 		uploadDocuments(dokdistDokumentList, arkivmeldingJAXBElement.getValue(), journalpostQdist013.getJournalpostId(), conversationId);
@@ -148,5 +156,13 @@ public class Qdist013Service {
 						.get(0).getReferanseDokumentfil().startsWith(format("%s-%s", journalpostId, dokumentInfoId)))
 				.findAny()
 				.get(); //ok, this field is always set by arkivMeldingMapper
+	}
+
+	public String getOrgnrForEnhet(String enhetsNr) {
+		HentEnhetsInfoResponse hentEnhetsInfoResponse = norg2.hentOrgnr(enhetsNr.trim());
+		if (isEmpty(hentEnhetsInfoResponse.getOrganisasjonsnummer())) {
+			throw new ManglendeOrgnrForEnhetFunctionalException(format("Orgnr for NAV-enhet med enhetsNr=%s er null eller tomt i respons fra Norg", enhetsNr));
+		}
+		return hentEnhetsInfoResponse.getOrganisasjonsnummer();
 	}
 }
