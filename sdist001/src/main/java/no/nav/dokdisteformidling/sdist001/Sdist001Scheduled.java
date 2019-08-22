@@ -30,7 +30,7 @@ public class Sdist001Scheduled {
 		this.sdist001Service = sdist001Service;
 	}
 
-	@Scheduled(fixedDelayString = "${sdist001.intervall ?: 600000}")
+	@Scheduled(initialDelay = 300000, fixedDelayString = "${sdist001.intervall?:600000}")
 	@Monitor(value = "dok_metric", extraTags = {"process", "oppdaterEformidlingStatus"}, histogram = true)
 	public void oppdaterEformidlingStatus() {
 		log.info("sdist001 oppdaterer status for eFormidlingforsendelser");
