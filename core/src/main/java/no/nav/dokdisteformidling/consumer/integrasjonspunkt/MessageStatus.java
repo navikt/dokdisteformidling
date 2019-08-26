@@ -33,16 +33,11 @@ public class MessageStatus {
 	}
 
 	public static String findLatestStatus(List<MessageStatus> statusList) {
-		if (statusList == null || statusList.size() == 0) {
+		if (statusList == null || statusList.isEmpty()) {
 			return null;
 		}
 
-		Comparator<MessageStatus> comparator = new Comparator<MessageStatus>() {
-			@Override
-			public int compare(MessageStatus msgStatus1, MessageStatus msgStatus2) {
-				return msgStatus1.getLastUpdateDate().compareTo(msgStatus2.getLastUpdateDate());
-			}
-		};
+		Comparator<MessageStatus> comparator = Comparator.comparing(MessageStatus::getLastUpdateDate);
 
 		return statusList.stream().max(comparator).get().getStatus();
 	}
