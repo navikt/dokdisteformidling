@@ -55,13 +55,13 @@ public class Sdist001Service {
 										   ForsendelseStatusEndringer forsendelseStatusEndringer) {
 		String forsendelseStatus = forsendelseTo.getForsendelseStatus();
 		String forsendelseId = forsendelseTo.getForsendelseId().toString();
-		String konversasjonId = forsendelseTo.getKonversasjonId();
 
 		if (!FORSENDELSE_STATUS_OVERSENDT.equals(forsendelseStatus) && !FORSENDELSE_STATUS_BEKREFTET.equals(forsendelseStatus)) {
 			log.warn("ForsendelseId={} med status={} ble feilaktig returnert av hentEformidlingForsendelser.", forsendelseId, forsendelseStatus);
 			return;
 		}
 
+		String konversasjonId = forsendelseTo.getKonversasjonId();
 		String konversasjonStatus = integrasjonspunkt.getStatus(konversasjonId);
 		konversasjonStatus = konversasjonStatus == null ? "null" : konversasjonStatus;
 
