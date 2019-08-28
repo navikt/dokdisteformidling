@@ -1,7 +1,7 @@
 team: teamdokumenthandtering
 image: "repo.adeo.no:5443/dok/dokdisteformidling"
 replicas:
-  min: 1
+  min: 2
   max: 2
   cpuThresholdPercentage: 50
 port: 8080
