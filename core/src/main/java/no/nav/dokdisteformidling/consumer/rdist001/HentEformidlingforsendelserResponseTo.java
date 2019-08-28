@@ -17,7 +17,7 @@ public class HentEformidlingforsendelserResponseTo {
 	@Data
 	@Builder
 	public static class ForsendelseTo {
-		private final Long forsendelseId;
+		private final String forsendelseId;
 		private final String forsendelseStatus;
 		private final String distribusjonKanal;
 		private final String konversasjonId;

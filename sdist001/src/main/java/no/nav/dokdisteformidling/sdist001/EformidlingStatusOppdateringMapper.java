@@ -10,10 +10,10 @@ import org.springframework.stereotype.Component;
 @Component
 public class EformidlingStatusOppdateringMapper {
 
-	public EformidlingStatusOppdatering map(String konversasjonId, String konversasjonStatus) {
+	public EformidlingStatusOppdatering map(String konversasjonId, String integrasjonspunktStatus) {
 		return EformidlingStatusOppdatering.builder()
 				.konversasjonId(konversasjonId)
-				.status(konversasjonStatus)
+				.status(integrasjonspunktStatus)
 				.statusTidspunkt(LocalDateTime.now())
 				.build();
 	}
