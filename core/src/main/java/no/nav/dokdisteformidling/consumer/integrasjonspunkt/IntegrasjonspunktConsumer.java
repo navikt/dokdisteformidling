@@ -10,6 +10,7 @@ import no.nav.dokdisteformidling.storage.DokdistDokument;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.hateoas.PagedResources;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -88,9 +89,9 @@ public class IntegrasjonspunktConsumer implements Integrasjonspunkt {
 	@Retryable(include = IntegrasjonspunktRequestTechnicalException.class, backoff = @Backoff(delay = DELAY_SHORT))
 	public String getStatus(String conversationId) {
 		try {
-			Page<MessageStatus> response = restTemplate.exchange(
+			PagedResources<MessageStatus> response = restTemplate.exchange(
 					this.integrasjonspunktUrl + "/api/statuses?conversationId=" + conversationId, HttpMethod.GET,
-					new HttpEntity<>(createContentTypeHeader()), new ParameterizedTypeReference<Page<MessageStatus>>() {}).getBody();
+					new HttpEntity<>(createContentTypeHeader()), new ParameterizedTypeReference<PagedResources<MessageStatus>>() {}).getBody();
 			return MessageStatus.findLatestStatus(response.getContent());
 		} catch (HttpClientErrorException e) {
 			throw new IntegrasjonspunktRequestFunctionalException(String.format("Funksjonell feil ved kall til getStatus " +

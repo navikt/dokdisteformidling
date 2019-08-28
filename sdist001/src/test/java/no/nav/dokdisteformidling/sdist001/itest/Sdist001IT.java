@@ -117,6 +117,33 @@ public class Sdist001IT {
 	}
 
 	@Test
+	public void shouldSetForsendelseStatusOversendtToEkspedert() throws Exception {
+		stubFor(get(HENT_EFORMIDLINGSFORSENDELSER_URL).willReturn(aResponse().withStatus(HttpStatus.OK.value())
+				.withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE)
+				.withBody(classpathToString("__files/rdist001/henteformidlingforsendelser-oversendtStatus.json"))));
+		stubFor(get("/integrasjonspunkt/api/statuses?conversationId=101").willReturn(aResponse().withStatus(HttpStatus.OK.value())
+				.withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE)
+				.withBody(classpathToString("__files/integrasjonspunkt/getStatus-MOTTATT.json"))));
+		stubFor(get("/administrerforsendelse/1").willReturn(aResponse().withStatus(HttpStatus.OK.value())
+				.withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE)
+				.withBody(classpathToString("__files/rdist001/getForsendelse-BEKREFTET.json")
+						.replace("insertCallIdHere", CALL_ID))));
+		stubFor(post("/juridiskLogg").willReturn(aResponse().withStatus(HttpStatus.OK.value())
+				.withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE)
+				.withBody("{\"id\": \"123\"}")));
+		stubFor(put("/administrerforsendelse?forsendelseId=1&forsendelseStatus=EKSPEDERT")
+				.willReturn(aResponse().withStatus(HttpStatus.OK.value())));
+
+		sdist001Scheduled.oppdaterEformidlingStatus();
+
+		verify(1, getRequestedFor(urlEqualTo(HENT_EFORMIDLINGSFORSENDELSER_URL)));
+		verify(1, getRequestedFor(urlEqualTo("/integrasjonspunkt/api/statuses?conversationId=101")));
+		verify(1, getRequestedFor(urlEqualTo("/administrerforsendelse/1")));
+		verify(1, postRequestedFor(urlEqualTo("/juridiskLogg")));
+		verify(1, putRequestedFor(urlEqualTo("/administrerforsendelse?forsendelseId=1&forsendelseStatus=EKSPEDERT")));
+	}
+
+	@Test
 	public void shouldSetForsendelseStatusBekreftetToFeilet() throws Exception {
 		stubFor(get(HENT_EFORMIDLINGSFORSENDELSER_URL).willReturn(aResponse().withStatus(HttpStatus.OK.value())
 				.withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE)
@@ -144,7 +171,7 @@ public class Sdist001IT {
 				.withBody(classpathToString("__files/integrasjonspunkt/getStatus-MOTTATT.json"))));
 		stubFor(get("/administrerforsendelse/1").willReturn(aResponse().withStatus(HttpStatus.OK.value())
 				.withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE)
-				.withBody(classpathToString("__files/rdist001/getForsendelse-happy.json")
+				.withBody(classpathToString("__files/rdist001/getForsendelse-BEKREFTET.json")
 						.replace("insertCallIdHere", CALL_ID))));
 		stubFor(put("/administrerforsendelse?forsendelseId=1&forsendelseStatus=EKSPEDERT")
 				.willReturn(aResponse().withStatus(HttpStatus.OK.value())));
@@ -153,7 +180,7 @@ public class Sdist001IT {
 				.withBody(classpathToString("__files/integrasjonspunkt/getStatus-LEVERT.json"))));
 		stubFor(get("/administrerforsendelse/2").willReturn(aResponse().withStatus(HttpStatus.OK.value())
 				.withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE)
-				.withBody(classpathToString("__files/rdist001/getForsendelse-happy.json")
+				.withBody(classpathToString("__files/rdist001/getForsendelse-BEKREFTET.json")
 						.replace("insertCallIdHere", CALL_ID))));
 		stubFor(put("/administrerforsendelse?forsendelseId=2&forsendelseStatus=EKSPEDERT")
 				.willReturn(aResponse().withStatus(HttpStatus.OK.value())));
@@ -162,7 +189,7 @@ public class Sdist001IT {
 				.withBody(classpathToString("__files/integrasjonspunkt/getStatus-LEST.json"))));
 		stubFor(get("/administrerforsendelse/3").willReturn(aResponse().withStatus(HttpStatus.OK.value())
 				.withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE)
-				.withBody(classpathToString("__files/rdist001/getForsendelse-happy.json")
+				.withBody(classpathToString("__files/rdist001/getForsendelse-BEKREFTET.json")
 						.replace("insertCallIdHere", CALL_ID))));
 		stubFor(put("/administrerforsendelse?forsendelseId=3&forsendelseStatus=EKSPEDERT")
 				.willReturn(aResponse().withStatus(HttpStatus.OK.value())));
@@ -196,7 +223,7 @@ public class Sdist001IT {
 				.withBody(classpathToString("__files/integrasjonspunkt/getStatus-MOTTATT.json"))));
 		stubFor(get("/administrerforsendelse/2").willReturn(aResponse().withStatus(HttpStatus.OK.value())
 				.withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE)
-				.withBody(classpathToString("__files/rdist001/getForsendelse-happy.json")
+				.withBody(classpathToString("__files/rdist001/getForsendelse-BEKREFTET.json")
 						.replace("insertCallIdHere", CALL_ID))));
 		stubFor(put("/administrerforsendelse?forsendelseId=2&forsendelseStatus=EKSPEDERT")
 				.willReturn(aResponse().withStatus(HttpStatus.OK.value())));
@@ -237,7 +264,7 @@ public class Sdist001IT {
 	}
 
 	@Test
-	public void shouldUseLatestKonversasjonStatus() throws Exception {
+	public void shouldUseLatestIntegrasjonspunktStatus() throws Exception {
 		stubFor(get(HENT_EFORMIDLINGSFORSENDELSER_URL).willReturn(aResponse().withStatus(HttpStatus.OK.value())
 				.withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE)
 				.withBody(classpathToString("__files/rdist001/henteformidlingforsendelser-bekreftetStatus.json"))));
@@ -246,7 +273,7 @@ public class Sdist001IT {
 				.withBody(classpathToString("__files/integrasjonspunkt/getStatus-flere.json"))));
 		stubFor(get("/administrerforsendelse/1").willReturn(aResponse().withStatus(HttpStatus.OK.value())
 				.withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE)
-				.withBody(classpathToString("__files/rdist001/getForsendelse-happy.json")
+				.withBody(classpathToString("__files/rdist001/getForsendelse-BEKREFTET.json")
 						.replace("insertCallIdHere", CALL_ID))));
 		stubFor(put("/administrerforsendelse?forsendelseId=1&forsendelseStatus=EKSPEDERT")
 				.willReturn(aResponse().withStatus(HttpStatus.OK.value())));
