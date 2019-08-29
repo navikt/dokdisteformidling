@@ -15,6 +15,8 @@ healthcheck:
     initialDelay: 30
     timeout: 3
 leaderElection: true
+vault:
+  enabled: true
 prometheus:
   enabled: true
   path: /actuator/prometheus
