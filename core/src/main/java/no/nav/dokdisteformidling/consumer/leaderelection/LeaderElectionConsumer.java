@@ -38,9 +38,7 @@ public class LeaderElectionConsumer implements LeaderElection {
 			String response = restTemplate.getForObject("http://" + electorPath, String.class);
 			String leader = mapper.readTree(response).get("name").asText();
 			String hostname = InetAddress.getLocalHost().getHostName();
-			boolean result = hostname.equals(leader);
-			log.info("hostname {} isLeader={}", hostname, result);
-			return result;
+			return hostname.equals(leader);
 		} catch (Exception e) {
 			log.warn(String.format("Kunne ikke bestemme lederpod. Feilmelding: %s", e.getMessage()), e);
 			return true;
