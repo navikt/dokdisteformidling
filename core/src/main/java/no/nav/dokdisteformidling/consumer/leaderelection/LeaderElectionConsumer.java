@@ -35,7 +35,7 @@ public class LeaderElectionConsumer implements LeaderElection {
 		}
 
 		try {
-			String response = restTemplate.getForObject(electorPath, String.class);
+			String response = restTemplate.getForObject("http://" + electorPath, String.class);
 			String leader = mapper.readTree(response).get("name").asText();
 			String hostname = InetAddress.getLocalHost().getHostName();
 			boolean result = hostname.equals(leader);
