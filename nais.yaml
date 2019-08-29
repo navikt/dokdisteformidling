@@ -46,8 +46,6 @@ fasitResources:
       resourceType: restservice
     - alias: VarselInfo_v1
       resourceType: restservice
-    - alias: LagreJuridiskLogg_Rest
-      resourceType: restservice
     - alias: administrerforsendelse_v1
       resourceType: restservice
     - alias: securityTokenService
