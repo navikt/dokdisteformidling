@@ -13,6 +13,7 @@ import no.arkivverket.standarder.noark5.arkivmelding.Journalpost;
 import no.nav.dokdisteformidling.consumer.integrasjonspunkt.CreateMessageRequest;
 import no.nav.dokdisteformidling.consumer.integrasjonspunkt.Integrasjonspunkt;
 import no.nav.dokdisteformidling.consumer.juridisklogg.JuridiskLogg;
+import no.nav.dokdisteformidling.consumer.juridisklogg.LagreJuridiskLoggMapper;
 import no.nav.dokdisteformidling.consumer.norg2.HentEnhetsInfoResponse;
 import no.nav.dokdisteformidling.consumer.norg2.Norg2;
 import no.nav.dokdisteformidling.consumer.rdist001.AdministrerForsendelse;

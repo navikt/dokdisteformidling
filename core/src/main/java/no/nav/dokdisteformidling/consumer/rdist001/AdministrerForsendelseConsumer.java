@@ -3,9 +3,11 @@ package no.nav.dokdisteformidling.consumer.rdist001;
 import no.nav.dokdisteformidling.config.alias.ServiceuserAlias;
 import no.nav.dokdisteformidling.constants.MdcConstants;
 import no.nav.dokdisteformidling.constants.RetryConstants;
+import no.nav.dokdisteformidling.exception.functional.Rdist001HentEformidlingforsendelserFunctionalException;
 import no.nav.dokdisteformidling.exception.functional.Rdist001HentForsendelseFunctionalException;
 import no.nav.dokdisteformidling.exception.functional.Rdist001OppdaterForsendelseFunctionalException;
 import no.nav.dokdisteformidling.exception.technical.AbstractDokdisteformidlingTechnicalException;
+import no.nav.dokdisteformidling.exception.technical.Rdist001HentEformidlingforsendelserTechnicalException;
 import no.nav.dokdisteformidling.exception.technical.Rdist001HentForsendelseTechnicalException;
 import no.nav.dokdisteformidling.exception.technical.Rdist001OppdaterForsendelseTechnicalException;
 import no.nav.dokdisteformidling.metrics.Monitor;
@@ -95,6 +97,25 @@ public class AdministrerForsendelseConsumer implements AdministrerForsendelse {
 		} catch (HttpServerErrorException e) {
 			throw new Rdist001OppdaterForsendelseTechnicalException(String.format("Kall mot rdist001 - oppdaterForsendelse feilet teknisk med statusKode=%s, feilmelding=%s", e
 					.getStatusCode(), e.getMessage()), e);
+		}
+	}
+
+	@Override
+	@Retryable(include = AbstractDokdisteformidlingTechnicalException.class, backoff = @Backoff(delay = RetryConstants.DELAY_SHORT, multiplier = RetryConstants.MULTIPLIER_SHORT))
+	@Monitor(value = "dok_consumer", extraTags = {"process", "hentEformidlingForsendelser"}, histogram = true)
+	public HentEformidlingforsendelserResponseTo hentEformidlingForsendelser() {
+		try {
+			HttpEntity entity = new HttpEntity<>(createHeaders());
+			return restTemplate.exchange(this.administrerforsendelseV1Url + "/henteformidlingforsendelser", HttpMethod.GET, entity, HentEformidlingforsendelserResponseTo.class)
+					.getBody();
+		} catch (HttpClientErrorException e) {
+			throw new Rdist001HentEformidlingforsendelserFunctionalException(
+					String.format("Kall mot rdist001 - hentEformidlingForsendelser feilet funksjonelt med statusKode=%s, feilmelding=%s", e
+							.getStatusCode(), e.getMessage()), e);
+		} catch (HttpServerErrorException e) {
+			throw new Rdist001HentEformidlingforsendelserTechnicalException(
+					String.format("Kall mot rdist001 - hentEformidlingForsendelser feilet teknisk med statusKode=%s, feilmelding=%s", e
+							.getStatusCode(), e.getMessage()), e);
 		}
 	}
 
