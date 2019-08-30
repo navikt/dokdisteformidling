@@ -11,4 +11,6 @@ public interface Integrasjonspunkt {
 	void lastOppFil(DokdistDokument dokumenter, String title, String filename, String conversationId);
 
 	void sendMelding(String conversationId);
+
+	String getStatus(String conversationId);
 }

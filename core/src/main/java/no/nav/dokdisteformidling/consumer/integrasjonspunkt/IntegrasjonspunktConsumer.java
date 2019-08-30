@@ -9,9 +9,12 @@ import no.nav.dokdisteformidling.metrics.Monitor;
 import no.nav.dokdisteformidling.storage.DokdistDokument;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.hateoas.PagedResources;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Component;
@@ -82,10 +85,33 @@ public class IntegrasjonspunktConsumer implements Integrasjonspunkt {
 		}
 	}
 
+	@Monitor(value = "dok_metric", extraTags = {"process", "integrasjonspunktGetStatus"}, histogram = true, percentiles = {0.5, 0.95})
+	@Retryable(include = IntegrasjonspunktRequestTechnicalException.class, backoff = @Backoff(delay = DELAY_SHORT))
+	public String getStatus(String conversationId) {
+		try {
+			PagedResources<MessageStatus> response = restTemplate.exchange(
+					this.integrasjonspunktUrl + "/api/statuses?conversationId=" + conversationId, HttpMethod.GET,
+					new HttpEntity<>(createContentTypeHeader()), new ParameterizedTypeReference<PagedResources<MessageStatus>>() {}).getBody();
+			return MessageStatus.findLatestStatus(response.getContent());
+		} catch (HttpClientErrorException e) {
+			throw new IntegrasjonspunktRequestFunctionalException(String.format("Funksjonell feil ved kall til getStatus " +
+					"mot integrasjonspunkt til Difi for conversationId=%s: %s", conversationId, e.getMessage()), e);
+		} catch (HttpServerErrorException e) {
+			throw new IntegrasjonspunktRequestTechnicalException(String.format("Teknisk feil ved kall til getStatus " +
+					"mot integrasjonspunkt til Difi for conversationId=%s: %s", conversationId, e.getMessage()), e);
+		}
+	}
+
 	private HttpHeaders createContentDispositionHeader(String title, String filename) {
 		String contentDispositionHeader = format("attachment; name=%s; filename=%s", title, filename);
 		HttpHeaders headers = new HttpHeaders();
 		headers.add(HttpHeaders.CONTENT_DISPOSITION, contentDispositionHeader);
+		return headers;
+	}
+
+	private HttpHeaders createContentTypeHeader() {
+		HttpHeaders headers = new HttpHeaders();
+		headers.setContentType(MediaType.APPLICATION_JSON);
 		return headers;
 	}
 

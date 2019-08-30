@@ -13,6 +13,7 @@
 		<module>core</module>
 		<module>qdist011</module>
 		<module>qdist013</module>
+		<module>sdist001</module>
 		<module>schemas</module>
 	</modules>
 	<parent>
@@ -61,6 +62,11 @@
 			<dependency>
 				<groupId>no.nav.dokdisteformidling</groupId>
 				<artifactId>qdist013</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>no.nav.dokdisteformidling</groupId>
+				<artifactId>sdist001</artifactId>
 				<version>${project.version}</version>
 			</dependency>
 			<dependency>

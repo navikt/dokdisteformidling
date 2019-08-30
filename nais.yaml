@@ -14,6 +14,7 @@ healthcheck:
     path: /isReady
     initialDelay: 30
     timeout: 3
+leaderElection: true
 vault:
   enabled: true
 prometheus:
