@@ -34,7 +34,7 @@ public class IntegrasjonspunktConsumer implements Integrasjonspunkt {
 	private final String integrasjonspunktUrl;
 
 	public IntegrasjonspunktConsumer(RestTemplateBuilder restTemplateBuilder,
-									 @Value("${integrasjonspunkt.api.url}") String integrasjonspunktUrl) {
+									 @Value("${integrasjonspunkt_api_url}") String integrasjonspunktUrl) {
 		this.restTemplate = restTemplateBuilder
 				.setReadTimeout(Duration.ofSeconds(20))
 				.setConnectTimeout(Duration.ofSeconds(5))
