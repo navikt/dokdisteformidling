@@ -41,7 +41,7 @@ public class TpsConsumer implements Tps {
 	private final StsRestConsumer stsRestConsumer;
 
 	public TpsConsumer(RestTemplateBuilder restTemplateBuilder,
-					   @Value("${tpsproxy.api.url}") String tpsProxyUrl,
+					   @Value("${tpsproxy_api_url}") String tpsProxyUrl,
 					   StsRestConsumer stsRestConsumer) {
 		this.restTemplate = restTemplateBuilder
 				.setReadTimeout(Duration.ofSeconds(20))

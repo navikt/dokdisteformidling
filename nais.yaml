@@ -14,6 +14,8 @@ healthcheck:
     path: /isReady
     initialDelay: 30
     timeout: 3
+vault:
+  enabled: true
 prometheus:
   enabled: true
   path: /actuator/prometheus
@@ -43,8 +45,6 @@ fasitResources:
       resourceType: restservice
     - alias: VarselInfo_v1
       resourceType: restservice
-    - alias: LagreJuridiskLogg_Rest
-      resourceType: restservice
     - alias: administrerforsendelse_v1
       resourceType: restservice
     - alias: securityTokenService
@@ -73,10 +73,6 @@ fasitResources:
         endpointUrl: virksomhet.digitalkontakinformasjon.v1.endpointurl
     - alias: "aktoerregister.api.v1"
       resourceType: restservice
-    - alias: "tps-proxy.api"
-      resourceType: restservice
-      propertyMap:
-        url: "tpsproxy.api.url"
     - alias: "ereg.api"
       resourceType: restservice
     - alias: "norg2.api.v1"
