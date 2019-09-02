@@ -3,6 +3,7 @@ package no.nav.dokdisteformidling.qdist011;
 import static no.nav.dokdisteformidling.common.FunctionalUtils.deserializeS3JsonPayloadToDokdistDokument;
 import static no.nav.dokdisteformidling.common.FunctionalUtils.getDokumenttypeIdHoveddokument;
 import static no.nav.dokdisteformidling.common.FunctionalUtils.validateThatForsendelseStatusIsKlarForDist;
+import static no.nav.dokdisteformidling.constants.RouteConstants.PROPERTY_BESTILLINGS_ID;
 
 import no.nav.dokdisteformidling.consumer.dki.DigitalKontaktinformasjonV1;
 import no.nav.dokdisteformidling.consumer.dki.HentSikkerDigitalPostadresseResponseTo;
@@ -18,6 +19,7 @@ import no.nav.dokdisteformidling.qdist011.saf.JournalpostQdist011;
 import no.nav.dokdisteformidling.storage.DokdistDokument;
 import no.nav.dokdisteformidling.storage.Storage;
 import no.nav.tjeneste.virksomhet.digitalpost.senddigitalpost.v1.SendDigitalPost;
+import org.apache.camel.Exchange;
 import org.apache.camel.Handler;
 import org.apache.camel.ProducerTemplate;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -65,10 +67,11 @@ public class Qdist011Service {
 	}
 
 	@Handler
-	public SendDigitalPost distribuerForsendelseTilDPIService(DistribuerForsendelseTilDpi distribuerForsendelseTilDpi) {
+	public SendDigitalPost distribuerForsendelseTilDPIService(DistribuerForsendelseTilDpi distribuerForsendelseTilDpi, Exchange exchange) {
 
 		HentForsendelseResponseTo hentForsendelseResponseTo = administrerForsendelse.hentForsendelse(distribuerForsendelseTilDpi
 				.getForsendelseId());
+		exchange.setProperty(PROPERTY_BESTILLINGS_ID, hentForsendelseResponseTo.getBestillingsId());
 
 		validateThatForsendelseStatusIsKlarForDist(hentForsendelseResponseTo.getForsendelseStatus());
 

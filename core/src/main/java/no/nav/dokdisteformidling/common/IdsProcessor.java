@@ -1,7 +1,6 @@
 package no.nav.dokdisteformidling.common;
 
 import static no.nav.dokdisteformidling.constants.MdcConstants.CALL_ID;
-import static no.nav.dokdisteformidling.constants.RouteConstants.PROPERTY_BESTILLINGS_ID;
 import static no.nav.dokdisteformidling.constants.RouteConstants.PROPERTY_FORSENDELSE_ID;
 
 import no.nav.dokdisteformidling.exception.functional.ForsendelseManglerForsendelseIdFunctionalException;
@@ -29,8 +28,7 @@ public class IdsProcessor implements Processor {
 		} else if (callId.trim().isEmpty()) {
 			throw new ForsendelseManglerPaakrevdHeaderFunctionalException(exchange.getFromRouteId() + " har mottatt forsendelse med tom header callId");
 		}
-		exchange.setProperty(PROPERTY_BESTILLINGS_ID, callId);
-		MDC.put(CALL_ID, exchange.getProperty(PROPERTY_BESTILLINGS_ID, String.class));
+		MDC.put(CALL_ID, callId);
 	}
 
 	private void setForsendelseIdAsProperty(Exchange exchange) {

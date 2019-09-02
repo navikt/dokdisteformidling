@@ -4,6 +4,7 @@ import static java.lang.String.format;
 import static no.nav.dokdisteformidling.common.FunctionalUtils.deserializeS3JsonPayloadToDokdistDokument;
 import static no.nav.dokdisteformidling.common.FunctionalUtils.generateRandomUUID;
 import static no.nav.dokdisteformidling.common.FunctionalUtils.validateThatForsendelseStatusIsKlarForDist;
+import static no.nav.dokdisteformidling.constants.RouteConstants.PROPERTY_BESTILLINGS_ID;
 import static no.nav.dokdisteformidling.constants.RouteConstants.PROPERTY_CONVERSATION_ID;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 
@@ -82,6 +83,7 @@ public class Qdist013Service {
 		exchange.setProperty(PROPERTY_CONVERSATION_ID, conversationId);
 		final HentForsendelseResponseTo hentForsendelseResponseTo = administrerForsendelse.hentForsendelse(distribuerForsendelseTilTrygderetten
 				.getForsendelseId());
+		exchange.setProperty(PROPERTY_BESTILLINGS_ID, hentForsendelseResponseTo.getBestillingsId());
 		validateThatForsendelseStatusIsKlarForDist(hentForsendelseResponseTo.getForsendelseStatus());
 
 		final List<DokdistDokument> dokdistDokumentList = getDocumentsFromS3(hentForsendelseResponseTo);
