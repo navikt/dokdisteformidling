@@ -44,8 +44,8 @@ import java.util.stream.Collectors;
 @Service
 public class Qdist013Service {
 
-	private static final String ARKIVMELDING = "arkivmelding";
-	private static final String ARKIVMELDING_XML = ARKIVMELDING + ".xml";
+	public static final String ARKIVMELDING = "arkivmelding";
+	public static final String ARKIVMELDING_XML = ARKIVMELDING + ".xml";
 
 	private final S3Storage s3Storage;
 	private final AdministrerForsendelse administrerForsendelse;

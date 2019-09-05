@@ -3,7 +3,6 @@ package no.nav.dokdisteformidling.qdist013;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import no.nav.dokdisteformidling.consumer.integrasjonspunkt.CreateMessageRequest;
@@ -27,12 +26,10 @@ class CreateMessageRequestMapperTest {
 	private final static String DOCUMENT_IDENTIFICATOR_STANDARD = "urn:no:difi:arkivmelding:xsd::arkivmelding";
 	private final static String ARKIVMELDING = "arkivmelding";
 	private final static String CONVERSATION_ID_IDENTIFIER = "urn:no:difi:profile:arkivmelding:administrasjon:ver1.0";
-	private final static String SENDER_REF = "SenderRef";
-	private final static String RECEIVER_REF = "ReceiverRef";
 	private final static String BESTILLINGS_ID = "bestillingsId";
 	private final static String MOTTAKER_ID = "mottakerId";
-	private final static String HOVEDDOKUMENT_ARKIVMELDING = null; //TODO Adjust to real value
-	private final static int SIKKERHETSNIVAA = 0; //TODO Adjust to real value
+	private final static String HOVEDDOKUMENT_ARKIVMELDING = "arkivmelding.xml";
+	private final static int SIKKERHETSNIVAA = 4;
 
 	private final CreateMessageRequestMapper createMessageRequestMapper = new CreateMessageRequestMapper();
 
@@ -92,33 +89,16 @@ class CreateMessageRequestMapperTest {
 
 	private void assertScope(CreateMessageRequest.StandardBusinessDocumentHeader.BusinessScope businessScope) {
 		assertNotNull(businessScope);
-		assertTrue(businessScope.getScope() != null && businessScope.getScope().size() == 3);
+		assertTrue(businessScope.getScope() != null && businessScope.getScope().size() == 1);
 
-		CreateMessageRequest.StandardBusinessDocumentHeader.BusinessScope.Scope scopeConvId = businessScope.getScope().stream()
-				.filter(scope -> CONVERSATION_ID_TYPE.equals(scope.getType()))
-				.findAny()
-				.orElseThrow(() -> new RuntimeException("the set of scopes did not contain ConversationId"));
+		CreateMessageRequest.StandardBusinessDocumentHeader.BusinessScope.Scope scopeConvId = businessScope.getScope()
+				.iterator().next();
 		assertEquals(CONVERSATION_ID, scopeConvId.getInstanceIdentifier());
+		assertEquals(CONVERSATION_ID_TYPE, scopeConvId.getType());
 		assertEquals(1, scopeConvId.getScopeInformation().size());
 		assertNotNull(scopeConvId.getScopeInformation().iterator().next().getExpectedResponseDateTime());
 		assertEquals(CONVERSATION_ID_IDENTIFIER, scopeConvId.getIdentifier());
 
-		CreateMessageRequest.StandardBusinessDocumentHeader.BusinessScope.Scope scopeSender = businessScope.getScope().stream()
-				.filter(scope -> SENDER_REF.equals(scope.getType()))
-				.findAny()
-				.orElseThrow(() -> new RuntimeException("the set of scopes did not contain SenderRef"));
-		assertNull(scopeSender.getInstanceIdentifier());
-		assertNull(scopeSender.getScopeInformation());
-//		assertEquals(, scopeConvId.getIdentifier()); TODO Må avklares
-
-		CreateMessageRequest.StandardBusinessDocumentHeader.BusinessScope.Scope scopeReceiver = businessScope.getScope()
-				.stream()
-				.filter(scope -> RECEIVER_REF.equals(scope.getType()))
-				.findAny()
-				.orElseThrow(() -> new RuntimeException("the set of scopes did not contain ReceiverRef"));
-		assertNull(scopeReceiver.getInstanceIdentifier());
-		assertNull(scopeReceiver.getScopeInformation());
-//		assertEquals(, scopeConvId.getIdentifier()); TODO Må avklares
 	}
 
 	private HentForsendelseResponseTo createHentforsendelseResponse() {
