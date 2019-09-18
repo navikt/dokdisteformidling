@@ -27,10 +27,10 @@ public class LightweightSafJournalpostQueryServiceImplQdist013 implements SafJou
 	private static final String JOURNALPOST_QUERY =
 			"query journalpost($queryJournalpostId: String!) {\n" +
 					"  journalpost(journalpostId: $queryJournalpostId) {\n" +
-					"    journalfortAvNavn\n" +
-					"    avsenderMottaker{\n" +
-					"		navn\n" +
-					"	 }\n" +
+						"    journalfortAvNavn\n" +
+						"    avsenderMottaker{\n" +
+						"		navn\n" +
+						"	 }\n" +
 					"  }\n" +
 					"}\n";
 
