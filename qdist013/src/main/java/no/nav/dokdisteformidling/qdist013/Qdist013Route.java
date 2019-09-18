@@ -78,7 +78,7 @@ public class Qdist013Route extends SpringRouteBuilder {
 				.bean(qdist013Service)
 				.log(LoggingLevel.INFO, log, "qdist013 har videresendt forsendelse med " + getIdsForLogging() + " til DIFI for distribusjon via TRYGDERETTEN")
 				.bean(dokdistAdministrerforsendelseUpdater, "updateStatusAndConversationId")
-				.log(LoggingLevel.INFO, log, "qdist013 har oppdatert dokdistDb med konversasjonsId og forsendelseStatus=OVERSENDT og avslutter behandling av forsendelse med " + getIdsForLogging())
+				.log(LoggingLevel.INFO, log, "qdist013 har oppdatert dokdistDb med konversasjonsId=${exchangeProperty.conversationId} og forsendelseStatus=OVERSENDT og avslutter behandling av forsendelse med " + getIdsForLogging())
 				.end();
 	}
 
