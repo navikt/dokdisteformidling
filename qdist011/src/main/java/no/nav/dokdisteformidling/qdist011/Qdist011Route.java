@@ -1,6 +1,7 @@
 package no.nav.dokdisteformidling.qdist011;
 
 import static no.nav.dokdisteformidling.constants.RouteConstants.PROPERTY_BESTILLINGS_ID;
+import static no.nav.dokdisteformidling.constants.RouteConstants.PROPERTY_CONVERSATION_ID;
 import static no.nav.dokdisteformidling.constants.RouteConstants.PROPERTY_FORSENDELSE_ID;
 import static no.nav.dokdisteformidling.constants.RouteConstants.QDIST011_SERVICE_ID;
 import static org.apache.camel.LoggingLevel.ERROR;
@@ -84,8 +85,8 @@ public class Qdist011Route extends SpringRouteBuilder {
 				.marshal(digitalpostFormat).convertBodyTo(String.class, Charsets.UTF_8.toString())
 				.to("jms:" + tdist005.getQueueName())
 				.log(LoggingLevel.INFO, log, "qdist011 har lagt forsendelse med " + getIdsForLogging() + " på kø til tdist005 for distribusjon via DPI")
-				.bean(dokdistAdministrerForsendelseUpdater, "updateStatus")
-				.log(LoggingLevel.INFO, log, "qdist011 har oppdatert forsendelseStatus i dokdist til OVERSENDT og avslutter behandling av forsendelse med " + getIdsForLogging());
+				.bean(dokdistAdministrerForsendelseUpdater, "updateStatusAndConversationId")
+				.log(LoggingLevel.INFO, log, "qdist011 har oppdatert dokdistDb med forsendelseStatus=OVERSENDT og konversasjonsId=${exchangeProperty." + PROPERTY_CONVERSATION_ID + "} og avslutter behandling av forsendelse med " + getIdsForLogging());
 	}
 
 	public static String getIdsForLogging() {
