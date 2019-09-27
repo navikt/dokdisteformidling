@@ -974,6 +974,7 @@ public class Qdist011IT {
 				.replaceAll("ns[0-9]:", "")
 				.replaceFirst("(?<=<sendDigitalPost).+(?=>)", "")
 				.replaceAll("[\t\r\n ]", "");
+
 	}
 }
 
