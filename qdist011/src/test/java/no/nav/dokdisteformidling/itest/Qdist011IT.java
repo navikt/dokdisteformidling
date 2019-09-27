@@ -170,7 +170,7 @@ public class Qdist011IT {
 			assertTrue(new File(uploadFilePath + DOKUMENT_OBJEKT_REFERANSE_VEDLEGG2 + ".pdf").exists());
 
 			String response = receive(tdist005);
-			String expected = classpathToString("tdist005/tdist005-happy.xml").replace("insertBestillingsIdHere", BESTILLINGS_ID);
+			String expected = classpathToString("tdist005/tdist005_happy.xml").replace("insertBestillingsIdHere", BESTILLINGS_ID);
 			assertEquals(comparableMessage(expected), comparableMessage(response));
 		});
 
