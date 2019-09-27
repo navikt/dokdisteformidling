@@ -4,6 +4,7 @@ import static no.nav.dokdisteformidling.common.FunctionalUtils.deserializeS3Json
 import static no.nav.dokdisteformidling.common.FunctionalUtils.getDokumenttypeIdHoveddokument;
 import static no.nav.dokdisteformidling.common.FunctionalUtils.validateThatForsendelseStatusIsKlarForDist;
 import static no.nav.dokdisteformidling.constants.RouteConstants.PROPERTY_BESTILLINGS_ID;
+import static no.nav.dokdisteformidling.constants.RouteConstants.PROPERTY_CONVERSATION_ID;
 
 import no.nav.dokdisteformidling.consumer.dki.DigitalKontaktinformasjonV1;
 import no.nav.dokdisteformidling.consumer.dki.HentSikkerDigitalPostadresseResponseTo;
@@ -72,6 +73,7 @@ public class Qdist011Service {
 		HentForsendelseResponseTo hentForsendelseResponseTo = administrerForsendelse.hentForsendelse(distribuerForsendelseTilDpi
 				.getForsendelseId());
 		exchange.setProperty(PROPERTY_BESTILLINGS_ID, hentForsendelseResponseTo.getBestillingsId());
+		exchange.setProperty(PROPERTY_CONVERSATION_ID, hentForsendelseResponseTo.getBestillingsId());
 
 		validateThatForsendelseStatusIsKlarForDist(hentForsendelseResponseTo.getForsendelseStatus());
 
