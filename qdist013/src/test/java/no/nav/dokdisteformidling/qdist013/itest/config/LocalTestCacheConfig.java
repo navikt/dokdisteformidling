@@ -1,6 +1,9 @@
 package no.nav.dokdisteformidling.qdist013.itest.config;
 
 import static no.nav.dokdisteformidling.config.cache.LokalCacheConfig.LIGHTWEIGHT_SAF_JOURNALPOST_QDIST013_CACHE;
+import static no.nav.dokdisteformidling.config.cache.LokalCacheConfig.STS_CACHE;
+import static no.nav.dokdisteformidling.config.cache.LokalCacheConfig.TKAT020_CACHE;
+import static no.nav.dokdisteformidling.config.cache.LokalCacheConfig.TKAT021_CACHE;
 
 import com.github.benmanes.caffeine.cache.Caffeine;
 import org.springframework.cache.CacheManager;
@@ -20,10 +23,6 @@ import java.util.concurrent.TimeUnit;
 @Profile({"itest"})
 public class LocalTestCacheConfig {
 
-	public static final String TKAT020_CACHE = "tkat020Cache";
-	public static final String TKAT021_CACHE = "tkat021Cache";
-	public static final String STS_CACHE = "stsCache";
-
 	@Bean
 	CacheManager cacheManager() {
 		SimpleCacheManager manager = new SimpleCacheManager();
@@ -38,9 +37,11 @@ public class LocalTestCacheConfig {
 						.build()),
 				new CaffeineCache(STS_CACHE, Caffeine.newBuilder()
 						.expireAfterWrite(0, TimeUnit.MINUTES)
+						.maximumSize(0)
 						.build()),
 				new CaffeineCache(LIGHTWEIGHT_SAF_JOURNALPOST_QDIST013_CACHE, Caffeine.newBuilder()
 						.expireAfterWrite(0, TimeUnit.MINUTES)
+						.maximumSize(0)
 						.build())
 		));
 		return manager;

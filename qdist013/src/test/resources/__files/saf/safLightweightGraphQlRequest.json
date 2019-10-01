@@ -1,10 +1,7 @@
 {
-  "data": {
-    "journalpost": {
-      "journalfortAvNavn": "qmot002",
-      "avsenderMottaker": {
-        "navn": "FORNAVN ETTERNAVN"
-      }
-    }
+  "query": "query journalpost($queryJournalpostId: String!) {\n  journalpost(journalpostId: $queryJournalpostId) {\n    journalfortAvNavn\n    avsenderMottaker{\n\t\tnavn\n\t }\n  }\n}\n",
+  "operationName":"journalpost",
+  "variables": {
+    "queryJournalpostId":"448212366"
   }
 }

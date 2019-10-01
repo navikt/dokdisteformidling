@@ -1,0 +1,12 @@
+{
+  "***gammelt_fnr***09": {
+    "identer": [
+      {
+        "ident": "***gammelt_fnr***",
+        "identgruppe": "NorskIdent",
+        "gjeldende": true
+      }
+    ],
+    "feilmelding": "Noe gikk galt"
+  }
+}
