@@ -1,0 +1,16 @@
+{
+  "organisasjonsnummer": "123456789",
+  "navn": null,
+  "enhetstype": "UTLA",
+  "adresse": {
+    "adresselinje1": "Asresselinje1",
+    "poststed": "GB-TESTCITY HL23 9ZD",
+    "landkode": "GB",
+    "bruksperiode": {
+      "fom": "2018-11-05T04:01:27.202"
+    },
+    "gyldighetsperiode": {
+      "fom": "2018-11-03"
+    }
+  }
+}

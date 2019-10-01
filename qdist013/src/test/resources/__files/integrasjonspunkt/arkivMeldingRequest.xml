@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<arkivmelding xmlns="http://www.arkivverket.no/standarder/noark5/arkivmelding">
+	<system>dokdisteformidling</system>
+	<meldingId>${xmlunit.ignore}</meldingId>
+	<tidspunkt>${xmlunit.ignore}</tidspunkt>
+	<antallFiler>3</antallFiler>
+	<mappe xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="saksmappe">
+		<systemID>${xmlunit.ignore}</systemID>
+		<tittel>Foreldre- og svangerskapspenger</tittel>
+		<opprettetDato>2019-04-01T08:44:21</opprettetDato>
+		<opprettetAv>qmot002</opprettetAv>
+		<basisregistrering xsi:type="journalpost">
+			<systemID>${xmlunit.ignore}</systemID>
+			<opprettetDato>2019-04-01T08:44:21</opprettetDato>
+			<opprettetAv>qmot002</opprettetAv>
+			<referanseForelderMappe>${xmlunit.ignore}</referanseForelderMappe>
+			<dokumentbeskrivelse>
+				<systemID>${xmlunit.ignore}</systemID>
+				<dokumenttype>Dokumentasjon</dokumenttype>
+				<dokumentstatus>Dokumentet er ferdigstilt</dokumentstatus>
+				<tittel>Tittel</tittel>
+				<opprettetDato>2019-05-01T08:44:21</opprettetDato>
+				<opprettetAv>qmot002</opprettetAv>
+				<tilknyttetRegistreringSom>Hoveddokument</tilknyttetRegistreringSom>
+				<dokumentnummer>1</dokumentnummer>
+				<tilknyttetDato>${xmlunit.ignore}</tilknyttetDato>
+				<tilknyttetAv>qmot002</tilknyttetAv>
+				<dokumentobjekt>
+					<versjonsnummer>1</versjonsnummer>
+					<variantformat>Produksjonsformat</variantformat>
+					<opprettetDato>2019-05-01T08:44:21</opprettetDato>
+					<opprettetAv>qmot002</opprettetAv>
+					<referanseDokumentfil>448212366-463791441-PRODUKSJON-PDF</referanseDokumentfil>
+				</dokumentobjekt>
+			</dokumentbeskrivelse>
+			<dokumentbeskrivelse>
+				<systemID>${xmlunit.ignore}</systemID>
+				<dokumenttype>Dokumentasjon</dokumenttype>
+				<dokumentstatus>Dokumentet er ferdigstilt</dokumentstatus>
+				<tittel>Tittel Vedlegg 1</tittel>
+				<opprettetDato>2019-06-01T08:44:21</opprettetDato>
+				<opprettetAv>qmot002</opprettetAv>
+				<tilknyttetRegistreringSom>Vedlegg</tilknyttetRegistreringSom>
+				<dokumentnummer>2</dokumentnummer>
+				<tilknyttetDato>${xmlunit.ignore}</tilknyttetDato>
+				<tilknyttetAv>qmot002</tilknyttetAv>
+				<dokumentobjekt>
+					<versjonsnummer>1</versjonsnummer>
+					<variantformat>Dokument hvor deler av innholdet er skjermet</variantformat>
+					<opprettetDato>2019-06-01T08:44:21</opprettetDato>
+					<opprettetAv>qmot002</opprettetAv>
+					<referanseDokumentfil>448212366-463791442-SLADDET-PDF</referanseDokumentfil>
+				</dokumentobjekt>
+			</dokumentbeskrivelse>
+			<dokumentbeskrivelse>
+				<systemID>${xmlunit.ignore}</systemID>
+				<dokumenttype>Dokumentasjon</dokumenttype>
+				<dokumentstatus>Dokumentet er ferdigstilt</dokumentstatus>
+				<tittel>Tittel Vedlegg 2, Fra FORNAVN ETTERNAVN</tittel>
+				<opprettetDato>2019-07-01T08:44:21</opprettetDato>
+				<opprettetAv>qmot002</opprettetAv>
+				<tilknyttetRegistreringSom>Vedlegg</tilknyttetRegistreringSom>
+				<dokumentnummer>3</dokumentnummer>
+				<tilknyttetDato>${xmlunit.ignore}</tilknyttetDato>
+				<tilknyttetAv>qmot002</tilknyttetAv>
+				<dokumentobjekt>
+					<versjonsnummer>1</versjonsnummer>
+					<variantformat>Arkivformat</variantformat>
+					<opprettetDato>2019-07-01T08:44:21</opprettetDato>
+					<opprettetAv>qmot002</opprettetAv>
+					<referanseDokumentfil>448212366-463791443-ARKIV-PNG</referanseDokumentfil>
+				</dokumentobjekt>
+			</dokumentbeskrivelse>
+			<tittel>MASKERT_FELT</tittel>
+			<journalposttype>${xmlunit.ignore}</journalposttype>
+			<journalstatus>Ekspedert</journalstatus>
+			<journaldato>2019-04-03</journaldato>
+			<korrespondansepart>
+				<korrespondanseparttype>Mottaker</korrespondanseparttype>
+				<korrespondansepartNavn>TRYGDERETTEN</korrespondansepartNavn>
+			</korrespondansepart>
+			<korrespondansepart>
+				<korrespondanseparttype>Avsender</korrespondanseparttype>
+				<korrespondansepartNavn>NAV Klageinstans</korrespondansepartNavn>
+			</korrespondansepart>
+		</basisregistrering>
+		<saksdato>2019-04-01</saksdato>
+		<administrativEnhet>NAV Klageinstans</administrativEnhet>
+		<saksansvarlig>qmot002</saksansvarlig>
+		<saksstatus>Under behandling</saksstatus>
+		<sakspart>
+			<sakspartNavn>NAV Klageinstans</sakspartNavn>
+			<sakspartRolle>AMP</sakspartRolle>
+			<kontaktperson>qmot002</kontaktperson>
+		</sakspart>
+		<sakspart>
+			<sakspartID>${xmlunit.ignore}</sakspartID>
+			<sakspartNavn>${xmlunit.ignore}</sakspartNavn>
+			<sakspartRolle>DAP</sakspartRolle>
+		</sakspart>
+	</mappe>
+</arkivmelding>

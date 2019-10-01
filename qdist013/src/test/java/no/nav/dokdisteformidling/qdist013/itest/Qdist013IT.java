@@ -1,10 +1,16 @@
 package no.nav.dokdisteformidling.qdist013.itest;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
+import static com.github.tomakehurst.wiremock.client.WireMock.absent;
+import static com.github.tomakehurst.wiremock.client.WireMock.binaryEqualTo;
 import static com.github.tomakehurst.wiremock.client.WireMock.containing;
 import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
+import static com.github.tomakehurst.wiremock.client.WireMock.equalToJson;
+import static com.github.tomakehurst.wiremock.client.WireMock.equalToXml;
+import static com.github.tomakehurst.wiremock.client.WireMock.findAll;
 import static com.github.tomakehurst.wiremock.client.WireMock.get;
 import static com.github.tomakehurst.wiremock.client.WireMock.getRequestedFor;
+import static com.github.tomakehurst.wiremock.client.WireMock.matchingJsonPath;
 import static com.github.tomakehurst.wiremock.client.WireMock.post;
 import static com.github.tomakehurst.wiremock.client.WireMock.postRequestedFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.put;
@@ -15,9 +21,13 @@ import static com.github.tomakehurst.wiremock.client.WireMock.urlMatching;
 import static com.github.tomakehurst.wiremock.client.WireMock.verify;
 import static java.lang.String.format;
 import static java.nio.charset.StandardCharsets.UTF_8;
-import static no.nav.dokdisteformidling.config.cache.LokalCacheConfig.TKAT020_CACHE;
-import static no.nav.dokdisteformidling.config.cache.LokalCacheConfig.TKAT021_CACHE;
+import static java.util.concurrent.TimeUnit.SECONDS;
+import static no.nav.dokdisteformidling.constants.RetryConstants.MAX_ATTEMPTS_SHORT;
 import static no.nav.dokdisteformidling.storage.S3Configuration.BUCKET_NAME;
+import static org.awaitility.Awaitility.await;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.when;
@@ -25,9 +35,12 @@ import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.http.HttpHeaders.CONTENT_DISPOSITION;
 import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE;
 import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
+import static wiremock.com.google.common.base.Strings.isNullOrEmpty;
 
+import com.amazonaws.SdkClientException;
 import com.amazonaws.services.s3.AmazonS3;
 import com.github.tomakehurst.wiremock.client.WireMock;
+import com.github.tomakehurst.wiremock.verification.LoggedRequest;
 import no.nav.dokdisteformidling.qdist013.itest.config.ApplicationTestConfig;
 import no.nav.dokdisteformidling.storage.DokdistDokument;
 import no.nav.dokdisteformidling.storage.JsonSerializer;
@@ -40,13 +53,14 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.cache.CacheManager;
 import org.springframework.cloud.contract.wiremock.AutoConfigureWireMock;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.HttpStatus;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import wiremock.com.fasterxml.jackson.databind.JsonNode;
+import wiremock.com.fasterxml.jackson.databind.ObjectMapper;
 
 import javax.inject.Inject;
 import javax.jms.Queue;
@@ -54,7 +68,9 @@ import javax.jms.TextMessage;
 import javax.xml.bind.JAXBElement;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author Erik Bråten, Visma Consulting
@@ -68,6 +84,9 @@ import java.util.UUID;
 public class Qdist013IT {
 
 	private static final String FORSENDELSE_ID = "33333";
+	private static final String ENHETSNR = "4806";
+	private static final String SAKSPARTNAVN_PERSON = "Fornavn Etternavn";
+	private static final String SAKSPARTNAVN_ORGANISASJON = "TEST1 COMPANY1 TESTING SERVICES LIMITED";
 	private static final String DOKUMENT_OBJEKT_REFERANSE_HOVEDDOK = "dokumentObjektReferanseHoveddok";
 	private static final String DOKUMENT_OBJEKT_REFERANSE_VEDLEGG1 = "dokumentObjektReferanseVedlegg1";
 	private static final String DOKUMENT_OBJEKT_REFERANSE_VEDLEGG2 = "dokumentObjektReferanseVedlegg2";
@@ -92,10 +111,6 @@ public class Qdist013IT {
 	@Inject
 	private AmazonS3 amazonS3;
 
-	@Inject
-	private CacheManager cacheManager;
-
-
 	@BeforeEach
 	public void setupBefore() {
 		CALL_ID = UUID.randomUUID().toString();
@@ -104,8 +119,6 @@ public class Qdist013IT {
 		WireMock.resetAllRequests();
 		WireMock.removeAllMappings();
 
-		cacheManager.getCache(TKAT020_CACHE).clear();
-		cacheManager.getCache(TKAT021_CACHE).clear();
 		reset(amazonS3);
 		when(amazonS3.getObjectAsString(eq(BUCKET_NAME), eq(DOKUMENT_OBJEKT_REFERANSE_HOVEDDOK)))
 				.thenReturn(JsonSerializer.serialize(DokdistDokument.builder().pdf(HOVEDDOK_TEST_CONTENT.getBytes()).build()));
@@ -116,14 +129,13 @@ public class Qdist013IT {
 	}
 
 	@Test
-	public void shouldProcessForsendelse() throws Exception {
+	public void shouldProcessForsendelseWithAktoerId() {
 
 		stubGetForsendelse("__files/rjoark001/getForsendelse-happy.json");
 		stubGetSecurityToken();
-		stubPostSafJournalpost("queryJournalpostId\":\"123\"", "saf/safQdist013GraphQlResponse-happy.json");
+		stubPostSafJournalpost("queryJournalpostId\":\"123\"", "saf/safQdist013GraphQlResponse-aktoerId.json");
 		stubPostSafJournalpost("queryJournalpostId\":\"448212366\"", "saf/safLightweightGraphQlResponse-happy.json");
-		stubGetNorg2HentOrgnr("4806");
-		stubGetEregHentOrgNavn("");
+		stubGetNorg2HentOrgnr();
 		stubGetTpsHentPersonNavn("***gammelt_fnr***");
 		stubGetAktoerregisterHentIdentForAktoerId("***gammelt_fnr***09");
 		stubPostIntegrasjonspunktCreateMessage();
@@ -134,7 +146,1010 @@ public class Qdist013IT {
 
 		sendStringMessage(qdist013, classpathToString("qdist013/qdist013-happy.xml"));
 
-		verifyAllStubs("4806", "", "***gammelt_fnr***", "***gammelt_fnr***09");
+		await().atMost(10, SECONDS).untilAsserted(() -> {
+			verifyAllStubs("", "***gammelt_fnr***", "***gammelt_fnr***09", 6);
+		});
+
+	}
+
+	@Test
+	public void shouldProcessForsendelseWithFnr() {
+
+		stubGetForsendelse("__files/rjoark001/getForsendelse-happy.json");
+		stubGetSecurityToken();
+		stubPostSafJournalpost("queryJournalpostId\":\"123\"", "saf/safQdist013GraphQlResponse-fnr.json");
+		stubPostSafJournalpost("queryJournalpostId\":\"448212366\"", "saf/safLightweightGraphQlResponse-happy.json");
+		stubGetNorg2HentOrgnr();
+		stubGetTpsHentPersonNavn("***gammelt_fnr***");
+		stubPostIntegrasjonspunktCreateMessage();
+		stubPutIntegrasjonspunktLastOppFil();
+		stubPostIntegrasjonspunktSendMelding();
+		stubPostJuridiskLoggLagre();
+		stubPutAdministrerforsendelseOppdatertForsendelsestatusAndkonvId();
+
+		sendStringMessage(qdist013, classpathToString("qdist013/qdist013-happy.xml"));
+
+		await().atMost(10, SECONDS).untilAsserted(() -> {
+			verifyAllStubs("", "***gammelt_fnr***", "", 5);
+		});
+
+	}
+
+	@Test
+	public void shouldProcessForsendelseWithOrgnr() {
+
+		stubGetForsendelse("__files/rjoark001/getForsendelse-happy.json");
+		stubGetSecurityToken();
+		stubPostSafJournalpost("queryJournalpostId\":\"123\"", "saf/safQdist013GraphQlResponse-orgnr.json");
+		stubPostSafJournalpost("queryJournalpostId\":\"448212366\"", "saf/safLightweightGraphQlResponse-happy.json");
+		stubGetNorg2HentOrgnr();
+		stubGetEregHentOrgNavn("123456789");
+		stubPostIntegrasjonspunktCreateMessage();
+		stubPutIntegrasjonspunktLastOppFil();
+		stubPostIntegrasjonspunktSendMelding();
+		stubPostJuridiskLoggLagre();
+		stubPutAdministrerforsendelseOppdatertForsendelsestatusAndkonvId();
+
+		sendStringMessage(qdist013, classpathToString("qdist013/qdist013-happy.xml"));
+
+		await().atMost(10, SECONDS).untilAsserted(() -> {
+			verifyAllStubs("123456789", "", "", 4);
+		});
+
+	}
+
+	@Test
+	public void shouldThrowRdist001HentForsendelseFunctionalException() {
+		stubFor(get("/administrerforsendelse/" + FORSENDELSE_ID)
+				.willReturn(aResponse().withStatus(HttpStatus.NOT_FOUND.value())));
+
+		sendStringMessage(qdist013, classpathToString("qdist013/qdist013-happy.xml"));
+
+		await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
+			assertMessageOnQueue(qdist013FunksjonellFeil);
+		});
+
+		verify(1, getRequestedFor(urlEqualTo("/administrerforsendelse/" + FORSENDELSE_ID)));
+	}
+
+	@Test
+	public void shouldThrowRdist001HentForsendelseTechnicalException() {
+		stubFor(get("/administrerforsendelse/" + FORSENDELSE_ID)
+				.willReturn(aResponse().withStatus(HttpStatus.INTERNAL_SERVER_ERROR.value())));
+
+		sendStringMessage(qdist013, classpathToString("qdist013/qdist013-happy.xml"));
+
+		await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
+			assertMessageOnQueue(backoutQueue);
+		});
+
+		verify(MAX_ATTEMPTS_SHORT, getRequestedFor(urlEqualTo("/administrerforsendelse/" + FORSENDELSE_ID)));
+	}
+
+	@Test
+	public void shouldThrowInvalidForsendelseStatusException() {
+		stubGetForsendelse("__files/rjoark001/getForsendelse-oversendtForsendelseStatus.json");
+
+		sendStringMessage(qdist013, classpathToString("qdist013/qdist013-happy.xml"));
+
+		await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
+			assertMessageOnQueue(qdist013FunksjonellFeil);
+		});
+
+		verify(1, getRequestedFor(urlEqualTo("/administrerforsendelse/" + FORSENDELSE_ID)));
+	}
+
+	@Test
+	public void shouldThrowKunneIkkeDeserialisereS3PayloadFunctionalException() {
+		when(amazonS3.getObjectAsString(eq(BUCKET_NAME),
+				eq(DOKUMENT_OBJEKT_REFERANSE_VEDLEGG2))).thenReturn("notJsonSerializedString");
+
+		stubGetForsendelse("__files/rjoark001/getForsendelse-happy.json");
+
+		sendStringMessage(qdist013, classpathToString("qdist013/qdist013-happy.xml"));
+
+		await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
+			assertMessageOnQueue(qdist013FunksjonellFeil);
+		});
+
+		verify(1, getRequestedFor(urlEqualTo("/administrerforsendelse/" + FORSENDELSE_ID)));
+	}
+
+	@Test
+	public void shouldThrowS3FailedToGetDocumentTechnicalExceptionVedSdkClientException() {
+		when(amazonS3.getObjectAsString(eq(BUCKET_NAME),
+				eq(DOKUMENT_OBJEKT_REFERANSE_HOVEDDOK))).thenThrow(new SdkClientException("SdkClientException"));
+
+		stubGetForsendelse("__files/rjoark001/getForsendelse-happy.json");
+
+		sendStringMessage(qdist013, classpathToString("qdist013/qdist013-happy.xml"));
+
+		await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
+			assertMessageOnQueue(backoutQueue);
+		});
+
+		verify(1, getRequestedFor(urlEqualTo("/administrerforsendelse/" + FORSENDELSE_ID)));
+	}
+
+	@Test
+	public void shouldThrowS3FailedToGetDocumentTechnicalExceptionVedSecurityException() {
+		when(amazonS3.getObjectAsString(eq(BUCKET_NAME), eq(DOKUMENT_OBJEKT_REFERANSE_HOVEDDOK))).thenThrow(new SecurityException("SecurityException"));
+
+		stubGetForsendelse("__files/rjoark001/getForsendelse-happy.json");
+
+		sendStringMessage(qdist013, classpathToString("qdist013/qdist013-happy.xml"));
+
+		await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
+			assertMessageOnQueue(backoutQueue);
+		});
+
+		verify(1, getRequestedFor(urlEqualTo("/administrerforsendelse/" + FORSENDELSE_ID)));
+	}
+
+	@Test
+	public void shouldThrowStsTechnicalException() {
+		stubGetForsendelse("__files/rjoark001/getForsendelse-happy.json");
+		stubFor(get("/securitytoken?grant_type=client_credentials&scope=openid")
+				.willReturn(aResponse().withStatus(HttpStatus.INTERNAL_SERVER_ERROR.value())));
+
+		sendStringMessage(qdist013, classpathToString("qdist013/qdist013-happy.xml"));
+
+		await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
+			assertMessageOnQueue(backoutQueue);
+		});
+
+		verify(1, getRequestedFor(urlEqualTo("/administrerforsendelse/" + FORSENDELSE_ID)));
+		verify(MAX_ATTEMPTS_SHORT, getRequestedFor(urlEqualTo("/securitytoken?grant_type=client_credentials&scope=openid")));
+	}
+
+	@Test
+	public void shouldThrowSafJournalpostIkkeFunnetFunctionalException() {
+		stubGetForsendelse("__files/rjoark001/getForsendelse-happy.json");
+		stubGetSecurityToken();
+		stubFor(post(urlMatching("/safgraphql")).willReturn(aResponse().withStatus(HttpStatus.OK.value())
+				.withHeader(org.springframework.http.HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_UTF8_VALUE)
+				.withBody("")));
+
+		sendStringMessage(qdist013, classpathToString("qdist013/qdist013-happy.xml"));
+
+		await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
+			assertMessageOnQueue(qdist013FunksjonellFeil);
+		});
+
+		verifyGetForsendelse();
+		verifyGetSecurityToken(1);
+		verify(1, postRequestedFor(urlEqualTo("/safgraphql")));
+	}
+
+	@Test
+	public void shouldThrowSafJournalpostQueryUnauthorizedException() {
+		stubGetForsendelse("__files/rjoark001/getForsendelse-happy.json");
+		stubGetSecurityToken();
+		stubFor(post(urlMatching("/safgraphql"))
+				.willReturn(aResponse().withStatus(HttpStatus.NOT_FOUND.value())));
+
+		sendStringMessage(qdist013, classpathToString("qdist013/qdist013-happy.xml"));
+
+		await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
+			assertMessageOnQueue(qdist013FunksjonellFeil);
+		});
+
+		verifyGetForsendelse();
+		verifyGetSecurityToken(1);
+		verify(1, postRequestedFor(urlEqualTo("/safgraphql")));
+	}
+
+	@Test
+	public void shouldThrowSafJournalpostQueryTechnicalException() {
+		stubGetForsendelse("__files/rjoark001/getForsendelse-happy.json");
+		stubGetSecurityToken();
+		stubFor(post(urlMatching("/safgraphql"))
+				.willReturn(aResponse().withStatus(HttpStatus.INTERNAL_SERVER_ERROR.value())));
+
+		sendStringMessage(qdist013, classpathToString("qdist013/qdist013-happy.xml"));
+
+		await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
+			assertMessageOnQueue(backoutQueue);
+		});
+
+		verifyGetForsendelse();
+		verify(MAX_ATTEMPTS_SHORT, getRequestedFor(urlEqualTo("/securitytoken?grant_type=client_credentials&scope=openid")));
+		verify(MAX_ATTEMPTS_SHORT, postRequestedFor(urlEqualTo("/safgraphql")));
+	}
+
+	@Test
+	public void shouldThrowSafJournalpostValidationException() {
+		stubGetForsendelse("__files/rjoark001/getForsendelse-happy.json");
+		stubGetSecurityToken();
+		stubPostSafJournalpost("queryJournalpostId\":\"123\"", "saf/safQdist013GraphQlResponse-tomJournalpostId.json");
+
+		sendStringMessage(qdist013, classpathToString("qdist013/qdist013-happy.xml"));
+
+		await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
+			assertMessageOnQueue(qdist013FunksjonellFeil);
+		});
+
+		verifyGetForsendelse();
+		verifyGetSecurityToken(1);
+		verify(1, postRequestedFor(urlEqualTo("/safgraphql")));
+	}
+
+	@Test
+	public void shouldThrowSafJournalpostIkkeFunnetFunctionalExceptionLightweight() {
+		stubGetForsendelse("__files/rjoark001/getForsendelse-happy.json");
+		stubGetSecurityToken();
+		stubPostSafJournalpost("queryJournalpostId\":\"123\"", "saf/safQdist013GraphQlResponse-aktoerId.json");
+		stubFor(post(urlMatching("/safgraphql"))
+				.withRequestBody(containing("queryJournalpostId\":\"448212366\""))
+				.willReturn(aResponse().withStatus(HttpStatus.OK.value())
+						.withHeader(org.springframework.http.HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_UTF8_VALUE)
+						.withBody("")));
+
+		sendStringMessage(qdist013, classpathToString("qdist013/qdist013-happy.xml"));
+
+		await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
+			assertMessageOnQueue(qdist013FunksjonellFeil);
+		});
+
+		verifyGetForsendelse();
+		verifyGetSecurityToken(2);
+		verifyPostSafJournalpost();
+		verify(1, postRequestedFor(urlEqualTo("/safgraphql"))
+				.withRequestBody(equalToJson(classpathToString("__files/saf/safLightweightGraphQlRequest.json"))));
+	}
+
+	@Test
+	public void shouldThrowSafJournalpostQueryUnauthorizedExceptionLightweight() {
+		stubGetForsendelse("__files/rjoark001/getForsendelse-happy.json");
+		stubGetSecurityToken();
+		stubPostSafJournalpost("queryJournalpostId\":\"123\"", "saf/safQdist013GraphQlResponse-aktoerId.json");
+		stubFor(post(urlMatching("/safgraphql"))
+				.withRequestBody(containing("queryJournalpostId\":\"448212366\""))
+				.willReturn(aResponse().withStatus(HttpStatus.FORBIDDEN.value())));
+
+		sendStringMessage(qdist013, classpathToString("qdist013/qdist013-happy.xml"));
+
+		await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
+			assertMessageOnQueue(qdist013FunksjonellFeil);
+		});
+
+		verifyGetForsendelse();
+		verifyGetSecurityToken(2);
+		verifyPostSafJournalpost();
+		verify(1, postRequestedFor(urlEqualTo("/safgraphql"))
+				.withRequestBody(equalToJson(classpathToString("__files/saf/safLightweightGraphQlRequest.json"))));
+	}
+
+	@Test
+	public void shouldThrowSafJournalpostQueryTechnicalExceptionLightweight() {
+		stubGetForsendelse("__files/rjoark001/getForsendelse-happy.json");
+		stubGetSecurityToken();
+		stubPostSafJournalpost("queryJournalpostId\":\"123\"", "saf/safQdist013GraphQlResponse-aktoerId.json");
+		stubFor(post(urlMatching("/safgraphql"))
+				.withRequestBody(containing("queryJournalpostId\":\"448212366\""))
+				.willReturn(aResponse().withStatus(HttpStatus.INTERNAL_SERVER_ERROR.value())));
+
+		sendStringMessage(qdist013, classpathToString("qdist013/qdist013-happy.xml"));
+
+		await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
+			assertMessageOnQueue(backoutQueue);
+		});
+
+		verifyGetForsendelse();
+		verifyGetSecurityToken(1 + MAX_ATTEMPTS_SHORT);
+		verifyPostSafJournalpost();
+		verify(MAX_ATTEMPTS_SHORT, postRequestedFor(urlEqualTo("/safgraphql"))
+				.withRequestBody(equalToJson(classpathToString("__files/saf/safLightweightGraphQlRequest.json"))));
+	}
+
+	@Test
+	public void shouldThrowSafJournalpostValidationExceptionLightweight() {
+		stubGetForsendelse("__files/rjoark001/getForsendelse-happy.json");
+		stubGetSecurityToken();
+		stubPostSafJournalpost("queryJournalpostId\":\"123\"", "saf/safQdist013GraphQlResponse-aktoerId.json");
+		stubPostSafJournalpost("queryJournalpostId\":\"448212366\"", "saf/safLightweightGraphQlResponse-tomJournalfoertAvNavn.json");
+
+		sendStringMessage(qdist013, classpathToString("qdist013/qdist013-happy.xml"));
+
+		await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
+			assertMessageOnQueue(qdist013FunksjonellFeil);
+		});
+
+		verifyGetForsendelse();
+		verifyGetSecurityToken(2);
+		verifyPostSafJournalpost();
+		verify(1, postRequestedFor(urlEqualTo("/safgraphql"))
+				.withRequestBody(equalToJson(classpathToString("__files/saf/safLightweightGraphQlRequest.json"))));
+	}
+
+	@Test
+	public void shouldThrowAktoerHentIdentForAktoerIdFunctionalException() {
+		stubGetForsendelse("__files/rjoark001/getForsendelse-happy.json");
+		stubGetSecurityToken();
+		stubPostSafJournalpost("queryJournalpostId\":\"123\"", "saf/safQdist013GraphQlResponse-aktoerId.json");
+		stubPostSafJournalpost("queryJournalpostId\":\"448212366\"", "saf/safLightweightGraphQlResponse-happy.json");
+		stubFor(get("/aktoerregister/identer?gjeldende=true&identgruppe=NorskIdent")
+				.withHeader("Nav-Personidenter", equalTo("***gammelt_fnr***09"))
+				.withHeader(AUTHORIZATION, equalTo(BEARER_OIDC_TOKEN))
+				.willReturn(aResponse().withStatus(HttpStatus.FORBIDDEN.value())));
+
+		sendStringMessage(qdist013, classpathToString("qdist013/qdist013-happy.xml"));
+
+		await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
+			assertMessageOnQueue(qdist013FunksjonellFeil);
+		});
+
+		verifyGetForsendelse();
+		verifyGetSecurityToken(4 + 1);
+		verifyPostSafJournalpost();
+		verifyPostSafJournalpostLightweight();
+		verify(1, getRequestedFor(urlEqualTo("/aktoerregister/identer?gjeldende=true&identgruppe=NorskIdent"))
+				.withHeader("Nav-Personidenter", equalTo("***gammelt_fnr***09"))
+				.withHeader(AUTHORIZATION, equalTo(BEARER_OIDC_TOKEN)));
+	}
+
+	@Test
+	public void shouldThrowAktoerHentIdentForAktoerIdFunctionalExceptionIngenResponse() {
+		stubGetForsendelse("__files/rjoark001/getForsendelse-happy.json");
+		stubGetSecurityToken();
+		stubPostSafJournalpost("queryJournalpostId\":\"123\"", "saf/safQdist013GraphQlResponse-aktoerId.json");
+		stubPostSafJournalpost("queryJournalpostId\":\"448212366\"", "saf/safLightweightGraphQlResponse-happy.json");
+		String nullStr = null;
+		stubFor(get("/aktoerregister/identer?gjeldende=true&identgruppe=NorskIdent")
+				.withHeader("Nav-Personidenter", equalTo("***gammelt_fnr***09"))
+				.withHeader(AUTHORIZATION, equalTo(BEARER_OIDC_TOKEN))
+				.willReturn(aResponse().withStatus(HttpStatus.OK
+						.value())
+						.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
+						.withBody(nullStr)));
+
+		sendStringMessage(qdist013, classpathToString("qdist013/qdist013-happy.xml"));
+
+		await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
+			assertMessageOnQueue(qdist013FunksjonellFeil);
+		});
+
+		verifyGetForsendelse();
+		verifyGetSecurityToken(4 + 1);
+		verifyPostSafJournalpost();
+		verifyPostSafJournalpostLightweight();
+		verify(1, getRequestedFor(urlEqualTo("/aktoerregister/identer?gjeldende=true&identgruppe=NorskIdent"))
+				.withHeader("Nav-Personidenter", equalTo("***gammelt_fnr***09"))
+				.withHeader(AUTHORIZATION, equalTo(BEARER_OIDC_TOKEN)));
+	}
+
+	@Test
+	public void shouldThrowAktoerHentIdentForAktoerIdFunctionalExceptionFeilmelding() {
+		stubGetForsendelse("__files/rjoark001/getForsendelse-happy.json");
+		stubGetSecurityToken();
+		stubPostSafJournalpost("queryJournalpostId\":\"123\"", "saf/safQdist013GraphQlResponse-aktoerId.json");
+		stubPostSafJournalpost("queryJournalpostId\":\"448212366\"", "saf/safLightweightGraphQlResponse-happy.json");
+		stubFor(get("/aktoerregister/identer?gjeldende=true&identgruppe=NorskIdent")
+				.withHeader("Nav-Personidenter", equalTo("***gammelt_fnr***09"))
+				.withHeader(AUTHORIZATION, equalTo(BEARER_OIDC_TOKEN))
+				.willReturn(aResponse().withStatus(HttpStatus.OK
+						.value())
+						.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
+						.withBodyFile("aktoerregister/aktoerregisterHentIdentForAktoerFeilmelding.json")));
+
+		sendStringMessage(qdist013, classpathToString("qdist013/qdist013-happy.xml"));
+
+		await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
+			assertMessageOnQueue(qdist013FunksjonellFeil);
+		});
+
+		verifyGetForsendelse();
+		verifyGetSecurityToken(4 + 1);
+		verifyPostSafJournalpost();
+		verifyPostSafJournalpostLightweight();
+		verify(1, getRequestedFor(urlEqualTo("/aktoerregister/identer?gjeldende=true&identgruppe=NorskIdent"))
+				.withHeader("Nav-Personidenter", equalTo("***gammelt_fnr***09"))
+				.withHeader(AUTHORIZATION, equalTo(BEARER_OIDC_TOKEN)));
+	}
+
+	@Test
+	public void shouldThrowAktoerHentIdentForAktoerIdFunctionalExceptionIngenIdent() {
+		stubGetForsendelse("__files/rjoark001/getForsendelse-happy.json");
+		stubGetSecurityToken();
+		stubPostSafJournalpost("queryJournalpostId\":\"123\"", "saf/safQdist013GraphQlResponse-aktoerId.json");
+		stubPostSafJournalpost("queryJournalpostId\":\"448212366\"", "saf/safLightweightGraphQlResponse-happy.json");
+		stubFor(get("/aktoerregister/identer?gjeldende=true&identgruppe=NorskIdent")
+				.withHeader("Nav-Personidenter", equalTo("***gammelt_fnr***09"))
+				.withHeader(AUTHORIZATION, equalTo(BEARER_OIDC_TOKEN))
+				.willReturn(aResponse().withStatus(HttpStatus.OK
+						.value())
+						.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
+						.withBodyFile("aktoerregister/aktoerregisterHentIdentForAktoerIngenIdent.json")));
+
+		sendStringMessage(qdist013, classpathToString("qdist013/qdist013-happy.xml"));
+
+		await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
+			assertMessageOnQueue(qdist013FunksjonellFeil);
+		});
+
+		verifyGetForsendelse();
+		verifyGetSecurityToken(4 + 1);
+		verifyPostSafJournalpost();
+		verifyPostSafJournalpostLightweight();
+		verify(1, getRequestedFor(urlEqualTo("/aktoerregister/identer?gjeldende=true&identgruppe=NorskIdent"))
+				.withHeader("Nav-Personidenter", equalTo("***gammelt_fnr***09"))
+				.withHeader(AUTHORIZATION, equalTo(BEARER_OIDC_TOKEN)));
+	}
+
+	@Test
+	public void shouldThrowAktoerHentIdentForAktoerIdTechnicalException() {
+		stubGetForsendelse("__files/rjoark001/getForsendelse-happy.json");
+		stubGetSecurityToken();
+		stubPostSafJournalpost("queryJournalpostId\":\"123\"", "saf/safQdist013GraphQlResponse-aktoerId.json");
+		stubPostSafJournalpost("queryJournalpostId\":\"448212366\"", "saf/safLightweightGraphQlResponse-happy.json");
+		stubFor(get("/aktoerregister/identer?gjeldende=true&identgruppe=NorskIdent")
+				.withHeader("Nav-Personidenter", equalTo("***gammelt_fnr***09"))
+				.withHeader(AUTHORIZATION, equalTo(BEARER_OIDC_TOKEN))
+				.willReturn(aResponse().withStatus(HttpStatus.INTERNAL_SERVER_ERROR.value())));
+
+		sendStringMessage(qdist013, classpathToString("qdist013/qdist013-happy.xml"));
+
+		await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
+			assertMessageOnQueue(backoutQueue);
+		});
+
+		verifyGetForsendelse();
+		verifyGetSecurityToken(4 + MAX_ATTEMPTS_SHORT);
+		verifyPostSafJournalpost();
+		verifyPostSafJournalpostLightweight();
+		verify(MAX_ATTEMPTS_SHORT, getRequestedFor(urlEqualTo("/aktoerregister/identer?gjeldende=true&identgruppe=NorskIdent"))
+				.withHeader("Nav-Personidenter", equalTo("***gammelt_fnr***09"))
+				.withHeader(AUTHORIZATION, equalTo(BEARER_OIDC_TOKEN)));
+	}
+
+	@Test
+	public void shouldThrowTpsHentNavnFunctionalException() {
+		stubGetForsendelse("__files/rjoark001/getForsendelse-happy.json");
+		stubGetSecurityToken();
+		stubPostSafJournalpost("queryJournalpostId\":\"123\"", "saf/safQdist013GraphQlResponse-fnr.json");
+		stubPostSafJournalpost("queryJournalpostId\":\"448212366\"", "saf/safLightweightGraphQlResponse-happy.json");
+		stubFor(get("/tps/v1/navn")
+				.withHeader("Nav-Personident", equalTo("***gammelt_fnr***"))
+				.withHeader(AUTHORIZATION, equalTo(BEARER_OIDC_TOKEN))
+				.willReturn(aResponse().withStatus(HttpStatus.NOT_FOUND.value())));
+
+		sendStringMessage(qdist013, classpathToString("qdist013/qdist013-happy.xml"));
+
+		await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
+			assertMessageOnQueue(qdist013FunksjonellFeil);
+		});
+
+		verifyGetForsendelse();
+		verifyGetSecurityToken(4 + 1);
+		verifyPostSafJournalpost();
+		verifyPostSafJournalpostLightweight();
+		verify(1, getRequestedFor(urlEqualTo("/tps/v1/navn"))
+				.withHeader("Nav-Personident", equalTo("***gammelt_fnr***"))
+				.withHeader(AUTHORIZATION, equalTo(BEARER_OIDC_TOKEN)));
+	}
+
+	@Test
+	public void shouldThrowTpsHentNavnTechnicalException() {
+		stubGetForsendelse("__files/rjoark001/getForsendelse-happy.json");
+		stubGetSecurityToken();
+		stubPostSafJournalpost("queryJournalpostId\":\"123\"", "saf/safQdist013GraphQlResponse-fnr.json");
+		stubPostSafJournalpost("queryJournalpostId\":\"448212366\"", "saf/safLightweightGraphQlResponse-happy.json");
+		stubFor(get("/tps/v1/navn")
+				.withHeader("Nav-Personident", equalTo("***gammelt_fnr***"))
+				.withHeader(AUTHORIZATION, equalTo(BEARER_OIDC_TOKEN))
+				.willReturn(aResponse().withStatus(HttpStatus.INTERNAL_SERVER_ERROR.value())));
+
+		sendStringMessage(qdist013, classpathToString("qdist013/qdist013-happy.xml"));
+
+		await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
+			assertMessageOnQueue(backoutQueue);
+		});
+
+		verifyGetForsendelse();
+		verifyGetSecurityToken(4 + MAX_ATTEMPTS_SHORT);
+		verifyPostSafJournalpost();
+		verifyPostSafJournalpostLightweight();
+		verify(MAX_ATTEMPTS_SHORT, getRequestedFor(urlEqualTo("/tps/v1/navn"))
+				.withHeader("Nav-Personident", equalTo("***gammelt_fnr***"))
+				.withHeader(AUTHORIZATION, equalTo(BEARER_OIDC_TOKEN)));
+	}
+
+	@Test
+	public void shouldThrowEregHentNoekkelinfoFunctionalException() {
+		stubGetForsendelse("__files/rjoark001/getForsendelse-happy.json");
+		stubGetSecurityToken();
+		stubPostSafJournalpost("queryJournalpostId\":\"123\"", "saf/safQdist013GraphQlResponse-orgnr.json");
+		stubPostSafJournalpost("queryJournalpostId\":\"448212366\"", "saf/safLightweightGraphQlResponse-happy.json");
+		stubFor(get("/ereg/v1/organisasjon/" + "123456789" + "/noekkelinfo")
+				.willReturn(aResponse().withStatus(HttpStatus.FORBIDDEN.value())));
+
+		sendStringMessage(qdist013, classpathToString("qdist013/qdist013-happy.xml"));
+
+		await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
+			assertMessageOnQueue(qdist013FunksjonellFeil);
+		});
+
+		verifyGetForsendelse();
+		verifyGetSecurityToken(4);
+		verifyPostSafJournalpost();
+		verifyPostSafJournalpostLightweight();
+		verify(1, getRequestedFor(urlEqualTo("/ereg/v1/organisasjon/" + "123456789" + "/noekkelinfo")));
+	}
+
+	@Test
+	public void shouldThrowEregHentNoekkelinfoFunctionalExceptionIngenResponse() {
+		stubGetForsendelse("__files/rjoark001/getForsendelse-happy.json");
+		stubGetSecurityToken();
+		stubPostSafJournalpost("queryJournalpostId\":\"123\"", "saf/safQdist013GraphQlResponse-orgnr.json");
+		stubPostSafJournalpost("queryJournalpostId\":\"448212366\"", "saf/safLightweightGraphQlResponse-happy.json");
+		String nullStr = null;
+		stubFor(get("/ereg/v1/organisasjon/" + "123456789" + "/noekkelinfo").willReturn(aResponse().withStatus(HttpStatus.OK.value())
+				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
+				.withBody(nullStr)));
+
+		sendStringMessage(qdist013, classpathToString("qdist013/qdist013-happy.xml"));
+
+		await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
+			assertMessageOnQueue(qdist013FunksjonellFeil);
+		});
+
+		verifyGetForsendelse();
+		verifyGetSecurityToken(4);
+		verifyPostSafJournalpost();
+		verifyPostSafJournalpostLightweight();
+		verify(1, getRequestedFor(urlEqualTo("/ereg/v1/organisasjon/" + "123456789" + "/noekkelinfo")));
+	}
+
+	@Test
+	public void shouldThrowEregHentNoekkelinfoFunctionalExceptionManglerNavn() {
+		stubGetForsendelse("__files/rjoark001/getForsendelse-happy.json");
+		stubGetSecurityToken();
+		stubPostSafJournalpost("queryJournalpostId\":\"123\"", "saf/safQdist013GraphQlResponse-orgnr.json");
+		stubPostSafJournalpost("queryJournalpostId\":\"448212366\"", "saf/safLightweightGraphQlResponse-happy.json");
+		stubFor(get("/ereg/v1/organisasjon/" + "123456789" + "/noekkelinfo").willReturn(aResponse().withStatus(HttpStatus.OK.value())
+				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
+				.withBodyFile("ereg/eregHentNavn_manglerNavn.json")));
+
+		sendStringMessage(qdist013, classpathToString("qdist013/qdist013-happy.xml"));
+
+		await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
+			assertMessageOnQueue(qdist013FunksjonellFeil);
+		});
+
+		verifyGetForsendelse();
+		verifyGetSecurityToken(4);
+		verifyPostSafJournalpost();
+		verifyPostSafJournalpostLightweight();
+		verify(1, getRequestedFor(urlEqualTo("/ereg/v1/organisasjon/" + "123456789" + "/noekkelinfo")));
+	}
+
+	@Test
+	public void shouldThrowEregHentNoekkelinfoTechnicalException() {
+		stubGetForsendelse("__files/rjoark001/getForsendelse-happy.json");
+		stubGetSecurityToken();
+		stubPostSafJournalpost("queryJournalpostId\":\"123\"", "saf/safQdist013GraphQlResponse-orgnr.json");
+		stubPostSafJournalpost("queryJournalpostId\":\"448212366\"", "saf/safLightweightGraphQlResponse-happy.json");
+		stubFor(get("/ereg/v1/organisasjon/" + "123456789" + "/noekkelinfo")
+				.willReturn(aResponse().withStatus(HttpStatus.INTERNAL_SERVER_ERROR.value())));
+
+		sendStringMessage(qdist013, classpathToString("qdist013/qdist013-happy.xml"));
+
+		await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
+			assertMessageOnQueue(backoutQueue);
+		});
+
+		verifyGetForsendelse();
+		verifyGetSecurityToken(4);
+		verifyPostSafJournalpost();
+		verifyPostSafJournalpostLightweight();
+		verify(MAX_ATTEMPTS_SHORT, getRequestedFor(urlEqualTo("/ereg/v1/organisasjon/" + "123456789" + "/noekkelinfo")));
+	}
+
+	@Test
+	public void shouldThrowNorg2HentEnhetsInfoFunctionalException() {
+		stubGetForsendelse("__files/rjoark001/getForsendelse-happy.json");
+		stubGetSecurityToken();
+		stubPostSafJournalpost("queryJournalpostId\":\"123\"", "saf/safQdist013GraphQlResponse-orgnr.json");
+		stubPostSafJournalpost("queryJournalpostId\":\"448212366\"", "saf/safLightweightGraphQlResponse-happy.json");
+		stubGetEregHentOrgNavn("123456789");
+		stubFor(get("/norg2/enhet/" + ENHETSNR).willReturn(aResponse().withStatus(HttpStatus.NOT_FOUND.value())));
+
+		sendStringMessage(qdist013, classpathToString("qdist013/qdist013-happy.xml"));
+
+		await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
+			assertMessageOnQueue(qdist013FunksjonellFeil);
+		});
+
+		verifyGetForsendelse();
+		verifyGetSecurityToken(4);
+		verifyPostSafJournalpost();
+		verifyPostSafJournalpostLightweight();
+		verifyGetEregHentOrgNavn("123456789");
+		verify(1, getRequestedFor(urlEqualTo("/norg2/enhet/" + ENHETSNR)));
+	}
+
+	@Test
+	public void shouldThrowManglendeOrgnrForEnhetFunctionalException() {
+		stubGetForsendelse("__files/rjoark001/getForsendelse-happy.json");
+		stubGetSecurityToken();
+		stubPostSafJournalpost("queryJournalpostId\":\"123\"", "saf/safQdist013GraphQlResponse-orgnr.json");
+		stubPostSafJournalpost("queryJournalpostId\":\"448212366\"", "saf/safLightweightGraphQlResponse-happy.json");
+		stubGetEregHentOrgNavn("123456789");
+		stubFor(get("/norg2/enhet/" + ENHETSNR).willReturn(aResponse().withStatus(HttpStatus.OK.value())
+				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
+				.withBodyFile("norg2/norg2HentOrgnr_manglerOrgnr.json")));
+
+		sendStringMessage(qdist013, classpathToString("qdist013/qdist013-happy.xml"));
+
+		await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
+			assertMessageOnQueue(qdist013FunksjonellFeil);
+		});
+
+		verifyGetForsendelse();
+		verifyGetSecurityToken(4);
+		verifyPostSafJournalpost();
+		verifyPostSafJournalpostLightweight();
+		verifyGetEregHentOrgNavn("123456789");
+		verify(1, getRequestedFor(urlEqualTo("/norg2/enhet/" + ENHETSNR)));
+	}
+
+	@Test
+	public void shouldThrowNorg2HentEnhetsInfoTechnicalException() {
+		stubGetForsendelse("__files/rjoark001/getForsendelse-happy.json");
+		stubGetSecurityToken();
+		stubPostSafJournalpost("queryJournalpostId\":\"123\"", "saf/safQdist013GraphQlResponse-orgnr.json");
+		stubPostSafJournalpost("queryJournalpostId\":\"448212366\"", "saf/safLightweightGraphQlResponse-happy.json");
+		stubGetEregHentOrgNavn("123456789");
+		stubFor(get("/norg2/enhet/" + ENHETSNR).willReturn(aResponse().withStatus(HttpStatus.INTERNAL_SERVER_ERROR.value())));
+
+		sendStringMessage(qdist013, classpathToString("qdist013/qdist013-happy.xml"));
+
+		await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
+			assertMessageOnQueue(backoutQueue);
+		});
+
+		verifyGetForsendelse();
+		verifyGetSecurityToken(4);
+		verifyPostSafJournalpost();
+		verifyPostSafJournalpostLightweight();
+		verifyGetEregHentOrgNavn("123456789");
+		verify(MAX_ATTEMPTS_SHORT, getRequestedFor(urlEqualTo("/norg2/enhet/" + ENHETSNR)));
+	}
+
+	@Test
+	public void shouldThrowIntegrasjonspunktRequestFunctionalExceptionOpprettMelding() {
+		stubGetForsendelse("__files/rjoark001/getForsendelse-happy.json");
+		stubGetSecurityToken();
+		stubPostSafJournalpost("queryJournalpostId\":\"123\"", "saf/safQdist013GraphQlResponse-orgnr.json");
+		stubPostSafJournalpost("queryJournalpostId\":\"448212366\"", "saf/safLightweightGraphQlResponse-happy.json");
+		stubGetEregHentOrgNavn("123456789");
+		stubGetNorg2HentOrgnr();
+		stubFor(post("/integrasjonspunkt")
+				.willReturn(aResponse().withStatus(HttpStatus.FORBIDDEN.value())));
+
+		sendStringMessage(qdist013, classpathToString("qdist013/qdist013-happy.xml"));
+
+		await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
+			assertMessageOnQueue(qdist013FunksjonellFeil);
+		});
+
+		verifyGetForsendelse();
+		verifyGetSecurityToken(4);
+		verifyPostSafJournalpost();
+		verifyPostSafJournalpostLightweight();
+		verifyGetEregHentOrgNavn("123456789");
+		verifyGetNorg2HentOrgnr();
+		verify(1, postRequestedFor(urlEqualTo("/integrasjonspunkt")).withRequestBody(equalToJson(
+				classpathToString("__files/integrasjonspunkt/createMessageRequest.json"), true, true)));
+	}
+
+	@Test
+	public void shouldThrowIntegrasjonspunktRequestTechnicalExceptionOpprettMelding() {
+		stubGetForsendelse("__files/rjoark001/getForsendelse-happy.json");
+		stubGetSecurityToken();
+		stubPostSafJournalpost("queryJournalpostId\":\"123\"", "saf/safQdist013GraphQlResponse-orgnr.json");
+		stubPostSafJournalpost("queryJournalpostId\":\"448212366\"", "saf/safLightweightGraphQlResponse-happy.json");
+		stubGetEregHentOrgNavn("123456789");
+		stubGetNorg2HentOrgnr();
+		stubFor(post("/integrasjonspunkt")
+				.willReturn(aResponse().withStatus(HttpStatus.INTERNAL_SERVER_ERROR.value())));
+
+		sendStringMessage(qdist013, classpathToString("qdist013/qdist013-happy.xml"));
+
+		await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
+			assertMessageOnQueue(backoutQueue);
+		});
+
+		verifyGetForsendelse();
+		verifyGetSecurityToken(4);
+		verifyPostSafJournalpost();
+		verifyPostSafJournalpostLightweight();
+		verifyGetEregHentOrgNavn("123456789");
+		verifyGetNorg2HentOrgnr();
+		verify(MAX_ATTEMPTS_SHORT, postRequestedFor(urlEqualTo("/integrasjonspunkt")).withRequestBody(equalToJson(
+				classpathToString("__files/integrasjonspunkt/createMessageRequest.json"), true, true)));
+	}
+
+	@Test
+	public void shouldThrowIntegrasjonspunktRequestFunctionalExceptionLastOppFil() {
+		stubGetForsendelse("__files/rjoark001/getForsendelse-happy.json");
+		stubGetSecurityToken();
+		stubPostSafJournalpost("queryJournalpostId\":\"123\"", "saf/safQdist013GraphQlResponse-orgnr.json");
+		stubPostSafJournalpost("queryJournalpostId\":\"448212366\"", "saf/safLightweightGraphQlResponse-happy.json");
+		stubGetEregHentOrgNavn("123456789");
+		stubGetNorg2HentOrgnr();
+		stubPostIntegrasjonspunktCreateMessage();
+		stubFor(put(urlMatching("/integrasjonspunkt/.*"))
+				.willReturn(aResponse().withStatus(HttpStatus.FORBIDDEN.value())));
+
+		sendStringMessage(qdist013, classpathToString("qdist013/qdist013-happy.xml"));
+
+		await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
+			assertMessageOnQueue(qdist013FunksjonellFeil);
+		});
+
+		verifyGetForsendelse();
+		verifyGetSecurityToken(4);
+		verifyPostSafJournalpost();
+		verifyPostSafJournalpostLightweight();
+		verifyGetEregHentOrgNavn("123456789");
+		verifyGetNorg2HentOrgnr();
+		verifyPostIntegrasjonspunktCreateMessage();
+		String conversationId = findConversationId();
+		verify(1, putRequestedFor(urlEqualTo("/integrasjonspunkt/" + conversationId))
+				.withHeader(CONTENT_DISPOSITION, equalTo("attachment; name=Tittel; filename=448212366-463791441-PRODUKSJON-PDF"))
+				.withRequestBody(binaryEqualTo(HOVEDDOK_TEST_CONTENT.getBytes())));
+	}
+
+	@Test
+	public void shouldThrowIntegrasjonspunktRequestTechnicalExceptionLastOppFil() {
+		stubGetForsendelse("__files/rjoark001/getForsendelse-happy.json");
+		stubGetSecurityToken();
+		stubPostSafJournalpost("queryJournalpostId\":\"123\"", "saf/safQdist013GraphQlResponse-orgnr.json");
+		stubPostSafJournalpost("queryJournalpostId\":\"448212366\"", "saf/safLightweightGraphQlResponse-happy.json");
+		stubGetEregHentOrgNavn("123456789");
+		stubGetNorg2HentOrgnr();
+		stubPostIntegrasjonspunktCreateMessage();
+		stubFor(put(urlMatching("/integrasjonspunkt/.*"))
+				.willReturn(aResponse().withStatus(HttpStatus.INTERNAL_SERVER_ERROR.value())));
+
+		sendStringMessage(qdist013, classpathToString("qdist013/qdist013-happy.xml"));
+
+		await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
+			assertMessageOnQueue(backoutQueue);
+		});
+
+		verifyGetForsendelse();
+		verifyGetSecurityToken(4);
+		verifyPostSafJournalpost();
+		verifyPostSafJournalpostLightweight();
+		verifyGetEregHentOrgNavn("123456789");
+		verifyGetNorg2HentOrgnr();
+		verifyPostIntegrasjonspunktCreateMessage();
+		String conversationId = findConversationId();
+		verify(MAX_ATTEMPTS_SHORT, putRequestedFor(urlEqualTo("/integrasjonspunkt/" + conversationId))
+				.withHeader(CONTENT_DISPOSITION, equalTo("attachment; name=Tittel; filename=448212366-463791441-PRODUKSJON-PDF"))
+				.withRequestBody(binaryEqualTo(HOVEDDOK_TEST_CONTENT.getBytes())));
+	}
+
+	@Test
+	public void shouldThrowIntegrasjonspunktRequestFunctionalExceptionSendMelding() {
+		stubGetForsendelse("__files/rjoark001/getForsendelse-happy.json");
+		stubGetSecurityToken();
+		stubPostSafJournalpost("queryJournalpostId\":\"123\"", "saf/safQdist013GraphQlResponse-orgnr.json");
+		stubPostSafJournalpost("queryJournalpostId\":\"448212366\"", "saf/safLightweightGraphQlResponse-happy.json");
+		stubGetEregHentOrgNavn("123456789");
+		stubGetNorg2HentOrgnr();
+		stubPostIntegrasjonspunktCreateMessage();
+		stubPutIntegrasjonspunktLastOppFil();
+		stubFor(post(urlMatching("/integrasjonspunkt/.*"))
+				.willReturn(aResponse().withStatus(HttpStatus.FORBIDDEN.value())));
+
+		sendStringMessage(qdist013, classpathToString("qdist013/qdist013-happy.xml"));
+
+		await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
+			assertMessageOnQueue(qdist013FunksjonellFeil);
+		});
+
+		verifyGetForsendelse();
+		verifyGetSecurityToken(4);
+		verifyPostSafJournalpost();
+		verifyPostSafJournalpostLightweight();
+		verifyGetEregHentOrgNavn("123456789");
+		verifyGetNorg2HentOrgnr();
+		verifyPostIntegrasjonspunktCreateMessage();
+		String conversationId = findConversationId();
+		verifyPutIntegrasjonspunktLastOppFilHoveddokument(conversationId);
+		verifyPutIntegrasjonspunktLastOppFilVedlegg1(conversationId);
+		verifyPutIntegrasjonspunktLastOppFilVedlegg2(conversationId);
+		verifyPutIntegrasjonspunktLastOppFilArkvimelding(conversationId, "123456789", "");
+		verify(1, postRequestedFor(urlEqualTo("/integrasjonspunkt/" + conversationId)).withRequestBody(absent()));
+	}
+
+	@Test
+	public void shouldThrowIntegrasjonspunktRequestTechnicalExceptionSendMelding() {
+		stubGetForsendelse("__files/rjoark001/getForsendelse-happy.json");
+		stubGetSecurityToken();
+		stubPostSafJournalpost("queryJournalpostId\":\"123\"", "saf/safQdist013GraphQlResponse-orgnr.json");
+		stubPostSafJournalpost("queryJournalpostId\":\"448212366\"", "saf/safLightweightGraphQlResponse-happy.json");
+		stubGetEregHentOrgNavn("123456789");
+		stubGetNorg2HentOrgnr();
+		stubPostIntegrasjonspunktCreateMessage();
+		stubPutIntegrasjonspunktLastOppFil();
+		stubFor(post(urlMatching("/integrasjonspunkt/.*"))
+				.willReturn(aResponse().withStatus(HttpStatus.INTERNAL_SERVER_ERROR.value())));
+
+		sendStringMessage(qdist013, classpathToString("qdist013/qdist013-happy.xml"));
+
+		await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
+			assertMessageOnQueue(backoutQueue);
+		});
+
+		verifyGetForsendelse();
+		verifyGetSecurityToken(4);
+		verifyPostSafJournalpost();
+		verifyPostSafJournalpostLightweight();
+		verifyGetEregHentOrgNavn("123456789");
+		verifyGetNorg2HentOrgnr();
+		verifyPostIntegrasjonspunktCreateMessage();
+		String conversationId = findConversationId();
+		verifyPutIntegrasjonspunktLastOppFilHoveddokument(conversationId);
+		verifyPutIntegrasjonspunktLastOppFilVedlegg1(conversationId);
+		verifyPutIntegrasjonspunktLastOppFilVedlegg2(conversationId);
+		verifyPutIntegrasjonspunktLastOppFilArkvimelding(conversationId, "123456789", "");
+		verify(MAX_ATTEMPTS_SHORT, postRequestedFor(urlEqualTo("/integrasjonspunkt/" + conversationId)).withRequestBody(absent()));
+	}
+
+	@Test
+	public void shouldThrowLagreJuridiskLoggFunctionalException() {
+		stubGetForsendelse("__files/rjoark001/getForsendelse-happy.json");
+		stubGetSecurityToken();
+		stubPostSafJournalpost("queryJournalpostId\":\"123\"", "saf/safQdist013GraphQlResponse-orgnr.json");
+		stubPostSafJournalpost("queryJournalpostId\":\"448212366\"", "saf/safLightweightGraphQlResponse-happy.json");
+		stubGetEregHentOrgNavn("123456789");
+		stubGetNorg2HentOrgnr();
+		stubPostIntegrasjonspunktCreateMessage();
+		stubPutIntegrasjonspunktLastOppFil();
+		stubPostIntegrasjonspunktSendMelding();
+		stubFor(post(urlMatching("/juridisklogg.*"))
+				.willReturn(aResponse().withStatus(HttpStatus.FORBIDDEN.value())));
+
+		sendStringMessage(qdist013, classpathToString("qdist013/qdist013-happy.xml"));
+
+		await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
+			assertMessageOnQueue(qdist013FunksjonellFeil);
+		});
+
+		verifyGetForsendelse();
+		verifyGetSecurityToken(4);
+		verifyPostSafJournalpost();
+		verifyPostSafJournalpostLightweight();
+		verifyGetEregHentOrgNavn("123456789");
+		verifyGetNorg2HentOrgnr();
+		verifyPostIntegrasjonspunktCreateMessage();
+		String conversationId = findConversationId();
+		verifyPutIntegrasjonspunktLastOppFilHoveddokument(conversationId);
+		verifyPutIntegrasjonspunktLastOppFilVedlegg1(conversationId);
+		verifyPutIntegrasjonspunktLastOppFilVedlegg2(conversationId);
+		verifyPutIntegrasjonspunktLastOppFilArkvimelding(conversationId, "123456789", "");
+		verifyPostIntegrasjonspunktSendMelding(conversationId);
+		verify(1, postRequestedFor(urlEqualTo("/juridisklogg"))
+				.withRequestBody(equalToJson(classpathToString("__files/juridisklogg/juridiskloggRequest.json"), true, true)));
+	}
+
+	@Test
+	public void shouldThrowLagreJuridiskLoggTechnicalException() {
+		stubGetForsendelse("__files/rjoark001/getForsendelse-happy.json");
+		stubGetSecurityToken();
+		stubPostSafJournalpost("queryJournalpostId\":\"123\"", "saf/safQdist013GraphQlResponse-orgnr.json");
+		stubPostSafJournalpost("queryJournalpostId\":\"448212366\"", "saf/safLightweightGraphQlResponse-happy.json");
+		stubGetEregHentOrgNavn("123456789");
+		stubGetNorg2HentOrgnr();
+		stubPostIntegrasjonspunktCreateMessage();
+		stubPutIntegrasjonspunktLastOppFil();
+		stubPostIntegrasjonspunktSendMelding();
+		stubFor(post(urlMatching("/juridisklogg.*"))
+				.willReturn(aResponse().withStatus(HttpStatus.INTERNAL_SERVER_ERROR.value())));
+
+		sendStringMessage(qdist013, classpathToString("qdist013/qdist013-happy.xml"));
+
+		await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
+			assertMessageOnQueue(backoutQueue);
+		});
+
+		verifyGetForsendelse();
+		verifyGetSecurityToken(4);
+		verifyPostSafJournalpost();
+		verifyPostSafJournalpostLightweight();
+		verifyGetEregHentOrgNavn("123456789");
+		verifyGetNorg2HentOrgnr();
+		verifyPostIntegrasjonspunktCreateMessage();
+		String conversationId = findConversationId();
+		verifyPutIntegrasjonspunktLastOppFilHoveddokument(conversationId);
+		verifyPutIntegrasjonspunktLastOppFilVedlegg1(conversationId);
+		verifyPutIntegrasjonspunktLastOppFilVedlegg2(conversationId);
+		verifyPutIntegrasjonspunktLastOppFilArkvimelding(conversationId, "123456789", "");
+		verifyPostIntegrasjonspunktSendMelding(conversationId);
+		verify(MAX_ATTEMPTS_SHORT, postRequestedFor(urlEqualTo("/juridisklogg"))
+				.withRequestBody(equalToJson(classpathToString("__files/juridisklogg/juridiskloggRequest.json"), true, true)));
+	}
+
+	@Test
+	public void shouldThrowRdist001OppdaterForsendelseFunctionalException() {
+		stubGetForsendelse("__files/rjoark001/getForsendelse-happy.json");
+		stubGetSecurityToken();
+		stubPostSafJournalpost("queryJournalpostId\":\"123\"", "saf/safQdist013GraphQlResponse-orgnr.json");
+		stubPostSafJournalpost("queryJournalpostId\":\"448212366\"", "saf/safLightweightGraphQlResponse-happy.json");
+		stubGetEregHentOrgNavn("123456789");
+		stubGetNorg2HentOrgnr();
+		stubPostIntegrasjonspunktCreateMessage();
+		stubPutIntegrasjonspunktLastOppFil();
+		stubPostIntegrasjonspunktSendMelding();
+		stubPostJuridiskLoggLagre();
+		stubFor(put(urlMatching("/administrerforsendelse\\?forsendelseId=" + FORSENDELSE_ID + "\\&forsendelseStatus=OVERSENDT\\&konversasjonsId=.*"))
+				.willReturn(aResponse().withStatus(HttpStatus.FORBIDDEN.value())));
+
+		sendStringMessage(qdist013, classpathToString("qdist013/qdist013-happy.xml"));
+
+		await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
+			assertMessageOnQueue(qdist013FunksjonellFeil);
+		});
+
+		verifyGetForsendelse();
+		verifyGetSecurityToken(4);
+		verifyPostSafJournalpost();
+		verifyPostSafJournalpostLightweight();
+		verifyGetEregHentOrgNavn("123456789");
+		verifyGetNorg2HentOrgnr();
+		verifyPostIntegrasjonspunktCreateMessage();
+		String conversationId = findConversationId();
+		verifyPutIntegrasjonspunktLastOppFilHoveddokument(conversationId);
+		verifyPutIntegrasjonspunktLastOppFilVedlegg1(conversationId);
+		verifyPutIntegrasjonspunktLastOppFilVedlegg2(conversationId);
+		verifyPutIntegrasjonspunktLastOppFilArkvimelding(conversationId, "123456789", "");
+		verifyPostIntegrasjonspunktSendMelding(conversationId);
+		verifyPostJuridiskLoggLagre();
+		verify(1, putRequestedFor(urlEqualTo("/administrerforsendelse?forsendelseId=" + FORSENDELSE_ID +
+				"&forsendelseStatus=OVERSENDT&konversasjonsId=" + conversationId)));
+	}
+
+	@Test
+	public void shouldThrowRdist001OppdaterForsendelseTechnicalException() {
+		stubGetForsendelse("__files/rjoark001/getForsendelse-happy.json");
+		stubGetSecurityToken();
+		stubPostSafJournalpost("queryJournalpostId\":\"123\"", "saf/safQdist013GraphQlResponse-orgnr.json");
+		stubPostSafJournalpost("queryJournalpostId\":\"448212366\"", "saf/safLightweightGraphQlResponse-happy.json");
+		stubGetEregHentOrgNavn("123456789");
+		stubGetNorg2HentOrgnr();
+		stubPostIntegrasjonspunktCreateMessage();
+		stubPutIntegrasjonspunktLastOppFil();
+		stubPostIntegrasjonspunktSendMelding();
+		stubPostJuridiskLoggLagre();
+		stubFor(put(urlMatching("/administrerforsendelse\\?forsendelseId=" + FORSENDELSE_ID + "\\&forsendelseStatus=OVERSENDT\\&konversasjonsId=.*"))
+				.willReturn(aResponse().withStatus(HttpStatus.INTERNAL_SERVER_ERROR.value())));
+
+		sendStringMessage(qdist013, classpathToString("qdist013/qdist013-happy.xml"));
+
+		await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
+			assertMessageOnQueue(backoutQueue);
+		});
+
+		verifyGetForsendelse();
+		verifyGetSecurityToken(4);
+		verifyPostSafJournalpost();
+		verifyPostSafJournalpostLightweight();
+		verifyGetEregHentOrgNavn("123456789");
+		verifyGetNorg2HentOrgnr();
+		verifyPostIntegrasjonspunktCreateMessage();
+		String conversationId = findConversationId();
+		verifyPutIntegrasjonspunktLastOppFilHoveddokument(conversationId);
+		verifyPutIntegrasjonspunktLastOppFilVedlegg1(conversationId);
+		verifyPutIntegrasjonspunktLastOppFilVedlegg2(conversationId);
+		verifyPutIntegrasjonspunktLastOppFilArkvimelding(conversationId, "123456789", "");
+		verifyPostIntegrasjonspunktSendMelding(conversationId);
+		verifyPostJuridiskLoggLagre();
+		verify(MAX_ATTEMPTS_SHORT, putRequestedFor(urlEqualTo("/administrerforsendelse?forsendelseId=" + FORSENDELSE_ID +
+				"&forsendelseStatus=OVERSENDT&konversasjonsId=" + conversationId)));
 	}
 
 	private void stubPutAdministrerforsendelseOppdatertForsendelsestatusAndkonvId() {
@@ -142,9 +1157,21 @@ public class Qdist013IT {
 				.willReturn(aResponse().withStatus(HttpStatus.OK.value())));
 	}
 
+	private void verifyPutAdministrerforsendelseOppdatertForsendelsestatusAndkonvId(String conversationId) {
+		verify(1, putRequestedFor(urlEqualTo("/administrerforsendelse?forsendelseId=" + FORSENDELSE_ID +
+				"&forsendelseStatus=OVERSENDT&konversasjonsId=" + conversationId)));
+	}
+
 	private void stubPostJuridiskLoggLagre() {
 		stubFor(post(urlMatching("/juridisklogg.*"))
 				.willReturn(aResponse().withStatus(HttpStatus.OK.value())));
+	}
+
+	private void verifyPostJuridiskLoggLagre() {
+		verify(1, postRequestedFor(urlEqualTo("/juridisklogg"))
+				.withRequestBody(equalToJson(classpathToString("__files/juridisklogg/juridiskloggRequest.json"), true, true))
+				.withRequestBody(matchingJsonPath("$.meldingsId", containing(CALL_ID)))
+				.withRequestBody(matchingJsonPath("$.meldingsInnhold")));
 	}
 
 	private void stubPostIntegrasjonspunktSendMelding() {
@@ -152,14 +1179,69 @@ public class Qdist013IT {
 				.willReturn(aResponse().withStatus(HttpStatus.OK.value())));
 	}
 
+	private void verifyPostIntegrasjonspunktSendMelding(String conversationId) {
+		verify(1, postRequestedFor(urlEqualTo("/integrasjonspunkt/" + conversationId)).withRequestBody(absent()));
+	}
+
 	private void stubPutIntegrasjonspunktLastOppFil() {
 		stubFor(put(urlMatching("/integrasjonspunkt/.*"))
 				.willReturn(aResponse().withStatus(HttpStatus.OK.value())));
 	}
 
+	private void verifyPutIntegrasjonspunktLastOppFilHoveddokument(String conversationId) {
+		verify(1, putRequestedFor(urlEqualTo("/integrasjonspunkt/" + conversationId))
+				.withHeader(CONTENT_DISPOSITION, equalTo("attachment; name=Tittel; filename=448212366-463791441-PRODUKSJON-PDF"))
+				.withRequestBody(binaryEqualTo(HOVEDDOK_TEST_CONTENT.getBytes())));
+	}
+
+	private void verifyPutIntegrasjonspunktLastOppFilVedlegg1(String conversationId) {
+		verify(1, putRequestedFor(urlEqualTo("/integrasjonspunkt/" + conversationId))
+				.withHeader(CONTENT_DISPOSITION, equalTo("attachment; name=Tittel Vedlegg 1; filename=448212366-463791442-SLADDET-PDF"))
+				.withRequestBody(binaryEqualTo(VEDLEGG1_TEST_CONTENT.getBytes())));
+	}
+
+	private void verifyPutIntegrasjonspunktLastOppFilVedlegg2(String conversationId) {
+		verify(1, putRequestedFor(urlEqualTo("/integrasjonspunkt/" + conversationId))
+				.withHeader(CONTENT_DISPOSITION, equalTo("attachment; name=Tittel Vedlegg 2, Fra FORNAVN ETTERNAVN; filename=448212366-463791443-ARKIV-PNG"))
+				.withRequestBody(binaryEqualTo(VEDLEGG2_TEST_CONTENT.getBytes())));
+	}
+
+	private void verifyPutIntegrasjonspunktLastOppFilArkvimelding(String conversationId, String orgnr, String fnr) {
+		verify(1, putRequestedFor(urlEqualTo("/integrasjonspunkt/" + conversationId))
+				.withHeader(CONTENT_DISPOSITION, equalTo("attachment; name=arkivmelding; filename=arkivmelding.xml"))
+				.withRequestBody(equalToXml(classpathToString("__files/integrasjonspunkt/arkivMeldingRequest.xml"), true)));
+
+		// separat verifisering av spesifikke elementer i arkivmelding, da det gir tydeligere feedback ved evt. feil
+		verifySpecificArkivMeldingElements(conversationId, orgnr, fnr);
+	}
+
+	private void verifySpecificArkivMeldingElements(String conversationId, String orgnr, String fnr) {
+		String sakspartID = orgnr;
+		if (!isNullOrEmpty(fnr)) {
+			sakspartID = fnr;
+		}
+		String sakspartNavn = SAKSPARTNAVN_PERSON;
+		if (!isNullOrEmpty(orgnr)) {
+			sakspartNavn = SAKSPARTNAVN_ORGANISASJON;
+		}
+		verify(1, putRequestedFor(urlEqualTo("/integrasjonspunkt/" + conversationId))
+				.withHeader(CONTENT_DISPOSITION, equalTo("attachment; name=arkivmelding; filename=arkivmelding.xml"))
+				.withRequestBody(containing("<meldingId>" + CALL_ID + "</meldingId>"))
+				.withRequestBody(containing("<sakspartID>" + sakspartID + "</sakspartID>"))
+				.withRequestBody(containing("<sakspartNavn>" + sakspartNavn + "</sakspartNavn>")));
+	}
+
 	private void stubPostIntegrasjonspunktCreateMessage() {
 		stubFor(post("/integrasjonspunkt")
 				.willReturn(aResponse().withStatus(HttpStatus.OK.value())));
+	}
+
+	private void verifyPostIntegrasjonspunktCreateMessage() {
+		verify(1, postRequestedFor(urlEqualTo("/integrasjonspunkt"))
+				.withRequestBody(equalToJson(classpathToString("__files/integrasjonspunkt/createMessageRequest.json"), true, true))
+				.withRequestBody(matchingJsonPath("$..documentIdentification.instanceIdentifier", containing(CALL_ID)))
+				.withRequestBody(matchingJsonPath("$..documentIdentification.creationDateAndTime"))
+				.withRequestBody(matchingJsonPath("$..businessScope.scope[0].scopeInformation[0].expectedResponseDateTime")));
 	}
 
 	private void stubGetAktoerregisterHentIdentForAktoerId(String aktoerId) {
@@ -172,6 +1254,12 @@ public class Qdist013IT {
 						.withBodyFile("aktoerregister/aktoerregisterHentIdentForAktoerHappy.json")));
 	}
 
+	private void verifyGetAktoerregisterHentIdentForAktoerId(String aktoerId) {
+		verify(1, getRequestedFor(urlEqualTo("/aktoerregister/identer?gjeldende=true&identgruppe=NorskIdent"))
+				.withHeader("Nav-Personidenter", equalTo(aktoerId))
+				.withHeader(AUTHORIZATION, equalTo(BEARER_OIDC_TOKEN)));
+	}
+
 	private void stubGetTpsHentPersonNavn(String fnr) {
 		stubFor(get("/tps/v1/navn")
 				.withHeader("Nav-Personident", equalTo(fnr))
@@ -181,16 +1269,30 @@ public class Qdist013IT {
 						.withBodyFile("tps/tpsHentNavn_happy.json")));
 	}
 
+	private void verifyGetTpsHentPersonNavn(String fnr) {
+		verify(1, getRequestedFor(urlEqualTo("/tps/v1/navn"))
+				.withHeader("Nav-Personident", equalTo(fnr))
+				.withHeader(AUTHORIZATION, equalTo(BEARER_OIDC_TOKEN)));
+	}
+
 	private void stubGetEregHentOrgNavn(String orgnr) {
-		stubFor(get("/v1/organisasjon/" + orgnr + "/noekkelinfo").willReturn(aResponse().withStatus(HttpStatus.OK.value())
+		stubFor(get("/ereg/v1/organisasjon/" + orgnr + "/noekkelinfo").willReturn(aResponse().withStatus(HttpStatus.OK.value())
 				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
 				.withBodyFile("ereg/eregHentNavn_happy.json")));
 	}
 
-	private void stubGetNorg2HentOrgnr(String enhetsNr) {
-		stubFor(get("/norg2/enhet/" + enhetsNr).willReturn(aResponse().withStatus(HttpStatus.OK.value())
+	private void verifyGetEregHentOrgNavn(String orgnr) {
+		verify(1, getRequestedFor(urlEqualTo("/ereg/v1/organisasjon/" + orgnr + "/noekkelinfo")));
+	}
+
+	private void stubGetNorg2HentOrgnr() {
+		stubFor(get("/norg2/enhet/" + ENHETSNR).willReturn(aResponse().withStatus(HttpStatus.OK.value())
 				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
 				.withBodyFile("norg2/norg2HentOrgnr_happy.json")));
+	}
+
+	private void verifyGetNorg2HentOrgnr() {
+		verify(1, getRequestedFor(urlEqualTo("/norg2/enhet/" + ENHETSNR)));
 	}
 
 	private void stubGetSecurityToken() {
@@ -198,6 +1300,10 @@ public class Qdist013IT {
 				.value())
 				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
 				.withBodyFile("securitytoken/stsResponse_happy.json")));
+	}
+
+	private void verifyGetSecurityToken(int stsCount) {
+		verify(stsCount, getRequestedFor(urlEqualTo("/securitytoken?grant_type=client_credentials&scope=openid")));
 	}
 
 	private void stubPostSafJournalpost(String stringInRequestBody, String returnBodyFileName) {
@@ -208,10 +1314,25 @@ public class Qdist013IT {
 						.withBodyFile(returnBodyFileName)));
 	}
 
-	private void stubGetForsendelse(String bodyClasspath) throws IOException {
+	private void verifyPostSafJournalpost() {
+		verify(1, postRequestedFor(urlEqualTo("/safgraphql"))
+				.withRequestBody(equalToJson(classpathToString("__files/saf/safQdist013GraphQlRequest.json"))));
+	}
+
+	private void verifyPostSafJournalpostLightweight() {
+		// no caching
+		verify(3, postRequestedFor(urlEqualTo("/safgraphql"))
+				.withRequestBody(equalToJson(classpathToString("__files/saf/safLightweightGraphQlRequest.json"))));
+	}
+
+	private void stubGetForsendelse(String bodyClasspath) {
 		stubFor(get("/administrerforsendelse/" + FORSENDELSE_ID).willReturn(aResponse().withStatus(HttpStatus.OK.value())
 				.withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE)
 				.withBody(classpathToString(bodyClasspath).replace("insertCallIdHere", CALL_ID))));
+	}
+
+	private void verifyGetForsendelse() {
+		verify(1, getRequestedFor(urlMatching("/administrerforsendelse/" + FORSENDELSE_ID)));
 	}
 
 	private void sendStringMessage(Queue queue, final String message) {
@@ -238,33 +1359,52 @@ public class Qdist013IT {
 		return (T) response;
 	}
 
-	private void verifyAllStubs(String enhetsNr, String orgnr, String fnr, String aktoerId) {
-		//TODO Fill in request files!
-		verify(1, getRequestedFor(urlMatching("/administrerforsendelse/" + FORSENDELSE_ID)));
-		verify(3, getRequestedFor(urlEqualTo("/securitytoken?grant_type=client_credentials&scope=openid")));
-		verify(1, getRequestedFor(urlEqualTo("/safgraphql"))
-				.withRequestBody(equalTo(classpathToString("__files/saf/safQdist013GraphQlResquest.json"))));
-		verify(1, getRequestedFor(urlEqualTo("/safgraphql"))
-				.withRequestBody(equalTo(classpathToString("__files/saf/safLightweightGraphQlResponse-happy.json"))));
-		verify(1, getRequestedFor(urlEqualTo("/norg2/enhet/" + enhetsNr)));
-		verify(1, getRequestedFor(urlEqualTo("/v1/organisasjon/" + orgnr + "/noekkelinfo")));
-		verify(1, getRequestedFor(urlEqualTo("/tps/v1/navn"))
-				.withHeader("Nav-Personident", equalTo(fnr))
-				.withHeader(AUTHORIZATION, equalTo(BEARER_OIDC_TOKEN)));
-		verify(1, getRequestedFor(urlEqualTo("/aktoerregister/identer?gjeldende=true&identgruppe=NorskIdent"))
-				.withHeader("Nav-Personidenter", equalTo(aktoerId))
-				.withHeader(AUTHORIZATION, equalTo(BEARER_OIDC_TOKEN)));
-		verify(1, postRequestedFor(urlEqualTo("/integrasjonspunkt"))
-				.withRequestBody(equalTo(classpathToString("__files/integrasjonspunkt/createMessageRequest.json"))));
-		verify(1, putRequestedFor(urlEqualTo("/integrasjonspunkt")) //TODO: assert x3
-				.withRequestBody(equalTo(classpathToString("__files/integrasjonspunkt/createMessageRequest.json")))
-				.withHeader(CONTENT_DISPOSITION, equalTo("attachment; name=%s; filename=%s")));
-		verify(1, postRequestedFor(urlEqualTo("/integrasjonspunkt")));
-		verify(1, postRequestedFor(urlEqualTo("/juridisklogg")));
-		verify(1, putRequestedFor(
-				urlEqualTo("/administrerforsendelse?forsendelseId=" + FORSENDELSE_ID + "&forsendelseStatus=OVERSENDT")));
+	private void verifyAllStubs(String orgnr, String fnr, String aktoerId, int stsCount) {
+		verifyGetForsendelse();
+		verifyGetSecurityToken(stsCount);
+		verifyPostSafJournalpost();
+		verifyPostSafJournalpostLightweight();
+
+		verifyGetNorg2HentOrgnr();
+		if (!isNullOrEmpty(orgnr)) {
+			verifyGetEregHentOrgNavn(orgnr);
+		} else {
+			verifyGetTpsHentPersonNavn(fnr);
+		}
+		if (!isNullOrEmpty(aktoerId)) {
+			verifyGetAktoerregisterHentIdentForAktoerId(aktoerId);
+		}
+
+		verifyPostIntegrasjonspunktCreateMessage();
+		String conversationId = findConversationId();
+		verifyPutIntegrasjonspunktLastOppFilHoveddokument(conversationId);
+		verifyPutIntegrasjonspunktLastOppFilVedlegg1(conversationId);
+		verifyPutIntegrasjonspunktLastOppFilVedlegg2(conversationId);
+		verifyPutIntegrasjonspunktLastOppFilArkvimelding(conversationId, orgnr, fnr);
+		verifyPostIntegrasjonspunktSendMelding(conversationId);
+
+		verifyPostJuridiskLoggLagre();
+		verifyPutAdministrerforsendelseOppdatertForsendelsestatusAndkonvId(conversationId);
 	}
 
+	private void assertMessageOnQueue(Queue queue) {
+		String message = receive(queue);
+		assertNotNull(message);
+		assertEquals(message, classpathToString("qdist013/qdist013-happy.xml"));
+	}
+
+	private String findConversationId() {
+		List<LoggedRequest> loggedRequests = findAll(postRequestedFor(urlEqualTo("/integrasjonspunkt")));
+		String requestStr = loggedRequests.get(0).getBodyAsString();
+		try {
+			JsonNode requestTree = new ObjectMapper().readTree(requestStr);
+			return requestTree.get("standardBusinessDocumentHeader").get("businessScope")
+					.get("scope").get(0).get("instanceIdentifier").asText();
+		} catch (Exception e) {
+			fail("Fant ikke konversasjonsId. Feil: " + e.getMessage(), e.getCause());
+			return null;
+		}
+	}
 
 	public static String classpathToString(String classpathResource) {
 		try {
@@ -278,6 +1418,3 @@ public class Qdist013IT {
 	}
 
 }
-
-
-
