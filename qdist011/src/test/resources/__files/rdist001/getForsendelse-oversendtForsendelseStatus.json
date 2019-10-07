@@ -1,6 +1,6 @@
 {
-  "bestillingsId": "insertCallIdHere",
-  "forsendelseStatus": "KLAR_FOR_DIST",
+  "bestillingsId": "insertBestillingsIdHere",
+  "forsendelseStatus": "OVERSENDT",
   "forsendelseTittel": "forsendelseTittel",
   "mottaker": {
     "mottakerId": "mottakerId",
