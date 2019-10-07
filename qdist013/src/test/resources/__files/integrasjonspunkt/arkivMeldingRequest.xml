@@ -7,7 +7,7 @@
 	<mappe xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="saksmappe">
 		<systemID>${xmlunit.ignore}</systemID>
 		<tittel>Foreldre- og svangerskapspenger</tittel>
-		<opprettetDato>2019-04-01T08:44:21</opprettetDato>
+		<opprettetDato>2018-12-12T06:45:06</opprettetDato>
 		<opprettetAv>qmot002</opprettetAv>
 		<basisregistrering xsi:type="journalpost">
 			<systemID>${xmlunit.ignore}</systemID>
@@ -84,7 +84,7 @@
 				<korrespondansepartNavn>NAV Klageinstans</korrespondansepartNavn>
 			</korrespondansepart>
 		</basisregistrering>
-		<saksdato>2019-04-01</saksdato>
+		<saksdato>2018-12-12</saksdato>
 		<administrativEnhet>NAV Klageinstans</administrativEnhet>
 		<saksansvarlig>qmot002</saksansvarlig>
 		<saksstatus>Under behandling</saksstatus>
