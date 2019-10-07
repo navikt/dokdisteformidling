@@ -16,7 +16,7 @@ public class JournalpostQdist013Mapper {
 		return JournalpostQdist013.builder()
 				.journalpostId(safJournalpost.getJournalpostId())
 				.sak(JournalpostQdist013.Sak.builder()
-						.datoOpprettet(safJournalpost.getDatoOpprettet())
+						.datoOpprettet(safJournalpost.getSak().getDatoOpprettet())
 						.build())
 				.opprettetAvNavn(safJournalpost.getOpprettetAvNavn())
 				.bruker(JournalpostQdist013.Bruker.builder()
