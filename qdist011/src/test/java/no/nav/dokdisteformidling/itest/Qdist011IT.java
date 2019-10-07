@@ -90,6 +90,7 @@ public class Qdist011IT {
 	private static final String VEDLEGG2_TEST_CONTENT = "VEDLEGG2_TEST_CONTENT";
 	private static final String REMOTE_FILE_PATH = "/dokumentdistribusjon/documentFileshare/";
 	private static String CALL_ID;
+	private static String BESTILLINGS_ID;
 
 	@Inject
 	private JmsTemplate jmsTemplate;
@@ -132,6 +133,7 @@ public class Qdist011IT {
 	@BeforeEach
 	public void setupBefore() {
 		CALL_ID = UUID.randomUUID().toString();
+		BESTILLINGS_ID = UUID.randomUUID().toString();
 
 		WireMock.reset();
 		WireMock.resetAllRequests();
@@ -151,14 +153,13 @@ public class Qdist011IT {
 	@Test
 	public void shouldProcessForsendelse() throws Exception {
 
-		stubGetForsendelse("__files/rjoark001/getForsendelse-happy.json");
+		stubGetForsendelse("__files/rdist001/getForsendelse-happy.json");
 		stubPostDigitalKontaktInformasjon();
 		stubGetDokumentTypeInfo("dokumentinfov4/tkat020-happy.json");
 		stubGetVarselInfo();
 		stubPostSafJournalpost("saf/safGraphQlResponse-happy.json");
 		stubGetSecurityToken();
-		stubFor(put("/administrerforsendelse?forsendelseId=" + FORSENDELSE_ID + "&forsendelseStatus=OVERSENDT")
-				.willReturn(aResponse().withStatus(HttpStatus.OK.value())));
+		stubPutForsendelseStatusAndkonversasjonsId();
 
 		sendStringMessage(qdist011, classpathToString("qdist011/qdist011-happy.xml"));
 
@@ -169,7 +170,7 @@ public class Qdist011IT {
 			assertTrue(new File(uploadFilePath + DOKUMENT_OBJEKT_REFERANSE_VEDLEGG2 + ".pdf").exists());
 
 			String response = receive(tdist005);
-			String expected = classpathToString("tdist005/tdist005-happy.xml").replace("insertCallIdHere", CALL_ID);
+			String expected = classpathToString("tdist005/tdist005_happy.xml").replace("insertBestillingsIdHere", BESTILLINGS_ID);
 			assertEquals(comparableMessage(expected), comparableMessage(response));
 		});
 
@@ -259,7 +260,7 @@ public class Qdist011IT {
 		verify(0, getRequestedFor(urlEqualTo("/securitytoken?grant_type=client_credentials&scope=openid")));
 		verify(0, postRequestedFor(urlEqualTo("/safgraphql")));
 		verify(0, putRequestedFor(
-				urlEqualTo("/administrerforsendelse?forsendelseId=" + FORSENDELSE_ID + "&forsendelseStatus=OVERSENDT")));
+				urlEqualTo("/administrerforsendelse?forsendelseId=" + FORSENDELSE_ID + "&forsendelseStatus=OVERSENDT&konversasjonsId=" + BESTILLINGS_ID)));
 	}
 
 	@Test
@@ -282,12 +283,12 @@ public class Qdist011IT {
 		verify(0, getRequestedFor(urlEqualTo("/securitytoken?grant_type=client_credentials&scope=openid")));
 		verify(0, postRequestedFor(urlEqualTo("/safgraphql")));
 		verify(0, putRequestedFor(
-				urlEqualTo("/administrerforsendelse?forsendelseId=" + FORSENDELSE_ID + "&forsendelseStatus=OVERSENDT")));
+				urlEqualTo("/administrerforsendelse?forsendelseId=" + FORSENDELSE_ID + "&forsendelseStatus=OVERSENDT&konversasjonsId=" + BESTILLINGS_ID)));
 	}
 
 	@Test
 	public void shouldThrowInvalidForsendelseStatusException() throws Exception {
-		stubGetForsendelse("__files/rjoark001/getForsendelse-oversendtForsendelseStatus.json");
+		stubGetForsendelse("__files/rdist001/getForsendelse-oversendtForsendelseStatus.json");
 
 		sendStringMessage(qdist011, classpathToString("qdist011/qdist011-happy.xml"));
 
@@ -304,12 +305,12 @@ public class Qdist011IT {
 		verify(0, getRequestedFor(urlEqualTo("/securitytoken?grant_type=client_credentials&scope=openid")));
 		verify(0, postRequestedFor(urlEqualTo("/safgraphql")));
 		verify(0, putRequestedFor(
-				urlEqualTo("/administrerforsendelse?forsendelseId=" + FORSENDELSE_ID + "&forsendelseStatus=OVERSENDT")));
+				urlEqualTo("/administrerforsendelse?forsendelseId=" + FORSENDELSE_ID + "&forsendelseStatus=OVERSENDT&konversasjonsId=" + BESTILLINGS_ID)));
 	}
 
 	@Test
 	public void shouldThrowDigitalKontaktinformasjonV1KontaktinformasjonIkkeFunnetFunctionalException() throws Exception {
-		stubGetForsendelse("__files/rjoark001/getForsendelse-happy.json");
+		stubGetForsendelse("__files/rdist001/getForsendelse-happy.json");
 		stubFor(post("/digitalkontaktinformasjonv1").willReturn(aResponse().withStatus(HttpStatus.OK.value())
 				.withBody(classpathToString("__files/digitalkontaktinformasjonv1/ikke-funnet.xml"))));
 
@@ -328,12 +329,12 @@ public class Qdist011IT {
 		verify(0, getRequestedFor(urlEqualTo("/securitytoken?grant_type=client_credentials&scope=openid")));
 		verify(0, postRequestedFor(urlEqualTo("/safgraphql")));
 		verify(0, putRequestedFor(
-				urlEqualTo("/administrerforsendelse?forsendelseId=" + FORSENDELSE_ID + "&forsendelseStatus=OVERSENDT")));
+				urlEqualTo("/administrerforsendelse?forsendelseId=" + FORSENDELSE_ID + "&forsendelseStatus=OVERSENDT&konversasjonsId=" + BESTILLINGS_ID)));
 	}
 
 	@Test
 	public void shouldThrowDigitalKontaktinformasjonV1PersonIkkeFunnetFunctionalException() throws Exception {
-		stubGetForsendelse("__files/rjoark001/getForsendelse-happy.json");
+		stubGetForsendelse("__files/rdist001/getForsendelse-happy.json");
 		stubFor(post("/digitalkontaktinformasjonv1").willReturn(aResponse().withStatus(HttpStatus.OK.value())
 				.withBody(classpathToString("__files/digitalkontaktinformasjonv1/person-ikke-funnet.xml"))));
 
@@ -357,7 +358,7 @@ public class Qdist011IT {
 
 	@Test
 	public void shouldThrowDigitalKontaktinformasjonV1SikkerhetsbegrensingFunctionalException() throws Exception {
-		stubGetForsendelse("__files/rjoark001/getForsendelse-happy.json");
+		stubGetForsendelse("__files/rdist001/getForsendelse-happy.json");
 		stubFor(post("/digitalkontaktinformasjonv1").willReturn(aResponse().withStatus(HttpStatus.OK.value())
 				.withBody(classpathToString("__files/digitalkontaktinformasjonv1/sikkerhet.xml"))));
 
@@ -381,7 +382,7 @@ public class Qdist011IT {
 
 	@Test
 	public void shouldThrowDigitalKontaktinformasjonV1HentSikkerDigitalPostadresseTechnicalException() throws Exception {
-		stubGetForsendelse("__files/rjoark001/getForsendelse-happy.json");
+		stubGetForsendelse("__files/rdist001/getForsendelse-happy.json");
 		stubFor(post("/digitalkontaktinformasjonv1").willReturn(aResponse().withStatus(HttpStatus.OK.value())
 				.withBody(classpathToString("__files/digitalkontaktinformasjonv1/securityError.xml"))));
 
@@ -400,12 +401,12 @@ public class Qdist011IT {
 		verify(0, getRequestedFor(urlEqualTo("/securitytoken?grant_type=client_credentials&scope=openid")));
 		verify(0, postRequestedFor(urlEqualTo("/safgraphql")));
 		verify(0, putRequestedFor(
-				urlEqualTo("/administrerforsendelse?forsendelseId=" + FORSENDELSE_ID + "&forsendelseStatus=OVERSENDT")));
+				urlEqualTo("/administrerforsendelse?forsendelseId=" + FORSENDELSE_ID + "&forsendelseStatus=OVERSENDT&konversasjonsId=" + BESTILLINGS_ID)));
 	}
 
 	@Test
 	public void shouldThrowTkat020FunctionalException() throws Exception {
-		stubGetForsendelse("__files/rjoark001/getForsendelse-happy.json");
+		stubGetForsendelse("__files/rdist001/getForsendelse-happy.json");
 		stubPostDigitalKontaktInformasjon();
 		stubFor(get(urlMatching("/dokumenttypeinfo/" + DOKUMENTTYPE_ID_HOVEDDOK))
 				.willReturn(aResponse().withStatus(HttpStatus.NOT_FOUND.value())));
@@ -425,12 +426,12 @@ public class Qdist011IT {
 		verify(0, getRequestedFor(urlEqualTo("/securitytoken?grant_type=client_credentials&scope=openid")));
 		verify(0, postRequestedFor(urlEqualTo("/safgraphql")));
 		verify(0, putRequestedFor(
-				urlEqualTo("/administrerforsendelse?forsendelseId=" + FORSENDELSE_ID + "&forsendelseStatus=OVERSENDT")));
+				urlEqualTo("/administrerforsendelse?forsendelseId=" + FORSENDELSE_ID + "&forsendelseStatus=OVERSENDT&konversasjonsId=" + BESTILLINGS_ID)));
 	}
 
 	@Test
 	public void shouldThrowTkat020FunctionalExceptionUtenDokumentProduksjonsInfo() throws Exception {
-		stubGetForsendelse("__files/rjoark001/getForsendelse-happy.json");
+		stubGetForsendelse("__files/rdist001/getForsendelse-happy.json");
 		stubPostDigitalKontaktInformasjon();
 		stubGetDokumentTypeInfo("dokumentinfov4/tkat020-utenDokumentProduksjonsInfo.json");
 
@@ -449,12 +450,12 @@ public class Qdist011IT {
 		verify(0, getRequestedFor(urlEqualTo("/securitytoken?grant_type=client_credentials&scope=openid")));
 		verify(0, postRequestedFor(urlEqualTo("/safgraphql")));
 		verify(0, putRequestedFor(
-				urlEqualTo("/administrerforsendelse?forsendelseId=" + FORSENDELSE_ID + "&forsendelseStatus=OVERSENDT")));
+				urlEqualTo("/administrerforsendelse?forsendelseId=" + FORSENDELSE_ID + "&forsendelseStatus=OVERSENDT&konversasjonsId=" + BESTILLINGS_ID)));
 	}
 
 	@Test
 	public void shouldThrowTkat020FunctionalExceptionUtenDistribusjonInfo() throws Exception {
-		stubGetForsendelse("__files/rjoark001/getForsendelse-happy.json");
+		stubGetForsendelse("__files/rdist001/getForsendelse-happy.json");
 		stubPostDigitalKontaktInformasjon();
 		stubGetDokumentTypeInfo("dokumentinfov4/tkat020-utenDistribusjonInfo.json");
 
@@ -473,12 +474,12 @@ public class Qdist011IT {
 		verify(0, getRequestedFor(urlEqualTo("/securitytoken?grant_type=client_credentials&scope=openid")));
 		verify(0, postRequestedFor(urlEqualTo("/safgraphql")));
 		verify(0, putRequestedFor(
-				urlEqualTo("/administrerforsendelse?forsendelseId=" + FORSENDELSE_ID + "&forsendelseStatus=OVERSENDT")));
+				urlEqualTo("/administrerforsendelse?forsendelseId=" + FORSENDELSE_ID + "&forsendelseStatus=OVERSENDT&konversasjonsId=" + BESTILLINGS_ID)));
 	}
 
 	@Test
 	public void shouldThrowTkat020FunctionalExceptionUtenSDPDistribusjonVarsel() throws Exception {
-		stubGetForsendelse("__files/rjoark001/getForsendelse-happy.json");
+		stubGetForsendelse("__files/rdist001/getForsendelse-happy.json");
 		stubPostDigitalKontaktInformasjon();
 		stubGetDokumentTypeInfo("dokumentinfov4/tkat020-utenSDPDistribusjonVarsel.json");
 
@@ -497,12 +498,12 @@ public class Qdist011IT {
 		verify(0, getRequestedFor(urlEqualTo("/securitytoken?grant_type=client_credentials&scope=openid")));
 		verify(0, postRequestedFor(urlEqualTo("/safgraphql")));
 		verify(0, putRequestedFor(
-				urlEqualTo("/administrerforsendelse?forsendelseId=" + FORSENDELSE_ID + "&forsendelseStatus=OVERSENDT")));
+				urlEqualTo("/administrerforsendelse?forsendelseId=" + FORSENDELSE_ID + "&forsendelseStatus=OVERSENDT&konversasjonsId=" + BESTILLINGS_ID)));
 	}
 
 	@Test
 	public void shouldThrowTkat020TechicalException() throws Exception {
-		stubGetForsendelse("__files/rjoark001/getForsendelse-happy.json");
+		stubGetForsendelse("__files/rdist001/getForsendelse-happy.json");
 		stubPostDigitalKontaktInformasjon();
 		stubFor(get(urlMatching("/dokumenttypeinfo/" + DOKUMENTTYPE_ID_HOVEDDOK))
 				.willReturn(aResponse().withStatus(HttpStatus.INTERNAL_SERVER_ERROR.value())));
@@ -522,12 +523,12 @@ public class Qdist011IT {
 		verify(0, getRequestedFor(urlEqualTo("/securitytoken?grant_type=client_credentials&scope=openid")));
 		verify(0, postRequestedFor(urlEqualTo("/safgraphql")));
 		verify(0, putRequestedFor(
-				urlEqualTo("/administrerforsendelse?forsendelseId=" + FORSENDELSE_ID + "&forsendelseStatus=OVERSENDT")));
+				urlEqualTo("/administrerforsendelse?forsendelseId=" + FORSENDELSE_ID + "&forsendelseStatus=OVERSENDT&konversasjonsId=" + BESTILLINGS_ID)));
 	}
 
 	@Test
 	public void shouldThrowTkat021FunctionalException() throws Exception {
-		stubGetForsendelse("__files/rjoark001/getForsendelse-happy.json");
+		stubGetForsendelse("__files/rdist001/getForsendelse-happy.json");
 		stubPostDigitalKontaktInformasjon();
 		stubGetDokumentTypeInfo("dokumentinfov4/tkat020-happy.json");
 		stubFor(get(urlMatching("/varselinfo/" + VARSEL_TYPE_ID))
@@ -548,12 +549,12 @@ public class Qdist011IT {
 		verify(0, getRequestedFor(urlEqualTo("/securitytoken?grant_type=client_credentials&scope=openid")));
 		verify(0, postRequestedFor(urlEqualTo("/safgraphql")));
 		verify(0, putRequestedFor(
-				urlEqualTo("/administrerforsendelse?forsendelseId=" + FORSENDELSE_ID + "&forsendelseStatus=OVERSENDT")));
+				urlEqualTo("/administrerforsendelse?forsendelseId=" + FORSENDELSE_ID + "&forsendelseStatus=OVERSENDT&konversasjonsId=" + BESTILLINGS_ID)));
 	}
 
 	@Test
 	public void shouldThrowTkat021TechnicalException() throws Exception {
-		stubGetForsendelse("__files/rjoark001/getForsendelse-happy.json");
+		stubGetForsendelse("__files/rdist001/getForsendelse-happy.json");
 		stubPostDigitalKontaktInformasjon();
 		stubGetDokumentTypeInfo("dokumentinfov4/tkat020-happy.json");
 		stubFor(get(urlMatching("/varselinfo/" + VARSEL_TYPE_ID))
@@ -574,14 +575,14 @@ public class Qdist011IT {
 		verify(0, getRequestedFor(urlEqualTo("/securitytoken?grant_type=client_credentials&scope=openid")));
 		verify(0, postRequestedFor(urlEqualTo("/safgraphql")));
 		verify(0, putRequestedFor(
-				urlEqualTo("/administrerforsendelse?forsendelseId=" + FORSENDELSE_ID + "&forsendelseStatus=OVERSENDT")));
+				urlEqualTo("/administrerforsendelse?forsendelseId=" + FORSENDELSE_ID + "&forsendelseStatus=OVERSENDT&konversasjonsId=" + BESTILLINGS_ID)));
 	}
 
 	@Test
 	public void shouldThrowKunneIkkeDeserialisereS3PayloadFunctionalException() throws Exception {
 		when(amazonS3.getObjectAsString(eq(BUCKET_NAME), eq(DOKUMENT_OBJEKT_REFERANSE_VEDLEGG2))).thenReturn("notJsonSerializedString");
 
-		stubGetForsendelse("__files/rjoark001/getForsendelse-happy.json");
+		stubGetForsendelse("__files/rdist001/getForsendelse-happy.json");
 		stubPostDigitalKontaktInformasjon();
 		stubGetDokumentTypeInfo("dokumentinfov4/tkat020-happy.json");
 		stubGetVarselInfo();
@@ -601,14 +602,14 @@ public class Qdist011IT {
 		verify(0, getRequestedFor(urlEqualTo("/securitytoken?grant_type=client_credentials&scope=openid")));
 		verify(0, postRequestedFor(urlEqualTo("/safgraphql")));
 		verify(0, putRequestedFor(
-				urlEqualTo("/administrerforsendelse?forsendelseId=" + FORSENDELSE_ID + "&forsendelseStatus=OVERSENDT")));
+				urlEqualTo("/administrerforsendelse?forsendelseId=" + FORSENDELSE_ID + "&forsendelseStatus=OVERSENDT&konversasjonsId=" + BESTILLINGS_ID)));
 	}
 
 	@Test
 	public void shouldThrowS3FailedToGetDocumentTechnicalExceptionVedSdkClientException() throws Exception {
 		when(amazonS3.getObjectAsString(eq(BUCKET_NAME), eq(DOKUMENT_OBJEKT_REFERANSE_HOVEDDOK))).thenThrow(new SdkClientException("SdkClientException"));
 
-		stubGetForsendelse("__files/rjoark001/getForsendelse-happy.json");
+		stubGetForsendelse("__files/rdist001/getForsendelse-happy.json");
 		stubPostDigitalKontaktInformasjon();
 		stubGetDokumentTypeInfo("dokumentinfov4/tkat020-happy.json");
 		stubGetVarselInfo();
@@ -628,14 +629,14 @@ public class Qdist011IT {
 		verify(0, getRequestedFor(urlEqualTo("/securitytoken?grant_type=client_credentials&scope=openid")));
 		verify(0, postRequestedFor(urlEqualTo("/safgraphql")));
 		verify(0, putRequestedFor(
-				urlEqualTo("/administrerforsendelse?forsendelseId=" + FORSENDELSE_ID + "&forsendelseStatus=OVERSENDT")));
+				urlEqualTo("/administrerforsendelse?forsendelseId=" + FORSENDELSE_ID + "&forsendelseStatus=OVERSENDT&konversasjonsId=" + BESTILLINGS_ID)));
 	}
 
 	@Test
 	public void shouldThrowS3FailedToGetDocumentTechnicalExceptionVedSecurityException() throws Exception {
 		when(amazonS3.getObjectAsString(eq(BUCKET_NAME), eq(DOKUMENT_OBJEKT_REFERANSE_HOVEDDOK))).thenThrow(new SecurityException("SecurityException"));
 
-		stubGetForsendelse("__files/rjoark001/getForsendelse-happy.json");
+		stubGetForsendelse("__files/rdist001/getForsendelse-happy.json");
 		stubPostDigitalKontaktInformasjon();
 		stubGetDokumentTypeInfo("dokumentinfov4/tkat020-happy.json");
 		stubGetVarselInfo();
@@ -655,14 +656,14 @@ public class Qdist011IT {
 		verify(0, getRequestedFor(urlEqualTo("/securitytoken?grant_type=client_credentials&scope=openid")));
 		verify(0, postRequestedFor(urlEqualTo("/safgraphql")));
 		verify(0, putRequestedFor(
-				urlEqualTo("/administrerforsendelse?forsendelseId=" + FORSENDELSE_ID + "&forsendelseStatus=OVERSENDT")));
+				urlEqualTo("/administrerforsendelse?forsendelseId=" + FORSENDELSE_ID + "&forsendelseStatus=OVERSENDT&konversasjonsId=" + BESTILLINGS_ID)));
 	}
 
 	@Test
 	public void shouldGetErrorWhenSFTPNotAvailable() throws Exception {
 		stopServer();
 
-		stubGetForsendelse("__files/rjoark001/getForsendelse-happy.json");
+		stubGetForsendelse("__files/rdist001/getForsendelse-happy.json");
 		stubPostDigitalKontaktInformasjon();
 		stubGetDokumentTypeInfo("dokumentinfov4/tkat020-happy.json");
 		stubGetVarselInfo();
@@ -682,12 +683,12 @@ public class Qdist011IT {
 		verify(0, getRequestedFor(urlEqualTo("/securitytoken?grant_type=client_credentials&scope=openid")));
 		verify(0, postRequestedFor(urlEqualTo("/safgraphql")));
 		verify(0, putRequestedFor(
-				urlEqualTo("/administrerforsendelse?forsendelseId=" + FORSENDELSE_ID + "&forsendelseStatus=OVERSENDT")));
+				urlEqualTo("/administrerforsendelse?forsendelseId=" + FORSENDELSE_ID + "&forsendelseStatus=OVERSENDT&konversasjonsId=" + BESTILLINGS_ID)));
 	}
 
 	@Test
 	public void shouldThrowSafFunctionalException() throws Exception {
-		stubGetForsendelse("__files/rjoark001/getForsendelse-happy.json");
+		stubGetForsendelse("__files/rdist001/getForsendelse-happy.json");
 		stubPostDigitalKontaktInformasjon();
 		stubGetDokumentTypeInfo("dokumentinfov4/tkat020-happy.json");
 		stubGetVarselInfo();
@@ -710,12 +711,12 @@ public class Qdist011IT {
 		verify(1, getRequestedFor(urlEqualTo("/securitytoken?grant_type=client_credentials&scope=openid")));
 		verify(1, postRequestedFor(urlEqualTo("/safgraphql")));
 		verify(0, putRequestedFor(
-				urlEqualTo("/administrerforsendelse?forsendelseId=" + FORSENDELSE_ID + "&forsendelseStatus=OVERSENDT")));
+				urlEqualTo("/administrerforsendelse?forsendelseId=" + FORSENDELSE_ID + "&forsendelseStatus=OVERSENDT&konversasjonsId=" + BESTILLINGS_ID)));
 	}
 
 	@Test
 	public void shouldThrowSafJournalpostIkkeFunnetFunctionalException() throws Exception {
-		stubGetForsendelse("__files/rjoark001/getForsendelse-happy.json");
+		stubGetForsendelse("__files/rdist001/getForsendelse-happy.json");
 		stubPostDigitalKontaktInformasjon();
 		stubGetDokumentTypeInfo("dokumentinfov4/tkat020-happy.json");
 		stubGetVarselInfo();
@@ -739,12 +740,12 @@ public class Qdist011IT {
 		verify(1, getRequestedFor(urlEqualTo("/securitytoken?grant_type=client_credentials&scope=openid")));
 		verify(1, postRequestedFor(urlEqualTo("/safgraphql")));
 		verify(0, putRequestedFor(
-				urlEqualTo("/administrerforsendelse?forsendelseId=" + FORSENDELSE_ID + "&forsendelseStatus=OVERSENDT")));
+				urlEqualTo("/administrerforsendelse?forsendelseId=" + FORSENDELSE_ID + "&forsendelseStatus=OVERSENDT&konversasjonsId=" + BESTILLINGS_ID)));
 	}
 
 	@Test
 	public void shouldThrowSafJournalpostValidationException() throws Exception {
-		stubGetForsendelse("__files/rjoark001/getForsendelse-happy.json");
+		stubGetForsendelse("__files/rdist001/getForsendelse-happy.json");
 		stubPostDigitalKontaktInformasjon();
 		stubGetDokumentTypeInfo("dokumentinfov4/tkat020-happy.json");
 		stubGetVarselInfo();
@@ -766,12 +767,12 @@ public class Qdist011IT {
 		verify(1, getRequestedFor(urlEqualTo("/securitytoken?grant_type=client_credentials&scope=openid")));
 		verify(1, postRequestedFor(urlEqualTo("/safgraphql")));
 		verify(0, putRequestedFor(
-				urlEqualTo("/administrerforsendelse?forsendelseId=" + FORSENDELSE_ID + "&forsendelseStatus=OVERSENDT")));
+				urlEqualTo("/administrerforsendelse?forsendelseId=" + FORSENDELSE_ID + "&forsendelseStatus=OVERSENDT&konversasjonsId=" + BESTILLINGS_ID)));
 	}
 
 	@Test
 	public void shouldThrowSafTechnicalException() throws Exception {
-		stubGetForsendelse("__files/rjoark001/getForsendelse-happy.json");
+		stubGetForsendelse("__files/rdist001/getForsendelse-happy.json");
 		stubPostDigitalKontaktInformasjon();
 		stubGetDokumentTypeInfo("dokumentinfov4/tkat020-happy.json");
 		stubGetVarselInfo();
@@ -794,12 +795,12 @@ public class Qdist011IT {
 		verify(MAX_ATTEMPTS_SHORT, getRequestedFor(urlEqualTo("/securitytoken?grant_type=client_credentials&scope=openid")));
 		verify(MAX_ATTEMPTS_SHORT, postRequestedFor(urlEqualTo("/safgraphql")));
 		verify(0, putRequestedFor(
-				urlEqualTo("/administrerforsendelse?forsendelseId=" + FORSENDELSE_ID + "&forsendelseStatus=OVERSENDT")));
+				urlEqualTo("/administrerforsendelse?forsendelseId=" + FORSENDELSE_ID + "&forsendelseStatus=OVERSENDT&konversasjonsId=" + BESTILLINGS_ID)));
 	}
 
 	@Test
 	public void shouldThrowStsTechnicalException() throws Exception {
-		stubGetForsendelse("__files/rjoark001/getForsendelse-happy.json");
+		stubGetForsendelse("__files/rdist001/getForsendelse-happy.json");
 		stubPostDigitalKontaktInformasjon();
 		stubGetDokumentTypeInfo("dokumentinfov4/tkat020-happy.json");
 		stubGetVarselInfo();
@@ -822,18 +823,18 @@ public class Qdist011IT {
 		verify(MAX_ATTEMPTS_SHORT, getRequestedFor(urlEqualTo("/securitytoken?grant_type=client_credentials&scope=openid")));
 		verify(0, postRequestedFor(urlEqualTo("/safgraphql")));
 		verify(0, putRequestedFor(
-				urlEqualTo("/administrerforsendelse?forsendelseId=" + FORSENDELSE_ID + "&forsendelseStatus=OVERSENDT")));
+				urlEqualTo("/administrerforsendelse?forsendelseId=" + FORSENDELSE_ID + "&forsendelseStatus=OVERSENDT&konversasjonsId=" + BESTILLINGS_ID)));
 	}
 
 	@Test
 	public void shouldThrowRdist001OppdaterForsendelseStatusFunctionalException() throws Exception {
-		stubGetForsendelse("__files/rjoark001/getForsendelse-happy.json");
+		stubGetForsendelse("__files/rdist001/getForsendelse-happy.json");
 		stubPostDigitalKontaktInformasjon();
 		stubGetDokumentTypeInfo("dokumentinfov4/tkat020-happy.json");
 		stubGetVarselInfo();
 		stubPostSafJournalpost("saf/safGraphQlResponse-happy.json");
 		stubGetSecurityToken();
-		stubFor(put("/administrerforsendelse?forsendelseId=" + FORSENDELSE_ID + "&forsendelseStatus=OVERSENDT")
+		stubFor(put("/administrerforsendelse?forsendelseId=" + FORSENDELSE_ID + "&forsendelseStatus=OVERSENDT&konversasjonsId=" + BESTILLINGS_ID)
 				.willReturn(aResponse().withStatus(HttpStatus.NOT_FOUND.value())));
 
 		sendStringMessage(qdist011, classpathToString("qdist011/qdist011-happy.xml"));
@@ -849,13 +850,13 @@ public class Qdist011IT {
 
 	@Test
 	public void shouldThrowRdist001OppdaterForsendelseStatusTechnicalException() throws Exception {
-		stubGetForsendelse("__files/rjoark001/getForsendelse-happy.json");
+		stubGetForsendelse("__files/rdist001/getForsendelse-happy.json");
 		stubPostDigitalKontaktInformasjon();
 		stubGetDokumentTypeInfo("dokumentinfov4/tkat020-happy.json");
 		stubGetVarselInfo();
 		stubPostSafJournalpost("saf/safGraphQlResponse-happy.json");
 		stubGetSecurityToken();
-		stubFor(put("/administrerforsendelse?forsendelseId=" + FORSENDELSE_ID + "&forsendelseStatus=OVERSENDT")
+		stubFor(put("/administrerforsendelse?forsendelseId=" + FORSENDELSE_ID + "&forsendelseStatus=OVERSENDT&konversasjonsId=" + BESTILLINGS_ID)
 				.willReturn(aResponse().withStatus(HttpStatus.INTERNAL_SERVER_ERROR.value())));
 
 		sendStringMessage(qdist011, classpathToString("qdist011/qdist011-happy.xml"));
@@ -873,7 +874,12 @@ public class Qdist011IT {
 		verify(1, getRequestedFor(urlEqualTo("/securitytoken?grant_type=client_credentials&scope=openid")));
 		verify(1, postRequestedFor(urlEqualTo("/safgraphql")));
 		verify(MAX_ATTEMPTS_SHORT, putRequestedFor(
-				urlEqualTo("/administrerforsendelse?forsendelseId=" + FORSENDELSE_ID + "&forsendelseStatus=OVERSENDT")));
+				urlEqualTo("/administrerforsendelse?forsendelseId=" + FORSENDELSE_ID + "&forsendelseStatus=OVERSENDT&konversasjonsId=" + BESTILLINGS_ID)));
+	}
+
+	private void stubPutForsendelseStatusAndkonversasjonsId() {
+		stubFor(put("/administrerforsendelse?forsendelseId=" + FORSENDELSE_ID + "&forsendelseStatus=OVERSENDT&konversasjonsId=" + BESTILLINGS_ID)
+				.willReturn(aResponse().withStatus(HttpStatus.OK.value())));
 	}
 
 	private void stubGetSecurityToken() {
@@ -911,7 +917,7 @@ public class Qdist011IT {
 	private void stubGetForsendelse(String bodyClasspath) throws IOException {
 		stubFor(get("/administrerforsendelse/" + FORSENDELSE_ID).willReturn(aResponse().withStatus(HttpStatus.OK.value())
 				.withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE)
-				.withBody(classpathToString(bodyClasspath).replace("insertCallIdHere", CALL_ID))));
+				.withBody(classpathToString(bodyClasspath).replace("insertBestillingsIdHere", BESTILLINGS_ID))));
 	}
 
 	private void sendStringMessage(Queue queue, final String message) {
@@ -946,7 +952,7 @@ public class Qdist011IT {
 		verify(count, getRequestedFor(urlEqualTo("/securitytoken?grant_type=client_credentials&scope=openid")));
 		verify(count, postRequestedFor(urlEqualTo("/safgraphql")));
 		verify(count, putRequestedFor(
-				urlEqualTo("/administrerforsendelse?forsendelseId=" + FORSENDELSE_ID + "&forsendelseStatus=OVERSENDT")));
+				urlEqualTo("/administrerforsendelse?forsendelseId=" + FORSENDELSE_ID + "&forsendelseStatus=OVERSENDT&konversasjonsId=" + BESTILLINGS_ID)));
 	}
 
 	private String comparableMessage(String melding) {
@@ -968,6 +974,7 @@ public class Qdist011IT {
 				.replaceAll("ns[0-9]:", "")
 				.replaceFirst("(?<=<sendDigitalPost).+(?=>)", "")
 				.replaceAll("[\t\r\n ]", "");
+
 	}
 }
 
