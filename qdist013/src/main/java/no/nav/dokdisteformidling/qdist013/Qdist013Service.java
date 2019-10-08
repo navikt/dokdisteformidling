@@ -20,11 +20,12 @@ import no.nav.dokdisteformidling.consumer.norg2.Norg2;
 import no.nav.dokdisteformidling.consumer.rdist001.AdministrerForsendelse;
 import no.nav.dokdisteformidling.consumer.rdist001.HentForsendelseResponseTo;
 import no.nav.dokdisteformidling.consumer.saf.SafJournalpostQueryService;
+import no.nav.dokdisteformidling.exception.functional.IkkeSammenfallendeIderFunctionalException;
 import no.nav.dokdisteformidling.exception.functional.ManglendeOrgnrForEnhetFunctionalException;
 import no.nav.dokdisteformidling.exception.technical.KunneIkkeMarshalleArkivmeldingTechnicalException;
 import no.nav.dokdisteformidling.qdist013.saf.main.JournalpostQdist013;
 import no.nav.dokdisteformidling.storage.DokdistDokument;
-import no.nav.dokdisteformidling.storage.S3Storage;
+import no.nav.dokdisteformidling.storage.Storage;
 import org.apache.camel.Exchange;
 import org.apache.camel.Handler;
 import org.springframework.stereotype.Service;
@@ -47,7 +48,7 @@ public class Qdist013Service {
 	public static final String ARKIVMELDING = "arkivmelding";
 	public static final String ARKIVMELDING_XML = ARKIVMELDING + ".xml";
 
-	private final S3Storage s3Storage;
+	private final Storage s3Storage;
 	private final AdministrerForsendelse administrerForsendelse;
 	private final SafJournalpostQueryService<JournalpostQdist013> safJournalpostQueryService;
 	private final JuridiskLogg juridiskLogg;
@@ -57,7 +58,7 @@ public class Qdist013Service {
 	private final ArkivmeldingMapper arkivmeldingMapper;
 	private final CreateMessageRequestMapper createMessageRequestMapper;
 
-	public Qdist013Service(S3Storage s3Storage,
+	public Qdist013Service(Storage s3Storage,
 						   AdministrerForsendelse administrerForsendelse,
 						   @Named("SafJournalpostQueryServiceQdist013") SafJournalpostQueryService<JournalpostQdist013> safJournalpostQueryService,
 						   JuridiskLogg juridiskLogg,
@@ -155,10 +156,10 @@ public class Qdist013Service {
 		Journalpost journalpost = (Journalpost) arkivmelding.getMappe().get(0).getBasisregistrering().get(0);
 		return (Dokumentbeskrivelse) journalpost.getDokumentbeskrivelseAndDokumentobjekt()
 				.stream()
-				.filter(a -> ((Dokumentbeskrivelse) a).getDokumentobjekt()
+				.filter(dokumentbeskrivelse -> ((Dokumentbeskrivelse) dokumentbeskrivelse).getDokumentobjekt()
 						.get(0).getReferanseDokumentfil().startsWith(format("%s-%s", journalpostId, dokumentInfoId)))
 				.findAny()
-				.get(); //ok, this field is always set by arkivMeldingMapper
+				.orElseThrow(() -> new IkkeSammenfallendeIderFunctionalException(format("DokumentInfoId=%s finnes på foresendelsen i dokdistDb, men ikke i respons fra SAF på journalpostId=%s.", dokumentInfoId, journalpostId)));
 	}
 
 	public String getOrgnrForEnhet(String enhetsNr) {

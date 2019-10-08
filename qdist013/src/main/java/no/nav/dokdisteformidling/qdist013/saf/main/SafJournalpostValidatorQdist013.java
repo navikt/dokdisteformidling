@@ -48,10 +48,11 @@ public class SafJournalpostValidatorQdist013 {
 
 	private void assertSak(SafJournalpost safJournalpost, String journalpostId) {
 		assertObjectOnSafJournalpostBodyNotNull("jounalpost.sak", safJournalpost.getSak(), journalpostId);
-		assertObjectOnSafJournalpostBodyNotNull("journalpost.sak.datoOpprettet", safJournalpost.getSak(), journalpostId);
+		assertObjectOnSafJournalpostBodyNotNull("journalpost.sak.datoOpprettet", safJournalpost.getSak().getDatoOpprettet(), journalpostId);
 	}
 
 	private void assertThatRelevanteDatoerContainsDatoJournalfoert(SafJournalpost safJournalpost, String journalpostId) {
+		assertObjectOnSafJournalpostBodyNotNull("jounalpost.relevanteDatoer", safJournalpost.getRelevanteDatoer(), journalpostId);
 		safJournalpost.getRelevanteDatoer().stream()
 				.filter(relevantDato -> DATO_JOURNALFOERT.name().equals(relevantDato.getDatotype()))
 				.findAny()
@@ -59,6 +60,7 @@ public class SafJournalpostValidatorQdist013 {
 	}
 
 	private void assertDokumenter(List<SafJournalpost.DokumentInfo> dokumenter, String journalpostId) {
+		assertObjectOnSafJournalpostBodyNotNull("jounalpost.dokumenter", dokumenter, journalpostId);
 		dokumenter.forEach(dokumentInfo -> {
 					assertFieldOnSafDokumenterNotNullOrEmpty("dokumentInfo.dokumentInfoid", dokumentInfo.getDokumentInfoId(), journalpostId, dokumentInfo
 							.getDokumentInfoId());
