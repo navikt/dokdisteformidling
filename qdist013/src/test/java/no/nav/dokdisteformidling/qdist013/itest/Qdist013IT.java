@@ -147,7 +147,7 @@ public class Qdist013IT {
 		sendStringMessage(qdist013, classpathToString("qdist013/qdist013-happy.xml"));
 
 		await().atMost(10, SECONDS).untilAsserted(() -> {
-			verifyAllStubs("", "***gammelt_fnr***", "***gammelt_fnr***09", 6);
+			verifyAllStubs("", "***gammelt_fnr***", "***gammelt_fnr***09", 8);
 		});
 
 	}
@@ -170,7 +170,7 @@ public class Qdist013IT {
 		sendStringMessage(qdist013, classpathToString("qdist013/qdist013-happy.xml"));
 
 		await().atMost(10, SECONDS).untilAsserted(() -> {
-			verifyAllStubs("", "***gammelt_fnr***", "", 5);
+			verifyAllStubs("", "***gammelt_fnr***", "", 7);
 		});
 
 	}
@@ -193,7 +193,7 @@ public class Qdist013IT {
 		sendStringMessage(qdist013, classpathToString("qdist013/qdist013-happy.xml"));
 
 		await().atMost(10, SECONDS).untilAsserted(() -> {
-			verifyAllStubs("123456789", "", "", 4);
+			verifyAllStubs("123456789", "", "", 6);
 		});
 
 	}
@@ -443,11 +443,31 @@ public class Qdist013IT {
 	}
 
 	@Test
-	public void shouldThrowSafJournalpostValidationExceptionLightweight() {
+	public void shouldThrowSafJournalpostValidationExceptionLightweightWhenTomJournalfoertAvNavn() {
 		stubGetForsendelse("__files/rjoark001/getForsendelse-happy.json");
 		stubGetSecurityToken();
 		stubPostSafJournalpost("queryJournalpostId\":\"123\"", "saf/safQdist013GraphQlResponse-aktoerId.json");
 		stubPostSafJournalpost("queryJournalpostId\":\"448212366\"", "saf/safLightweightGraphQlResponse-tomJournalfoertAvNavn.json");
+
+		sendStringMessage(qdist013, classpathToString("qdist013/qdist013-happy.xml"));
+
+		await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
+			assertMessageOnQueue(qdist013FunksjonellFeil);
+		});
+
+		verifyGetForsendelse();
+		verifyGetSecurityToken(2);
+		verifyPostSafJournalpost();
+		verify(1, postRequestedFor(urlEqualTo("/safgraphql"))
+				.withRequestBody(equalToJson(classpathToString("__files/saf/safLightweightGraphQlRequest.json"))));
+	}
+
+	@Test
+	public void shouldThrowSafJournalpostValidationExceptionLightweightWhenUtenDatoJournalfoert() {
+		stubGetForsendelse("__files/rjoark001/getForsendelse-happy.json");
+		stubGetSecurityToken();
+		stubPostSafJournalpost("queryJournalpostId\":\"123\"", "saf/safQdist013GraphQlResponse-aktoerId.json");
+		stubPostSafJournalpost("queryJournalpostId\":\"448212366\"", "saf/safLightweightGraphQlResponse-utenDatoJournalfoert.json");
 
 		sendStringMessage(qdist013, classpathToString("qdist013/qdist013-happy.xml"));
 
@@ -480,7 +500,7 @@ public class Qdist013IT {
 		});
 
 		verifyGetForsendelse();
-		verifyGetSecurityToken(4 + 1);
+		verifyGetSecurityToken(6 + 1);
 		verifyPostSafJournalpost();
 		verifyPostSafJournalpostLightweight();
 		verify(1, getRequestedFor(urlEqualTo("/aktoerregister/identer?gjeldende=true&identgruppe=NorskIdent"))
@@ -510,7 +530,7 @@ public class Qdist013IT {
 		});
 
 		verifyGetForsendelse();
-		verifyGetSecurityToken(4 + 1);
+		verifyGetSecurityToken(6 + 1);
 		verifyPostSafJournalpost();
 		verifyPostSafJournalpostLightweight();
 		verify(1, getRequestedFor(urlEqualTo("/aktoerregister/identer?gjeldende=true&identgruppe=NorskIdent"))
@@ -539,7 +559,7 @@ public class Qdist013IT {
 		});
 
 		verifyGetForsendelse();
-		verifyGetSecurityToken(4 + 1);
+		verifyGetSecurityToken(6 + 1);
 		verifyPostSafJournalpost();
 		verifyPostSafJournalpostLightweight();
 		verify(1, getRequestedFor(urlEqualTo("/aktoerregister/identer?gjeldende=true&identgruppe=NorskIdent"))
@@ -568,7 +588,7 @@ public class Qdist013IT {
 		});
 
 		verifyGetForsendelse();
-		verifyGetSecurityToken(4 + 1);
+		verifyGetSecurityToken(6 + 1);
 		verifyPostSafJournalpost();
 		verifyPostSafJournalpostLightweight();
 		verify(1, getRequestedFor(urlEqualTo("/aktoerregister/identer?gjeldende=true&identgruppe=NorskIdent"))
@@ -594,7 +614,7 @@ public class Qdist013IT {
 		});
 
 		verifyGetForsendelse();
-		verifyGetSecurityToken(4 + MAX_ATTEMPTS_SHORT);
+		verifyGetSecurityToken(6 + MAX_ATTEMPTS_SHORT);
 		verifyPostSafJournalpost();
 		verifyPostSafJournalpostLightweight();
 		verify(MAX_ATTEMPTS_SHORT, getRequestedFor(urlEqualTo("/aktoerregister/identer?gjeldende=true&identgruppe=NorskIdent"))
@@ -620,7 +640,7 @@ public class Qdist013IT {
 		});
 
 		verifyGetForsendelse();
-		verifyGetSecurityToken(4 + 1);
+		verifyGetSecurityToken(6 + 1);
 		verifyPostSafJournalpost();
 		verifyPostSafJournalpostLightweight();
 		verify(1, getRequestedFor(urlEqualTo("/tps/v1/navn"))
@@ -646,7 +666,7 @@ public class Qdist013IT {
 		});
 
 		verifyGetForsendelse();
-		verifyGetSecurityToken(4 + MAX_ATTEMPTS_SHORT);
+		verifyGetSecurityToken(6 + MAX_ATTEMPTS_SHORT);
 		verifyPostSafJournalpost();
 		verifyPostSafJournalpostLightweight();
 		verify(MAX_ATTEMPTS_SHORT, getRequestedFor(urlEqualTo("/tps/v1/navn"))
@@ -670,7 +690,7 @@ public class Qdist013IT {
 		});
 
 		verifyGetForsendelse();
-		verifyGetSecurityToken(4);
+		verifyGetSecurityToken(6);
 		verifyPostSafJournalpost();
 		verifyPostSafJournalpostLightweight();
 		verify(1, getRequestedFor(urlEqualTo("/ereg/v1/organisasjon/" + "123456789" + "/noekkelinfo")));
@@ -694,7 +714,7 @@ public class Qdist013IT {
 		});
 
 		verifyGetForsendelse();
-		verifyGetSecurityToken(4);
+		verifyGetSecurityToken(6);
 		verifyPostSafJournalpost();
 		verifyPostSafJournalpostLightweight();
 		verify(1, getRequestedFor(urlEqualTo("/ereg/v1/organisasjon/" + "123456789" + "/noekkelinfo")));
@@ -717,7 +737,7 @@ public class Qdist013IT {
 		});
 
 		verifyGetForsendelse();
-		verifyGetSecurityToken(4);
+		verifyGetSecurityToken(6);
 		verifyPostSafJournalpost();
 		verifyPostSafJournalpostLightweight();
 		verify(1, getRequestedFor(urlEqualTo("/ereg/v1/organisasjon/" + "123456789" + "/noekkelinfo")));
@@ -739,7 +759,7 @@ public class Qdist013IT {
 		});
 
 		verifyGetForsendelse();
-		verifyGetSecurityToken(4);
+		verifyGetSecurityToken(6);
 		verifyPostSafJournalpost();
 		verifyPostSafJournalpostLightweight();
 		verify(MAX_ATTEMPTS_SHORT, getRequestedFor(urlEqualTo("/ereg/v1/organisasjon/" + "123456789" + "/noekkelinfo")));
@@ -761,7 +781,7 @@ public class Qdist013IT {
 		});
 
 		verifyGetForsendelse();
-		verifyGetSecurityToken(4);
+		verifyGetSecurityToken(6);
 		verifyPostSafJournalpost();
 		verifyPostSafJournalpostLightweight();
 		verifyGetEregHentOrgNavn("123456789");
@@ -786,7 +806,7 @@ public class Qdist013IT {
 		});
 
 		verifyGetForsendelse();
-		verifyGetSecurityToken(4);
+		verifyGetSecurityToken(6);
 		verifyPostSafJournalpost();
 		verifyPostSafJournalpostLightweight();
 		verifyGetEregHentOrgNavn("123456789");
@@ -809,7 +829,7 @@ public class Qdist013IT {
 		});
 
 		verifyGetForsendelse();
-		verifyGetSecurityToken(4);
+		verifyGetSecurityToken(6);
 		verifyPostSafJournalpost();
 		verifyPostSafJournalpostLightweight();
 		verifyGetEregHentOrgNavn("123456789");
@@ -834,7 +854,7 @@ public class Qdist013IT {
 		});
 
 		verifyGetForsendelse();
-		verifyGetSecurityToken(4);
+		verifyGetSecurityToken(6);
 		verifyPostSafJournalpost();
 		verifyPostSafJournalpostLightweight();
 		verifyGetEregHentOrgNavn("123456789");
@@ -861,7 +881,7 @@ public class Qdist013IT {
 		});
 
 		verifyGetForsendelse();
-		verifyGetSecurityToken(4);
+		verifyGetSecurityToken(6);
 		verifyPostSafJournalpost();
 		verifyPostSafJournalpostLightweight();
 		verifyGetEregHentOrgNavn("123456789");
@@ -889,7 +909,7 @@ public class Qdist013IT {
 		});
 
 		verifyGetForsendelse();
-		verifyGetSecurityToken(4);
+		verifyGetSecurityToken(6);
 		verifyPostSafJournalpost();
 		verifyPostSafJournalpostLightweight();
 		verifyGetEregHentOrgNavn("123456789");
@@ -920,7 +940,7 @@ public class Qdist013IT {
 		});
 
 		verifyGetForsendelse();
-		verifyGetSecurityToken(4);
+		verifyGetSecurityToken(6);
 		verifyPostSafJournalpost();
 		verifyPostSafJournalpostLightweight();
 		verifyGetEregHentOrgNavn("123456789");
@@ -952,7 +972,7 @@ public class Qdist013IT {
 		});
 
 		verifyGetForsendelse();
-		verifyGetSecurityToken(4);
+		verifyGetSecurityToken(6);
 		verifyPostSafJournalpost();
 		verifyPostSafJournalpostLightweight();
 		verifyGetEregHentOrgNavn("123456789");
@@ -986,7 +1006,7 @@ public class Qdist013IT {
 		});
 
 		verifyGetForsendelse();
-		verifyGetSecurityToken(4);
+		verifyGetSecurityToken(6);
 		verifyPostSafJournalpost();
 		verifyPostSafJournalpostLightweight();
 		verifyGetEregHentOrgNavn("123456789");
@@ -1021,7 +1041,7 @@ public class Qdist013IT {
 		});
 
 		verifyGetForsendelse();
-		verifyGetSecurityToken(4);
+		verifyGetSecurityToken(6);
 		verifyPostSafJournalpost();
 		verifyPostSafJournalpostLightweight();
 		verifyGetEregHentOrgNavn("123456789");
@@ -1058,7 +1078,7 @@ public class Qdist013IT {
 		});
 
 		verifyGetForsendelse();
-		verifyGetSecurityToken(4);
+		verifyGetSecurityToken(6);
 		verifyPostSafJournalpost();
 		verifyPostSafJournalpostLightweight();
 		verifyGetEregHentOrgNavn("123456789");
@@ -1096,7 +1116,7 @@ public class Qdist013IT {
 		});
 
 		verifyGetForsendelse();
-		verifyGetSecurityToken(4);
+		verifyGetSecurityToken(6);
 		verifyPostSafJournalpost();
 		verifyPostSafJournalpostLightweight();
 		verifyGetEregHentOrgNavn("123456789");
@@ -1135,7 +1155,7 @@ public class Qdist013IT {
 		});
 
 		verifyGetForsendelse();
-		verifyGetSecurityToken(4);
+		verifyGetSecurityToken(6);
 		verifyPostSafJournalpost();
 		verifyPostSafJournalpostLightweight();
 		verifyGetEregHentOrgNavn("123456789");
@@ -1321,7 +1341,7 @@ public class Qdist013IT {
 
 	private void verifyPostSafJournalpostLightweight() {
 		// no caching
-		verify(3, postRequestedFor(urlEqualTo("/safgraphql"))
+		verify(5, postRequestedFor(urlEqualTo("/safgraphql"))
 				.withRequestBody(equalToJson(classpathToString("__files/saf/safLightweightGraphQlRequest.json"))));
 	}
 
