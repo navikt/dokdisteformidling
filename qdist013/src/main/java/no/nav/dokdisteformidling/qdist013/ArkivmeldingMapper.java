@@ -152,7 +152,7 @@ public class ArkivmeldingMapper {
 		dokumentbeskrivelse.setDokumenttype(DOKUMENTTYPE_DOKUMENTASJON);
 		dokumentbeskrivelse.setDokumentstatus(Dokumentstatus.DOKUMENTET_ER_FERDIGSTILT);
 		dokumentbeskrivelse.setTittel(getDokumentbeskrivelseTittel(journalpostQdist013, dokumentInfo, isHoveddokument(rekkefolge)));
-		dokumentbeskrivelse.setOpprettetDato(convertLocalDateTimeToXmlGregorianCalendar(dokumentInfo.getDatoFerdigstilt()));
+		dokumentbeskrivelse.setOpprettetDato(getDokumentOpprettetDato(isHoveddokument(rekkefolge), journalpostQdist013, dokumentInfo));
 		dokumentbeskrivelse.setOpprettetAv(getDokumentOpprettetAv(isHoveddokument(rekkefolge), journalpostQdist013, dokumentInfo));
 		dokumentbeskrivelse.setTilknyttetRegistreringSom(isHoveddokument(rekkefolge) ? TilknyttetRegistreringSom.HOVEDDOKUMENT : TilknyttetRegistreringSom.VEDLEGG);
 		dokumentbeskrivelse.setDokumentnummer(BigInteger.valueOf(rekkefolge + 1));
@@ -182,6 +182,16 @@ public class ArkivmeldingMapper {
 
 	}
 
+	private XMLGregorianCalendar getDokumentOpprettetDato(boolean isHoveddok, JournalpostQdist013 journalpostQdist013, JournalpostQdist013.DokumentInfo dokumentInfo) {
+		if (isHoveddok || isEmpty(dokumentInfo.getOriginalJournalpostId())) {
+			return convertLocalDateTimeToXmlGregorianCalendar(journalpostQdist013.getDatoJournalfoert());
+		} else {
+			LightweightSafJournalpostQdist013 lightweightSafJournalpostQdist013 = safJournalpostQueryService.hentJournalpost(dokumentInfo
+					.getOriginalJournalpostId());
+			return convertLocalDateTimeToXmlGregorianCalendar(lightweightSafJournalpostQdist013.getDatoJournalfoert());
+		}
+	}
+
 	private String getDokumentOpprettetAv(boolean isHoveddok, JournalpostQdist013 journalpostQdist013, JournalpostQdist013.DokumentInfo dokumentInfo) {
 		if (isHoveddok || isEmpty(dokumentInfo.getOriginalJournalpostId())) {
 			return journalpostQdist013.getJournalfortAvNavn();
@@ -199,7 +209,7 @@ public class ArkivmeldingMapper {
 		Dokumentobjekt dokumentobjekt = objectFactory.createDokumentobjekt();
 		dokumentobjekt.setVersjonsnummer(BigInteger.ONE);
 		dokumentobjekt.setVariantformat(mapVariantformatSafValueToNoark5VariantFormat(getDokumentVariant(dokumentInfo)));
-		dokumentobjekt.setOpprettetDato(convertLocalDateTimeToXmlGregorianCalendar(dokumentInfo.getDatoFerdigstilt()));
+		dokumentobjekt.setOpprettetDato(getDokumentOpprettetDato(isHoveddokument, journalpostQdist013, dokumentInfo));
 		dokumentobjekt.setOpprettetAv(getDokumentOpprettetAv(isHoveddokument, journalpostQdist013, dokumentInfo));
 		dokumentobjekt.setReferanseDokumentfil(getReferanseDokumentFil(journalpostQdist013.getJournalpostId(), dokumentInfo));
 		return dokumentobjekt;
