@@ -94,6 +94,7 @@ class ArkivmeldingMapperTest {
 
 	private static final String AVSENDER_MOTTAKER_NAVN_ORIG_JP = "avsenderMottakerNavnOrigJp";
 	private static final String JOURNALFOERT_AV_NAVN_ORIG_JP = "ajournalfoertAvNavnOrigJp";
+	private static final LocalDateTime DATO_JOURNALFOERT_ORIG_JP = LocalDateTime.now().minusDays(5);
 
 	private static final String FILTYPE_PNG = "PNG";
 	private static final String FILTYPE_JPEG = "JPEG";
@@ -111,7 +112,7 @@ class ArkivmeldingMapperTest {
 	@DisplayName("Asserts all fields")
 	void fullHappyPath() {
 		when(tpsMock.hentNavn(any(String.class))).thenReturn(TPS_NAVN);
-		JAXBElement<Arkivmelding> arkivmeldingJAXBElement = arkivmeldingMapper.createArkivMelding(createJouranlpostQdist013Builder()
+		JAXBElement<Arkivmelding> arkivmeldingJAXBElement = arkivmeldingMapper.createArkivMelding(createJournalpostQdist013Builder()
 				.build(), BESTILLINGS_ID);
 
 		assertThat(arkivmeldingJAXBElement, notNullValue());
@@ -129,7 +130,7 @@ class ArkivmeldingMapperTest {
 	void happyPathBrukerIsOrgansisasjon() {
 		when(eregMock.hentNavn(any(String.class))).thenReturn(EREG_NAVN);
 
-		JournalpostQdist013 journalpostQdist013 = createJouranlpostQdist013Builder()
+		JournalpostQdist013 journalpostQdist013 = createJournalpostQdist013Builder()
 				.bruker(JournalpostQdist013.Bruker.builder()
 						.id(BRUKER_ID_ORGNR)
 						.type(BRUKER_TYPE_ORGNR)
@@ -158,7 +159,7 @@ class ArkivmeldingMapperTest {
 		when(aktoerregisterMock.hentIdentForAktoerId(any(String.class))).thenReturn(FNR_FOR_AKTOER_ID);
 		when(tpsMock.hentNavn(any(String.class))).thenReturn(TPS_NAVN);
 
-		JournalpostQdist013 journalpostQdist013 = createJouranlpostQdist013Builder()
+		JournalpostQdist013 journalpostQdist013 = createJournalpostQdist013Builder()
 				.bruker(JournalpostQdist013.Bruker.builder()
 						.id(BRUKER_ID_AKTOER_ID)
 						.type(BRUKER_TYPE_AKTOER_ID)
@@ -187,7 +188,7 @@ class ArkivmeldingMapperTest {
 	void happyPathTestTittelWhenJpIsInngaaendeAndVedleggHasOriginalJpId() {
 		when(safJournalpostQueryServiceMock.hentJournalpost(ORIGINAL_JPID_VEDLEGG)).thenReturn(createLightweightSafJournalpostQdist013());
 
-		JournalpostQdist013 journalpostQdist013 = createJouranlpostQdist013Builder()
+		JournalpostQdist013 journalpostQdist013 = createJournalpostQdist013Builder()
 				.journalposttype(INNGAAENDE)
 				.dokumenter(Arrays.asList(createHoveddokumentBuilder().build(),
 						createVedleggBuilder().originalJournalpostId(ORIGINAL_JPID_VEDLEGG).build()))
@@ -203,7 +204,7 @@ class ArkivmeldingMapperTest {
 
 		assertEquals(dokumentbeskrivelse.getTittel(), TITTEL_VEDLEGG + ", Fra " + AVSENDER_MOTTAKER_NAVN_ORIG_JP);
 
-		verify(safJournalpostQueryServiceMock, times(3)).hentJournalpost(ORIGINAL_JPID_VEDLEGG);
+		verify(safJournalpostQueryServiceMock, times(5)).hentJournalpost(ORIGINAL_JPID_VEDLEGG);
 	}
 
 	@Test
@@ -211,7 +212,7 @@ class ArkivmeldingMapperTest {
 	void happyPathTestTittelWhenJpIsUtgaaendeAndVedleggHasOriginalJpId() {
 		when(safJournalpostQueryServiceMock.hentJournalpost(ORIGINAL_JPID_VEDLEGG)).thenReturn(createLightweightSafJournalpostQdist013());
 
-		JournalpostQdist013 journalpostQdist013 = createJouranlpostQdist013Builder()
+		JournalpostQdist013 journalpostQdist013 = createJournalpostQdist013Builder()
 				.journalposttype(UTGAAENDE)
 				.dokumenter(Arrays.asList(createHoveddokumentBuilder().build(),
 						createVedleggBuilder().originalJournalpostId(ORIGINAL_JPID_VEDLEGG).build()))
@@ -227,7 +228,7 @@ class ArkivmeldingMapperTest {
 
 		assertEquals(dokumentbeskrivelse.getTittel(), TITTEL_VEDLEGG + ", Til " + AVSENDER_MOTTAKER_NAVN_ORIG_JP);
 
-		verify(safJournalpostQueryServiceMock, times(3)).hentJournalpost(ORIGINAL_JPID_VEDLEGG);
+		verify(safJournalpostQueryServiceMock, times(5)).hentJournalpost(ORIGINAL_JPID_VEDLEGG);
 	}
 
 	@Test
@@ -235,7 +236,7 @@ class ArkivmeldingMapperTest {
 	void happyPathTestTittelWhenJpIsNotatAndVedleggHasOriginalJpId() {
 		when(safJournalpostQueryServiceMock.hentJournalpost(ORIGINAL_JPID_VEDLEGG)).thenReturn(createLightweightSafJournalpostQdist013());
 
-		JournalpostQdist013 journalpostQdist013 = createJouranlpostQdist013Builder()
+		JournalpostQdist013 journalpostQdist013 = createJournalpostQdist013Builder()
 				.journalposttype("Notat")
 				.dokumenter(Arrays.asList(createHoveddokumentBuilder().build(),
 						createVedleggBuilder().originalJournalpostId(ORIGINAL_JPID_VEDLEGG).build()))
@@ -251,15 +252,15 @@ class ArkivmeldingMapperTest {
 
 		assertEquals(dokumentbeskrivelse.getTittel(), TITTEL_VEDLEGG);
 
-		verify(safJournalpostQueryServiceMock, times(2)).hentJournalpost(ORIGINAL_JPID_VEDLEGG);
+		verify(safJournalpostQueryServiceMock, times(4)).hentJournalpost(ORIGINAL_JPID_VEDLEGG);
 	}
 
 	@Test
-	@DisplayName("Case when vedlegg has original jpId. Should get opprettet av from original journalpost")
-	void happyPathTestOpprettetAvWhenVedleggHasOriginalJpId() {
+	@DisplayName("Case when vedlegg has original jpId. Should get opprettet dato from original journalpost")
+	void happyPathTestOpprettetDatoWhenVedleggHasOriginalJpId() {
 		when(safJournalpostQueryServiceMock.hentJournalpost(ORIGINAL_JPID_VEDLEGG)).thenReturn(createLightweightSafJournalpostQdist013());
 
-		JournalpostQdist013 journalpostQdist013 = createJouranlpostQdist013Builder()
+		JournalpostQdist013 journalpostQdist013 = createJournalpostQdist013Builder()
 				.dokumenter(Arrays.asList(createHoveddokumentBuilder().build(),
 						createVedleggBuilder().originalJournalpostId(ORIGINAL_JPID_VEDLEGG).build()))
 				.build();
@@ -277,12 +278,43 @@ class ArkivmeldingMapperTest {
 				.get(1);
 		Dokumentobjekt dokumentobjektVedlegg = dokumentbeskrivelseVedlegg.getDokumentobjekt().get(0);
 
-		assertEquals(dokumentobjektHoveddok.getOpprettetAv(), JOURNALFOERT_AV_NAVN);
+		assertEquals(convertFromXmlGregorianCalendarToLocalDateTime(dokumentbeskrivelseHoveddok.getOpprettetDato()), DATO_JOURNALFOERT);
+		assertEquals(convertFromXmlGregorianCalendarToLocalDateTime(dokumentobjektHoveddok.getOpprettetDato()), DATO_JOURNALFOERT);
+		assertEquals(convertFromXmlGregorianCalendarToLocalDateTime(dokumentbeskrivelseVedlegg.getOpprettetDato()), DATO_JOURNALFOERT_ORIG_JP);
+		assertEquals(convertFromXmlGregorianCalendarToLocalDateTime(dokumentobjektVedlegg.getOpprettetDato()), DATO_JOURNALFOERT_ORIG_JP);
+
+		verify(safJournalpostQueryServiceMock, times(5)).hentJournalpost(ORIGINAL_JPID_VEDLEGG);
+	}
+
+	@Test
+	@DisplayName("Case when vedlegg has original jpId. Should get opprettet av from original journalpost")
+	void happyPathTestOpprettetAvWhenVedleggHasOriginalJpId() {
+		when(safJournalpostQueryServiceMock.hentJournalpost(ORIGINAL_JPID_VEDLEGG)).thenReturn(createLightweightSafJournalpostQdist013());
+
+		JournalpostQdist013 journalpostQdist013 = createJournalpostQdist013Builder()
+				.dokumenter(Arrays.asList(createHoveddokumentBuilder().build(),
+						createVedleggBuilder().originalJournalpostId(ORIGINAL_JPID_VEDLEGG).build()))
+				.build();
+
+		JAXBElement<Arkivmelding> arkivmeldingJAXBElement = arkivmeldingMapper.createArkivMelding(journalpostQdist013, BESTILLINGS_ID);
+		Arkivmelding arkivmelding = arkivmeldingJAXBElement.getValue();
+		List<Mappe> mappeList = arkivmelding.getMappe();
+		Saksmappe saksmappe = (Saksmappe) mappeList.get(0);
+		Journalpost basisregistreringJp = (Journalpost) saksmappe.getBasisregistrering().get(0);
+
+		Dokumentbeskrivelse dokumentbeskrivelseHoveddok = (Dokumentbeskrivelse) basisregistreringJp.getDokumentbeskrivelseAndDokumentobjekt()
+				.get(0);
+		Dokumentobjekt dokumentobjektHoveddok = dokumentbeskrivelseHoveddok.getDokumentobjekt().get(0);
+		Dokumentbeskrivelse dokumentbeskrivelseVedlegg = (Dokumentbeskrivelse) basisregistreringJp.getDokumentbeskrivelseAndDokumentobjekt()
+				.get(1);
+		Dokumentobjekt dokumentobjektVedlegg = dokumentbeskrivelseVedlegg.getDokumentobjekt().get(0);
+
+		assertEquals(dokumentbeskrivelseHoveddok.getOpprettetAv(), JOURNALFOERT_AV_NAVN);
 		assertEquals(dokumentobjektHoveddok.getOpprettetAv(), JOURNALFOERT_AV_NAVN);
 		assertEquals(dokumentbeskrivelseVedlegg.getOpprettetAv(), JOURNALFOERT_AV_NAVN_ORIG_JP);
 		assertEquals(dokumentobjektVedlegg.getOpprettetAv(), JOURNALFOERT_AV_NAVN_ORIG_JP);
 
-		verify(safJournalpostQueryServiceMock, times(3)).hentJournalpost(ORIGINAL_JPID_VEDLEGG);
+		verify(safJournalpostQueryServiceMock, times(5)).hentJournalpost(ORIGINAL_JPID_VEDLEGG);
 	}
 
 	@Test
@@ -290,7 +322,7 @@ class ArkivmeldingMapperTest {
 	void happyPathTestNoSladdetVariantAndFiltypeNotPngOrJPEG() {
 		when(safJournalpostQueryServiceMock.hentJournalpost(ORIGINAL_JPID_VEDLEGG)).thenReturn(createLightweightSafJournalpostQdist013());
 
-		JournalpostQdist013 journalpostQdist013 = createJouranlpostQdist013Builder()
+		JournalpostQdist013 journalpostQdist013 = createJournalpostQdist013Builder()
 				.dokumenter(Arrays.asList(createHoveddokumentBuilder()
 						.dokumentvarianter(Arrays.asList(JournalpostQdist013.DokumentInfo.Dokumentvariant.builder()
 										.variantformat(VARIANTFORMAT_ARKIV)
@@ -322,7 +354,7 @@ class ArkivmeldingMapperTest {
 	void happyPathTestNoSladdetVariantAndFiltypeIsPng() {
 		when(safJournalpostQueryServiceMock.hentJournalpost(ORIGINAL_JPID_VEDLEGG)).thenReturn(createLightweightSafJournalpostQdist013());
 
-		JournalpostQdist013 journalpostQdist013 = createJouranlpostQdist013Builder()
+		JournalpostQdist013 journalpostQdist013 = createJournalpostQdist013Builder()
 				.dokumenter(Arrays.asList(createHoveddokumentBuilder()
 						.dokumentvarianter(Arrays.asList(JournalpostQdist013.DokumentInfo.Dokumentvariant.builder()
 										.variantformat(VARIANTFORMAT_ARKIV)
@@ -354,7 +386,7 @@ class ArkivmeldingMapperTest {
 	void happyPathTestNoSladdetVariantAndFiltypeIsJPEG() {
 		when(safJournalpostQueryServiceMock.hentJournalpost(ORIGINAL_JPID_VEDLEGG)).thenReturn(createLightweightSafJournalpostQdist013());
 
-		JournalpostQdist013 journalpostQdist013 = createJouranlpostQdist013Builder()
+		JournalpostQdist013 journalpostQdist013 = createJournalpostQdist013Builder()
 				.dokumenter(Arrays.asList(createHoveddokumentBuilder()
 						.dokumentvarianter(Arrays.asList(JournalpostQdist013.DokumentInfo.Dokumentvariant.builder()
 										.variantformat(VARIANTFORMAT_ARKIV)
@@ -464,7 +496,7 @@ class ArkivmeldingMapperTest {
 		assertEquals(dokumentbeskrivelseHoveddok.getDokumentnummer(), BigInteger.ONE);
 		assertCommonAttributesDokumentbeskrivelse(dokumentbeskrivelseHoveddok);
 		assertEquals(dokumentbeskrivelseHoveddok.getTittel(), TITTEL_HOVEDDOK);
-		assertEquals(convertFromXmlGregorianCalendarToLocalDateTime(dokumentbeskrivelseHoveddok.getOpprettetDato()), DATO_FERDIGSTILT_HOVEDDOK);
+		assertEquals(convertFromXmlGregorianCalendarToLocalDateTime(dokumentbeskrivelseHoveddok.getOpprettetDato()), DATO_JOURNALFOERT);
 
 
 		assertDokumentobjektHoveddokument(dokumentbeskrivelseHoveddok.getDokumentobjekt());
@@ -475,7 +507,7 @@ class ArkivmeldingMapperTest {
 		assertEquals(dokumentbeskrivelseVedlegg.getDokumentnummer(), BigInteger.valueOf(2));
 		assertCommonAttributesDokumentbeskrivelse(dokumentbeskrivelseVedlegg);
 		assertEquals(dokumentbeskrivelseVedlegg.getTittel(), TITTEL_VEDLEGG);
-		assertEquals(convertFromXmlGregorianCalendarToLocalDateTime(dokumentbeskrivelseVedlegg.getOpprettetDato()), DATO_FERDIGSTILT_VEDLEGG);
+		assertEquals(convertFromXmlGregorianCalendarToLocalDateTime(dokumentbeskrivelseVedlegg.getOpprettetDato()), DATO_JOURNALFOERT);
 
 		assertDokumentobjektVedlegg(dokumentbeskrivelseVedlegg.getDokumentobjekt());
 	}
@@ -485,7 +517,7 @@ class ArkivmeldingMapperTest {
 		Dokumentobjekt dokumentobjektHoveddok = dokumentobjektList.get(0);
 		assertEquals(dokumentobjektHoveddok.getVersjonsnummer(), BigInteger.ONE);
 		assertEquals(dokumentobjektHoveddok.getVariantformat(), Variantformat.DOKUMENT_HVOR_DELER_AV_INNHOLDET_ER_SKJERMET);
-		assertEquals(convertFromXmlGregorianCalendarToLocalDateTime(dokumentobjektHoveddok.getOpprettetDato()), DATO_FERDIGSTILT_HOVEDDOK);
+		assertEquals(convertFromXmlGregorianCalendarToLocalDateTime(dokumentobjektHoveddok.getOpprettetDato()), DATO_JOURNALFOERT);
 		assertEquals(dokumentobjektHoveddok.getOpprettetAv(), JOURNALFOERT_AV_NAVN);
 		assertEquals(dokumentobjektHoveddok.getReferanseDokumentfil(), JOURNALPOST_ID + "-" + DOKUMENT_INFO_ID_HOVEDDOK + "-" + VARIANTFORMAT_SLADDET + "-" + FILTYPE_PDF);
 	}
@@ -496,7 +528,7 @@ class ArkivmeldingMapperTest {
 		Dokumentobjekt dokumentobjektVedlegg = dokumentobjektList.get(0);
 		assertEquals(dokumentobjektVedlegg.getVersjonsnummer(), BigInteger.ONE);
 		assertEquals(dokumentobjektVedlegg.getVariantformat(), Variantformat.ARKIVFORMAT);
-		assertEquals(convertFromXmlGregorianCalendarToLocalDateTime(dokumentobjektVedlegg.getOpprettetDato()), DATO_FERDIGSTILT_VEDLEGG);
+		assertEquals(convertFromXmlGregorianCalendarToLocalDateTime(dokumentobjektVedlegg.getOpprettetDato()), DATO_JOURNALFOERT);
 		assertEquals(dokumentobjektVedlegg.getOpprettetAv(), JOURNALFOERT_AV_NAVN);
 		assertEquals(dokumentobjektVedlegg.getReferanseDokumentfil(), JOURNALPOST_ID + "-" + DOKUMENT_INFO_ID_VEDLEGG + "-" + VARIANTFORMAT_ARKIV + "-" + FILTYPE_JPEG);
 	}
@@ -510,7 +542,7 @@ class ArkivmeldingMapperTest {
 		assertEquals(dokumentbeskrivelse.getTilknyttetAv(), JOURNALFOERT_AV_NAVN);
 	}
 
-	private JournalpostQdist013.JournalpostQdist013Builder createJouranlpostQdist013Builder() {
+	private JournalpostQdist013.JournalpostQdist013Builder createJournalpostQdist013Builder() {
 		return JournalpostQdist013.builder()
 				.journalpostId(JOURNALPOST_ID)
 				.sak(JournalpostQdist013.Sak.builder()
@@ -570,6 +602,7 @@ class ArkivmeldingMapperTest {
 		return LightweightSafJournalpostQdist013.builder()
 				.avsenderMottakerNavn(AVSENDER_MOTTAKER_NAVN_ORIG_JP)
 				.journalfortAvNavn(JOURNALFOERT_AV_NAVN_ORIG_JP)
+				.datoJournalfoert(DATO_JOURNALFOERT_ORIG_JP)
 				.build();
 	}
 

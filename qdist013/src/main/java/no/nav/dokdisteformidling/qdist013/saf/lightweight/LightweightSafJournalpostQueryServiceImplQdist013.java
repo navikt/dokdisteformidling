@@ -2,6 +2,7 @@ package no.nav.dokdisteformidling.qdist013.saf.lightweight;
 
 import static java.lang.String.format;
 import static no.nav.dokdisteformidling.config.cache.LokalCacheConfig.LIGHTWEIGHT_SAF_JOURNALPOST_QDIST013_CACHE;
+import static no.nav.dokdisteformidling.qdist013.saf.main.JournalpostQdist013.Datotype.DATO_JOURNALFOERT;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 
 import lombok.extern.slf4j.Slf4j;
@@ -13,7 +14,9 @@ import no.nav.dokdisteformidling.exception.functional.SafJournalpostValidationEx
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDateTime;
 import java.util.Collections;
+import java.util.List;
 
 /**
  * @author Sigurd Midttun, Visma Consulting.
@@ -30,6 +33,10 @@ public class LightweightSafJournalpostQueryServiceImplQdist013 implements SafJou
 						"    journalfortAvNavn\n" +
 						"    avsenderMottaker{\n" +
 						"		navn\n" +
+						"	 }\n" +
+						"	 relevanteDatoer {\n" +
+						"		dato\n" +
+						"		datotype\n" +
 						"	 }\n" +
 					"  }\n" +
 					"}\n";
@@ -59,6 +66,7 @@ public class LightweightSafJournalpostQueryServiceImplQdist013 implements SafJou
 		return LightweightSafJournalpostQdist013.builder()
 				.journalfortAvNavn(safJournalpost.getJournalfortAvNavn())
 				.avsenderMottakerNavn(getAvsenderMottakerNavn(safJournalpost.getAvsenderMottaker()))
+				.datoJournalfoert(getDatoJournalfoert(safJournalpost.getRelevanteDatoer(), journalpostId))
 				.build();
 	}
 
@@ -68,5 +76,17 @@ public class LightweightSafJournalpostQueryServiceImplQdist013 implements SafJou
 		} else {
 			return avsenderMottaker.getNavn();
 		}
+	}
+
+	public LocalDateTime getDatoJournalfoert(List<SafJournalpost.RelevantDato> relevanteDatoer, String journalpostId) {
+		if (relevanteDatoer == null) {
+			throw new SafJournalpostValidationException(format("RelevanteDatoer er null i respons fra SAF på journalpostId=%s", journalpostId));
+		}
+
+		return relevanteDatoer.stream()
+				.filter(relevantDato -> DATO_JOURNALFOERT.name().equals(relevantDato.getDatotype()))
+				.map(SafJournalpost.RelevantDato::getDato)
+				.findAny()
+				.orElseThrow(() -> new SafJournalpostValidationException(format("Kan ikke finne dato journalført i respons fra SAF på journalpostId=%s", journalpostId)));
 	}
 }
