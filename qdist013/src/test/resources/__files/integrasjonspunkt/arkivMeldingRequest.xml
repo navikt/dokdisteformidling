@@ -19,7 +19,7 @@
 				<dokumenttype>Dokumentasjon</dokumenttype>
 				<dokumentstatus>Dokumentet er ferdigstilt</dokumentstatus>
 				<tittel>Tittel</tittel>
-				<opprettetDato>2019-05-01T08:44:21</opprettetDato>
+				<opprettetDato>2019-04-03T10:24:59</opprettetDato>
 				<opprettetAv>qmot002</opprettetAv>
 				<tilknyttetRegistreringSom>Hoveddokument</tilknyttetRegistreringSom>
 				<dokumentnummer>1</dokumentnummer>
@@ -28,7 +28,7 @@
 				<dokumentobjekt>
 					<versjonsnummer>1</versjonsnummer>
 					<variantformat>Produksjonsformat</variantformat>
-					<opprettetDato>2019-05-01T08:44:21</opprettetDato>
+					<opprettetDato>2019-04-03T10:24:59</opprettetDato>
 					<opprettetAv>qmot002</opprettetAv>
 					<referanseDokumentfil>448212366-463791441-PRODUKSJON-PDF</referanseDokumentfil>
 				</dokumentobjekt>
@@ -38,7 +38,7 @@
 				<dokumenttype>Dokumentasjon</dokumenttype>
 				<dokumentstatus>Dokumentet er ferdigstilt</dokumentstatus>
 				<tittel>Tittel Vedlegg 1</tittel>
-				<opprettetDato>2019-06-01T08:44:21</opprettetDato>
+				<opprettetDato>2019-04-03T10:24:59</opprettetDato>
 				<opprettetAv>qmot002</opprettetAv>
 				<tilknyttetRegistreringSom>Vedlegg</tilknyttetRegistreringSom>
 				<dokumentnummer>2</dokumentnummer>
@@ -47,7 +47,7 @@
 				<dokumentobjekt>
 					<versjonsnummer>1</versjonsnummer>
 					<variantformat>Dokument hvor deler av innholdet er skjermet</variantformat>
-					<opprettetDato>2019-06-01T08:44:21</opprettetDato>
+					<opprettetDato>2019-04-03T10:24:59</opprettetDato>
 					<opprettetAv>qmot002</opprettetAv>
 					<referanseDokumentfil>448212366-463791442-SLADDET-PDF</referanseDokumentfil>
 				</dokumentobjekt>
@@ -57,7 +57,7 @@
 				<dokumenttype>Dokumentasjon</dokumenttype>
 				<dokumentstatus>Dokumentet er ferdigstilt</dokumentstatus>
 				<tittel>Tittel Vedlegg 2, Fra FORNAVN ETTERNAVN</tittel>
-				<opprettetDato>2019-07-01T08:44:21</opprettetDato>
+				<opprettetDato>2018-02-03T10:24:59</opprettetDato>
 				<opprettetAv>qmot002</opprettetAv>
 				<tilknyttetRegistreringSom>Vedlegg</tilknyttetRegistreringSom>
 				<dokumentnummer>3</dokumentnummer>
@@ -66,7 +66,7 @@
 				<dokumentobjekt>
 					<versjonsnummer>1</versjonsnummer>
 					<variantformat>Arkivformat</variantformat>
-					<opprettetDato>2019-07-01T08:44:21</opprettetDato>
+					<opprettetDato>2018-02-03T10:24:59</opprettetDato>
 					<opprettetAv>qmot002</opprettetAv>
 					<referanseDokumentfil>448212366-463791443-ARKIV-PNG</referanseDokumentfil>
 				</dokumentobjekt>
