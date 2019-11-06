@@ -844,7 +844,7 @@ public class Qdist013IT {
 		stubPostSafJournalpost("queryJournalpostId\":\"448212366\"", "saf/safLightweightGraphQlResponse-happy.json");
 		stubGetEregHentOrgNavn("123456789");
 		stubGetNorg2HentOrgnr();
-		stubFor(post("/integrasjonspunkt")
+		stubFor(post("/integrasjonspunkt/api/messages/out")
 				.willReturn(aResponse().withStatus(HttpStatus.FORBIDDEN.value())));
 
 		sendStringMessage(qdist013, classpathToString("qdist013/qdist013-happy.xml"));
@@ -859,7 +859,7 @@ public class Qdist013IT {
 		verifyPostSafJournalpostLightweight();
 		verifyGetEregHentOrgNavn("123456789");
 		verifyGetNorg2HentOrgnr();
-		verify(1, postRequestedFor(urlEqualTo("/integrasjonspunkt")).withRequestBody(equalToJson(
+		verify(1, postRequestedFor(urlEqualTo("/integrasjonspunkt/api/messages/out")).withRequestBody(equalToJson(
 				classpathToString("__files/integrasjonspunkt/createMessageRequest.json"), true, true)));
 	}
 
@@ -871,7 +871,7 @@ public class Qdist013IT {
 		stubPostSafJournalpost("queryJournalpostId\":\"448212366\"", "saf/safLightweightGraphQlResponse-happy.json");
 		stubGetEregHentOrgNavn("123456789");
 		stubGetNorg2HentOrgnr();
-		stubFor(post("/integrasjonspunkt")
+		stubFor(post("/integrasjonspunkt/api/messages/out")
 				.willReturn(aResponse().withStatus(HttpStatus.INTERNAL_SERVER_ERROR.value())));
 
 		sendStringMessage(qdist013, classpathToString("qdist013/qdist013-happy.xml"));
@@ -886,7 +886,7 @@ public class Qdist013IT {
 		verifyPostSafJournalpostLightweight();
 		verifyGetEregHentOrgNavn("123456789");
 		verifyGetNorg2HentOrgnr();
-		verify(MAX_ATTEMPTS_SHORT, postRequestedFor(urlEqualTo("/integrasjonspunkt")).withRequestBody(equalToJson(
+		verify(MAX_ATTEMPTS_SHORT, postRequestedFor(urlEqualTo("/integrasjonspunkt/api/messages/out")).withRequestBody(equalToJson(
 				classpathToString("__files/integrasjonspunkt/createMessageRequest.json"), true, true)));
 	}
 
@@ -899,7 +899,7 @@ public class Qdist013IT {
 		stubGetEregHentOrgNavn("123456789");
 		stubGetNorg2HentOrgnr();
 		stubPostIntegrasjonspunktCreateMessage();
-		stubFor(put(urlMatching("/integrasjonspunkt/.*"))
+		stubFor(put(urlMatching("/integrasjonspunkt/api/messages/out/.*"))
 				.willReturn(aResponse().withStatus(HttpStatus.FORBIDDEN.value())));
 
 		sendStringMessage(qdist013, classpathToString("qdist013/qdist013-happy.xml"));
@@ -916,7 +916,7 @@ public class Qdist013IT {
 		verifyGetNorg2HentOrgnr();
 		verifyPostIntegrasjonspunktCreateMessage();
 		String conversationId = findConversationId();
-		verify(1, putRequestedFor(urlEqualTo("/integrasjonspunkt/" + conversationId))
+		verify(1, putRequestedFor(urlEqualTo("/integrasjonspunkt/api/messages/out/" + conversationId))
 				.withHeader(CONTENT_DISPOSITION, equalTo("attachment; name=Tittel; filename=448212366-463791441-PRODUKSJON-PDF"))
 				.withRequestBody(binaryEqualTo(HOVEDDOK_TEST_CONTENT.getBytes())));
 	}
@@ -930,7 +930,7 @@ public class Qdist013IT {
 		stubGetEregHentOrgNavn("123456789");
 		stubGetNorg2HentOrgnr();
 		stubPostIntegrasjonspunktCreateMessage();
-		stubFor(put(urlMatching("/integrasjonspunkt/.*"))
+		stubFor(put(urlMatching("/integrasjonspunkt/api/messages/out/.*"))
 				.willReturn(aResponse().withStatus(HttpStatus.INTERNAL_SERVER_ERROR.value())));
 
 		sendStringMessage(qdist013, classpathToString("qdist013/qdist013-happy.xml"));
@@ -947,7 +947,7 @@ public class Qdist013IT {
 		verifyGetNorg2HentOrgnr();
 		verifyPostIntegrasjonspunktCreateMessage();
 		String conversationId = findConversationId();
-		verify(MAX_ATTEMPTS_SHORT, putRequestedFor(urlEqualTo("/integrasjonspunkt/" + conversationId))
+		verify(MAX_ATTEMPTS_SHORT, putRequestedFor(urlEqualTo("/integrasjonspunkt/api/messages/out/" + conversationId))
 				.withHeader(CONTENT_DISPOSITION, equalTo("attachment; name=Tittel; filename=448212366-463791441-PRODUKSJON-PDF"))
 				.withRequestBody(binaryEqualTo(HOVEDDOK_TEST_CONTENT.getBytes())));
 	}
@@ -962,7 +962,7 @@ public class Qdist013IT {
 		stubGetNorg2HentOrgnr();
 		stubPostIntegrasjonspunktCreateMessage();
 		stubPutIntegrasjonspunktLastOppFil();
-		stubFor(post(urlMatching("/integrasjonspunkt/.*"))
+		stubFor(post(urlMatching("/integrasjonspunkt/api/messages/out/.*"))
 				.willReturn(aResponse().withStatus(HttpStatus.FORBIDDEN.value())));
 
 		sendStringMessage(qdist013, classpathToString("qdist013/qdist013-happy.xml"));
@@ -983,7 +983,7 @@ public class Qdist013IT {
 		verifyPutIntegrasjonspunktLastOppFilVedlegg1(conversationId);
 		verifyPutIntegrasjonspunktLastOppFilVedlegg2(conversationId);
 		verifyPutIntegrasjonspunktLastOppFilArkvimelding(conversationId, "123456789", "");
-		verify(1, postRequestedFor(urlEqualTo("/integrasjonspunkt/" + conversationId)).withRequestBody(absent()));
+		verify(1, postRequestedFor(urlEqualTo("/integrasjonspunkt/api/messages/out/" + conversationId)).withRequestBody(absent()));
 	}
 
 	@Test
@@ -996,7 +996,7 @@ public class Qdist013IT {
 		stubGetNorg2HentOrgnr();
 		stubPostIntegrasjonspunktCreateMessage();
 		stubPutIntegrasjonspunktLastOppFil();
-		stubFor(post(urlMatching("/integrasjonspunkt/.*"))
+		stubFor(post(urlMatching("/integrasjonspunkt/api/messages/out/.*"))
 				.willReturn(aResponse().withStatus(HttpStatus.INTERNAL_SERVER_ERROR.value())));
 
 		sendStringMessage(qdist013, classpathToString("qdist013/qdist013-happy.xml"));
@@ -1017,7 +1017,7 @@ public class Qdist013IT {
 		verifyPutIntegrasjonspunktLastOppFilVedlegg1(conversationId);
 		verifyPutIntegrasjonspunktLastOppFilVedlegg2(conversationId);
 		verifyPutIntegrasjonspunktLastOppFilArkvimelding(conversationId, "123456789", "");
-		verify(MAX_ATTEMPTS_SHORT, postRequestedFor(urlEqualTo("/integrasjonspunkt/" + conversationId)).withRequestBody(absent()));
+		verify(MAX_ATTEMPTS_SHORT, postRequestedFor(urlEqualTo("/integrasjonspunkt/api/messages/out/" + conversationId)).withRequestBody(absent()));
 	}
 
 	@Test
@@ -1195,39 +1195,39 @@ public class Qdist013IT {
 	}
 
 	private void stubPostIntegrasjonspunktSendMelding() {
-		stubFor(post(urlMatching("/integrasjonspunkt/.*"))
+		stubFor(post(urlMatching("/integrasjonspunkt/api/messages/out/.*"))
 				.willReturn(aResponse().withStatus(HttpStatus.OK.value())));
 	}
 
 	private void verifyPostIntegrasjonspunktSendMelding(String conversationId) {
-		verify(1, postRequestedFor(urlEqualTo("/integrasjonspunkt/" + conversationId)).withRequestBody(absent()));
+		verify(1, postRequestedFor(urlEqualTo("/integrasjonspunkt/api/messages/out/" + conversationId)).withRequestBody(absent()));
 	}
 
 	private void stubPutIntegrasjonspunktLastOppFil() {
-		stubFor(put(urlMatching("/integrasjonspunkt/.*"))
+		stubFor(put(urlMatching("/integrasjonspunkt/api/messages/out/.*"))
 				.willReturn(aResponse().withStatus(HttpStatus.OK.value())));
 	}
 
 	private void verifyPutIntegrasjonspunktLastOppFilHoveddokument(String conversationId) {
-		verify(1, putRequestedFor(urlEqualTo("/integrasjonspunkt/" + conversationId))
+		verify(1, putRequestedFor(urlEqualTo("/integrasjonspunkt/api/messages/out/" + conversationId))
 				.withHeader(CONTENT_DISPOSITION, equalTo("attachment; name=Tittel; filename=448212366-463791441-PRODUKSJON-PDF"))
 				.withRequestBody(binaryEqualTo(HOVEDDOK_TEST_CONTENT.getBytes())));
 	}
 
 	private void verifyPutIntegrasjonspunktLastOppFilVedlegg1(String conversationId) {
-		verify(1, putRequestedFor(urlEqualTo("/integrasjonspunkt/" + conversationId))
+		verify(1, putRequestedFor(urlEqualTo("/integrasjonspunkt/api/messages/out/" + conversationId))
 				.withHeader(CONTENT_DISPOSITION, equalTo("attachment; name=Tittel Vedlegg 1; filename=448212366-463791442-SLADDET-PDF"))
 				.withRequestBody(binaryEqualTo(VEDLEGG1_TEST_CONTENT.getBytes())));
 	}
 
 	private void verifyPutIntegrasjonspunktLastOppFilVedlegg2(String conversationId) {
-		verify(1, putRequestedFor(urlEqualTo("/integrasjonspunkt/" + conversationId))
+		verify(1, putRequestedFor(urlEqualTo("/integrasjonspunkt/api/messages/out/" + conversationId))
 				.withHeader(CONTENT_DISPOSITION, equalTo("attachment; name=Tittel Vedlegg 2, Fra FORNAVN ETTERNAVN; filename=448212366-463791443-ARKIV-PNG"))
 				.withRequestBody(binaryEqualTo(VEDLEGG2_TEST_CONTENT.getBytes())));
 	}
 
 	private void verifyPutIntegrasjonspunktLastOppFilArkvimelding(String conversationId, String orgnr, String fnr) {
-		verify(1, putRequestedFor(urlEqualTo("/integrasjonspunkt/" + conversationId))
+		verify(1, putRequestedFor(urlEqualTo("/integrasjonspunkt/api/messages/out/" + conversationId))
 				.withHeader(CONTENT_DISPOSITION, equalTo("attachment; name=arkivmelding; filename=arkivmelding.xml"))
 				.withRequestBody(equalToXml(classpathToString("__files/integrasjonspunkt/arkivMeldingRequest.xml"), true)));
 
@@ -1244,7 +1244,7 @@ public class Qdist013IT {
 		if (!isNullOrEmpty(orgnr)) {
 			sakspartNavn = SAKSPARTNAVN_ORGANISASJON;
 		}
-		verify(1, putRequestedFor(urlEqualTo("/integrasjonspunkt/" + conversationId))
+		verify(1, putRequestedFor(urlEqualTo("/integrasjonspunkt/api/messages/out/" + conversationId))
 				.withHeader(CONTENT_DISPOSITION, equalTo("attachment; name=arkivmelding; filename=arkivmelding.xml"))
 				.withRequestBody(containing("<meldingId>" + CALL_ID + "</meldingId>"))
 				.withRequestBody(containing("<sakspartID>" + sakspartID + "</sakspartID>"))
@@ -1252,12 +1252,12 @@ public class Qdist013IT {
 	}
 
 	private void stubPostIntegrasjonspunktCreateMessage() {
-		stubFor(post("/integrasjonspunkt")
+		stubFor(post("/integrasjonspunkt/api/messages/out")
 				.willReturn(aResponse().withStatus(HttpStatus.OK.value())));
 	}
 
 	private void verifyPostIntegrasjonspunktCreateMessage() {
-		verify(1, postRequestedFor(urlEqualTo("/integrasjonspunkt"))
+		verify(1, postRequestedFor(urlEqualTo("/integrasjonspunkt/api/messages/out"))
 				.withRequestBody(equalToJson(classpathToString("__files/integrasjonspunkt/createMessageRequest.json"), true, true))
 				.withRequestBody(matchingJsonPath("$..documentIdentification.instanceIdentifier", containing(CALL_ID)))
 				.withRequestBody(matchingJsonPath("$..documentIdentification.creationDateAndTime"))
@@ -1414,7 +1414,7 @@ public class Qdist013IT {
 	}
 
 	private String findConversationId() {
-		List<LoggedRequest> loggedRequests = findAll(postRequestedFor(urlEqualTo("/integrasjonspunkt")));
+		List<LoggedRequest> loggedRequests = findAll(postRequestedFor(urlEqualTo("/integrasjonspunkt/api/messages/out")));
 		String requestStr = loggedRequests.get(0).getBodyAsString();
 		try {
 			JsonNode requestTree = new ObjectMapper().readTree(requestStr);

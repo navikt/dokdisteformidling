@@ -32,6 +32,7 @@ public class IntegrasjonspunktConsumer implements Integrasjonspunkt {
 
 	private final RestTemplate restTemplate;
 	private final String integrasjonspunktUrl;
+	private final String MESSAGES_OUT_PATH = "/messages/out";
 
 	public IntegrasjonspunktConsumer(RestTemplateBuilder restTemplateBuilder,
 									 @Value("${integrasjonspunkt_api_url}") String integrasjonspunktUrl) {
@@ -46,7 +47,7 @@ public class IntegrasjonspunktConsumer implements Integrasjonspunkt {
 	@Retryable(include = IntegrasjonspunktRequestTechnicalException.class, backoff = @Backoff(delay = DELAY_SHORT))
 	public void opprettMelding(CreateMessageRequest createMessageRequest, String conversationId) {
 		try {
-			restTemplate.postForObject(this.integrasjonspunktUrl, createMessageRequest, Object.class);
+			restTemplate.postForObject(this.integrasjonspunktUrl + MESSAGES_OUT_PATH, createMessageRequest, Object.class);
 		} catch (HttpClientErrorException e) {
 			throw new IntegrasjonspunktRequestFunctionalException(format("Funksjonell feil ved kall mot tjensten opprettMelding på integrasjonspunktet til Difi. ConversationId=%s. Feilmelding=%s",
 					conversationId, e.getMessage()), e);
@@ -61,7 +62,8 @@ public class IntegrasjonspunktConsumer implements Integrasjonspunkt {
 	public void lastOppFil(DokdistDokument dokument, String title, String filename, String conversationId) {
 		try {
 			HttpHeaders headers = createContentDispositionHeader(title, filename);
-			restTemplate.exchange(this.integrasjonspunktUrl + "/" + conversationId, HttpMethod.PUT, new HttpEntity<>(dokument.getPdf(), headers), Object.class);
+			restTemplate.exchange(this.integrasjonspunktUrl + MESSAGES_OUT_PATH + "/" + conversationId,
+					HttpMethod.PUT, new HttpEntity<>(dokument.getPdf(), headers), Object.class);
 		} catch (HttpClientErrorException e) {
 			throw new IntegrasjonspunktRequestFunctionalException(format("Funksjonell feil ved kall til lastOppFil " +
 					"mot integrasjonspunkt til Difi. Feilmelding=%s", e.getMessage()), e);
@@ -75,7 +77,7 @@ public class IntegrasjonspunktConsumer implements Integrasjonspunkt {
 	@Retryable(include = IntegrasjonspunktRequestTechnicalException.class, backoff = @Backoff(delay = DELAY_SHORT))
 	public void sendMelding(String conversationId) {
 		try {
-			restTemplate.postForObject(this.integrasjonspunktUrl + "/" + conversationId, null, Object.class);
+			restTemplate.postForObject(this.integrasjonspunktUrl + MESSAGES_OUT_PATH + "/" + conversationId, null, Object.class);
 		} catch (HttpClientErrorException e) {
 			throw new IntegrasjonspunktRequestFunctionalException(format("Funksjonell feil ved kall til sendMelding " +
 					"mot integrasjonspunkt til Difi. Feilmelding=%s", e.getMessage()), e);
@@ -90,7 +92,7 @@ public class IntegrasjonspunktConsumer implements Integrasjonspunkt {
 	public String getStatus(String conversationId) {
 		try {
 			PagedResources<MessageStatus> response = restTemplate.exchange(
-					this.integrasjonspunktUrl + "/api/statuses?conversationId=" + conversationId, HttpMethod.GET,
+					this.integrasjonspunktUrl + "/statuses?conversationId=" + conversationId, HttpMethod.GET,
 					new HttpEntity<>(createContentTypeHeader()), new ParameterizedTypeReference<PagedResources<MessageStatus>>() {}).getBody();
 			return MessageStatus.findLatestStatus(response.getContent());
 		} catch (HttpClientErrorException e) {
