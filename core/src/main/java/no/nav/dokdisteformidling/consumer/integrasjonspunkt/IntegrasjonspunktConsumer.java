@@ -49,11 +49,11 @@ public class IntegrasjonspunktConsumer implements Integrasjonspunkt {
 		try {
 			restTemplate.postForObject(this.integrasjonspunktUrl + MESSAGES_OUT_PATH, createMessageRequest, Object.class);
 		} catch (HttpClientErrorException e) {
-			throw new IntegrasjonspunktRequestFunctionalException(format("Funksjonell feil ved kall mot tjensten opprettMelding på integrasjonspunktet til Difi. ConversationId=%s. Feilmelding=%s",
-					conversationId, e.getMessage()), e);
+			throw new IntegrasjonspunktRequestFunctionalException(format("Funksjonell feil ved kall mot tjenesten opprettMelding på integrasjonspunktet til Difi. ConversationId=%s. Feilmelding=%s",
+					conversationId, e.getResponseBodyAsString()), e);
 		} catch (HttpServerErrorException e) {
-			throw new IntegrasjonspunktRequestTechnicalException(format("Teknisk feil ved kall opprettMelding på integrasjonspunktet til Difi.  ConversationId=%s  Feilmelding=%s",
-					conversationId, e.getMessage()), e);
+			throw new IntegrasjonspunktRequestTechnicalException(format("Teknisk feil ved kall mot tjenesten opprettMelding på integrasjonspunktet til Difi. ConversationId=%s  Feilmelding=%s",
+					conversationId, e.getResponseBodyAsString()), e);
 		}
 	}
 
@@ -66,10 +66,10 @@ public class IntegrasjonspunktConsumer implements Integrasjonspunkt {
 					HttpMethod.PUT, new HttpEntity<>(dokument.getPdf(), headers), Object.class);
 		} catch (HttpClientErrorException e) {
 			throw new IntegrasjonspunktRequestFunctionalException(format("Funksjonell feil ved kall til lastOppFil " +
-					"mot integrasjonspunkt til Difi. Feilmelding=%s", e.getMessage()), e);
+					"mot integrasjonspunkt til Difi. Feilmelding=%s", e.getResponseBodyAsString()), e);
 		} catch (HttpServerErrorException e) {
 			throw new IntegrasjonspunktRequestTechnicalException(format("Teknisk feil ved kall på lastOppFil " +
-					"mot integrasjonspunkt til Difi. Feilmelding=%s", e.getMessage()), e);
+					"mot integrasjonspunkt til Difi. Feilmelding=%s", e.getResponseBodyAsString()), e);
 		}
 	}
 
@@ -80,10 +80,10 @@ public class IntegrasjonspunktConsumer implements Integrasjonspunkt {
 			restTemplate.postForObject(this.integrasjonspunktUrl + MESSAGES_OUT_PATH + "/" + conversationId, null, Object.class);
 		} catch (HttpClientErrorException e) {
 			throw new IntegrasjonspunktRequestFunctionalException(format("Funksjonell feil ved kall til sendMelding " +
-					"mot integrasjonspunkt til Difi. Feilmelding=%s", e.getMessage()), e);
+					"mot integrasjonspunkt til Difi. Feilmelding=%s", e.getResponseBodyAsString()), e);
 		} catch (HttpServerErrorException e) {
 			throw new IntegrasjonspunktRequestTechnicalException(format("Teknisk feil ved kall på sendMelding " +
-					"mot integrasjonspunkt til Difi. Feilmelding=%s", e.getMessage()), e);
+					"mot integrasjonspunkt til Difi. Feilmelding=%s", e.getResponseBodyAsString()), e);
 		}
 	}
 
@@ -97,10 +97,10 @@ public class IntegrasjonspunktConsumer implements Integrasjonspunkt {
 			return MessageStatus.findLatestStatus(response.getContent());
 		} catch (HttpClientErrorException e) {
 			throw new IntegrasjonspunktRequestFunctionalException(String.format("Funksjonell feil ved kall til getStatus " +
-					"mot integrasjonspunkt til Difi for conversationId=%s: %s", conversationId, e.getMessage()), e);
+					"mot integrasjonspunkt til Difi for conversationId=%s: %s", conversationId, e.getResponseBodyAsString()), e);
 		} catch (HttpServerErrorException e) {
 			throw new IntegrasjonspunktRequestTechnicalException(String.format("Teknisk feil ved kall til getStatus " +
-					"mot integrasjonspunkt til Difi for conversationId=%s: %s", conversationId, e.getMessage()), e);
+					"mot integrasjonspunkt til Difi for conversationId=%s: %s", conversationId, e.getResponseBodyAsString()), e);
 		}
 	}
 

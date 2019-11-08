@@ -28,6 +28,7 @@ class CreateMessageRequestMapperTest {
 	private final static String CONVERSATION_ID_IDENTIFIER = "urn:no:difi:profile:arkivmelding:administrasjon:ver1.0";
 	private final static String BESTILLINGS_ID = "bestillingsId";
 	private final static String MOTTAKER_ID = "mottakerId";
+	private static final String TRYGDERETTEN_ORG_NR = "974761084";
 	private final static String HOVEDDOKUMENT_ARKIVMELDING = "arkivmelding.xml";
 	private final static int SIKKERHETSNIVAA = 4;
 
@@ -66,7 +67,7 @@ class CreateMessageRequestMapperTest {
 		assertTrue(receiver != null && receiver.size() == 1);
 		assertNotNull(receiver.iterator().next());
 		assertEquals(IDENTIFIER_AUTHORITY, receiver.iterator().next().getIdentifier().getAuthority());
-		assertEquals(PREFIX_IDENTIFIER_VALUE + MOTTAKER_ID, receiver.iterator().next().getIdentifier().getValue());
+		assertEquals(PREFIX_IDENTIFIER_VALUE + TRYGDERETTEN_ORG_NR, receiver.iterator().next().getIdentifier().getValue());
 	}
 
 	private void assertSender(Set<CreateMessageRequest.StandardBusinessDocumentHeader.Sender> senders) {
