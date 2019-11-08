@@ -1,6 +1,7 @@
 package no.nav.dokdisteformidling.qdist013;
 
 import static java.time.temporal.ChronoUnit.HOURS;
+import static java.time.temporal.ChronoUnit.SECONDS;
 import static no.nav.dokdisteformidling.qdist013.Qdist013Service.ARKIVMELDING;
 import static no.nav.dokdisteformidling.qdist013.Qdist013Service.ARKIVMELDING_XML;
 
@@ -22,6 +23,7 @@ public class CreateMessageRequestMapper {
 	private static final String TYPE_VERSION = "1.0";
 	private static final String IDENTIFIER_AUTHORITY = "iso6523-actorid-upis";
 	private static final String PREFIX_IDENTIFIER_VALUE = "0192:";
+	private static final String TRYGDERETTEN_ORG_NR = "974761084";
 	private static final String DOCUMENT_IDENTIFICATOR_STANDARD = "urn:no:difi:arkivmelding:xsd::arkivmelding";
 	private static final String CONVERSATION_ID_SCOPE_IDENTIFIER = "urn:no:difi:profile:arkivmelding:administrasjon:ver1.0";
 	private static final String CONVERSATION_ID = "ConversationId";
@@ -53,7 +55,7 @@ public class CreateMessageRequestMapper {
 						)))
 						.build())
 				.documentIdentification(CreateMessageRequest.StandardBusinessDocumentHeader.DocumentIdentification.builder()
-						.creationDateAndTime(OffsetDateTime.now())
+						.creationDateAndTime(OffsetDateTime.now().minus(10, SECONDS))
 						.instanceIdentifier(hentForsendelseResponseTo.getBestillingsId())
 						.multipleType(Boolean.TRUE)
 						.standard(DOCUMENT_IDENTIFICATOR_STANDARD)
@@ -64,7 +66,7 @@ public class CreateMessageRequestMapper {
 				.receiver(new HashSet<>(Collections.singletonList(CreateMessageRequest.StandardBusinessDocumentHeader.Receiver.builder()
 						.identifier(CreateMessageRequest.StandardBusinessDocumentHeader.Partner.PartnerIdentification.builder()
 								.authority(IDENTIFIER_AUTHORITY)
-								.value(PREFIX_IDENTIFIER_VALUE + hentForsendelseResponseTo.getMottaker().getMottakerId())
+								.value(PREFIX_IDENTIFIER_VALUE + TRYGDERETTEN_ORG_NR)
 								.build())
 						.build())))
 				.sender(new HashSet<>(Collections.singletonList(CreateMessageRequest.StandardBusinessDocumentHeader.Sender.builder()
