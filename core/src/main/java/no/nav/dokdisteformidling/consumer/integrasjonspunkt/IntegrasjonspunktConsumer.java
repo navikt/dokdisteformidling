@@ -59,10 +59,10 @@ public class IntegrasjonspunktConsumer implements Integrasjonspunkt {
 
 	@Monitor(value = "dok_metric", extraTags = {"process", "integrasjonspunktLastOppFiler"}, histogram = true, percentiles = {0.5, 0.95})
 	@Retryable(include = IntegrasjonspunktRequestTechnicalException.class, backoff = @Backoff(delay = DELAY_SHORT))
-	public void lastOppFil(DokdistDokument dokument, String title, String filename, String conversationId) {
+	public void lastOppFil(DokdistDokument dokument, String title, String filename, String messageId) {
 		try {
 			HttpHeaders headers = createContentDispositionHeader(title, filename);
-			restTemplate.exchange(this.integrasjonspunktUrl + MESSAGES_OUT_PATH + "/" + conversationId,
+			restTemplate.exchange(this.integrasjonspunktUrl + MESSAGES_OUT_PATH + "/" + messageId,
 					HttpMethod.PUT, new HttpEntity<>(dokument.getPdf(), headers), Object.class);
 		} catch (HttpClientErrorException e) {
 			throw new IntegrasjonspunktRequestFunctionalException(format("Funksjonell feil ved kall til lastOppFil " +
@@ -75,9 +75,9 @@ public class IntegrasjonspunktConsumer implements Integrasjonspunkt {
 
 	@Monitor(value = "dok_metric", extraTags = {"process", "integrasjonspunktSendMelding"}, histogram = true, percentiles = {0.5, 0.95})
 	@Retryable(include = IntegrasjonspunktRequestTechnicalException.class, backoff = @Backoff(delay = DELAY_SHORT))
-	public void sendMelding(String conversationId) {
+	public void sendMelding(String messageId) {
 		try {
-			restTemplate.postForObject(this.integrasjonspunktUrl + MESSAGES_OUT_PATH + "/" + conversationId, null, Object.class);
+			restTemplate.postForObject(this.integrasjonspunktUrl + MESSAGES_OUT_PATH + "/" + messageId, null, Object.class);
 		} catch (HttpClientErrorException e) {
 			throw new IntegrasjonspunktRequestFunctionalException(format("Funksjonell feil ved kall til sendMelding " +
 					"mot integrasjonspunkt til Difi. Feilmelding=%s", e.getResponseBodyAsString()), e);
