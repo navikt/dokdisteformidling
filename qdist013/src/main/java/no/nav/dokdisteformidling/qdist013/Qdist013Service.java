@@ -84,22 +84,22 @@ public class Qdist013Service {
 		exchange.setProperty(PROPERTY_CONVERSATION_ID, conversationId);
 		final HentForsendelseResponseTo hentForsendelseResponseTo = administrerForsendelse.hentForsendelse(distribuerForsendelseTilTrygderetten
 				.getForsendelseId());
-		exchange.setProperty(PROPERTY_BESTILLINGS_ID, hentForsendelseResponseTo.getBestillingsId());
+		final String bestillingsId = hentForsendelseResponseTo.getBestillingsId();
+		exchange.setProperty(PROPERTY_BESTILLINGS_ID, bestillingsId);
 		validateThatForsendelseStatusIsKlarForDist(hentForsendelseResponseTo.getForsendelseStatus());
 
 		final List<DokdistDokument> dokdistDokumentList = getDocumentsFromS3(hentForsendelseResponseTo);
 		final JournalpostQdist013 journalpostQdist013 = safJournalpostQueryService.hentJournalpost(hentForsendelseResponseTo.getArkivInformasjon()
 				.getArkivId());
-		final JAXBElement<Arkivmelding> arkivmeldingJAXBElement = arkivmeldingMapper.createArkivMelding(journalpostQdist013, hentForsendelseResponseTo
-				.getBestillingsId());
+		final JAXBElement<Arkivmelding> arkivmeldingJAXBElement = arkivmeldingMapper.createArkivMelding(journalpostQdist013, bestillingsId);
 		final String arkivmeldingXmlString = marshalArkivmeldingToXmlString(arkivmeldingJAXBElement);
 		final String orgnrForEnhet = getOrgnrForEnhet(journalpostQdist013.getJournalfoerendeEnhet());
 		final CreateMessageRequest createMessageRequest = createMessageRequestMapper.map(conversationId, orgnrForEnhet, hentForsendelseResponseTo);
 
 		integrasjonspunkt.opprettMelding(createMessageRequest, conversationId);
-		uploadDocuments(dokdistDokumentList, arkivmeldingJAXBElement.getValue(), journalpostQdist013.getJournalpostId(), conversationId);
-		uploadArkivmelding(arkivmeldingXmlString, conversationId);
-		integrasjonspunkt.sendMelding(conversationId);
+		uploadDocuments(dokdistDokumentList, arkivmeldingJAXBElement.getValue(), journalpostQdist013.getJournalpostId(), bestillingsId);
+		uploadArkivmelding(arkivmeldingXmlString, bestillingsId);
+		integrasjonspunkt.sendMelding(bestillingsId);
 		juridiskLogg.lagreJuridiskLogg(lagreJuridiskLoggMapper.map(hentForsendelseResponseTo, arkivmeldingXmlString.getBytes()));
 	}
 
@@ -114,18 +114,18 @@ public class Qdist013Service {
 				.collect(Collectors.toList());
 	}
 
-	private void uploadDocuments(List<DokdistDokument> dokdistDokumentList, Arkivmelding arkivmelding, String journalpostId, String conversationId) {
+	private void uploadDocuments(List<DokdistDokument> dokdistDokumentList, Arkivmelding arkivmelding, String journalpostId, String bestillingsId) {
 		dokdistDokumentList.forEach(dokdistDokument -> {
 			final String title = getDocumentTitle(arkivmelding, journalpostId, dokdistDokument.getDokumentInfoId());
 			final String filename = getDocumentFilename(arkivmelding, journalpostId, dokdistDokument.getDokumentInfoId());
-			integrasjonspunkt.lastOppFil(dokdistDokument, title, filename, conversationId);
+			integrasjonspunkt.lastOppFil(dokdistDokument, title, filename, bestillingsId);
 		});
 	}
 
-	private void uploadArkivmelding(String arkivmeldingXmlString, String conversationId) {
+	private void uploadArkivmelding(String arkivmeldingXmlString, String bestillingsId) {
 		integrasjonspunkt.lastOppFil(DokdistDokument.builder()
 				.pdf(arkivmeldingXmlString.getBytes())
-				.build(), ARKIVMELDING, ARKIVMELDING_XML, conversationId);
+				.build(), ARKIVMELDING, ARKIVMELDING_XML, bestillingsId);
 	}
 
 	private String marshalArkivmeldingToXmlString(JAXBElement<Arkivmelding> arkivmeldingJAXBElement) {
