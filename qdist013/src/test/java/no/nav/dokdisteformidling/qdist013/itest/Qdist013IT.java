@@ -915,8 +915,8 @@ public class Qdist013IT {
 		verifyGetEregHentOrgNavn("123456789");
 		verifyGetNorg2HentOrgnr();
 		verifyPostIntegrasjonspunktCreateMessage();
-		String conversationId = findConversationId();
-		verify(1, putRequestedFor(urlEqualTo("/integrasjonspunkt/api/messages/out/" + conversationId))
+		String bestillingsId = findBestillingsId();
+		verify(1, putRequestedFor(urlEqualTo("/integrasjonspunkt/api/messages/out/" + bestillingsId))
 				.withHeader(CONTENT_DISPOSITION, equalTo("attachment; name=Tittel; filename=448212366-463791441-PRODUKSJON-PDF"))
 				.withRequestBody(binaryEqualTo(HOVEDDOK_TEST_CONTENT.getBytes())));
 	}
@@ -946,8 +946,8 @@ public class Qdist013IT {
 		verifyGetEregHentOrgNavn("123456789");
 		verifyGetNorg2HentOrgnr();
 		verifyPostIntegrasjonspunktCreateMessage();
-		String conversationId = findConversationId();
-		verify(MAX_ATTEMPTS_SHORT, putRequestedFor(urlEqualTo("/integrasjonspunkt/api/messages/out/" + conversationId))
+		String bestillingsId = findBestillingsId();
+		verify(MAX_ATTEMPTS_SHORT, putRequestedFor(urlEqualTo("/integrasjonspunkt/api/messages/out/" + bestillingsId))
 				.withHeader(CONTENT_DISPOSITION, equalTo("attachment; name=Tittel; filename=448212366-463791441-PRODUKSJON-PDF"))
 				.withRequestBody(binaryEqualTo(HOVEDDOK_TEST_CONTENT.getBytes())));
 	}
@@ -978,12 +978,12 @@ public class Qdist013IT {
 		verifyGetEregHentOrgNavn("123456789");
 		verifyGetNorg2HentOrgnr();
 		verifyPostIntegrasjonspunktCreateMessage();
-		String conversationId = findConversationId();
-		verifyPutIntegrasjonspunktLastOppFilHoveddokument(conversationId);
-		verifyPutIntegrasjonspunktLastOppFilVedlegg1(conversationId);
-		verifyPutIntegrasjonspunktLastOppFilVedlegg2(conversationId);
-		verifyPutIntegrasjonspunktLastOppFilArkvimelding(conversationId, "123456789", "");
-		verify(1, postRequestedFor(urlEqualTo("/integrasjonspunkt/api/messages/out/" + conversationId)).withRequestBody(absent()));
+		String bestillingsId = findBestillingsId();
+		verifyPutIntegrasjonspunktLastOppFilHoveddokument(bestillingsId);
+		verifyPutIntegrasjonspunktLastOppFilVedlegg1(bestillingsId);
+		verifyPutIntegrasjonspunktLastOppFilVedlegg2(bestillingsId);
+		verifyPutIntegrasjonspunktLastOppFilArkvimelding(bestillingsId, "123456789", "");
+		verify(1, postRequestedFor(urlEqualTo("/integrasjonspunkt/api/messages/out/" + bestillingsId)).withRequestBody(absent()));
 	}
 
 	@Test
@@ -1012,12 +1012,12 @@ public class Qdist013IT {
 		verifyGetEregHentOrgNavn("123456789");
 		verifyGetNorg2HentOrgnr();
 		verifyPostIntegrasjonspunktCreateMessage();
-		String conversationId = findConversationId();
-		verifyPutIntegrasjonspunktLastOppFilHoveddokument(conversationId);
-		verifyPutIntegrasjonspunktLastOppFilVedlegg1(conversationId);
-		verifyPutIntegrasjonspunktLastOppFilVedlegg2(conversationId);
-		verifyPutIntegrasjonspunktLastOppFilArkvimelding(conversationId, "123456789", "");
-		verify(MAX_ATTEMPTS_SHORT, postRequestedFor(urlEqualTo("/integrasjonspunkt/api/messages/out/" + conversationId)).withRequestBody(absent()));
+		String bestillingsId = findBestillingsId();
+		verifyPutIntegrasjonspunktLastOppFilHoveddokument(bestillingsId);
+		verifyPutIntegrasjonspunktLastOppFilVedlegg1(bestillingsId);
+		verifyPutIntegrasjonspunktLastOppFilVedlegg2(bestillingsId);
+		verifyPutIntegrasjonspunktLastOppFilArkvimelding(bestillingsId, "123456789", "");
+		verify(MAX_ATTEMPTS_SHORT, postRequestedFor(urlEqualTo("/integrasjonspunkt/api/messages/out/" + bestillingsId)).withRequestBody(absent()));
 	}
 
 	@Test
@@ -1047,12 +1047,12 @@ public class Qdist013IT {
 		verifyGetEregHentOrgNavn("123456789");
 		verifyGetNorg2HentOrgnr();
 		verifyPostIntegrasjonspunktCreateMessage();
-		String conversationId = findConversationId();
-		verifyPutIntegrasjonspunktLastOppFilHoveddokument(conversationId);
-		verifyPutIntegrasjonspunktLastOppFilVedlegg1(conversationId);
-		verifyPutIntegrasjonspunktLastOppFilVedlegg2(conversationId);
-		verifyPutIntegrasjonspunktLastOppFilArkvimelding(conversationId, "123456789", "");
-		verifyPostIntegrasjonspunktSendMelding(conversationId);
+		String bestillingsId = findBestillingsId();
+		verifyPutIntegrasjonspunktLastOppFilHoveddokument(bestillingsId);
+		verifyPutIntegrasjonspunktLastOppFilVedlegg1(bestillingsId);
+		verifyPutIntegrasjonspunktLastOppFilVedlegg2(bestillingsId);
+		verifyPutIntegrasjonspunktLastOppFilArkvimelding(bestillingsId, "123456789", "");
+		verifyPostIntegrasjonspunktSendMelding(bestillingsId);
 		verify(1, postRequestedFor(urlEqualTo("/juridisklogg"))
 				.withRequestBody(equalToJson(classpathToString("__files/juridisklogg/juridiskloggRequest.json"), true, true)));
 	}
@@ -1084,12 +1084,12 @@ public class Qdist013IT {
 		verifyGetEregHentOrgNavn("123456789");
 		verifyGetNorg2HentOrgnr();
 		verifyPostIntegrasjonspunktCreateMessage();
-		String conversationId = findConversationId();
-		verifyPutIntegrasjonspunktLastOppFilHoveddokument(conversationId);
-		verifyPutIntegrasjonspunktLastOppFilVedlegg1(conversationId);
-		verifyPutIntegrasjonspunktLastOppFilVedlegg2(conversationId);
-		verifyPutIntegrasjonspunktLastOppFilArkvimelding(conversationId, "123456789", "");
-		verifyPostIntegrasjonspunktSendMelding(conversationId);
+		String bestillingsId = findBestillingsId();
+		verifyPutIntegrasjonspunktLastOppFilHoveddokument(bestillingsId);
+		verifyPutIntegrasjonspunktLastOppFilVedlegg1(bestillingsId);
+		verifyPutIntegrasjonspunktLastOppFilVedlegg2(bestillingsId);
+		verifyPutIntegrasjonspunktLastOppFilArkvimelding(bestillingsId, "123456789", "");
+		verifyPostIntegrasjonspunktSendMelding(bestillingsId);
 		verify(MAX_ATTEMPTS_SHORT, postRequestedFor(urlEqualTo("/juridisklogg"))
 				.withRequestBody(equalToJson(classpathToString("__files/juridisklogg/juridiskloggRequest.json"), true, true)));
 	}
@@ -1122,13 +1122,14 @@ public class Qdist013IT {
 		verifyGetEregHentOrgNavn("123456789");
 		verifyGetNorg2HentOrgnr();
 		verifyPostIntegrasjonspunktCreateMessage();
-		String conversationId = findConversationId();
-		verifyPutIntegrasjonspunktLastOppFilHoveddokument(conversationId);
-		verifyPutIntegrasjonspunktLastOppFilVedlegg1(conversationId);
-		verifyPutIntegrasjonspunktLastOppFilVedlegg2(conversationId);
-		verifyPutIntegrasjonspunktLastOppFilArkvimelding(conversationId, "123456789", "");
-		verifyPostIntegrasjonspunktSendMelding(conversationId);
+		String bestillingsId = findBestillingsId();
+		verifyPutIntegrasjonspunktLastOppFilHoveddokument(bestillingsId);
+		verifyPutIntegrasjonspunktLastOppFilVedlegg1(bestillingsId);
+		verifyPutIntegrasjonspunktLastOppFilVedlegg2(bestillingsId);
+		verifyPutIntegrasjonspunktLastOppFilArkvimelding(bestillingsId, "123456789", "");
+		verifyPostIntegrasjonspunktSendMelding(bestillingsId);
 		verifyPostJuridiskLoggLagre();
+		String conversationId = findConversationId();
 		verify(1, putRequestedFor(urlEqualTo("/administrerforsendelse?forsendelseId=" + FORSENDELSE_ID +
 				"&forsendelseStatus=OVERSENDT&konversasjonsId=" + conversationId)));
 	}
@@ -1161,13 +1162,14 @@ public class Qdist013IT {
 		verifyGetEregHentOrgNavn("123456789");
 		verifyGetNorg2HentOrgnr();
 		verifyPostIntegrasjonspunktCreateMessage();
-		String conversationId = findConversationId();
-		verifyPutIntegrasjonspunktLastOppFilHoveddokument(conversationId);
-		verifyPutIntegrasjonspunktLastOppFilVedlegg1(conversationId);
-		verifyPutIntegrasjonspunktLastOppFilVedlegg2(conversationId);
-		verifyPutIntegrasjonspunktLastOppFilArkvimelding(conversationId, "123456789", "");
-		verifyPostIntegrasjonspunktSendMelding(conversationId);
+		String bestillingsId = findBestillingsId();
+		verifyPutIntegrasjonspunktLastOppFilHoveddokument(bestillingsId);
+		verifyPutIntegrasjonspunktLastOppFilVedlegg1(bestillingsId);
+		verifyPutIntegrasjonspunktLastOppFilVedlegg2(bestillingsId);
+		verifyPutIntegrasjonspunktLastOppFilArkvimelding(bestillingsId, "123456789", "");
+		verifyPostIntegrasjonspunktSendMelding(bestillingsId);
 		verifyPostJuridiskLoggLagre();
+		String conversationId = findConversationId();
 		verify(MAX_ATTEMPTS_SHORT, putRequestedFor(urlEqualTo("/administrerforsendelse?forsendelseId=" + FORSENDELSE_ID +
 				"&forsendelseStatus=OVERSENDT&konversasjonsId=" + conversationId)));
 	}
@@ -1396,14 +1398,15 @@ public class Qdist013IT {
 		}
 
 		verifyPostIntegrasjonspunktCreateMessage();
-		String conversationId = findConversationId();
-		verifyPutIntegrasjonspunktLastOppFilHoveddokument(conversationId);
-		verifyPutIntegrasjonspunktLastOppFilVedlegg1(conversationId);
-		verifyPutIntegrasjonspunktLastOppFilVedlegg2(conversationId);
-		verifyPutIntegrasjonspunktLastOppFilArkvimelding(conversationId, orgnr, fnr);
-		verifyPostIntegrasjonspunktSendMelding(conversationId);
+		String bestillingsId = findBestillingsId();
+		verifyPutIntegrasjonspunktLastOppFilHoveddokument(bestillingsId);
+		verifyPutIntegrasjonspunktLastOppFilVedlegg1(bestillingsId);
+		verifyPutIntegrasjonspunktLastOppFilVedlegg2(bestillingsId);
+		verifyPutIntegrasjonspunktLastOppFilArkvimelding(bestillingsId, orgnr, fnr);
+		verifyPostIntegrasjonspunktSendMelding(bestillingsId);
 
 		verifyPostJuridiskLoggLagre();
+		String conversationId = findConversationId();
 		verifyPutAdministrerforsendelseOppdatertForsendelsestatusAndkonvId(conversationId);
 	}
 
@@ -1411,6 +1414,19 @@ public class Qdist013IT {
 		String message = receive(queue);
 		assertNotNull(message);
 		assertEquals(message, classpathToString("qdist013/qdist013-happy.xml"));
+	}
+
+	private String findBestillingsId() {
+		List<LoggedRequest> loggedRequests = findAll(postRequestedFor(urlEqualTo("/integrasjonspunkt/api/messages/out")));
+		String requestStr = loggedRequests.get(0).getBodyAsString();
+		try {
+			JsonNode requestTree = new ObjectMapper().readTree(requestStr);
+			return requestTree.get("standardBusinessDocumentHeader").get("documentIdentification")
+					.get("instanceIdentifier").asText();
+		} catch (Exception e) {
+			fail("Fant ikke konversasjonsId. Feil: " + e.getMessage(), e.getCause());
+			return null;
+		}
 	}
 
 	private String findConversationId() {

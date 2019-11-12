@@ -8,9 +8,9 @@ import no.nav.dokdisteformidling.storage.DokdistDokument;
 public interface Integrasjonspunkt {
 	void opprettMelding(CreateMessageRequest createMessageRequest, String conversationId);
 
-	void lastOppFil(DokdistDokument dokumenter, String title, String filename, String conversationId);
+	void lastOppFil(DokdistDokument dokumenter, String title, String filename, String messageId);
 
-	void sendMelding(String conversationId);
+	void sendMelding(String messageId);
 
 	String getStatus(String conversationId);
 }
