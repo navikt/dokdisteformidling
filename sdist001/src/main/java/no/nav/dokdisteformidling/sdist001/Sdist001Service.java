@@ -31,7 +31,7 @@ public class Sdist001Service {
 	public static final String KONVERSASJON_STATUS_MOTTATT = "MOTTATT";
 	public static final String KONVERSASJON_STATUS_OPPRETTET = "OPPRETTET";
 	public static final String KONVERSASJON_STATUS_SENDT = "SENDT";
-	public static final String KONVERSASJON_STATUS_TTL_EXPIRED = "TTL_EXPIRED";
+	public static final String KONVERSASJON_STATUS_LEVETID_UTLOPT = "LEVETID_UTLOPT";
 
 	private final AdministrerForsendelse administrerForsendelse;
 	private final Integrasjonspunkt integrasjonspunkt;
@@ -75,7 +75,7 @@ public class Sdist001Service {
 	private void kontrollerStatusOversendt(String integrasjonspunktStatus, String forsendelseId, String konversasjonId,
 										   ForsendelseStatusEndringer forsendelseStatusEndringer) {
 		switch (integrasjonspunktStatus) {
-			case KONVERSASJON_STATUS_TTL_EXPIRED:
+			case KONVERSASJON_STATUS_LEVETID_UTLOPT:
 				log.error("Avvik har oppstått for forsendelseId={}. Forsendelsen settes til FEILET.", forsendelseId);
 				administrerForsendelse.oppdaterForsendelseStatus(forsendelseId, FORSENDELSE_STATUS_FEILET);
 				forsendelseStatusEndringer.getFeilet().add(forsendelseId);
@@ -103,7 +103,7 @@ public class Sdist001Service {
 	private void kontrollerStatusBekreftet(String integrasjonspunktStatus, String forsendelseId, String konversasjonId,
 										   ForsendelseStatusEndringer forsendelseStatusEndringer) {
 		switch (integrasjonspunktStatus) {
-			case KONVERSASJON_STATUS_TTL_EXPIRED:
+			case KONVERSASJON_STATUS_LEVETID_UTLOPT:
 				log.error("Avvik har oppstått for forsendelseId={}. Forsendelsen settes til FEILET.", forsendelseId);
 				administrerForsendelse.oppdaterForsendelseStatus(forsendelseId, FORSENDELSE_STATUS_FEILET);
 				forsendelseStatusEndringer.getFeilet().add(forsendelseId);
