@@ -87,7 +87,7 @@ public class Sdist001IT {
 				.withBody(classpathToString("__files/rdist001/henteformidlingforsendelser-oversendtStatus.json"))));
 		stubFor(get("/integrasjonspunkt/api/statuses?conversationId=101").willReturn(aResponse().withStatus(HttpStatus.OK.value())
 				.withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE)
-				.withBody(classpathToString("__files/integrasjonspunkt/getStatus-TTL_EXPIRED.json"))));
+				.withBody(classpathToString("__files/integrasjonspunkt/getStatus-LEVETID_UTLOPT.json"))));
 		stubFor(put("/administrerforsendelse?forsendelseId=1&forsendelseStatus=FEILET")
 				.willReturn(aResponse().withStatus(HttpStatus.OK.value())));
 
@@ -150,7 +150,7 @@ public class Sdist001IT {
 				.withBody(classpathToString("__files/rdist001/henteformidlingforsendelser-bekreftetStatus.json"))));
 		stubFor(get("/integrasjonspunkt/api/statuses?conversationId=101").willReturn(aResponse().withStatus(HttpStatus.OK.value())
 				.withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE)
-				.withBody(classpathToString("__files/integrasjonspunkt/getStatus-TTL_EXPIRED.json"))));
+				.withBody(classpathToString("__files/integrasjonspunkt/getStatus-LEVETID_UTLOPT.json"))));
 		stubFor(put("/administrerforsendelse?forsendelseId=1&forsendelseStatus=FEILET")
 				.willReturn(aResponse().withStatus(HttpStatus.OK.value())));
 
