@@ -23,6 +23,7 @@ public class CreateMessageRequestMapper {
 	private static final String TYPE_VERSION = "1.0";
 	private static final String IDENTIFIER_AUTHORITY = "iso6523-actorid-upis";
 	private static final String PREFIX_IDENTIFIER_VALUE = "0192:";
+	private static final String NAV_ORG_NR = "889640782";
 	private static final String TRYGDERETTEN_ORG_NR = "974761084";
 	private static final String DOCUMENT_IDENTIFICATOR_STANDARD = "urn:no:difi:arkivmelding:xsd::arkivmelding";
 	private static final String CONVERSATION_ID_SCOPE_IDENTIFIER = "urn:no:difi:profile:arkivmelding:administrasjon:ver1.0";
@@ -72,7 +73,7 @@ public class CreateMessageRequestMapper {
 				.sender(new HashSet<>(Collections.singletonList(CreateMessageRequest.StandardBusinessDocumentHeader.Sender.builder()
 						.identifier(CreateMessageRequest.StandardBusinessDocumentHeader.Partner.PartnerIdentification.builder()
 								.authority(IDENTIFIER_AUTHORITY)
-								.value(PREFIX_IDENTIFIER_VALUE + orgnrForEnhet)
+								.value(PREFIX_IDENTIFIER_VALUE + NAV_ORG_NR)
 								.build())
 						.build())))
 				.build();
