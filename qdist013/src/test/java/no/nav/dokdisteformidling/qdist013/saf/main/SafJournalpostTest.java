@@ -24,11 +24,9 @@ public abstract class SafJournalpostTest {
 	protected final static LocalDateTime DATO_OPPRETTET_SAK = LocalDateTime.now().minusHours(2);
 	protected final static String ORIGINAL_JOURNALPOST_ID = "originalJournalpostId";
 
-	protected final static LocalDateTime HOVEDDOK_DATO_FERDIGSTILT = LocalDateTime.now().minusDays(7);
 	protected final static String HOVEDDOK_DOKUMENT_INFO_ID = "hovedDokumentInfoId";
 	protected final static String HOVEDDOK_TITTEL = "hovedDokumentTittel";
 
-	protected final static LocalDateTime VEDLEGG_DATO_FERDIGSTILT = LocalDateTime.now().minusDays(5);
 	protected final static String VEDLEGG_DOKUMENT_INFO_ID = "vedleggDokumentInfoId";
 	protected final static String VEDLEGG_TITTEL = "vedleggTittel";
 
@@ -61,7 +59,6 @@ public abstract class SafJournalpostTest {
 
 	protected SafJournalpost.DokumentInfo.DokumentInfoBuilder createHovedDokumentInfo() {
 		return SafJournalpost.DokumentInfo.builder()
-				.datoFerdigstilt(HOVEDDOK_DATO_FERDIGSTILT)
 				.dokumentInfoId(HOVEDDOK_DOKUMENT_INFO_ID)
 				.dokumentvarianter(Arrays.asList(createDokumentVariantOriginal(), createDokumentVariantArkiv()))
 				.tittel(HOVEDDOK_TITTEL);
@@ -69,7 +66,6 @@ public abstract class SafJournalpostTest {
 
 	private SafJournalpost.DokumentInfo createVedleggDokumentInfo() {
 		return SafJournalpost.DokumentInfo.builder()
-				.datoFerdigstilt(VEDLEGG_DATO_FERDIGSTILT)
 				.dokumentInfoId(VEDLEGG_DOKUMENT_INFO_ID)
 				.dokumentvarianter(Arrays.asList(createDokumentVariantArkiv()))
 				.originalJournalpostId(ORIGINAL_JOURNALPOST_ID)

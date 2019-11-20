@@ -26,7 +26,7 @@
  uker{\nid\ntype\n}\ndatoOpprettet\ntittel\njournalfortAvN
  avn\ntemanavn\njournalfoerendeEnhet\nrelevanteDatoer
  {\ndato\ndatotype\n}\ndokumenter
- {\ndokumentInfoId\ntittel\ndatoFerdigstilt\noriginalJourn
+ {\ndokumentInfoId\ntittel\noriginalJourn
  alpostId\ndokumentvarianter
  {\nvariantformat\nfiltype\n}\n}\n}\n}","operationName":"j
  ournalpost","variables":{"queryJournalpostId":"123"}}

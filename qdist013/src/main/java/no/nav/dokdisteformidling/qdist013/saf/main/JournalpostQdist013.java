@@ -55,7 +55,6 @@ public class JournalpostQdist013 implements Journalpost {
 	public static class DokumentInfo {
 		private final String dokumentInfoId;
 		private final String tittel;
-		private final LocalDateTime datoFerdigstilt;
 		private final String originalJournalpostId;
 		@Builder.Default
 		private final List<Dokumentvariant> dokumentvarianter = new ArrayList<>();
