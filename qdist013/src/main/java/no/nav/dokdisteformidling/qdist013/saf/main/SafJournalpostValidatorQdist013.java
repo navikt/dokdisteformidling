@@ -66,8 +66,6 @@ public class SafJournalpostValidatorQdist013 {
 							.getDokumentInfoId());
 					assertFieldOnSafDokumenterNotNullOrEmpty("dokumentInfo.tittel", dokumentInfo.getTittel(), journalpostId, dokumentInfo
 							.getDokumentInfoId());
-					assertObjectOnSafDokumenterNotNull("dokumentInfo.datoFerdigstilt", dokumentInfo.getDatoFerdigstilt(), journalpostId, dokumentInfo
-							.getDokumentInfoId());
 					assertObjectOnSafDokumenterNotNull("dokumentInfo.dokumentvarianter", dokumentInfo.getDokumentvarianter(), journalpostId, dokumentInfo
 							.getDokumentInfoId());
 					if (!dokumentInfoContainsDokumentvariantSladdetOrArkiv(dokumentInfo)) {
