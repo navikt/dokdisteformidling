@@ -135,7 +135,6 @@ public class Qdist013IT {
 		stubGetSecurityToken();
 		stubPostSafJournalpost("queryJournalpostId\":\"123\"", "saf/safQdist013GraphQlResponse-aktoerId.json");
 		stubPostSafJournalpost("queryJournalpostId\":\"448212366\"", "saf/safLightweightGraphQlResponse-happy.json");
-		stubGetNorg2HentOrgnr();
 		stubGetTpsHentPersonNavn("***gammelt_fnr***");
 		stubGetAktoerregisterHentIdentForAktoerId("***gammelt_fnr***09");
 		stubPostIntegrasjonspunktCreateMessage();
@@ -159,7 +158,6 @@ public class Qdist013IT {
 		stubGetSecurityToken();
 		stubPostSafJournalpost("queryJournalpostId\":\"123\"", "saf/safQdist013GraphQlResponse-fnr.json");
 		stubPostSafJournalpost("queryJournalpostId\":\"448212366\"", "saf/safLightweightGraphQlResponse-happy.json");
-		stubGetNorg2HentOrgnr();
 		stubGetTpsHentPersonNavn("***gammelt_fnr***");
 		stubPostIntegrasjonspunktCreateMessage();
 		stubPutIntegrasjonspunktLastOppFil();
@@ -182,7 +180,6 @@ public class Qdist013IT {
 		stubGetSecurityToken();
 		stubPostSafJournalpost("queryJournalpostId\":\"123\"", "saf/safQdist013GraphQlResponse-orgnr.json");
 		stubPostSafJournalpost("queryJournalpostId\":\"448212366\"", "saf/safLightweightGraphQlResponse-happy.json");
-		stubGetNorg2HentOrgnr();
 		stubGetEregHentOrgNavn("123456789");
 		stubPostIntegrasjonspunktCreateMessage();
 		stubPutIntegrasjonspunktLastOppFil();
@@ -766,84 +763,12 @@ public class Qdist013IT {
 	}
 
 	@Test
-	public void shouldThrowNorg2HentEnhetsInfoFunctionalException() {
-		stubGetForsendelse("__files/rjoark001/getForsendelse-happy.json");
-		stubGetSecurityToken();
-		stubPostSafJournalpost("queryJournalpostId\":\"123\"", "saf/safQdist013GraphQlResponse-orgnr.json");
-		stubPostSafJournalpost("queryJournalpostId\":\"448212366\"", "saf/safLightweightGraphQlResponse-happy.json");
-		stubGetEregHentOrgNavn("123456789");
-		stubFor(get("/norg2/enhet/" + ENHETSNR).willReturn(aResponse().withStatus(HttpStatus.NOT_FOUND.value())));
-
-		sendStringMessage(qdist013, classpathToString("qdist013/qdist013-happy.xml"));
-
-		await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
-			assertMessageOnQueue(qdist013FunksjonellFeil);
-		});
-
-		verifyGetForsendelse();
-		verifyGetSecurityToken(6);
-		verifyPostSafJournalpost();
-		verifyPostSafJournalpostLightweight();
-		verifyGetEregHentOrgNavn("123456789");
-		verify(1, getRequestedFor(urlEqualTo("/norg2/enhet/" + ENHETSNR)));
-	}
-
-	@Test
-	public void shouldThrowManglendeOrgnrForEnhetFunctionalException() {
-		stubGetForsendelse("__files/rjoark001/getForsendelse-happy.json");
-		stubGetSecurityToken();
-		stubPostSafJournalpost("queryJournalpostId\":\"123\"", "saf/safQdist013GraphQlResponse-orgnr.json");
-		stubPostSafJournalpost("queryJournalpostId\":\"448212366\"", "saf/safLightweightGraphQlResponse-happy.json");
-		stubGetEregHentOrgNavn("123456789");
-		stubFor(get("/norg2/enhet/" + ENHETSNR).willReturn(aResponse().withStatus(HttpStatus.OK.value())
-				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
-				.withBodyFile("norg2/norg2HentOrgnr_manglerOrgnr.json")));
-
-		sendStringMessage(qdist013, classpathToString("qdist013/qdist013-happy.xml"));
-
-		await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
-			assertMessageOnQueue(qdist013FunksjonellFeil);
-		});
-
-		verifyGetForsendelse();
-		verifyGetSecurityToken(6);
-		verifyPostSafJournalpost();
-		verifyPostSafJournalpostLightweight();
-		verifyGetEregHentOrgNavn("123456789");
-		verify(1, getRequestedFor(urlEqualTo("/norg2/enhet/" + ENHETSNR)));
-	}
-
-	@Test
-	public void shouldThrowNorg2HentEnhetsInfoTechnicalException() {
-		stubGetForsendelse("__files/rjoark001/getForsendelse-happy.json");
-		stubGetSecurityToken();
-		stubPostSafJournalpost("queryJournalpostId\":\"123\"", "saf/safQdist013GraphQlResponse-orgnr.json");
-		stubPostSafJournalpost("queryJournalpostId\":\"448212366\"", "saf/safLightweightGraphQlResponse-happy.json");
-		stubGetEregHentOrgNavn("123456789");
-		stubFor(get("/norg2/enhet/" + ENHETSNR).willReturn(aResponse().withStatus(HttpStatus.INTERNAL_SERVER_ERROR.value())));
-
-		sendStringMessage(qdist013, classpathToString("qdist013/qdist013-happy.xml"));
-
-		await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
-			assertMessageOnQueue(backoutQueue);
-		});
-
-		verifyGetForsendelse();
-		verifyGetSecurityToken(6);
-		verifyPostSafJournalpost();
-		verifyPostSafJournalpostLightweight();
-		verifyGetEregHentOrgNavn("123456789");
-		verify(MAX_ATTEMPTS_SHORT, getRequestedFor(urlEqualTo("/norg2/enhet/" + ENHETSNR)));
-	}
-
-	@Test
 	public void shouldThrowIntegrasjonspunktRequestFunctionalExceptionOpprettMelding() {
 		stubGetForsendelse("__files/rjoark001/getForsendelse-happy.json");
 		stubGetSecurityToken();
 		stubPostSafJournalpost("queryJournalpostId\":\"123\"", "saf/safQdist013GraphQlResponse-orgnr.json");
 		stubPostSafJournalpost("queryJournalpostId\":\"448212366\"", "saf/safLightweightGraphQlResponse-happy.json");
 		stubGetEregHentOrgNavn("123456789");
-		stubGetNorg2HentOrgnr();
 		stubFor(post("/integrasjonspunkt/api/messages/out")
 				.willReturn(aResponse().withStatus(HttpStatus.FORBIDDEN.value())));
 
@@ -858,7 +783,6 @@ public class Qdist013IT {
 		verifyPostSafJournalpost();
 		verifyPostSafJournalpostLightweight();
 		verifyGetEregHentOrgNavn("123456789");
-		verifyGetNorg2HentOrgnr();
 		verify(1, postRequestedFor(urlEqualTo("/integrasjonspunkt/api/messages/out")).withRequestBody(equalToJson(
 				classpathToString("__files/integrasjonspunkt/createMessageRequest.json"), true, true)));
 	}
@@ -870,7 +794,6 @@ public class Qdist013IT {
 		stubPostSafJournalpost("queryJournalpostId\":\"123\"", "saf/safQdist013GraphQlResponse-orgnr.json");
 		stubPostSafJournalpost("queryJournalpostId\":\"448212366\"", "saf/safLightweightGraphQlResponse-happy.json");
 		stubGetEregHentOrgNavn("123456789");
-		stubGetNorg2HentOrgnr();
 		stubFor(post("/integrasjonspunkt/api/messages/out")
 				.willReturn(aResponse().withStatus(HttpStatus.INTERNAL_SERVER_ERROR.value())));
 
@@ -885,7 +808,6 @@ public class Qdist013IT {
 		verifyPostSafJournalpost();
 		verifyPostSafJournalpostLightweight();
 		verifyGetEregHentOrgNavn("123456789");
-		verifyGetNorg2HentOrgnr();
 		verify(MAX_ATTEMPTS_SHORT, postRequestedFor(urlEqualTo("/integrasjonspunkt/api/messages/out")).withRequestBody(equalToJson(
 				classpathToString("__files/integrasjonspunkt/createMessageRequest.json"), true, true)));
 	}
@@ -897,7 +819,6 @@ public class Qdist013IT {
 		stubPostSafJournalpost("queryJournalpostId\":\"123\"", "saf/safQdist013GraphQlResponse-orgnr.json");
 		stubPostSafJournalpost("queryJournalpostId\":\"448212366\"", "saf/safLightweightGraphQlResponse-happy.json");
 		stubGetEregHentOrgNavn("123456789");
-		stubGetNorg2HentOrgnr();
 		stubPostIntegrasjonspunktCreateMessage();
 		stubFor(put(urlMatching("/integrasjonspunkt/api/messages/out/.*"))
 				.willReturn(aResponse().withStatus(HttpStatus.FORBIDDEN.value())));
@@ -913,7 +834,6 @@ public class Qdist013IT {
 		verifyPostSafJournalpost();
 		verifyPostSafJournalpostLightweight();
 		verifyGetEregHentOrgNavn("123456789");
-		verifyGetNorg2HentOrgnr();
 		verifyPostIntegrasjonspunktCreateMessage();
 		String bestillingsId = findBestillingsId();
 		verify(1, putRequestedFor(urlEqualTo("/integrasjonspunkt/api/messages/out/" + bestillingsId))
@@ -928,7 +848,6 @@ public class Qdist013IT {
 		stubPostSafJournalpost("queryJournalpostId\":\"123\"", "saf/safQdist013GraphQlResponse-orgnr.json");
 		stubPostSafJournalpost("queryJournalpostId\":\"448212366\"", "saf/safLightweightGraphQlResponse-happy.json");
 		stubGetEregHentOrgNavn("123456789");
-		stubGetNorg2HentOrgnr();
 		stubPostIntegrasjonspunktCreateMessage();
 		stubFor(put(urlMatching("/integrasjonspunkt/api/messages/out/.*"))
 				.willReturn(aResponse().withStatus(HttpStatus.INTERNAL_SERVER_ERROR.value())));
@@ -944,7 +863,6 @@ public class Qdist013IT {
 		verifyPostSafJournalpost();
 		verifyPostSafJournalpostLightweight();
 		verifyGetEregHentOrgNavn("123456789");
-		verifyGetNorg2HentOrgnr();
 		verifyPostIntegrasjonspunktCreateMessage();
 		String bestillingsId = findBestillingsId();
 		verify(MAX_ATTEMPTS_SHORT, putRequestedFor(urlEqualTo("/integrasjonspunkt/api/messages/out/" + bestillingsId))
@@ -959,7 +877,6 @@ public class Qdist013IT {
 		stubPostSafJournalpost("queryJournalpostId\":\"123\"", "saf/safQdist013GraphQlResponse-orgnr.json");
 		stubPostSafJournalpost("queryJournalpostId\":\"448212366\"", "saf/safLightweightGraphQlResponse-happy.json");
 		stubGetEregHentOrgNavn("123456789");
-		stubGetNorg2HentOrgnr();
 		stubPostIntegrasjonspunktCreateMessage();
 		stubPutIntegrasjonspunktLastOppFil();
 		stubFor(post(urlMatching("/integrasjonspunkt/api/messages/out/.*"))
@@ -976,7 +893,6 @@ public class Qdist013IT {
 		verifyPostSafJournalpost();
 		verifyPostSafJournalpostLightweight();
 		verifyGetEregHentOrgNavn("123456789");
-		verifyGetNorg2HentOrgnr();
 		verifyPostIntegrasjonspunktCreateMessage();
 		String bestillingsId = findBestillingsId();
 		verifyPutIntegrasjonspunktLastOppFilHoveddokument(bestillingsId);
@@ -993,7 +909,6 @@ public class Qdist013IT {
 		stubPostSafJournalpost("queryJournalpostId\":\"123\"", "saf/safQdist013GraphQlResponse-orgnr.json");
 		stubPostSafJournalpost("queryJournalpostId\":\"448212366\"", "saf/safLightweightGraphQlResponse-happy.json");
 		stubGetEregHentOrgNavn("123456789");
-		stubGetNorg2HentOrgnr();
 		stubPostIntegrasjonspunktCreateMessage();
 		stubPutIntegrasjonspunktLastOppFil();
 		stubFor(post(urlMatching("/integrasjonspunkt/api/messages/out/.*"))
@@ -1010,7 +925,6 @@ public class Qdist013IT {
 		verifyPostSafJournalpost();
 		verifyPostSafJournalpostLightweight();
 		verifyGetEregHentOrgNavn("123456789");
-		verifyGetNorg2HentOrgnr();
 		verifyPostIntegrasjonspunktCreateMessage();
 		String bestillingsId = findBestillingsId();
 		verifyPutIntegrasjonspunktLastOppFilHoveddokument(bestillingsId);
@@ -1027,7 +941,6 @@ public class Qdist013IT {
 		stubPostSafJournalpost("queryJournalpostId\":\"123\"", "saf/safQdist013GraphQlResponse-orgnr.json");
 		stubPostSafJournalpost("queryJournalpostId\":\"448212366\"", "saf/safLightweightGraphQlResponse-happy.json");
 		stubGetEregHentOrgNavn("123456789");
-		stubGetNorg2HentOrgnr();
 		stubPostIntegrasjonspunktCreateMessage();
 		stubPutIntegrasjonspunktLastOppFil();
 		stubPostIntegrasjonspunktSendMelding();
@@ -1045,7 +958,6 @@ public class Qdist013IT {
 		verifyPostSafJournalpost();
 		verifyPostSafJournalpostLightweight();
 		verifyGetEregHentOrgNavn("123456789");
-		verifyGetNorg2HentOrgnr();
 		verifyPostIntegrasjonspunktCreateMessage();
 		String bestillingsId = findBestillingsId();
 		verifyPutIntegrasjonspunktLastOppFilHoveddokument(bestillingsId);
@@ -1064,7 +976,6 @@ public class Qdist013IT {
 		stubPostSafJournalpost("queryJournalpostId\":\"123\"", "saf/safQdist013GraphQlResponse-orgnr.json");
 		stubPostSafJournalpost("queryJournalpostId\":\"448212366\"", "saf/safLightweightGraphQlResponse-happy.json");
 		stubGetEregHentOrgNavn("123456789");
-		stubGetNorg2HentOrgnr();
 		stubPostIntegrasjonspunktCreateMessage();
 		stubPutIntegrasjonspunktLastOppFil();
 		stubPostIntegrasjonspunktSendMelding();
@@ -1082,7 +993,6 @@ public class Qdist013IT {
 		verifyPostSafJournalpost();
 		verifyPostSafJournalpostLightweight();
 		verifyGetEregHentOrgNavn("123456789");
-		verifyGetNorg2HentOrgnr();
 		verifyPostIntegrasjonspunktCreateMessage();
 		String bestillingsId = findBestillingsId();
 		verifyPutIntegrasjonspunktLastOppFilHoveddokument(bestillingsId);
@@ -1101,7 +1011,6 @@ public class Qdist013IT {
 		stubPostSafJournalpost("queryJournalpostId\":\"123\"", "saf/safQdist013GraphQlResponse-orgnr.json");
 		stubPostSafJournalpost("queryJournalpostId\":\"448212366\"", "saf/safLightweightGraphQlResponse-happy.json");
 		stubGetEregHentOrgNavn("123456789");
-		stubGetNorg2HentOrgnr();
 		stubPostIntegrasjonspunktCreateMessage();
 		stubPutIntegrasjonspunktLastOppFil();
 		stubPostIntegrasjonspunktSendMelding();
@@ -1120,7 +1029,6 @@ public class Qdist013IT {
 		verifyPostSafJournalpost();
 		verifyPostSafJournalpostLightweight();
 		verifyGetEregHentOrgNavn("123456789");
-		verifyGetNorg2HentOrgnr();
 		verifyPostIntegrasjonspunktCreateMessage();
 		String bestillingsId = findBestillingsId();
 		verifyPutIntegrasjonspunktLastOppFilHoveddokument(bestillingsId);
@@ -1141,7 +1049,6 @@ public class Qdist013IT {
 		stubPostSafJournalpost("queryJournalpostId\":\"123\"", "saf/safQdist013GraphQlResponse-orgnr.json");
 		stubPostSafJournalpost("queryJournalpostId\":\"448212366\"", "saf/safLightweightGraphQlResponse-happy.json");
 		stubGetEregHentOrgNavn("123456789");
-		stubGetNorg2HentOrgnr();
 		stubPostIntegrasjonspunktCreateMessage();
 		stubPutIntegrasjonspunktLastOppFil();
 		stubPostIntegrasjonspunktSendMelding();
@@ -1160,7 +1067,6 @@ public class Qdist013IT {
 		verifyPostSafJournalpost();
 		verifyPostSafJournalpostLightweight();
 		verifyGetEregHentOrgNavn("123456789");
-		verifyGetNorg2HentOrgnr();
 		verifyPostIntegrasjonspunktCreateMessage();
 		String bestillingsId = findBestillingsId();
 		verifyPutIntegrasjonspunktLastOppFilHoveddokument(bestillingsId);
@@ -1307,16 +1213,6 @@ public class Qdist013IT {
 		verify(1, getRequestedFor(urlEqualTo("/ereg/v1/organisasjon/" + orgnr + "/noekkelinfo")));
 	}
 
-	private void stubGetNorg2HentOrgnr() {
-		stubFor(get("/norg2/enhet/" + ENHETSNR).willReturn(aResponse().withStatus(HttpStatus.OK.value())
-				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
-				.withBodyFile("norg2/norg2HentOrgnr_happy.json")));
-	}
-
-	private void verifyGetNorg2HentOrgnr() {
-		verify(1, getRequestedFor(urlEqualTo("/norg2/enhet/" + ENHETSNR)));
-	}
-
 	private void stubGetSecurityToken() {
 		stubFor(get("/securitytoken?grant_type=client_credentials&scope=openid").willReturn(aResponse().withStatus(HttpStatus.OK
 				.value())
@@ -1387,7 +1283,6 @@ public class Qdist013IT {
 		verifyPostSafJournalpost();
 		verifyPostSafJournalpostLightweight();
 
-		verifyGetNorg2HentOrgnr();
 		if (!isNullOrEmpty(orgnr)) {
 			verifyGetEregHentOrgNavn(orgnr);
 		} else {

@@ -36,7 +36,7 @@ class CreateMessageRequestMapperTest {
 
 	@Test
 	void shouldMap() {
-		CreateMessageRequest createMessageRequest = createMessageRequestMapper.map(CONVERSATION_ID, ORGNR_FOR_ENHET, createHentforsendelseResponse());
+		CreateMessageRequest createMessageRequest = createMessageRequestMapper.map(CONVERSATION_ID, createHentforsendelseResponse());
 		assertCreateMessageRequest(createMessageRequest);
 	}
 
