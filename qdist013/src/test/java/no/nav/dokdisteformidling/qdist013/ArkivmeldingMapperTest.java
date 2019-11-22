@@ -5,6 +5,7 @@ import static no.nav.dokdisteformidling.constants.DomainConstants.VARIANTFORMAT_
 import static no.nav.dokdisteformidling.constants.DomainConstants.VARIANTFORMAT_PRODUKSJON;
 import static no.nav.dokdisteformidling.constants.DomainConstants.VARIANTFORMAT_SLADDET;
 import static no.nav.dokdisteformidling.qdist013.ArkivmeldingMapper.DOKUMENTTYPE_DOKUMENTASJON;
+import static no.nav.dokdisteformidling.qdist013.ArkivmeldingMapper.FERDIGSTILT;
 import static no.nav.dokdisteformidling.qdist013.ArkivmeldingMapper.INNGAAENDE;
 import static no.nav.dokdisteformidling.qdist013.ArkivmeldingMapper.NAV_KLAGEINSTANS;
 import static no.nav.dokdisteformidling.qdist013.ArkivmeldingMapper.SAKSPART_ROLLE_AMP;
@@ -81,12 +82,12 @@ class ArkivmeldingMapperTest {
 
 	private static final String DOKUMENT_INFO_ID_HOVEDDOK = "1234567";
 	private static final String TITTEL_HOVEDDOK = "tittelHoveddok";
-	private static final LocalDateTime DATO_FERDIGSTILT_HOVEDDOK = LocalDateTime.now().minusDays(3);
 
 	private static final String DOKUMENT_INFO_ID_VEDLEGG = "7654321";
 	private static final String TITTEL_VEDLEGG = "tittelVedlegg";
-	private static final LocalDateTime DATO_FERDIGSTILT_VEDLEGG = LocalDateTime.now().minusDays(4);
 	private static final String ORIGINAL_JPID_VEDLEGG = "1111111111";
+
+	private static final String DOKUMENT_INFO_ID_VEDLEGG2 = "9876543";
 
 	private static final String FNR_FOR_AKTOER_ID = "222222222";
 	private static final String EREG_NAVN = "ereg_navn";
@@ -413,6 +414,25 @@ class ArkivmeldingMapperTest {
 		assertTrue(dokumentobjektHoveddok.getReferanseDokumentfil().contains(VARIANTFORMAT_ARKIV));
 	}
 
+	@Test
+	@DisplayName("Case when vedlegg does not have dokumentstatus FERDIGSTILT. That vedlegg should not be mapped.")
+	void happyPathIkkeFerdigstiltVedlegg() {
+		JournalpostQdist013 journalpostQdist013 = createJournalpostQdist013Builder()
+				.dokumenter(Arrays.asList(createHoveddokumentBuilder().build(),
+						createVedleggBuilder().dokumentInfoId(DOKUMENT_INFO_ID_VEDLEGG2).dokumentstatus(null).build(),
+						createVedleggBuilder().build()))
+				.build();
+
+		JAXBElement<Arkivmelding> arkivmeldingJAXBElement = arkivmeldingMapper.createArkivMelding(journalpostQdist013, BESTILLINGS_ID);
+		Arkivmelding arkivmelding = arkivmeldingJAXBElement.getValue();
+		List<Mappe> mappeList = arkivmelding.getMappe();
+		Saksmappe saksmappe = (Saksmappe) mappeList.get(0);
+		Journalpost basisregistreringJp = (Journalpost) saksmappe.getBasisregistrering().get(0);
+
+		assertEquals(2, arkivmelding.getAntallFiler());
+		assertDokumentbeskrivelse(basisregistreringJp.getDokumentbeskrivelseAndDokumentobjekt());
+	}
+
 
 	private void assertArkivmelding(Arkivmelding arkivmelding) {
 		assertNotNull(arkivmelding);
@@ -569,6 +589,7 @@ class ArkivmeldingMapperTest {
 	private JournalpostQdist013.DokumentInfo.DokumentInfoBuilder createHoveddokumentBuilder() {
 		return JournalpostQdist013.DokumentInfo.builder()
 				.dokumentInfoId(DOKUMENT_INFO_ID_HOVEDDOK)
+				.dokumentstatus(FERDIGSTILT)
 				.tittel(TITTEL_HOVEDDOK)
 				.originalJournalpostId(null)
 				.dokumentvarianter(Arrays.asList(JournalpostQdist013.DokumentInfo.Dokumentvariant.builder()
@@ -584,6 +605,7 @@ class ArkivmeldingMapperTest {
 	private JournalpostQdist013.DokumentInfo.DokumentInfoBuilder createVedleggBuilder() {
 		return JournalpostQdist013.DokumentInfo.builder()
 				.dokumentInfoId(DOKUMENT_INFO_ID_VEDLEGG)
+				.dokumentstatus(FERDIGSTILT)
 				.tittel(TITTEL_VEDLEGG)
 				.originalJournalpostId(null)
 				.dokumentvarianter(Arrays.asList(JournalpostQdist013.DokumentInfo.Dokumentvariant.builder()

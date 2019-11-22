@@ -33,6 +33,7 @@
       "dokumenter": [
         {
           "dokumentInfoId": "463791441",
+          "dokumentstatus": "FERDIGSTILT",
           "tittel": "Tittel",
           "originalJournalpostId": null,
           "dokumentvarianter": [
@@ -48,6 +49,7 @@
         },
         {
           "dokumentInfoId": "463791442",
+          "dokumentstatus": "FERDIGSTILT",
           "tittel": "Tittel Vedlegg 1",
           "originalJournalpostId": null,
           "dokumentvarianter": [
@@ -63,6 +65,7 @@
         },
         {
           "dokumentInfoId": "463791443",
+          "dokumentstatus": "FERDIGSTILT",
           "tittel": "Tittel Vedlegg 2",
           "originalJournalpostId": "448212366",
           "dokumentvarianter": [

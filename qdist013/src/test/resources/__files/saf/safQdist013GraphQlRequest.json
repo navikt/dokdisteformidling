@@ -1,5 +1,5 @@
 {
-  "query": "query journalpost($queryJournalpostId: String!) {\njournalpost(journalpostId: $queryJournalpostId) {\njournalpostId\nsak {\ndatoOpprettet\n}\nopprettetAvNavn\njournalposttype\nbruker{\nid\ntype\n}\ndatoOpprettet\ntittel\njournalfortAvNavn\ntemanavn\njournalfoerendeEnhet\nrelevanteDatoer {\ndato\ndatotype\n}\ndokumenter {\ndokumentInfoId\ntittel\noriginalJournalpostId\ndokumentvarianter {\nvariantformat\nfiltype\n}\n}\n}\n}",
+  "query": "query journalpost($queryJournalpostId: String!) {\njournalpost(journalpostId: $queryJournalpostId) {\njournalpostId\nsak {\ndatoOpprettet\n}\nopprettetAvNavn\njournalposttype\nbruker{\nid\ntype\n}\ndatoOpprettet\ntittel\njournalfortAvNavn\ntemanavn\njournalfoerendeEnhet\nrelevanteDatoer {\ndato\ndatotype\n}\ndokumenter {\ndokumentInfoId\ndokumentstatus\ntittel\noriginalJournalpostId\ndokumentvarianter {\nvariantformat\nfiltype\n}\n}\n}\n}",
   "operationName":"journalpost",
   "variables": {
     "queryJournalpostId":"123"
