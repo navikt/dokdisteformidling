@@ -64,10 +64,42 @@
           ]
         },
         {
+          "dokumentInfoId": "463791444",
+          "dokumentstatus": null,
+          "tittel": "Tittel Vedlegg 1.5",
+          "originalJournalpostId": null,
+          "dokumentvarianter": [
+            {
+              "variantformat": "ARKIV",
+              "filtype": "PNG"
+            },
+            {
+              "variantformat": "ORIGINAL",
+              "filtype": "XML"
+            }
+          ]
+        },
+        {
           "dokumentInfoId": "463791443",
           "dokumentstatus": "FERDIGSTILT",
           "tittel": "Tittel Vedlegg 2",
           "originalJournalpostId": "448212366",
+          "dokumentvarianter": [
+            {
+              "variantformat": "ARKIV",
+              "filtype": "PNG"
+            },
+            {
+              "variantformat": "ORIGINAL",
+              "filtype": "XML"
+            }
+          ]
+        },
+        {
+          "dokumentInfoId": "463791445",
+          "dokumentstatus": null,
+          "tittel": "Tittel Vedlegg 3",
+          "originalJournalpostId": null,
           "dokumentvarianter": [
             {
               "variantformat": "ARKIV",

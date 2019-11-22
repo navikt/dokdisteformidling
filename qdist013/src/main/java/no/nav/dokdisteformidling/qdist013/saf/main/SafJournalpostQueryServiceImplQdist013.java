@@ -40,6 +40,7 @@ public class SafJournalpostQueryServiceImplQdist013 implements SafJournalpostQue
 						"}\n" +
 						"dokumenter {\n" +
 							"dokumentInfoId\n" +
+							"dokumentstatus\n" +
 							"tittel\n" +
 							"originalJournalpostId\n" +
 							"dokumentvarianter {\n" +

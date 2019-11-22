@@ -56,6 +56,7 @@ public class ArkivmeldingMapper {
 	public static final String INNGAAENDE = "I";
 	public static final String UTGAAENDE = "U";
 	public static final String DOKUMENTTYPE_DOKUMENTASJON = "Dokumentasjon";
+	public static final String FERDIGSTILT = "FERDIGSTILT";
 	public static final String FILFORMAT_PNG = "PNG";
 	public static final String FILFORMAT_JPEG = "JPEG";
 
@@ -83,7 +84,10 @@ public class ArkivmeldingMapper {
 		arkivmelding.setSystem(APP_NAME);
 		arkivmelding.setMeldingId(bestillingsId);
 		arkivmelding.setTidspunkt(datoArkivmeldingOpprettet);
-		arkivmelding.setAntallFiler(journalpostQdist013.getDokumenter().size());
+		arkivmelding.setAntallFiler(((int) journalpostQdist013.getDokumenter()
+				.stream()
+				.filter(dokumentInfo -> FERDIGSTILT.equals(dokumentInfo.getDokumentstatus()))
+				.count()));
 		arkivmelding.getMappe()
 				.add(createAndPopulateSaksmappe(journalpostQdist013, systemId, datoArkivmeldingOpprettet, objectFactory));
 
@@ -137,7 +141,10 @@ public class ArkivmeldingMapper {
 		IntStream.range(0, journalpostQdist013.getDokumenter().size())
 				.forEach(i -> {
 					JournalpostQdist013.DokumentInfo dokumentInfo = journalpostQdist013.getDokumenter().get(i);
-					dokumentbeskrivelser.add(createAndPopulateDokumentBeskrivelse(journalpostQdist013, dokumentInfo, i, systemId, datoArkivmeldingOpprettet, objectFactory));
+					if (FERDIGSTILT.equals(dokumentInfo.getDokumentstatus())) {
+						dokumentbeskrivelser.add(createAndPopulateDokumentBeskrivelse(journalpostQdist013, dokumentInfo,
+								dokumentbeskrivelser.size() + 1, systemId, datoArkivmeldingOpprettet, objectFactory));
+					}
 				});
 	}
 
@@ -155,7 +162,7 @@ public class ArkivmeldingMapper {
 		dokumentbeskrivelse.setOpprettetDato(getDokumentOpprettetDato(isHoveddokument(rekkefolge), journalpostQdist013, dokumentInfo));
 		dokumentbeskrivelse.setOpprettetAv(getDokumentOpprettetAv(isHoveddokument(rekkefolge), journalpostQdist013, dokumentInfo));
 		dokumentbeskrivelse.setTilknyttetRegistreringSom(isHoveddokument(rekkefolge) ? TilknyttetRegistreringSom.HOVEDDOKUMENT : TilknyttetRegistreringSom.VEDLEGG);
-		dokumentbeskrivelse.setDokumentnummer(BigInteger.valueOf(rekkefolge + 1));
+		dokumentbeskrivelse.setDokumentnummer(BigInteger.valueOf(rekkefolge));
 		dokumentbeskrivelse.setTilknyttetDato(datoArkivmeldingOpprettet);
 		dokumentbeskrivelse.setTilknyttetAv(journalpostQdist013.getJournalfortAvNavn());
 		dokumentbeskrivelse.getDokumentobjekt()
