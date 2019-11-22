@@ -670,7 +670,7 @@ public class Qdist011IT {
 
 		sendStringMessage(qdist011, classpathToString("qdist011/qdist011-happy.xml"));
 
-		await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
+		await().atMost(20, TimeUnit.SECONDS).untilAsserted(() -> {
 			String resultOnQdist011BackoutQueue = receive(backoutQueue);
 			assertNotNull(resultOnQdist011BackoutQueue);
 			assertEquals(resultOnQdist011BackoutQueue, classpathToString("qdist011/qdist011-happy.xml"));
