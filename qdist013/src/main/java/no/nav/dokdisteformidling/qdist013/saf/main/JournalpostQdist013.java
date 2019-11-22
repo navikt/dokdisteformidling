@@ -54,6 +54,7 @@ public class JournalpostQdist013 implements Journalpost {
 	@Builder
 	public static class DokumentInfo {
 		private final String dokumentInfoId;
+		private final String dokumentstatus;
 		private final String tittel;
 		private final String originalJournalpostId;
 		@Builder.Default

@@ -152,6 +152,29 @@ public class Qdist013IT {
 	}
 
 	@Test
+	public void shouldProcessForsendelseWithIkkeFerdigstiltVedlegg() {
+
+		stubGetForsendelse("__files/rjoark001/getForsendelse-happy.json");
+		stubGetSecurityToken();
+		stubPostSafJournalpost("queryJournalpostId\":\"123\"", "saf/safQdist013GraphQlResponse-ikkeFerdigstiltVedlegg.json");
+		stubPostSafJournalpost("queryJournalpostId\":\"448212366\"", "saf/safLightweightGraphQlResponse-happy.json");
+		stubGetTpsHentPersonNavn("***gammelt_fnr***");
+		stubGetAktoerregisterHentIdentForAktoerId("***gammelt_fnr***09");
+		stubPostIntegrasjonspunktCreateMessage();
+		stubPutIntegrasjonspunktLastOppFil();
+		stubPostIntegrasjonspunktSendMelding();
+		stubPostJuridiskLoggLagre();
+		stubPutAdministrerforsendelseOppdatertForsendelsestatusAndkonvId();
+
+		sendStringMessage(qdist013, classpathToString("qdist013/qdist013-happy.xml"));
+
+		await().atMost(10, SECONDS).untilAsserted(() -> {
+			verifyAllStubs("", "***gammelt_fnr***", "***gammelt_fnr***09", 8);
+		});
+
+	}
+
+	@Test
 	public void shouldProcessForsendelseWithFnr() {
 
 		stubGetForsendelse("__files/rjoark001/getForsendelse-happy.json");

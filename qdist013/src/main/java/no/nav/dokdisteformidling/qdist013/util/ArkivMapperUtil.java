@@ -22,7 +22,7 @@ public final class ArkivMapperUtil {
 	}
 
 	public static boolean isHoveddokument(int rekkefolge) {
-		return rekkefolge == 0;
+		return rekkefolge == 1;
 	}
 
 }
