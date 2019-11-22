@@ -189,18 +189,6 @@ public class SafJournalpostValidatorQdist013Test extends SafJournalpostTest {
 	}
 
 	@Test
-	public void shouldThrowWhenMissingDokumentInfoDatoFerdigstilt() {
-		SafJournalpost.SafJournalpostBuilder safJournalpostBuilder = createSafJournalpost();
-		SafJournalpost.DokumentInfo.DokumentInfoBuilder dokumentInfoBuilder = createHovedDokumentInfo();
-		SafJournalpost.DokumentInfo dokumentInfo = dokumentInfoBuilder.datoFerdigstilt(null).build();
-		SafJournalpost safJournalpost = safJournalpostBuilder
-				.dokumenter(Arrays.asList(dokumentInfo))
-				.build();
-		assertThrows(SafJournalpostValidationException.class, () ->
-				validator.validate(safJournalpost, JOURNALPOST_ID));
-	}
-
-	@Test
 	public void shouldThrowWhenMissingDokumentInfoDokumentvarianter() {
 		SafJournalpost.SafJournalpostBuilder safJournalpostBuilder = createSafJournalpost();
 		SafJournalpost.DokumentInfo.DokumentInfoBuilder dokumentInfoBuilder = createHovedDokumentInfo();

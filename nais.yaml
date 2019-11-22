@@ -76,5 +76,3 @@ fasitResources:
       resourceType: restservice
     - alias: "ereg.api"
       resourceType: restservice
-    - alias: "norg2.api.v1"
-      resourceType: restservice

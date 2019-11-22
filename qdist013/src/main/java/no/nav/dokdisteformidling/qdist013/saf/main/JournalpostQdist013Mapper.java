@@ -43,7 +43,6 @@ public class JournalpostQdist013Mapper {
 						.map(dokumentInfo -> JournalpostQdist013.DokumentInfo.builder()
 								.dokumentInfoId(dokumentInfo.getDokumentInfoId())
 								.tittel(dokumentInfo.getTittel())
-								.datoFerdigstilt(dokumentInfo.getDatoFerdigstilt())
 								.originalJournalpostId(dokumentInfo.getOriginalJournalpostId())
 								.dokumentvarianter(dokumentInfo.getDokumentvarianter().stream()
 										.map(dokumentvariant -> JournalpostQdist013.DokumentInfo.Dokumentvariant.builder()
