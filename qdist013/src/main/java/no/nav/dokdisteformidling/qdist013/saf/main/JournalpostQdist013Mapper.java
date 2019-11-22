@@ -42,6 +42,7 @@ public class JournalpostQdist013Mapper {
 				.dokumenter(safJournalpost.getDokumenter().stream()
 						.map(dokumentInfo -> JournalpostQdist013.DokumentInfo.builder()
 								.dokumentInfoId(dokumentInfo.getDokumentInfoId())
+								.dokumentstatus(dokumentInfo.getDokumentstatus())
 								.tittel(dokumentInfo.getTittel())
 								.originalJournalpostId(dokumentInfo.getOriginalJournalpostId())
 								.dokumentvarianter(dokumentInfo.getDokumentvarianter().stream()
