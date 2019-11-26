@@ -87,7 +87,7 @@ class ArkivmeldingMapperTest {
 	private static final String TITTEL_VEDLEGG = "tittelVedlegg";
 	private static final String ORIGINAL_JPID_VEDLEGG = "1111111111";
 
-	private static final String DOKUMENT_INFO_ID_VEDLEGG2 = "9876543";
+	private static final String DOKUMENT_INFO_ID_VEDLEGG_2 = "9876543";
 
 	private static final String FNR_FOR_AKTOER_ID = "222222222";
 	private static final String EREG_NAVN = "ereg_navn";
@@ -415,11 +415,29 @@ class ArkivmeldingMapperTest {
 	}
 
 	@Test
+	@DisplayName("Case when vedlegg has no dokumentstatus set. That vedlegg should be considered FERDIGSTILT.")
+	void happyPathVedleggFerdigstiltUtenStatus() {
+		JournalpostQdist013 journalpostQdist013 = createJournalpostQdist013Builder()
+				.dokumenter(Arrays.asList(createHoveddokumentBuilder().build(),
+						createVedleggBuilder().dokumentstatus(null).build()))
+				.build();
+
+		JAXBElement<Arkivmelding> arkivmeldingJAXBElement = arkivmeldingMapper.createArkivMelding(journalpostQdist013, BESTILLINGS_ID);
+		Arkivmelding arkivmelding = arkivmeldingJAXBElement.getValue();
+		List<Mappe> mappeList = arkivmelding.getMappe();
+		Saksmappe saksmappe = (Saksmappe) mappeList.get(0);
+		Journalpost basisregistreringJp = (Journalpost) saksmappe.getBasisregistrering().get(0);
+
+		assertEquals(2, arkivmelding.getAntallFiler());
+		assertDokumentbeskrivelse(basisregistreringJp.getDokumentbeskrivelseAndDokumentobjekt());
+	}
+
+	@Test
 	@DisplayName("Case when vedlegg does not have dokumentstatus FERDIGSTILT. That vedlegg should not be mapped.")
 	void happyPathIkkeFerdigstiltVedlegg() {
 		JournalpostQdist013 journalpostQdist013 = createJournalpostQdist013Builder()
 				.dokumenter(Arrays.asList(createHoveddokumentBuilder().build(),
-						createVedleggBuilder().dokumentInfoId(DOKUMENT_INFO_ID_VEDLEGG2).dokumentstatus(null).build(),
+						createVedleggBuilder().dokumentInfoId(DOKUMENT_INFO_ID_VEDLEGG_2).dokumentstatus("UNDER_REDIGERING").build(),
 						createVedleggBuilder().build()))
 				.build();
 
