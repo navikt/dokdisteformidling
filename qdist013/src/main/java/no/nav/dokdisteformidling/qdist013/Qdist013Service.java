@@ -4,6 +4,7 @@ import static java.lang.String.format;
 import static no.nav.dokdisteformidling.common.FunctionalUtils.deserializeS3JsonPayloadToDokdistDokument;
 import static no.nav.dokdisteformidling.common.FunctionalUtils.generateRandomUUID;
 import static no.nav.dokdisteformidling.common.FunctionalUtils.validateThatForsendelseStatusIsKlarForDist;
+import static no.nav.dokdisteformidling.constants.RouteConstants.PROPERTY_ANTALL_DOK;
 import static no.nav.dokdisteformidling.constants.RouteConstants.PROPERTY_BESTILLINGS_ID;
 import static no.nav.dokdisteformidling.constants.RouteConstants.PROPERTY_CONVERSATION_ID;
 
@@ -82,6 +83,7 @@ public class Qdist013Service {
 		validateThatForsendelseStatusIsKlarForDist(hentForsendelseResponseTo.getForsendelseStatus());
 
 		final List<DokdistDokument> dokdistDokumentList = getDocumentsFromS3(hentForsendelseResponseTo);
+		exchange.setProperty(PROPERTY_ANTALL_DOK, dokdistDokumentList.size());
 		final JournalpostQdist013 journalpostQdist013 = safJournalpostQueryService.hentJournalpost(hentForsendelseResponseTo.getArkivInformasjon()
 				.getArkivId());
 		final JAXBElement<Arkivmelding> arkivmeldingJAXBElement = arkivmeldingMapper.createArkivMelding(journalpostQdist013, bestillingsId);
