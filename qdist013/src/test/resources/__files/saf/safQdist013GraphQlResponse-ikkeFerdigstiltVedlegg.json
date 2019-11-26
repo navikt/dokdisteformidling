@@ -65,7 +65,7 @@
         },
         {
           "dokumentInfoId": "463791444",
-          "dokumentstatus": null,
+          "dokumentstatus": "UNDER_REDIGERING",
           "tittel": "Tittel Vedlegg 1.5",
           "originalJournalpostId": null,
           "dokumentvarianter": [
@@ -81,7 +81,7 @@
         },
         {
           "dokumentInfoId": "463791443",
-          "dokumentstatus": "FERDIGSTILT",
+          "dokumentstatus": null,
           "tittel": "Tittel Vedlegg 2",
           "originalJournalpostId": "448212366",
           "dokumentvarianter": [
@@ -97,7 +97,7 @@
         },
         {
           "dokumentInfoId": "463791445",
-          "dokumentstatus": null,
+          "dokumentstatus": "AVBRUTT",
           "tittel": "Tittel Vedlegg 3",
           "originalJournalpostId": null,
           "dokumentvarianter": [
