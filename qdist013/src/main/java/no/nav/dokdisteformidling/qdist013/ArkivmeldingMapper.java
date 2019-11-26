@@ -11,6 +11,7 @@ import static no.nav.dokdisteformidling.constants.DomainConstants.VARIANTFORMAT_
 import static no.nav.dokdisteformidling.qdist013.util.ArkivMapperUtil.brukerTypeIsAktoerId;
 import static no.nav.dokdisteformidling.qdist013.util.ArkivMapperUtil.brukerTypeIsOrgnr;
 import static no.nav.dokdisteformidling.qdist013.util.ArkivMapperUtil.isHoveddokument;
+import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 
 import no.arkivverket.standarder.noark5.arkivmelding.Arkivmelding;
@@ -86,12 +87,16 @@ public class ArkivmeldingMapper {
 		arkivmelding.setTidspunkt(datoArkivmeldingOpprettet);
 		arkivmelding.setAntallFiler(((int) journalpostQdist013.getDokumenter()
 				.stream()
-				.filter(dokumentInfo -> FERDIGSTILT.equals(dokumentInfo.getDokumentstatus()))
+				.filter(dokumentInfo -> isDokumentFerdigstilt(dokumentInfo.getDokumentstatus()))
 				.count()));
 		arkivmelding.getMappe()
 				.add(createAndPopulateSaksmappe(journalpostQdist013, systemId, datoArkivmeldingOpprettet, objectFactory));
 
 		return objectFactory.createArkivmelding(arkivmelding);
+	}
+
+	private boolean isDokumentFerdigstilt(String dokumentStatus) {
+		return isBlank(dokumentStatus) || FERDIGSTILT.equals(dokumentStatus);
 	}
 
 	private Saksmappe createAndPopulateSaksmappe(JournalpostQdist013 journalpostQdist013,
@@ -141,7 +146,7 @@ public class ArkivmeldingMapper {
 		IntStream.range(0, journalpostQdist013.getDokumenter().size())
 				.forEach(i -> {
 					JournalpostQdist013.DokumentInfo dokumentInfo = journalpostQdist013.getDokumenter().get(i);
-					if (FERDIGSTILT.equals(dokumentInfo.getDokumentstatus())) {
+					if (isDokumentFerdigstilt(dokumentInfo.getDokumentstatus())) {
 						dokumentbeskrivelser.add(createAndPopulateDokumentBeskrivelse(journalpostQdist013, dokumentInfo,
 								dokumentbeskrivelser.size() + 1, systemId, datoArkivmeldingOpprettet, objectFactory));
 					}
