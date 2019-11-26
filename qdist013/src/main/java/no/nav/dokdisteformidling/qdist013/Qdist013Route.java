@@ -76,7 +76,8 @@ public class Qdist013Route extends SpringRouteBuilder {
 				.unmarshal(new JaxbDataFormat(JAXBContext.newInstance(DistribuerTilKanal.class)))
 				.bean(distribuerForsendelseTilTrygderettenMapper)
 				.bean(qdist013Service)
-				.log(LoggingLevel.INFO, log, "qdist013 har videresendt forsendelse med " + getIdsForLogging() + " til DIFI for distribusjon via TRYGDERETTEN")
+				.log(LoggingLevel.INFO, log, "qdist013 har videresendt forsendelse med " + getIdsForLogging() + " til DIFI for distribusjon via TRYGDERETTEN. " +
+						"Forsendelsen inneholder ${exchangeProperty.antallDok} dokumenter og arkivmelding.")
 				.bean(dokdistAdministrerforsendelseUpdater, "updateStatusAndConversationId")
 				.log(LoggingLevel.INFO, log, "qdist013 har oppdatert dokdistDb med konversasjonsId=${exchangeProperty.conversationId} og forsendelseStatus=OVERSENDT og avslutter behandling av forsendelse med " + getIdsForLogging())
 				.end();
