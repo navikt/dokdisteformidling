@@ -23,7 +23,7 @@ prometheus:
 resources:
   limits:
     cpu: 3000m
-    memory: 3072‬Mi
+    memory: 3072Mi
   requests:
     memory: 1024Mi
 fasitResources:
