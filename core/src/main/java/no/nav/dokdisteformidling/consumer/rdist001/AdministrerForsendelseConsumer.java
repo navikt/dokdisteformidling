@@ -68,6 +68,7 @@ public class AdministrerForsendelseConsumer implements AdministrerForsendelse {
 	}
 
 	@Retryable(include = AbstractDokdisteformidlingTechnicalException.class, backoff = @Backoff(delay = RetryConstants.DELAY_SHORT, multiplier = RetryConstants.MULTIPLIER_SHORT))
+	@Monitor(value = "dok_consumer", extraTags = {"process", "oppdaterForsendelseStatus"}, histogram = true)
 	public void oppdaterForsendelseStatus(String forsendelseId, String forsendelseStatus) {
 		String uri = UriComponentsBuilder.fromHttpUrl(administrerforsendelseV1Url)
 				.queryParam("forsendelseId", forsendelseId)
@@ -77,6 +78,7 @@ public class AdministrerForsendelseConsumer implements AdministrerForsendelse {
 	}
 
 	@Retryable(include = AbstractDokdisteformidlingTechnicalException.class, backoff = @Backoff(delay = RetryConstants.DELAY_SHORT, multiplier = RetryConstants.MULTIPLIER_SHORT))
+	@Monitor(value = "dok_consumer", extraTags = {"process", "oppdaterForsendelseStatusOgKonversasjonsId"}, histogram = true)
 	public void oppdaterForsendelseStatusOgKonversasjonsId(String forsendelseId, String forsendelseStatus, String konversasjonsId) {
 		String uri = UriComponentsBuilder.fromHttpUrl(administrerforsendelseV1Url)
 				.queryParam("forsendelseId", forsendelseId)
@@ -86,7 +88,6 @@ public class AdministrerForsendelseConsumer implements AdministrerForsendelse {
 		oppdaterForsendelse(uri);
 	}
 
-	@Monitor(value = "dok_consumer", extraTags = {"process", "oppdaterForsendelse"}, histogram = true)
 	private void oppdaterForsendelse(String uri) {
 		try {
 			HttpEntity entity = new HttpEntity<>(createHeaders());
