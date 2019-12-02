@@ -71,8 +71,7 @@ public class Qdist011Route extends SpringRouteBuilder {
 				.log(LoggingLevel.WARN, log, "${exception}; " + getIdsForLogging())
 				.to("jms:" + qdist011FunksjonellFeil.getQueueName());
 
-		from("jms:" + qdist011.getQueueName() +
-				"?transacted=true")
+		from("jms:" + qdist011.getQueueName() + "?transacted=true&concurrentConsumers=4")
 				.routeId(QDIST011_SERVICE_ID)
 				.routePolicy(qdist0011MetricsRoutePolicy)
 				.setExchangePattern(ExchangePattern.InOnly)
