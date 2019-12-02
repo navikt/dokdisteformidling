@@ -17,7 +17,7 @@ public class LastOppDokumentRoute extends SpringRouteBuilder {
 
 	private static final String PROPERTY_FILNAVN = "filnavn";
 	private static final String SFTP_FILETYPE = ".pdf";
-	private static final String SFTP_FILE_CONFIG = "binary=true&fileName=${exchangeProperty." + PROPERTY_FILNAVN + "}" + SFTP_FILETYPE + "&";
+	private static final String SFTP_FILE_CONFIG = "autoCreate=false&binary=true&fileName=${exchangeProperty." + PROPERTY_FILNAVN + "}" + SFTP_FILETYPE + "&";
 	private static final String SFTP_SECURITY_CONFIG = "privateKeyFile={{sftp.privateKeyFile}}&privateKeyPassphrase={{sftp.privateKeyPassphrase}}&preferredAuthentications=publickey";
 	private static final String SFTP_SERVER = "sftp://{{sftp.url}}:{{sftp.port}}/{{sftp.remoteFilePath}}?username={{sftp.username}}&***passord=gammelt_passord***;
 
