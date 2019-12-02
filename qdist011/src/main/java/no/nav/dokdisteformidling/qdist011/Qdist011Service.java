@@ -5,7 +5,12 @@ import static no.nav.dokdisteformidling.common.FunctionalUtils.getDokumenttypeId
 import static no.nav.dokdisteformidling.common.FunctionalUtils.validateThatForsendelseStatusIsKlarForDist;
 import static no.nav.dokdisteformidling.constants.RouteConstants.PROPERTY_BESTILLINGS_ID;
 import static no.nav.dokdisteformidling.constants.RouteConstants.PROPERTY_CONVERSATION_ID;
+import static no.nav.dokdisteformidling.constants.RouteConstants.QDIST011_SERVICE_ID;
+import static no.nav.dokdisteformidling.metrics.MetricLabels.LABEL_PROCESS;
+import static no.nav.dokdisteformidling.qdist011.Qdist011MetricsRoutePolicy.QDIST011_PROCESS_TIMER;
 
+import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.Timer;
 import no.nav.dokdisteformidling.consumer.dki.DigitalKontaktinformasjonV1;
 import no.nav.dokdisteformidling.consumer.dki.HentSikkerDigitalPostadresseResponseTo;
 import no.nav.dokdisteformidling.consumer.dokkat.tkat020.DokumentkatalogAdmin;
@@ -36,7 +41,7 @@ import java.util.stream.Collectors;
  */
 @Component
 public class Qdist011Service {
-
+	private final MeterRegistry meterRegistry;
 	private final DokumentkatalogAdmin dokumentkatalogAdmin;
 	private final VarselInfo varselInfo;
 	private final AdministrerForsendelse administrerForsendelse;
@@ -48,7 +53,8 @@ public class Qdist011Service {
 	private final SafJournalpostQueryService<JournalpostQdist011> safJournalpostQueryService;
 
 	@Inject
-	public Qdist011Service(DokumentkatalogAdmin dokumentkatalogAdmin,
+	public Qdist011Service(MeterRegistry meterRegistry,
+						   DokumentkatalogAdmin dokumentkatalogAdmin,
 						   VarselInfo varselInfo,
 						   AdministrerForsendelse administrerForsendelse,
 						   Storage storage,
@@ -56,6 +62,7 @@ public class Qdist011Service {
 						   ProducerTemplate producer, BridgeMotSDPMapper bridgeMotSDPMapper,
 						   DigitalKontaktInformasjonValidator digitalKontaktInformasjonValidator,
 						   @Qualifier("SafJournalpostQueryServiceQdist011") SafJournalpostQueryService<JournalpostQdist011> safJournalpostQueryService) {
+		this.meterRegistry = meterRegistry;
 		this.dokumentkatalogAdmin = dokumentkatalogAdmin;
 		this.varselInfo = varselInfo;
 		this.administrerForsendelse = administrerForsendelse;
@@ -90,7 +97,16 @@ public class Qdist011Service {
 
 		List<DokdistDokument> dokdistDokumentList = getDocumentsFromS3(hentForsendelseResponseTo);
 		for (DokdistDokument dokdistDokument : dokdistDokumentList) {
-			producer.sendBody(LastOppDokumentRoute.ROUTE, dokdistDokument);
+			Timer.Sample lastOppDokumentSample = Timer.start(meterRegistry);
+			try {
+				producer.sendBody(LastOppDokumentRoute.ROUTE, dokdistDokument);
+			} finally {
+				lastOppDokumentSample.stop(Timer.builder(QDIST011_PROCESS_TIMER)
+						.description("Sample for opplasting til NFS share gjennom SFTP.")
+						.tags(LABEL_PROCESS, "lastoppdokument")
+						.publishPercentileHistogram(true)
+						.register(meterRegistry));
+			}
 		}
 
 		JournalpostQdist011 journalpostQdist011 = safJournalpostQueryService.hentJournalpost(hentForsendelseResponseTo.getArkivInformasjon()
