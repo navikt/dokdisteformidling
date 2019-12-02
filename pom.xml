@@ -36,7 +36,7 @@
 		<resilience4j.version>0.11.0</resilience4j.version>
 		<aws-java-sdk-s3.version>1.11.497</aws-java-sdk-s3.version>
 		<dokkat-api>10.4.0</dokkat-api>
-		<wmq.version>8.0.0.6</wmq.version>
+		<wmq.version>9.1.3.0</wmq.version>
 		<cxf.version>3.3.0</cxf.version>
 		<activemq.version>5.15.2</activemq.version>
 		<commons-io.version>2.4</commons-io.version>

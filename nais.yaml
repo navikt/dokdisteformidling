@@ -2,7 +2,7 @@ team: teamdokumenthandtering
 image: "repo.adeo.no:5443/dok/dokdisteformidling"
 replicas:
   min: 1
-  max: 2
+  max: 6
   cpuThresholdPercentage: 50
 port: 8080
 healthcheck:
@@ -23,7 +23,7 @@ prometheus:
 resources:
   limits:
     cpu: 3000m
-    memory: 3072Mi
+    memory: 2560Mi
   requests:
     memory: 1024Mi
 fasitResources:
