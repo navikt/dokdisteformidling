@@ -10,7 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import no.nav.dokdisteformidling.consumer.saf.journalpost.SafJournalpost;
 import no.nav.dokdisteformidling.consumer.saf.journalpost.SafJsonJournalpost;
 import no.nav.dokdisteformidling.consumer.sts.StsRestConsumer;
-import no.nav.dokdisteformidling.exception.functional.SafJournalpostIkkeFunnetFunctionalException;
+import no.nav.dokdisteformidling.exception.functional.SafJournalpostIkkeFunnetException;
 import no.nav.dokdisteformidling.exception.functional.SafJournalpostQueryUnauthorizedException;
 import no.nav.dokdisteformidling.exception.technical.MarshalGraphqlRequestToJsonTechnicalException;
 import no.nav.dokdisteformidling.exception.technical.SafJournalpostQueryTechnicalException;
@@ -55,17 +55,16 @@ public class SafGraphqlConsumer {
 	@Monitor(value = "dok_metric", extraTags = {"process", "safJournalpostquery"}, histogram = true)
 	@Retryable(include = SafJournalpostQueryTechnicalException.class, maxAttempts = MAX_ATTEMPTS_SHORT, backoff = @Backoff(delay = DELAY_SHORT))
 	public SafJournalpost performQuery(GraphQLRequest graphQLRequest) {
-
 		try {
 			ResponseEntity<SafJsonJournalpost> responseEntity = restTemplate.exchange(graphQLurl, HttpMethod.POST, new HttpEntity<>(requestToJson(graphQLRequest), createAuthorizationHeader()), SafJsonJournalpost.class);
 
 			if (responseEntity.getBody() == null || responseEntity.getBody().getData() == null || responseEntity.getBody()
 					.getData().getJournalpost() == null) {
-				throw new SafJournalpostIkkeFunnetFunctionalException("Ingen journalpost ble funnet");
+				// Forsøk på nytt. GraphQL endepunktet gir kun httpstatus 200. Verdikjeden forventer at man finner journalpost her.
+				// Hvis ikke er dette en teknisk feil, ikke funksjonell feil.
+				throw new SafJournalpostIkkeFunnetException("Ingen journalpost ble funnet i saf.");
 			}
-
 			return responseEntity.getBody().getJournalpost();
-
 		} catch (HttpClientErrorException e) {
 			throw new SafJournalpostQueryUnauthorizedException(String.format("Henting av journalpost feilet med status: %s, feilmelding: %s", e
 					.getStatusCode(), e.getMessage()), e);
