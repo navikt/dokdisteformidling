@@ -323,7 +323,7 @@ public class Qdist013IT {
 	}
 
 	@Test
-	public void shouldThrowSafJournalpostIkkeFunnetFunctionalException() {
+	public void shouldPutOnBackoutQueueWhenSafJournalpostIkkeFunnetException() {
 		stubGetForsendelse("__files/rjoark001/getForsendelse-happy.json");
 		stubGetSecurityToken();
 		stubFor(post(urlMatching("/safgraphql")).willReturn(aResponse().withStatus(HttpStatus.OK.value())
@@ -333,12 +333,12 @@ public class Qdist013IT {
 		sendStringMessage(qdist013, classpathToString("qdist013/qdist013-happy.xml"));
 
 		await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
-			assertMessageOnQueue(qdist013FunksjonellFeil);
+			assertMessageOnQueue(backoutQueue);
 		});
 
 		verifyGetForsendelse();
-		verifyGetSecurityToken(1);
-		verify(1, postRequestedFor(urlEqualTo("/safgraphql")));
+		verifyGetSecurityToken(MAX_ATTEMPTS_SHORT);
+		verify(MAX_ATTEMPTS_SHORT, postRequestedFor(urlEqualTo("/safgraphql")));
 	}
 
 	@Test
@@ -395,7 +395,7 @@ public class Qdist013IT {
 	}
 
 	@Test
-	public void shouldThrowSafJournalpostIkkeFunnetFunctionalExceptionLightweight() {
+	public void shouldPutMessageOnBackoutWhenSafJournalpostIkkeFunnetExceptionUsingLightweightService() {
 		stubGetForsendelse("__files/rjoark001/getForsendelse-happy.json");
 		stubGetSecurityToken();
 		stubPostSafJournalpost("queryJournalpostId\":\"123\"", "saf/safQdist013GraphQlResponse-aktoerId.json");
@@ -408,13 +408,13 @@ public class Qdist013IT {
 		sendStringMessage(qdist013, classpathToString("qdist013/qdist013-happy.xml"));
 
 		await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
-			assertMessageOnQueue(qdist013FunksjonellFeil);
+			assertMessageOnQueue(backoutQueue);
 		});
 
 		verifyGetForsendelse();
-		verifyGetSecurityToken(2);
+		verifyGetSecurityToken(MAX_ATTEMPTS_SHORT + 1);
 		verifyPostSafJournalpost();
-		verify(1, postRequestedFor(urlEqualTo("/safgraphql"))
+		verify(MAX_ATTEMPTS_SHORT, postRequestedFor(urlEqualTo("/safgraphql"))
 				.withRequestBody(equalToJson(classpathToString("__files/saf/safLightweightGraphQlRequest.json"))));
 	}
 
