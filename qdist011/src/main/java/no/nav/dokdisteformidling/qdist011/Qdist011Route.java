@@ -63,6 +63,8 @@ public class Qdist011Route extends SpringRouteBuilder {
 				.maximumRedeliveries(0)
 				.log(log)
 				.logExhaustedMessageBody(false)
+				.logExhaustedMessageHistory(false)
+				.logStackTrace(true)
 				.loggingLevel(ERROR));
 
 		onException(AbstractDokdisteformidlingFunctionalException.class, ValidationException.class)
