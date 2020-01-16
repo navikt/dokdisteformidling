@@ -16,13 +16,13 @@ import java.util.GregorianCalendar;
 /**
  * @author Heidi Elisabeth Sando, Visma Consulting
  */
-
 @Component
 public class DigitalKontaktInformasjonValidator {
 
 	public void validateKontaktinfo(HentSikkerDigitalPostadresseResponseTo hentSikkerDigitalPostadresseResponseTo, VarselInfoTo varselInfoTo) {
 
-		if (RESERVASJON.equals(hentSikkerDigitalPostadresseResponseTo.getDigitalKontaktinformasjon().getReservasjon())) {
+		if (hentSikkerDigitalPostadresseResponseTo.getDigitalKontaktinformasjon() != null &&
+				RESERVASJON.equals(hentSikkerDigitalPostadresseResponseTo.getDigitalKontaktinformasjon().getReservasjon())) {
 			throw new IllegalKontaktInformasjonFunctionalException("Reservert kontaktinformasjon");
 		}
 
@@ -30,7 +30,7 @@ public class DigitalKontaktInformasjonValidator {
 			throw new IllegalKontaktInformasjonFunctionalException("Manglende sertifikat, leverandoerAdresse eller brukerAdresse");
 		}
 
-		if (!(varselInfoTo == null)) {
+		if (varselInfoTo != null) {
 			verifyEmailAndPhone(hentSikkerDigitalPostadresseResponseTo);
 		}
 
@@ -42,7 +42,7 @@ public class DigitalKontaktInformasjonValidator {
 				(hentSikkerDigitalPostadresseResponseTo.getSertifikat().length > 0);
 
 
-		boolean hasLeverandorAdresse = (hentSikkerDigitalPostadresseResponseTo.getDigitalKontaktinformasjon() != null) &&
+		boolean hasLeverandorAdresse = (hentSikkerDigitalPostadresseResponseTo.getSikkerDigitalPostkasse() != null) &&
 				StringUtils.isNotBlank(hentSikkerDigitalPostadresseResponseTo.getSikkerDigitalPostkasse()
 						.getLeverandoerAdresse());
 
@@ -56,7 +56,7 @@ public class DigitalKontaktInformasjonValidator {
 
 		int result = -1;
 
-		if (!(dateTime == null)) {
+		if (dateTime != null) {
 			GregorianCalendar calendar = dateTime.toGregorianCalendar();
 			GregorianCalendar today = getNow().toGregorianCalendar();
 			today.add(GregorianCalendar.MONTH, -DATE_VALID_MONTHS);
@@ -66,7 +66,7 @@ public class DigitalKontaktInformasjonValidator {
 		return result < 0;
 	}
 
-	public static boolean isEpostInvalid(HentSikkerDigitalPostadresseResponseTo.Epostadresse epostadresse) {
+	static boolean isEpostInvalid(HentSikkerDigitalPostadresseResponseTo.Epostadresse epostadresse) {
 
 		if (epostadresse == null) {
 			return true;
@@ -77,7 +77,7 @@ public class DigitalKontaktInformasjonValidator {
 		}
 	}
 
-	public static boolean isMobilInvalid(HentSikkerDigitalPostadresseResponseTo.Mobiltelefonnummer mobiltelefonnummer) {
+	static boolean isMobilInvalid(HentSikkerDigitalPostadresseResponseTo.Mobiltelefonnummer mobiltelefonnummer) {
 
 		if (mobiltelefonnummer == null) {
 			return true;
