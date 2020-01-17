@@ -28,5 +28,6 @@
   "EREG_API_URL": "https://modapp-t8.adeo.no/ereg/api",
   "INGRESSES": "https://dokdisteformidling.nais.preprod.local",
   "SRVDOKDISTEFORMIDLING": "/serviceuser/data/test/srvdokdisteformidling",
-  "SFTP_PRIVATE_KEY": "/kv/preprod/fss/dokdisteformidling/privatekey"
+  "SFTP_PRIVATE_KEY": "/kv/preprod/fss/dokdisteformidling/privatekey",
+  "NAMESPACE": "t8"
 }
