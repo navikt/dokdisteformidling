@@ -2,7 +2,7 @@ kind: Application
 apiVersion: nais.io/v1alpha1
 metadata:
   name: dokdisteformidling
-  namespace: default
+  namespace: {{ NAMESPACE }}
   labels:
     team: teamdokumenthandtering
 spec:
@@ -61,7 +61,7 @@ spec:
       value: {{ AKTOERREGISTER_API_V1_URL }}
     - name: EREG_API_URL
       value: {{ EREG_API_URL }}
-  image: repo.adeo.no:5443/dok/dokdisteformidling
+  image: {{ image }}
   ingresses:
     - {{ INGRESSES }}
   leaderElection: true
