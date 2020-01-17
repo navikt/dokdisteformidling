@@ -63,7 +63,7 @@ spec:
       value: {{ EREG_API_URL }}
   image: repo.adeo.no:5443/dok/dokdisteformidling
   ingresses:
-    - https://dokdisteformidling.nais.preprod.local
+    - {{ INGRESSES }}
   leaderElection: true
   liveness:
     path: /isAlive
@@ -93,7 +93,7 @@ spec:
   vault:
     enabled: true
     paths:
-      - kvPath: /serviceuser/data/test/srvdokdisteformidling
+      - kvPath: {{ SRVDOKDISTEFORMIDLING }}
         mountPath: /var/run/secrets/nais.io/srvdokdisteformidling
-      - kvPath: /kv/preprod/fss/dokdisteformidling/default
+      - kvPath: {{ SFTP_PRIVATE_KEY }}
         mountPath: /var/run/secrets/nais.io/vault
