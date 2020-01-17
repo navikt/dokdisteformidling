@@ -60,6 +60,7 @@ public class ArkivmeldingMapper {
 	public static final String FERDIGSTILT = "FERDIGSTILT";
 	public static final String FILFORMAT_PNG = "PNG";
 	public static final String FILFORMAT_JPEG = "JPEG";
+	public static final String UKJENT = "UKJENT";
 
 	private final Aktoerregister aktoerregister;
 	private final Ereg ereg;
@@ -210,7 +211,10 @@ public class ArkivmeldingMapper {
 		} else {
 			LightweightSafJournalpostQdist013 lightweightSafJournalpostQdist013 = safJournalpostQueryService.hentJournalpost(dokumentInfo
 					.getOriginalJournalpostId());
-			return lightweightSafJournalpostQdist013.getJournalfortAvNavn();
+			if(!isEmpty(lightweightSafJournalpostQdist013.getJournalfortAvNavn())){
+				return lightweightSafJournalpostQdist013.getJournalfortAvNavn();
+			}
+			return UKJENT;
 		}
 	}
 
