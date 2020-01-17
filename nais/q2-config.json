@@ -26,7 +26,7 @@
   "VIRKSOMHET_DIGITALKONTAKINFORMASJON_V1_ENDPOINTURL": "https://dkif.nais.preprod.local/ws/DigitalKontaktinformasjon/v1",
   "AKTOERREGISTER_API_V1_URL": "https://app-q2.adeo.no/aktoerregister/api/v1",
   "EREG_API_URL": "https://modapp-q2.adeo.no/ereg/api",
-  "INGRESSES": "https://dokdisteformidling-q1.nais.preprod.local",
+  "INGRESSES": "https://dokdisteformidling-q2.nais.preprod.local",
   "SRVDOKDISTEFORMIDLING": "/serviceuser/data/dev/srvdokdisteformidling",
   "SFTP_PRIVATE_KEY": "/kv/preprod/fss/dokdisteformidling/privatekey",
   "NAMESPACE": "q2"
