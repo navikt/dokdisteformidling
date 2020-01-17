@@ -79,6 +79,7 @@ class ArkivmeldingMapperTest {
 	private static final String TITTEL = "tittel";
 	private static final String JOURNALFOERT_AV_NAVN = "journalfoertAvNavn";
 	private static final String TEMA_NAVN = "temaNavn";
+	private static final String OPPRETTET_AV_UKJENT = "UKJENT";
 
 	private static final String DOKUMENT_INFO_ID_HOVEDDOK = "1234567";
 	private static final String TITTEL_HOVEDDOK = "tittelHoveddok";
@@ -451,6 +452,24 @@ class ArkivmeldingMapperTest {
 		assertDokumentbeskrivelse(basisregistreringJp.getDokumentbeskrivelseAndDokumentobjekt());
 	}
 
+	@Test
+	@DisplayName("Case for satt originalJournalPostId men ukjent journalfører")
+	void ukjentJournalFoertAv() {
+		when(safJournalpostQueryServiceMock.hentJournalpost(ORIGINAL_JPID_VEDLEGG)).thenReturn(createLightweightSafJournalpostQdist013NoJournalFoertAv());
+
+		JournalpostQdist013 journalpostQdist013 = createJournalpostQdist013Builder()
+				.dokumenter(Arrays.asList(createHoveddokumentBuilder().build(),
+						createVedleggBuilder().originalJournalpostId(ORIGINAL_JPID_VEDLEGG).build()))
+				.build();
+
+		JAXBElement<Arkivmelding> arkivmeldingJAXBElement = arkivmeldingMapper.createArkivMelding(journalpostQdist013, BESTILLINGS_ID);
+		Journalpost basisregistreringJp = (Journalpost) arkivmeldingJAXBElement.getValue().getMappe().get(0).getBasisregistrering().get(0);
+		Dokumentbeskrivelse dokumentbeskrivelseVedlegg = (Dokumentbeskrivelse) basisregistreringJp.getDokumentbeskrivelseAndDokumentobjekt()
+				.get(1);
+		Dokumentobjekt dokumentobjektVedlegg = dokumentbeskrivelseVedlegg.getDokumentobjekt().get(0);
+
+		assertEquals(dokumentobjektVedlegg.getOpprettetAv(), OPPRETTET_AV_UKJENT);
+	}
 
 	private void assertArkivmelding(Arkivmelding arkivmelding) {
 		assertNotNull(arkivmelding);
@@ -640,6 +659,14 @@ class ArkivmeldingMapperTest {
 		return LightweightSafJournalpostQdist013.builder()
 				.avsenderMottakerNavn(AVSENDER_MOTTAKER_NAVN_ORIG_JP)
 				.journalfortAvNavn(JOURNALFOERT_AV_NAVN_ORIG_JP)
+				.datoJournalfoert(DATO_JOURNALFOERT_ORIG_JP)
+				.build();
+	}
+
+	private LightweightSafJournalpostQdist013 createLightweightSafJournalpostQdist013NoJournalFoertAv() {
+		return LightweightSafJournalpostQdist013.builder()
+				.avsenderMottakerNavn(AVSENDER_MOTTAKER_NAVN_ORIG_JP)
+				.journalfortAvNavn("")
 				.datoJournalfoert(DATO_JOURNALFOERT_ORIG_JP)
 				.build();
 	}
