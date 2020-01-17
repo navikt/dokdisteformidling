@@ -7,80 +7,60 @@ metadata:
     team: teamdokumenthandtering
 spec:
   env:
-    - name: NAV_TRUSTSTORE_KEYSTOREALIAS
-      value: na
-    - name: SERVICEUSER_USERNAME
-      value: srvdokdisteformidl
-    - name: SFTP_PRIVATEKEY_KEYSTOREALIAS
-      value: na
     - name: SFTP_URL
-      value: d26fsvl002.test.local
+      value: {{ SFTP_URL }}
     - name: SFTP_USERNAME
-      value: dokdisteformidling-sftp
+      value: {{ SFTP_USERNAME }}
     - name: DOKDISTEFORMIDLING_S3_CREDS_USERNAME
-      value: VGFWE6C66LF34ME6NRII
-    - name: DOKDISTMELLOMLAGER_S3_STORAGE_CRYPTO_USERNAME
-      value: whatever
+      value: {{ DOKDISTEFORMIDLING_S3_CREDS_USERNAME }}
     - name: DOKUMENTTYPEINFO_V4_URL
-      value: https://app-t8.adeo.no/dokkat/rest/dokumenttypeinfo/v4
+      value: {{ DOKUMENTTYPEINFO_V4_URL }}
     - name: VARSELINFO_V1_URL
-      value: https://app-t8.adeo.no/dokkat/rest/varselinfo/v1
-    - name: VARSELINFO_V1_DESCRIPTION
-      value: Informasjon om varseltyper og varselmaler
-    - name: ADMINISTRERFORSENDELSE_V1_DESCRIPTION
-      value: Rest-endepunkt for rdist001 - administrerForsendelse. Endepunktet er sikret
-        med basic auth
+      value: {{ VARSELINFO_V1_URL }}
     - name: ADMINISTRERFORSENDELSE_V1_URL
-      value: https://app-t8.adeo.no/dokdist/rest/v1/administrerforsendelse
+      value: {{ ADMINISTRERFORSENDELSE_V1_URL }}
     - name: SECURITYTOKENSERVICE_URL
-      value: https://sts-t8.test.local/SecurityTokenServiceProvider/
+      value: {{ SECURITYTOKENSERVICE_URL }}
     - name: SECURITY_TOKEN_SERVICE_TOKEN_URL
-      value: https://security-token-service-t4.nais.preprod.local/rest/v1/sts/token
+      value: {{ SECURITY_TOKEN_SERVICE_TOKEN_URL }}
     - name: DOKDISTEFORMIDLING_CHANNEL_QUEUEMANAGER
-      value: mq://d26apvl257.test.local:1412/MTXLSC01
+      value: {{ DOKDISTEFORMIDLING_CHANNEL_QUEUEMANAGER }}
     - name: DOKDISTEFORMIDLING_CHANNEL_NAME
-      value: T8_DOKDISTEFORMIDLIN
+      value: {{ DOKDISTEFORMIDLING_CHANNEL_NAME }}
     - name: MQGATEWAY01_NAME
-      value: MTXLSC01
+      value: {{ MQGATEWAY01_NAME }}
     - name: MQGATEWAY01_HOSTNAME
-      value: d26apvl257.test.local
+      value: {{ MQGATEWAY01_HOSTNAME }}
     - name: MQGATEWAY01_PORT
-      value: "1412"
+      value: "{{ MQGATEWAY01_PORT }}"
     - name: DOKDISTEFORMIDLING_QDIST011_DIST_TIL_DPI_QUEUENAME
-      value: QA.T8_DOKDISTEFORMIDLING.QDIST011_DIST_TIL_DPI
+      value: {{ DOKDISTEFORMIDLING_QDIST011_DIST_TIL_DPI_QUEUENAME }}
     - name: DOKDISTEFORMIDLING_QDIST011_DIST_TIL_DPI_QUEUEMANAGER
-      value: mq://d26apvl257.test.local:1412/MTXLSC01
+      value: {{ DOKDISTEFORMIDLING_QDIST011_DIST_TIL_DPI_QUEUEMANAGER }}
     - name: DOKDISTEFORMIDLING_QDIST011_FUNK_FEIL_QUEUENAME
-      value: QA.T8_DOKDISTEFORMIDLING.QDIST011_FUNK_FEIL
+      value: {{ DOKDISTEFORMIDLING_QDIST011_FUNK_FEIL_QUEUENAME }}
     - name: DOKDISTEFORMIDLING_QDIST011_FUNK_FEIL_QUEUEMANAGER
-      value: mq://d26apvl257.test.local:1412/MTXLSC01
+      value: {{ DOKDISTEFORMIDLING_QDIST011_FUNK_FEIL_QUEUEMANAGER }}
     - name: DOKDISTEFORMIDLING_QDIST013_DIST_TRYGDERETTEN_QUEUEMANAGER
-      value: mq://d26apvl257.test.local:1412/MTXLSC01
+      value: {{ DOKDISTEFORMIDLING_QDIST013_DIST_TRYGDERETTEN_QUEUEMANAGER }}
     - name: DOKDISTEFORMIDLING_QDIST013_DIST_TRYGDERETTEN_QUEUENAME
-      value: QA.T8_DOKDISTEFORMIDLING.QDIST013_DIST_TRYGDERE
+      value: {{ DOKDISTEFORMIDLING_QDIST013_DIST_TRYGDERETTEN_QUEUENAME }}
     - name: DOKDISTEFORMIDLING_QDIST013_FUNK_FEIL_QUEUENAME
-      value: QA.T8_DOKDISTEFORMIDLING.QDIST013_FUNK_FEIL
+      value: {{ DOKDISTEFORMIDLING_QDIST013_FUNK_FEIL_QUEUENAME }}
     - name: DOKDISTEFORMIDLING_QDIST013_FUNK_FEIL_QUEUEMANAGER
-      value: mq://d26apvl257.test.local:1412/MTXLSC01
+      value: {{ DOKDISTEFORMIDLING_QDIST013_FUNK_FEIL_QUEUEMANAGER }}
     - name: DOKDISTSDPBATCHINTERN_QUEUENAME
-      value: T8_475.DOKDIST_SDP_BATCH_INTERN
+      value: {{ DOKDISTSDPBATCHINTERN_QUEUENAME }}
     - name: VIRKSOMHET_DIGITALKONTAKINFORMASJON_V1_WSDLURL
-      value: http://maven.adeo.no/nexus/service/local/artifact/maven/redirect?a=nav-digitalKontaktinformasjon-v1-tjenestespesifikasjon&e=zip&g=no.nav.tjenester.fim&r=m2internal&v=2.0.0
+      value: {{ VIRKSOMHET_DIGITALKONTAKINFORMASJON_V1_WSDLURL }}
     - name: VIRKSOMHET_DIGITALKONTAKINFORMASJON_V1_SECURITYTOKEN
-      value: SAML
+      value: {{ VIRKSOMHET_DIGITALKONTAKINFORMASJON_V1_SECURITYTOKEN }}
     - name: VIRKSOMHET_DIGITALKONTAKINFORMASJON_V1_ENDPOINTURL
-      value: https://dkif-t2.nais.preprod.local/ws/DigitalKontaktinformasjon/v1
-    - name: VIRKSOMHET_DIGITALKONTAKINFORMASJON_V1_DESCRIPTION
-      value: Temporary resource, pending update of dokdisteformidling to use dkif rest
-        api
-    - name: AKTOERREGISTER_API_V1_DESCRIPTION
-      value: Versjon 1 av REST-API for aktoerregisteret
+      value: {{ VIRKSOMHET_DIGITALKONTAKINFORMASJON_V1_ENDPOINTURL }}
     - name: AKTOERREGISTER_API_V1_URL
-      value: https://app-t8.adeo.no/aktoerregister/api/v1
-    - name: EREG_API_DESCRIPTION
-      value: 'REST-API''et for EREG. Dokumentasjon av grensesnittet: se /ereg/api/swagger-ui.html'
+      value: {{ AKTOERREGISTER_API_V1_URL }}
     - name: EREG_API_URL
-      value: https://modapp-t8.adeo.no/ereg/api
+      value: {{ EREG_API_URL }}
   image: repo.adeo.no:5443/dok/dokdisteformidling
   ingresses:
     - https://dokdisteformidling.nais.preprod.local
