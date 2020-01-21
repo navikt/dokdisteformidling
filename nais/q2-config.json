@@ -1,7 +1,6 @@
 {
   "SFTP_URL": "b27fsvl002.preprod.local",
   "SFTP_USERNAME": "dokdisteformidling-sftp",
-  "DOKDISTEFORMIDLING_S3_CREDS_USERNAME": "VGFWE6C66LF34ME6NRII",
   "DOKUMENTTYPEINFO_V4_URL": "https://app-q2.adeo.no/dokkat/rest/dokumenttypeinfo/v4",
   "VARSELINFO_V1_URL": "https://app-q2.adeo.no/dokkat/rest/varselinfo/v1",
   "ADMINISTRERFORSENDELSE_V1_URL": "https://app-q2.adeo.no/dokdist/rest/v1/administrerforsendelse",
@@ -22,12 +21,12 @@
   "DOKDISTEFORMIDLING_QDIST013_FUNK_FEIL_QUEUEMANAGER": "mq://b27apvl170.preprod.local:1413/MQXLSC01",
   "DOKDISTSDPBATCHINTERN_QUEUENAME": "Q1_475.DOKDIST_SDP_BATCH_INTERN",
   "VIRKSOMHET_DIGITALKONTAKINFORMASJON_V1_WSDLURL": "http://maven.adeo.no/nexus/service/local/artifact/maven/redirect?a=nav-digitalKontaktinformasjon-v1-tjenestespesifikasjon&e=zip&g=no.nav.tjenester.fim&r=m2internal&v=2.0.0",
-  "VIRKSOMHET_DIGITALKONTAKINFORMASJON_V1_SECURITYTOKEN": "SAML",
   "VIRKSOMHET_DIGITALKONTAKINFORMASJON_V1_ENDPOINTURL": "https://dkif.nais.preprod.local/ws/DigitalKontaktinformasjon/v1",
   "AKTOERREGISTER_API_V1_URL": "https://app-q2.adeo.no/aktoerregister/api/v1",
   "EREG_API_URL": "https://modapp-q2.adeo.no/ereg/api",
   "INGRESSES": "https://dokdisteformidling-q2.nais.preprod.local",
   "SRVDOKDISTEFORMIDLING": "/serviceuser/data/dev/srvdokdisteformidling",
   "SFTP_PRIVATE_KEY": "/kv/preprod/fss/dokdisteformidling/privatekey",
-  "NAMESPACE": "q2"
+  "NAMESPACE": "q2",
+  "DOKDISTEFORMIDLING_VAULT": "/kv/preprod/fss/dokdisteformidling/q2"
 }
