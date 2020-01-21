@@ -11,8 +11,6 @@ spec:
       value: {{ SFTP_URL }}
     - name: SFTP_USERNAME
       value: {{ SFTP_USERNAME }}
-    - name: DOKDISTEFORMIDLING_S3_CREDS_USERNAME
-      value: {{ DOKDISTEFORMIDLING_S3_CREDS_USERNAME }}
     - name: DOKUMENTTYPEINFO_V4_URL
       value: {{ DOKUMENTTYPEINFO_V4_URL }}
     - name: VARSELINFO_V1_URL
@@ -54,7 +52,7 @@ spec:
     - name: VIRKSOMHET_DIGITALKONTAKINFORMASJON_V1_WSDLURL
       value: {{ VIRKSOMHET_DIGITALKONTAKINFORMASJON_V1_WSDLURL }}
     - name: VIRKSOMHET_DIGITALKONTAKINFORMASJON_V1_SECURITYTOKEN
-      value: {{ VIRKSOMHET_DIGITALKONTAKINFORMASJON_V1_SECURITYTOKEN }}
+      value: "SAML"
     - name: VIRKSOMHET_DIGITALKONTAKINFORMASJON_V1_ENDPOINTURL
       value: {{ VIRKSOMHET_DIGITALKONTAKINFORMASJON_V1_ENDPOINTURL }}
     - name: AKTOERREGISTER_API_V1_URL
@@ -96,4 +94,6 @@ spec:
       - kvPath: {{ SRVDOKDISTEFORMIDLING }}
         mountPath: /var/run/secrets/nais.io/srvdokdisteformidling
       - kvPath: {{ SFTP_PRIVATE_KEY }}
+        mountPath: /var/run/secrets/nais.io/vault
+      - kvPath: {{ DOKDISTEFORMIDLING_VAULT }}
         mountPath: /var/run/secrets/nais.io/vault
