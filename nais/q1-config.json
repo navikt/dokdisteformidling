@@ -27,6 +27,6 @@
   "INGRESSES": "https://dokdisteformidling-q1.nais.preprod.local",
   "SRVDOKDISTEFORMIDLING": "/serviceuser/data/dev/srvdokdisteformidling",
   "SFTP_PRIVATE_KEY": "/kv/preprod/fss/dokdisteformidling/privatekey",
-  "NAMESPACE": "q1",
-  "DOKDISTEFORMIDLING_VAULT": "/kv/preprod/fss/dokdisteformidling/q1"
+  "DOKDISTEFORMIDLING_VAULT": "/kv/preprod/fss/dokdisteformidling/q1",
+  "NAMESPACE": "q1"
 }
