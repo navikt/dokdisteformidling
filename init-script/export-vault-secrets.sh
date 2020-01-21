@@ -1,4 +1,4 @@
-if test -f /var/run/secrets/nais.io/srvdokdisteformidling;
+if test -f /var/run/secrets/nais.io/srvdokdisteformidling/username;
 then
     echo "Setting serviceuser_username"
     export  serviceuser_username=$(cat /serviceuser/data/test/srvdokdisteformidling/username)
@@ -8,13 +8,13 @@ then
     echo "Setting serviceuser_password"
     export  serviceuser_***passord=gammelt_passord***)
 fi
-if test -f /var/run/secrets/nais.io/vault;
+if test -f /secrets/privateKey/privateKeyFile;
 then
     echo "Setting sftp_privateKey"
-    export  sftp_privateKey=$(cat /kv/preprod/fss/dokdisteformidling/privatekey)
+    export  sftp_privateKey=$(cat /secrets/privateKey/privateKeyFile)
 fi
-if test -f /var/run/secrets/nais.io/vault;
+if test -f /secrets/privateKey/privateKeyPassphrase;
 then
     echo "Setting sftp_privateKeyPassphrase"
-    export  sftp_privateKeyPassphrase=$(cat /kv/preprod/fss/dokdisteformidling/privatekey_passphrase)
+    export  sftp_privateKeyPassphrase=$(cat /secrets/privateKey/privateKeyPassphrase)
 fi

@@ -9,8 +9,6 @@ spec:
   env:
     - name: SFTP_URL
       value: {{ SFTP_URL }}
-    - name: SFTP_USERNAME
-      value: {{ SFTP_USERNAME }}
     - name: DOKUMENTTYPEINFO_V4_URL
       value: {{ DOKUMENTTYPEINFO_V4_URL }}
     - name: VARSELINFO_V1_URL
@@ -50,7 +48,7 @@ spec:
     - name: DOKDISTSDPBATCHINTERN_QUEUENAME
       value: {{ DOKDISTSDPBATCHINTERN_QUEUENAME }}
     - name: VIRKSOMHET_DIGITALKONTAKINFORMASJON_V1_WSDLURL
-      value: {{ VIRKSOMHET_DIGITALKONTAKINFORMASJON_V1_WSDLURL }}
+      value: "http://maven.adeo.no/nexus/service/local/artifact/maven/redirect?a=nav-digitalKontaktinformasjon-v1-tjenestespesifikasjon&e=zip&g=no.nav.tjenester.fim&r=m2internal&v=2.0.0"
     - name: VIRKSOMHET_DIGITALKONTAKINFORMASJON_V1_SECURITYTOKEN
       value: "SAML"
     - name: VIRKSOMHET_DIGITALKONTAKINFORMASJON_V1_ENDPOINTURL
@@ -94,6 +92,6 @@ spec:
       - kvPath: {{ SRVDOKDISTEFORMIDLING }}
         mountPath: /var/run/secrets/nais.io/srvdokdisteformidling
       - kvPath: {{ SFTP_PRIVATE_KEY }}
-        mountPath: /var/run/secrets/nais.io/vault
+        mountPath: /secrets/privateKey
       - kvPath: {{ DOKDISTEFORMIDLING_VAULT }}
         mountPath: /var/run/secrets/nais.io/vault
