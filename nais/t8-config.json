@@ -27,6 +27,6 @@
   "INGRESSES": "https://dokdisteformidling-t8.nais.preprod.local",
   "SRVDOKDISTEFORMIDLING": "/serviceuser/data/test/srvdokdisteformidling",
   "SFTP_PRIVATE_KEY": "/kv/preprod/fss/dokdisteformidling/privatekey",
-  "NAMESPACE": "t8",
-  "DOKDISTEFORMIDLING_VAULT": "/kv/preprod/fss/dokdisteformidling/t8"
+  "DOKDISTEFORMIDLING_VAULT": "/kv/preprod/fss/dokdisteformidling/t8",
+  "NAMESPACE": "t8"
 }

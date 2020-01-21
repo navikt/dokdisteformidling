@@ -27,6 +27,6 @@
   "INGRESSES": "https://dokdisteformidling.nais.adeo.no",
   "SRVDOKDISTEFORMIDLING": "/serviceuser/data/prod/srvdokdisteformidling",
   "SFTP_PRIVATE_KEY": "/kv/prod/fss/dokdisteformidling/privatekey",
-  "NAMESPACE": "default",
-  "DOKDISTEFORMIDLING_VAULT": "/kv/prod/fss/dokdisteformidling/default"
+  "DOKDISTEFORMIDLING_VAULT": "/kv/prod/fss/dokdisteformidling/default",
+  "NAMESPACE": "default"
 }
