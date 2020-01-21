@@ -122,10 +122,7 @@ public class MaskinportenTokenConsumer {
 			log.error("Error occured during signing of JWT", e);
 		}
 
-		String serializedJwt = signedJWT.serialize();
-		log.info("SerializedJWT: {}", serializedJwt);
-
-		return serializedJwt;
+		return signedJWT.serialize();
 	}
 
 	public String getCurrentScopes() {
