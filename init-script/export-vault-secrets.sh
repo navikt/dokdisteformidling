@@ -1,3 +1,5 @@
+#!/usr/bin/env sh
+
 if test -f /var/run/secrets/nais.io/srvdokdisteformidling/username;
 then
     echo "Setting serviceuser_username"
