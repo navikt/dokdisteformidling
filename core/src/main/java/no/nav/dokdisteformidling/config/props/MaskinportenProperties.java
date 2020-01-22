@@ -20,6 +20,4 @@ public class MaskinportenProperties {
 	private URL url;
 	private String audience;
 	private String clientid;
-	@NestedConfigurationProperty
-	private KeyStoreProperties keystore;
 }

@@ -1,5 +1,6 @@
 package no.nav.dokdisteformidling;
 
+import no.nav.dokdisteformidling.certificate.KeyStoreProperties;
 import no.nav.dokdisteformidling.config.alias.DigitalKontaktinformasjonV1Alias;
 import no.nav.dokdisteformidling.config.alias.MqGatewayAlias;
 import no.nav.dokdisteformidling.config.alias.ServiceuserAlias;
@@ -16,6 +17,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @EnableRetry
 @EnableScheduling
 @EnableConfigurationProperties({ServiceuserAlias.class,
+		KeyStoreProperties.class,
 		MqGatewayAlias.class,
 		SrvAppserverProperties.class,
 		DigitalKontaktinformasjonV1Alias.class,

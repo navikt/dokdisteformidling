@@ -12,6 +12,7 @@ import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.dokdisteformidling.certificate.AppCertificate;
+import no.nav.dokdisteformidling.certificate.KeyStoreProperties;
 import no.nav.dokdisteformidling.config.props.MaskinportenProperties;
 import no.nav.dokdisteformidling.metrics.Monitor;
 import org.springframework.boot.web.client.RestTemplateBuilder;
@@ -46,11 +47,15 @@ public class MaskinportenTokenConsumer {
 	// TODO nytt scope når virksomhetssertifikat er klart.
 	private static final String SCOPE_DPO = "move/dpo.read";
 
-	private final MaskinportenProperties props;
+	private final KeyStoreProperties keyStoreProperties;
+	private final MaskinportenProperties maskinportenProperties;
 	private final RestTemplate restTemplate;
 
-	public MaskinportenTokenConsumer(MaskinportenProperties props, RestTemplateBuilder restTemplateBuilder) {
-		this.props = props;
+	public MaskinportenTokenConsumer(KeyStoreProperties keyStoreProperties,
+									 MaskinportenProperties maskinportenProperties,
+									 RestTemplateBuilder restTemplateBuilder) {
+		this.keyStoreProperties = keyStoreProperties;
+		this.maskinportenProperties = maskinportenProperties;
 		this.restTemplate = restTemplateBuilder
 				.messageConverters(new FormHttpMessageConverter(),
 						new MappingJackson2HttpMessageConverter())
@@ -73,21 +78,21 @@ public class MaskinportenTokenConsumer {
 
 		URI accessTokenUri;
 		try {
-			accessTokenUri = props.getUrl().toURI();
+			accessTokenUri = maskinportenProperties.getUrl().toURI();
 		} catch (URISyntaxException e) {
 			log.error("Error converting property to URI", e);
 			throw new RuntimeException(e);
 		}
 
-		log.info("Henter accessToken fra maskinporten på url={}", props.getUrl().toString());
+		log.info("Henter accessToken fra maskinporten på url={}", maskinportenProperties.getUrl().toString());
 		ResponseEntity<OidcTokenResponse> response = restTemplate.exchange(accessTokenUri, HttpMethod.POST,
 				httpEntity, OidcTokenResponse.class);
-		log.info("AccessToken hentet OK fra maskinporten på url={}", props.getUrl().toString());
+		log.info("AccessToken hentet OK fra maskinporten på url={}", maskinportenProperties.getUrl().toString());
 		return response.getBody();
 	}
 
 	private String generateJWT() {
-		AppCertificate nokkel = new AppCertificate(props.getKeystore());
+		AppCertificate nokkel = new AppCertificate(keyStoreProperties);
 
 		List<Base64> certChain = new ArrayList<>();
 		try {
@@ -99,9 +104,9 @@ public class MaskinportenTokenConsumer {
 
 		JWSHeader jwsHeader = new JWSHeader.Builder(JWSAlgorithm.RS256).x509CertChain(certChain).build();
 
-		String clientId = props.getClientid();
+		String clientId = maskinportenProperties.getClientid();
 		JWTClaimsSet claims = new JWTClaimsSet.Builder()
-				.audience(props.getAudience())
+				.audience(maskinportenProperties.getAudience())
 				.issuer(clientId)
 				.claim("scope", getCurrentScopes())
 				.jwtID(UUID.randomUUID().toString())

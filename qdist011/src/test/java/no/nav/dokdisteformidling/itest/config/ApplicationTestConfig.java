@@ -3,6 +3,7 @@ package no.nav.dokdisteformidling.itest.config;
 import static org.mockito.Mockito.mock;
 
 import com.amazonaws.services.s3.AmazonS3;
+import no.nav.dokdisteformidling.certificate.KeyStoreProperties;
 import no.nav.dokdisteformidling.config.alias.DigitalKontaktinformasjonV1Alias;
 import no.nav.dokdisteformidling.config.alias.MqGatewayAlias;
 import no.nav.dokdisteformidling.config.alias.ServiceuserAlias;
@@ -26,6 +27,7 @@ import org.springframework.retry.annotation.EnableRetry;
 @Profile("itest")
 @EnableRetry
 @EnableConfigurationProperties({ServiceuserAlias.class,
+		KeyStoreProperties.class,
 		MqGatewayAlias.class,
 		SrvAppserverProperties.class,
 		DigitalKontaktinformasjonV1Alias.class,
