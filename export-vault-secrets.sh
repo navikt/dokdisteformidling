@@ -18,7 +18,7 @@ then
     echo "Setting sftp_privateKeyPassphrase"
     export  sftp_privateKeyPassphrase=$(cat /secrets/privateKey/privateKeyPassphrase)
 fi
-if test -f /var/run/secrets/nais.io/vault;
+if test -d /var/run/secrets/nais.io/vault;
 then
     echo "Setting sftp_username"
     export  sftp_username=$(cat /var/run/secrets/nais.io/vault/sftp_username)
