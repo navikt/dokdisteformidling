@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import no.nav.dokdisteformidling.consumer.integrasjonspunkt.CreateMessageRequest;
+import no.nav.dokdisteformidling.consumer.integrasjonspunkt.StandardBusinessDocumentHeader;
 import no.nav.dokdisteformidling.consumer.rdist001.HentForsendelseResponseTo;
 import org.junit.jupiter.api.Test;
 
@@ -53,7 +54,7 @@ class CreateMessageRequestMapperTest {
 		assertEquals(SIKKERHETSNIVAA, arkivmelding.getSikkerhetsnivaa());
 	}
 
-	private void assertStandardBusinessDocumentHeader(CreateMessageRequest.StandardBusinessDocumentHeader standardBusinessDocumentHeader) {
+	private void assertStandardBusinessDocumentHeader(StandardBusinessDocumentHeader standardBusinessDocumentHeader) {
 		assertNotNull(standardBusinessDocumentHeader);
 		assertScope(standardBusinessDocumentHeader.getBusinessScope());
 		assertDocumentIdentification(standardBusinessDocumentHeader.getDocumentIdentification());
@@ -63,21 +64,21 @@ class CreateMessageRequestMapperTest {
 
 	}
 
-	private void assertReceiver(Set<CreateMessageRequest.StandardBusinessDocumentHeader.Receiver> receiver) {
+	private void assertReceiver(Set<StandardBusinessDocumentHeader.Receiver> receiver) {
 		assertTrue(receiver != null && receiver.size() == 1);
 		assertNotNull(receiver.iterator().next());
 		assertEquals(IDENTIFIER_AUTHORITY, receiver.iterator().next().getIdentifier().getAuthority());
 		assertEquals(PREFIX_IDENTIFIER_VALUE + TRYGDERETTEN_ORG_NR, receiver.iterator().next().getIdentifier().getValue());
 	}
 
-	private void assertSender(Set<CreateMessageRequest.StandardBusinessDocumentHeader.Sender> senders) {
+	private void assertSender(Set<StandardBusinessDocumentHeader.Sender> senders) {
 		assertTrue(senders != null && senders.size() == 1);
 		assertNotNull(senders.iterator().next());
 		assertEquals(IDENTIFIER_AUTHORITY, senders.iterator().next().getIdentifier().getAuthority());
 		assertEquals(PREFIX_IDENTIFIER_VALUE + ORGNR_FOR_ENHET, senders.iterator().next().getIdentifier().getValue());
 	}
 
-	private void assertDocumentIdentification(CreateMessageRequest.StandardBusinessDocumentHeader.DocumentIdentification documentIdentification) {
+	private void assertDocumentIdentification(StandardBusinessDocumentHeader.DocumentIdentification documentIdentification) {
 		assertNotNull(documentIdentification);
 		assertNotNull(documentIdentification.getCreationDateAndTime());
 		assertEquals(BESTILLINGS_ID, documentIdentification.getInstanceIdentifier());
@@ -88,11 +89,11 @@ class CreateMessageRequestMapperTest {
 	}
 
 
-	private void assertScope(CreateMessageRequest.StandardBusinessDocumentHeader.BusinessScope businessScope) {
+	private void assertScope(StandardBusinessDocumentHeader.BusinessScope businessScope) {
 		assertNotNull(businessScope);
 		assertTrue(businessScope.getScope() != null && businessScope.getScope().size() == 1);
 
-		CreateMessageRequest.StandardBusinessDocumentHeader.BusinessScope.Scope scopeConvId = businessScope.getScope()
+		StandardBusinessDocumentHeader.BusinessScope.Scope scopeConvId = businessScope.getScope()
 				.iterator().next();
 		assertEquals(CONVERSATION_ID, scopeConvId.getInstanceIdentifier());
 		assertEquals(CONVERSATION_ID_TYPE, scopeConvId.getType());
