@@ -5,7 +5,7 @@ then
     echo "Setting serviceuser.username"
     export  serviceuser.username=$(cat /secrets/serviceuser/srvdokdisteformidling/username)
 fi
-if test -f /secrets/serviceuser/srvdokdisteformidling;
+if test -f /secrets/serviceuser/srvdokdisteformidling/password;
 then
     echo "Setting serviceuser.password"
     export  serviceuser.***passord=gammelt_passord***)
