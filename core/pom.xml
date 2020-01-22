@@ -118,10 +118,6 @@
 			<groupId>io.micrometer</groupId>
 			<artifactId>micrometer-registry-prometheus</artifactId>
 		</dependency>
-		<dependency>
-			<groupId>no.difi.commons</groupId>
-			<artifactId>commons-asic</artifactId>
-		</dependency>
 		<!--Tjenestegrensesnitt-->
 		<dependency>
 			<groupId>no.nav.dokkat</groupId>

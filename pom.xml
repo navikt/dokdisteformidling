@@ -179,6 +179,11 @@
 				<version>${commons-asic.version}</version>
 			</dependency>
 			<dependency>
+				<groupId>commons-io</groupId>
+				<artifactId>commons-io</artifactId>
+				<version>${commons-io.version}</version>
+			</dependency>
+			<dependency>
 				<groupId>com.nimbusds</groupId>
 				<artifactId>nimbus-jose-jwt</artifactId>
 				<version>${nimbus-jose-jwt.version}</version>
@@ -259,12 +264,6 @@
 				<groupId>org.apache.sshd</groupId>
 				<artifactId>sshd-sftp</artifactId>
 				<version>${sshd-sftp.version}</version>
-				<scope>test</scope>
-			</dependency>
-			<dependency>
-				<groupId>commons-io</groupId>
-				<artifactId>commons-io</artifactId>
-				<version>${commons-io.version}</version>
 				<scope>test</scope>
 			</dependency>
 			<dependency>
