@@ -1,5 +1,8 @@
 #!/usr/bin/env sh
 
+echo "starter init-script"
+ls -la /secrets/serviceuser
+
 if test -f /secrets/serviceuser/srvdokdisteformidling/username;
 then
     echo "Setting serviceuser.username"
