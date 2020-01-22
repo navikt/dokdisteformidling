@@ -8,6 +8,7 @@ import no.nav.dokdisteformidling.config.props.MaskinportenProperties;
 import no.nav.dokdisteformidling.config.props.ServiceRegistryProperties;
 import no.nav.dokdisteformidling.qdist013.maskinporten.MaskinportenTokenConsumer;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.core.io.FileSystemResource;
@@ -18,6 +19,7 @@ import java.net.URL;
 /**
  * @author Joakim Bjørnstad, Jbit AS
  */
+@Disabled("Manuell test")
 class ServiceRegistryConsumerTest {
 	private MaskinportenProperties maskinportenProperties = new MaskinportenProperties();
 	private ServiceRegistryProperties serviceRegistryProperties = new ServiceRegistryProperties();
