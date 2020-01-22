@@ -1,7 +1,7 @@
 if test -f /var/run/secrets/nais.io/srvdokdisteformidling/username;
 then
     echo "Setting serviceuser_username"
-    export  serviceuser_username=$(cat /serviceuser/data/test/srvdokdisteformidling/username)
+    export  serviceuser_username=$(cat /var/run/secrets/nais.io/srvdokdisteformidling/username)
 fi
 if test -f /var/run/secrets/nais.io/srvdokdisteformidling;
 then
