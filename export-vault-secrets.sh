@@ -1,8 +1,5 @@
 #!/usr/bin/env sh
 
-echo "starter init-script"
-ls -la /secrets/serviceuser
-
 if test -f /secrets/serviceuser/srvdokdisteformidling/username;
 then
     echo "Setting serviceuser_username"
@@ -24,7 +21,6 @@ then
     export  sftp_username=$(cat /var/run/secrets/nais.io/vault/sftp_username)
     echo "Setting dokdisteformidling_s3_creds_username"
     export  dokdisteformidling_s3_creds_username=$(cat /var/run/secrets/nais.io/vault/dokdisteformidling_s3_creds_username)
-    dokdisteformidling_s3_creds_username
     echo "Setting dokdisteformidling_S3_creds_password"
     export  dokdisteformidling_s3_creds_***passord=gammelt_passord***)
     echo "Setting dokdistmellomlager_s3_storage_crypto_password"
