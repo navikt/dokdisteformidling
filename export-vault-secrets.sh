@@ -1,11 +1,11 @@
 #!/usr/bin/env sh
 
-if test -f /var/run/secrets/nais.io/srvdokdisteformidling/username;
+if test -f /secrets/serviceuser/srvdokdisteformidling/username;
 then
     echo "Setting serviceuser.username"
-    export  serviceuser.username=$(cat /var/run/secrets/nais.io/srvdokdisteformidling/username)
+    export  serviceuser.username=$(cat /secrets/serviceuser/srvdokdisteformidling/username)
 fi
-if test -f /var/run/secrets/nais.io/srvdokdisteformidling;
+if test -f /secrets/serviceuser/srvdokdisteformidling;
 then
     echo "Setting serviceuser.password"
     export  serviceuser.***passord=gammelt_passord***)
