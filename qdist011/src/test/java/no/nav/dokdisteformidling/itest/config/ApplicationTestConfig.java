@@ -7,6 +7,7 @@ import no.nav.dokdisteformidling.config.alias.DigitalKontaktinformasjonV1Alias;
 import no.nav.dokdisteformidling.config.alias.MqGatewayAlias;
 import no.nav.dokdisteformidling.config.alias.ServiceuserAlias;
 import no.nav.dokdisteformidling.config.cache.LokalCacheConfig;
+import no.nav.dokdisteformidling.config.props.MaskinportenProperties;
 import no.nav.dokdisteformidling.config.props.SrvAppserverProperties;
 import no.nav.dokdisteformidling.storage.S3Storage;
 import no.nav.dokdisteformidling.storage.Storage;
@@ -27,7 +28,8 @@ import org.springframework.retry.annotation.EnableRetry;
 @EnableConfigurationProperties({ServiceuserAlias.class,
 		MqGatewayAlias.class,
 		SrvAppserverProperties.class,
-		DigitalKontaktinformasjonV1Alias.class})
+		DigitalKontaktinformasjonV1Alias.class,
+		MaskinportenProperties.class})
 @Import({JmsItestConfig.class,
 		LokalCacheConfig.class,
 		STSTestConfig.class})

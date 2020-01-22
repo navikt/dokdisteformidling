@@ -21,6 +21,14 @@
 			<artifactId>schemas</artifactId>
 		</dependency>
 		<dependency>
+			<groupId>no.difi.commons</groupId>
+			<artifactId>commons-asic</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.nimbusds</groupId>
+			<artifactId>nimbus-jose-jwt</artifactId>
+		</dependency>
+		<dependency>
 			<groupId>no.nav.meldinger.virksomhet</groupId>
 			<artifactId>melding-virksomhet-dokdistfordeling</artifactId>
 		</dependency>
