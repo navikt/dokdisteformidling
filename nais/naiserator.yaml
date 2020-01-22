@@ -57,6 +57,8 @@ spec:
       value: {{ AKTOERREGISTER_API_V1_URL }}
     - name: EREG_API_URL
       value: {{ EREG_API_URL }}
+    - name: sftp_privateKey
+      value: "/secrets/privateKey/privateKeyFile"
   image: {{ image }}
   ingresses:
     - {{ INGRESSES }}

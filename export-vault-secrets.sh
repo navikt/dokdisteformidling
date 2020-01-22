@@ -13,11 +13,6 @@ then
     echo "Setting serviceuser_password"
     export  serviceuser_***passord=gammelt_passord***)
 fi
-if test -f /secrets/privateKey/privateKeyFile;
-then
-    echo "Setting sftp_privateKey"
-    export  sftp_privateKey=$(cat /secrets/privateKey/privateKeyFile)
-fi
 if test -f /secrets/privateKey/privateKeyPassphrase;
 then
     echo "Setting sftp_privateKeyPassphrase"
