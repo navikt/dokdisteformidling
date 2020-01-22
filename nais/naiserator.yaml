@@ -90,9 +90,8 @@ spec:
     enabled: true
     paths:
       - kvPath: {{ SRVDOKDISTEFORMIDLING }}
-        mounthPath: /secrets/serviceuser/srvdokdisteformidling
-#        mountPath: /var/run/secrets/nais.io/srvdokdisteformidling
+        mountPath: "/secrets/serviceuser/srvdokdisteformidling"
       - kvPath: {{ SFTP_PRIVATE_KEY }}
-        mountPath: /secrets/privateKey
+        mountPath: "/secrets/privateKey"
       - kvPath: {{ DOKDISTEFORMIDLING_VAULT }}
-        mountPath: /var/run/secrets/nais.io/vault
+        mountPath: "/var/run/secrets/nais.io/vault"
