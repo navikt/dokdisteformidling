@@ -31,9 +31,13 @@ public class EformidlingMessagePackager {
 												X509Certificate mottakerCertificate) {
 		// TODO vi burde ha pipes her for å unngå mye minnebruk
 		try {
-			final OutputStream asiceStreamed = asiceCreator.createAsiceStreamed(navDokumentpakke.getNavDokumenter().stream(), appCertificate);
+			final OutputStream asiceStreamed = asiceCreator.createAsiceStreamed(
+					navDokumentpakke.getArkivmelding(),
+					navDokumentpakke.getNavDokumenter().stream(),
+					appCertificate);
 			final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-			cmsUtil.createCMSStreamed(new ByteArrayInputStream(((ByteArrayOutputStream) asiceStreamed).toByteArray()), outputStream, mottakerCertificate);
+			cmsUtil.createCMSStreamed(new ByteArrayInputStream(((ByteArrayOutputStream) asiceStreamed).toByteArray()),
+					outputStream, mottakerCertificate);
 			return new ByteArrayInputStream(outputStream.toByteArray());
 		} catch (IOException e) {
 			throw new DokumentpakkingException("Klarte ikke pakke dokumentpakke.", e);

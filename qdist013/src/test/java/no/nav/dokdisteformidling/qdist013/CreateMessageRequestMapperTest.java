@@ -1,6 +1,8 @@
 package no.nav.dokdisteformidling.qdist013;
 
 
+import static no.nav.dokdisteformidling.consumer.eformidling.EformidlingConstants.NAV_ORGNUMMER;
+import static no.nav.dokdisteformidling.consumer.eformidling.EformidlingConstants.TRYGDERETTEN_ORGNUMMER;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -19,7 +21,6 @@ class CreateMessageRequestMapperTest {
 
 	private final static String CONVERSATION_ID = "convId";
 	private final static String CONVERSATION_ID_TYPE = "ConversationId";
-	private final static String ORGNR_FOR_ENHET = "889640782";
 	private final static String HEADER_VERSION = "1.0";
 	private final static String TYPE_VERSION = "1.0";
 	private final static String IDENTIFIER_AUTHORITY = "iso6523-actorid-upis";
@@ -29,7 +30,6 @@ class CreateMessageRequestMapperTest {
 	private final static String CONVERSATION_ID_IDENTIFIER = "urn:no:difi:profile:arkivmelding:administrasjon:ver1.0";
 	private final static String BESTILLINGS_ID = "bestillingsId";
 	private final static String MOTTAKER_ID = "mottakerId";
-	private static final String TRYGDERETTEN_ORG_NR = "974761084";
 	private final static String HOVEDDOKUMENT_ARKIVMELDING = "arkivmelding.xml";
 	private final static int SIKKERHETSNIVAA = 4;
 
@@ -68,14 +68,14 @@ class CreateMessageRequestMapperTest {
 		assertTrue(receiver != null && receiver.size() == 1);
 		assertNotNull(receiver.iterator().next());
 		assertEquals(IDENTIFIER_AUTHORITY, receiver.iterator().next().getIdentifier().getAuthority());
-		assertEquals(PREFIX_IDENTIFIER_VALUE + TRYGDERETTEN_ORG_NR, receiver.iterator().next().getIdentifier().getValue());
+		assertEquals(PREFIX_IDENTIFIER_VALUE + TRYGDERETTEN_ORGNUMMER, receiver.iterator().next().getIdentifier().getValue());
 	}
 
 	private void assertSender(Set<StandardBusinessDocumentHeader.Sender> senders) {
 		assertTrue(senders != null && senders.size() == 1);
 		assertNotNull(senders.iterator().next());
 		assertEquals(IDENTIFIER_AUTHORITY, senders.iterator().next().getIdentifier().getAuthority());
-		assertEquals(PREFIX_IDENTIFIER_VALUE + ORGNR_FOR_ENHET, senders.iterator().next().getIdentifier().getValue());
+		assertEquals(PREFIX_IDENTIFIER_VALUE + NAV_ORGNUMMER, senders.iterator().next().getIdentifier().getValue());
 	}
 
 	private void assertDocumentIdentification(StandardBusinessDocumentHeader.DocumentIdentification documentIdentification) {
