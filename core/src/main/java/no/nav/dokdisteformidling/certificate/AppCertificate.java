@@ -1,6 +1,6 @@
 package no.nav.dokdisteformidling.certificate;
 
-import no.difi.asic.SignatureHelper;
+import lombok.Getter;
 
 import java.security.KeyPair;
 import java.security.KeyStore;
@@ -17,6 +17,7 @@ import java.security.cert.X509Certificate;
  *
  * @author Glebnn Bech
  */
+@Getter
 public class AppCertificate {
 	private static final String ERR_MISSING_PRIVATE_KEY_OR_PASS = "Problem accessing PrivateKey with alias \"%s\" inadequate access or Password is wrong";
 	private static final String ERR_MISSING_PRIVATE_KEY = "No PrivateKey with alias \"%s\" found in the KeyStore";
@@ -81,24 +82,7 @@ public class AppCertificate {
 		return new KeyPair(certificate.getPublicKey(), privateKey);
 	}
 
-	public SignatureHelper getSignatureHelper() {
-		return new DefaultSignatureHelper(keyStore, properties.getAlias(), properties.getPassword());
-	}
-
 	public boolean shouldLockProvider() {
 		return properties.getLockProvider();
-	}
-
-	public KeyStore getKeyStore() {
-		return keyStore;
-	}
-
-	public class DefaultSignatureHelper extends SignatureHelper {
-
-		DefaultSignatureHelper(KeyStore keyStore, String keyAlias, String keyPassword) {
-
-			super(properties.getLockProvider() ? keyStore.getProvider() : null);
-			loadCertificate(keyStore, keyAlias, keyPassword);
-		}
 	}
 }

@@ -1,4 +1,4 @@
-package no.nav.dokdisteformidling.qdist013.maskinporten;
+package no.nav.dokdisteformidling.consumer.eformidling.maskinporten;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -9,7 +9,6 @@ import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestClientException;
 
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 
 @Slf4j
 public class OidcErrorHandler extends DefaultResponseErrorHandler {

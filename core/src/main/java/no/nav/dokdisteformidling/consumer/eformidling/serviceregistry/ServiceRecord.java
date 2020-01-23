@@ -1,7 +1,6 @@
-package no.nav.dokdisteformidling.qdist013.serviceregistry;
+package no.nav.dokdisteformidling.consumer.eformidling.serviceregistry;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 

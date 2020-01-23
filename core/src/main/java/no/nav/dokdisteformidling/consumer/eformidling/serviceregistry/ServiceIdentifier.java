@@ -1,4 +1,4 @@
-package no.nav.dokdisteformidling.qdist013.serviceregistry;
+package no.nav.dokdisteformidling.consumer.eformidling.serviceregistry;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
