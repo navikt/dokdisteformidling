@@ -40,12 +40,6 @@ class AltinnEformidling implements Eformidling {
 		final InputStream kryptertEformidlingDokumentpakke = eformidlingMessagePackager.createEformidlingMessage(navDokumentpakke,
 				new AppCertificate(keyStoreProperties), mottakerInfo.getX509Certificate());
 
-		//TODO testkode
-		try {
-			IOUtils.copy(kryptertEformidlingDokumentpakke, new FileOutputStream("C:\\test\\asice.zip"));
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
 		// TODO Altinn BrokerServiceExternalEC2.InitiateBrokerServiceEC
 		// TODO Altinn BrokerServiceExternalEC2Streamed.UploadFileStreamedEC
 	}

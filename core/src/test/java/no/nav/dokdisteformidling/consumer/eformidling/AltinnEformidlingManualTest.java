@@ -58,9 +58,13 @@ class AltinnEformidlingManualTest {
 		EformidlingMessagePackager eformidlingMessagePackager = new EformidlingMessagePackager();
 		final Eformidling eformidling = new AltinnEformidling(keyStoreProperties, eformidlingMottakerInfoService, eformidlingMessagePackager);
 
-		final NavDokumentpakke navDokumentpakke = new NavDokumentpakke(null,
-				NavDokument.fromArkivmelding(new ByteArrayInputStream("arkivmelding".getBytes())),
-				Collections.singletonList(NavDokument.fromVedlegg("test1.pdf", new ByteArrayInputStream("test1pdf".getBytes()))));
+		final NavDokumentpakke navDokumentpakke = NavDokumentpakke.builder()
+				.conversationId("1")
+				.bestillingsId("2")
+				.standardBusinessDocumentHeader(null)
+				.arkivmelding(NavDokument.fromArkivmelding(new ByteArrayInputStream("arkivmelding".getBytes())))
+				.navDokumenter(Collections.singletonList(NavDokument.fromVedlegg("test1.pdf", new ByteArrayInputStream("test1pdf".getBytes()))))
+				.build();
 
 		eformidling.send(navDokumentpakke);
 	}
