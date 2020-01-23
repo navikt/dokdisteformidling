@@ -1,35 +1,21 @@
 package no.nav.dokdisteformidling.consumer.eformidling.dokumentpakker;
 
+import static no.nav.dokdisteformidling.CertTestUtils.itestVirksomhetssertifikatBase64Properties;
 import static org.assertj.core.api.Assertions.assertThat;
 
+import no.nav.dokdisteformidling.CertTestUtils;
+import no.nav.dokdisteformidling.certificate.AppCertificate;
+import no.nav.dokdisteformidling.certificate.KeyStoreProperties;
 import org.apache.commons.io.IOUtils;
-import org.bouncycastle.asn1.ASN1Sequence;
-import org.bouncycastle.asn1.x500.X500Name;
-import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
-import org.bouncycastle.cert.X509CertificateHolder;
-import org.bouncycastle.cert.X509v3CertificateBuilder;
-import org.bouncycastle.operator.ContentSigner;
-import org.bouncycastle.operator.OperatorCreationException;
-import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
 import org.junit.jupiter.api.Test;
+import org.springframework.core.io.ClassPathResource;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
-import java.math.BigInteger;
 import java.security.KeyPair;
-import java.security.KeyPairGenerator;
-import java.security.NoSuchAlgorithmException;
-import java.security.PrivateKey;
-import java.security.PublicKey;
 import java.security.cert.Certificate;
-import java.security.cert.CertificateException;
-import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 
 /**
  * @author Joakim Bjørnstad, Jbit AS
@@ -37,8 +23,8 @@ import java.util.Date;
 class CmsUtilTest {
 	@Test
 	void shouldEncryptAndDecryptWithCmsWhenKeysGeneratedProgramatically() throws Exception {
-		KeyPair keyPair = generateKeyPair();
-		Certificate certificate = generateCertificate(keyPair.getPublic(), keyPair.getPrivate());
+		KeyPair keyPair = CertTestUtils.generateKeyPair();
+		Certificate certificate = CertTestUtils.generateCertificate(keyPair.getPublic(), keyPair.getPrivate());
 		byte[] plaintext = "Text to be encrypted".getBytes();
 		ByteArrayOutputStream ciphertext = new ByteArrayOutputStream();
 
@@ -49,31 +35,17 @@ class CmsUtilTest {
 		assertThat(IOUtils.toByteArray(recoveredPlaintext)).isEqualTo(plaintext);
 	}
 
-	private KeyPair generateKeyPair() throws NoSuchAlgorithmException {
-		KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("RSA");
-		keyPairGenerator.initialize(2048);
-		return keyPairGenerator.generateKeyPair();
-	}
+	@Test
+	void shouldEncryptAndDecryptWithCmsWhenB64PKCS12File() throws Exception {
+		AppCertificate appCertificate = new AppCertificate(itestVirksomhetssertifikatBase64Properties());
 
-	private Certificate generateCertificate(PublicKey subjectPublicKey, PrivateKey issuerPrivateKey) throws ParseException, OperatorCreationException,
-			CertificateException, IOException {
-		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+		byte[] plaintext = "Text to be encrypted".getBytes();
+		ByteArrayOutputStream ciphertext = new ByteArrayOutputStream();
 
-		X500Name issuer = new X500Name("CN=Issuer and subject (self signed)");
-		BigInteger serial = new BigInteger("100");
-		Date notBefore = df.parse("2010-01-01");
-		Date notAfter = df.parse("2050-01-01");
-		X500Name subject = issuer;
-		SubjectPublicKeyInfo publicKeyInfo = SubjectPublicKeyInfo.getInstance(ASN1Sequence.getInstance(subjectPublicKey.getEncoded()));
+		final CmsUtil cmsUtil = new CmsUtil();
+		cmsUtil.createCMSStreamed(new ByteArrayInputStream(plaintext), ciphertext, appCertificate.getX509Certificate());
+		final InputStream recoveredPlaintext = cmsUtil.decryptCMSStreamed(new ByteArrayInputStream(ciphertext.toByteArray()), appCertificate.loadPrivateKey());
 
-		X509v3CertificateBuilder certBuilder = new X509v3CertificateBuilder(issuer, serial, notBefore, notAfter, subject, publicKeyInfo);
-
-		ContentSigner signer = new JcaContentSignerBuilder("SHA256withRSA").build(issuerPrivateKey);
-
-		X509CertificateHolder holder = certBuilder.build(signer);
-
-		CertificateFactory factory = CertificateFactory.getInstance("X.509");
-
-		return factory.generateCertificate(new ByteArrayInputStream(holder.getEncoded()));
+		assertThat(IOUtils.toByteArray(recoveredPlaintext)).isEqualTo(plaintext);
 	}
 }
