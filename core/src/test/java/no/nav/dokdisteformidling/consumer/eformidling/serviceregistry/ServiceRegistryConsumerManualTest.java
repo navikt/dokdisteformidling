@@ -1,12 +1,12 @@
-package no.nav.dokdisteformidling.qdist013.serviceregistry;
+package no.nav.dokdisteformidling.consumer.eformidling.serviceregistry;
 
-import static no.nav.dokdisteformidling.qdist013.Qdist013Constants.ARKIVMELDING_PROCESS;
-import static no.nav.dokdisteformidling.qdist013.Qdist013Constants.TRYGDERETTEN_ORGNUMMER;
+import static no.nav.dokdisteformidling.consumer.eformidling.EformidlingConstants.ARKIVMELDING_PROCESS;
+import static no.nav.dokdisteformidling.consumer.eformidling.EformidlingConstants.TRYGDERETTEN_ORGNUMMER;
 
 import no.nav.dokdisteformidling.certificate.KeyStoreProperties;
 import no.nav.dokdisteformidling.config.props.MaskinportenProperties;
 import no.nav.dokdisteformidling.config.props.ServiceRegistryProperties;
-import no.nav.dokdisteformidling.qdist013.maskinporten.MaskinportenTokenConsumer;
+import no.nav.dokdisteformidling.consumer.eformidling.maskinporten.MaskinportenTokenConsumer;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -20,7 +20,8 @@ import java.net.URL;
  * @author Joakim Bjørnstad, Jbit AS
  */
 @Disabled("Manuell test")
-class ServiceRegistryConsumerTest {
+class ServiceRegistryConsumerManualTest {
+	private KeyStoreProperties keyStoreProperties = new KeyStoreProperties();
 	private MaskinportenProperties maskinportenProperties = new MaskinportenProperties();
 	private ServiceRegistryProperties serviceRegistryProperties = new ServiceRegistryProperties();
 
@@ -30,28 +31,26 @@ class ServiceRegistryConsumerTest {
 		//
 		// javax.net.ssl.trustStore
 		// javax.net.ssl.trustStorePassword
-		// maskinporten.keystore.type
-		// maskinporten.keystore.alias
-		// maskinporten.keystore.password
-		// maskinporten.keystore.path
+		// virksomhetssertifikat.type
+		// virksomhetssertifikat.alias
+		// virksomhetssertifikat.password
+		// virksomhetssertifikat.path
 		System.setProperty("https.proxyHost", "webproxy-utvikler.nav.no");
 		System.setProperty("https.proxyPort", "8088");
 		System.setProperty("https.nonProxyHosts", "*.155.55.|*.192.168.|*.10.|*.local|*.rtv.gov|*.adeo.no|*.nav.no|*.aetat.no|*.devillo.no|*.oera.no");
 		maskinportenProperties.setAudience("https://oidc-ver1.difi.no/idporten-oidc-provider/");
 		maskinportenProperties.setClientid("MOVE_IP_889640782");
 		maskinportenProperties.setUrl(new URL("https://oidc-ver1.difi.no/idporten-oidc-provider/token"));
-		KeyStoreProperties keyStoreProperties = new KeyStoreProperties();
-		keyStoreProperties.setType(System.getProperty("maskinporten.keystore.type"));
-		keyStoreProperties.setAlias(System.getProperty("maskinporten.keystore.alias"));
-		keyStoreProperties.setPassword(System.getProperty("maskinporten.keystore.password"));
-		keyStoreProperties.setPath(new FileSystemResource(System.getProperty("maskinporten.keystore.path")));
-		maskinportenProperties.setKeystore(keyStoreProperties);
+		keyStoreProperties.setType(System.getProperty("virksomhetssertifikat.type"));
+		keyStoreProperties.setAlias(System.getProperty("virksomhetssertifikat.alias"));
+		keyStoreProperties.setPassword(System.getProperty("virksomhetssertifikat.password"));
+		keyStoreProperties.setPath(new FileSystemResource(System.getProperty("virksomhetssertifikat.path")));
 		serviceRegistryProperties.setUrl(new URL("https://qa-meldingsutveksling.difi.no/serviceregistry/"));
 	}
 
 	@Test
 	public void shouldFetchTokenWhenSystemPropertiesSet() {
-		MaskinportenTokenConsumer maskinportenTokenConsumer = new MaskinportenTokenConsumer(maskinportenProperties, new RestTemplateBuilder());
+		MaskinportenTokenConsumer maskinportenTokenConsumer = new MaskinportenTokenConsumer(keyStoreProperties, maskinportenProperties, new RestTemplateBuilder());
 		ServiceRegistryConsumer serviceRegistryConsumer = new ServiceRegistryConsumer(serviceRegistryProperties, maskinportenTokenConsumer, new RestTemplateBuilder());
 
 		final IdentifierResource identifierResource = serviceRegistryConsumer.getIdentifierResource(TRYGDERETTEN_ORGNUMMER, ARKIVMELDING_PROCESS);

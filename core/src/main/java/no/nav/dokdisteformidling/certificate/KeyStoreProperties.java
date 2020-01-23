@@ -2,6 +2,7 @@ package no.nav.dokdisteformidling.certificate;
 
 import lombok.Data;
 import lombok.ToString;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.core.io.Resource;
 
 import javax.validation.constraints.NotNull;
@@ -11,6 +12,7 @@ import java.security.KeyStore;
  * Kopiert fra https://github.com/difi/move-integrasjonspunkt
  */
 @Data
+@ConfigurationProperties("virksomhetssertifikat")
 @ToString(exclude = "password")
 public class KeyStoreProperties {
 

@@ -1,8 +1,8 @@
-package no.nav.dokdisteformidling.qdist013.serviceregistry;
+package no.nav.dokdisteformidling.consumer.eformidling.serviceregistry;
 
 import no.nav.dokdisteformidling.config.props.ServiceRegistryProperties;
 import no.nav.dokdisteformidling.metrics.Monitor;
-import no.nav.dokdisteformidling.qdist013.maskinporten.MaskinportenTokenConsumer;
+import no.nav.dokdisteformidling.consumer.eformidling.maskinporten.MaskinportenTokenConsumer;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;

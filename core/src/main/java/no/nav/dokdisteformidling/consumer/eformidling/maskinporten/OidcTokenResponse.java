@@ -1,4 +1,4 @@
-package no.nav.dokdisteformidling.qdist013.maskinporten;
+package no.nav.dokdisteformidling.consumer.eformidling.maskinporten;
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
