@@ -12,7 +12,6 @@ import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.dokdisteformidling.certificate.AppCertificate;
-import no.nav.dokdisteformidling.certificate.KeyStoreProperties;
 import no.nav.dokdisteformidling.config.props.MaskinportenProperties;
 import no.nav.dokdisteformidling.metrics.Monitor;
 import org.springframework.boot.web.client.RestTemplateBuilder;
@@ -47,14 +46,13 @@ public class MaskinportenTokenConsumer {
 	// TODO nytt scope når virksomhetssertifikat er klart.
 	private static final String SCOPE_DPO = "move/dpo.read";
 
-	private final KeyStoreProperties keyStoreProperties;
+	private final AppCertificate appCertificate;
 	private final MaskinportenProperties maskinportenProperties;
 	private final RestTemplate restTemplate;
 
-	public MaskinportenTokenConsumer(KeyStoreProperties keyStoreProperties,
-									 MaskinportenProperties maskinportenProperties,
+	public MaskinportenTokenConsumer(AppCertificate appCertificate, MaskinportenProperties maskinportenProperties,
 									 RestTemplateBuilder restTemplateBuilder) {
-		this.keyStoreProperties = keyStoreProperties;
+		this.appCertificate = appCertificate;
 		this.maskinportenProperties = maskinportenProperties;
 		this.restTemplate = restTemplateBuilder
 				.messageConverters(new FormHttpMessageConverter(),
@@ -92,11 +90,9 @@ public class MaskinportenTokenConsumer {
 	}
 
 	private String generateJWT() {
-		AppCertificate nokkel = new AppCertificate(keyStoreProperties);
-
 		List<Base64> certChain = new ArrayList<>();
 		try {
-			certChain.add(Base64.encode(nokkel.getX509Certificate().getEncoded()));
+			certChain.add(Base64.encode(appCertificate.getX509Certificate().getEncoded()));
 		} catch (CertificateEncodingException e) {
 			log.error("Could not get encoded certificate", e);
 			throw new RuntimeException(e);
@@ -114,10 +110,10 @@ public class MaskinportenTokenConsumer {
 				.expirationTime(Date.from(OffsetDateTime.now(DEFAULT_ZONE_ID).toInstant().plusSeconds(120)))
 				.build();
 
-		RSASSASigner signer = new RSASSASigner(nokkel.loadPrivateKey());
+		RSASSASigner signer = new RSASSASigner(appCertificate.loadPrivateKey());
 
-		if (nokkel.shouldLockProvider()) {
-			signer.getJCAContext().setProvider(nokkel.getKeyStore().getProvider());
+		if (appCertificate.shouldLockProvider()) {
+			signer.getJCAContext().setProvider(appCertificate.getKeyStore().getProvider());
 		}
 
 		SignedJWT signedJWT = new SignedJWT(jwsHeader, claims);

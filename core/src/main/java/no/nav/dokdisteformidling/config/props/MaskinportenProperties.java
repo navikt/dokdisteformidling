@@ -7,6 +7,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.NestedConfigurationProperty;
 import org.springframework.validation.annotation.Validated;
 
+import javax.validation.constraints.NotNull;
 import java.net.URL;
 
 /**
@@ -17,7 +18,10 @@ import java.net.URL;
 @ConfigurationProperties("maskinporten")
 @Validated
 public class MaskinportenProperties {
+	@NotNull
 	private URL url;
+	@NotNull
 	private String audience;
+	@NotNull
 	private String clientid;
 }

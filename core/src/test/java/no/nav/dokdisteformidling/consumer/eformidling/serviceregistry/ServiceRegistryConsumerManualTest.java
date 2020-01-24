@@ -3,6 +3,7 @@ package no.nav.dokdisteformidling.consumer.eformidling.serviceregistry;
 import static no.nav.dokdisteformidling.consumer.eformidling.EformidlingConstants.ARKIVMELDING_PROCESS;
 import static no.nav.dokdisteformidling.consumer.eformidling.EformidlingConstants.TRYGDERETTEN_ORGNUMMER;
 
+import no.nav.dokdisteformidling.certificate.AppCertificate;
 import no.nav.dokdisteformidling.certificate.KeyStoreProperties;
 import no.nav.dokdisteformidling.config.props.MaskinportenProperties;
 import no.nav.dokdisteformidling.config.props.ServiceRegistryProperties;
@@ -50,7 +51,7 @@ class ServiceRegistryConsumerManualTest {
 
 	@Test
 	public void shouldFetchTokenWhenSystemPropertiesSet() {
-		MaskinportenTokenConsumer maskinportenTokenConsumer = new MaskinportenTokenConsumer(keyStoreProperties, maskinportenProperties, new RestTemplateBuilder());
+		MaskinportenTokenConsumer maskinportenTokenConsumer = new MaskinportenTokenConsumer(new AppCertificate(keyStoreProperties), maskinportenProperties, new RestTemplateBuilder());
 		ServiceRegistryConsumer serviceRegistryConsumer = new ServiceRegistryConsumer(serviceRegistryProperties, maskinportenTokenConsumer, new RestTemplateBuilder());
 
 		final IdentifierResource identifierResource = serviceRegistryConsumer.getIdentifierResource(TRYGDERETTEN_ORGNUMMER, ARKIVMELDING_PROCESS);
