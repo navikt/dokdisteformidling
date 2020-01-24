@@ -1,5 +1,6 @@
 package no.nav.dokdisteformidling.consumer.eformidling.maskinporten;
 
+import no.nav.dokdisteformidling.certificate.AppCertificate;
 import no.nav.dokdisteformidling.certificate.KeyStoreProperties;
 import no.nav.dokdisteformidling.config.props.MaskinportenProperties;
 import org.junit.jupiter.api.BeforeEach;
@@ -40,7 +41,7 @@ public class MaskinportenTokenConsumerManualTest {
 
 	@Test
 	public void shouldFetchTokenWhenSystemPropertiesSet() {
-		MaskinportenTokenConsumer oidcTokenClient = new MaskinportenTokenConsumer(keyStoreProperties, maskinportenProperties, new RestTemplateBuilder());
+		MaskinportenTokenConsumer oidcTokenClient = new MaskinportenTokenConsumer(new AppCertificate(keyStoreProperties), maskinportenProperties, new RestTemplateBuilder());
 
 		final OidcTokenResponse oidcTokenResponse = oidcTokenClient.fetchToken();
 		System.out.println(oidcTokenResponse.getAccessToken());

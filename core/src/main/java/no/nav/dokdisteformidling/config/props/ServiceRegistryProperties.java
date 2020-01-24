@@ -5,6 +5,7 @@ import lombok.ToString;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.validation.annotation.Validated;
 
+import javax.validation.constraints.NotNull;
 import java.net.URL;
 
 /**
@@ -15,5 +16,6 @@ import java.net.URL;
 @ConfigurationProperties("serviceregistry")
 @Validated
 public class ServiceRegistryProperties {
+	@NotNull
 	private URL url;
 }
