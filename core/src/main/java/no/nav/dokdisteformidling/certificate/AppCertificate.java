@@ -1,7 +1,9 @@
 package no.nav.dokdisteformidling.certificate;
 
 import lombok.Getter;
+import org.springframework.stereotype.Component;
 
+import javax.inject.Inject;
 import java.security.KeyPair;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
@@ -18,6 +20,7 @@ import java.security.cert.X509Certificate;
  * @author Glebnn Bech
  */
 @Getter
+@Component
 public class AppCertificate {
 	private static final String ERR_MISSING_PRIVATE_KEY_OR_PASS = "Problem accessing PrivateKey with alias \"%s\" inadequate access or Password is wrong";
 	private static final String ERR_MISSING_PRIVATE_KEY = "No PrivateKey with alias \"%s\" found in the KeyStore";
@@ -27,6 +30,7 @@ public class AppCertificate {
 	private final KeyStoreProperties properties;
 	private final KeyStore keyStore;
 
+	@Inject
 	public AppCertificate(KeyStoreProperties properties) {
 		this.properties = properties;
 		try {

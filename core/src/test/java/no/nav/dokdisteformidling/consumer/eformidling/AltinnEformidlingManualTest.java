@@ -1,5 +1,6 @@
 package no.nav.dokdisteformidling.consumer.eformidling;
 
+import no.nav.dokdisteformidling.certificate.AppCertificate;
 import no.nav.dokdisteformidling.certificate.KeyStoreProperties;
 import no.nav.dokdisteformidling.config.props.MaskinportenProperties;
 import no.nav.dokdisteformidling.config.props.ServiceRegistryProperties;
@@ -26,6 +27,7 @@ class AltinnEformidlingManualTest {
 	private KeyStoreProperties keyStoreProperties = new KeyStoreProperties();
 	private MaskinportenProperties maskinportenProperties = new MaskinportenProperties();
 	private ServiceRegistryProperties serviceRegistryProperties = new ServiceRegistryProperties();
+	private AppCertificate appCertificate;
 
 	@BeforeEach
 	public void setup() throws MalformedURLException {
@@ -48,15 +50,16 @@ class AltinnEformidlingManualTest {
 		keyStoreProperties.setPassword(System.getProperty("virksomhetssertifikat.password"));
 		keyStoreProperties.setPath(new FileSystemResource(System.getProperty("virksomhetssertifikat.path")));
 		serviceRegistryProperties.setUrl(new URL("https://qa-meldingsutveksling.difi.no/serviceregistry/"));
+		appCertificate = new AppCertificate(keyStoreProperties);
 	}
 
 	@Test
 	void shouldSendManualTest() {
-		MaskinportenTokenConsumer maskinportenTokenConsumer = new MaskinportenTokenConsumer(keyStoreProperties, maskinportenProperties, new RestTemplateBuilder());
+		MaskinportenTokenConsumer maskinportenTokenConsumer = new MaskinportenTokenConsumer(appCertificate, maskinportenProperties, new RestTemplateBuilder());
 		ServiceRegistryConsumer serviceRegistryConsumer = new ServiceRegistryConsumer(serviceRegistryProperties, maskinportenTokenConsumer, new RestTemplateBuilder());
 		EformidlingMottakerInfoService eformidlingMottakerInfoService = new EformidlingMottakerInfoService(serviceRegistryConsumer);
 		EformidlingMessagePackager eformidlingMessagePackager = new EformidlingMessagePackager();
-		final Eformidling eformidling = new AltinnEformidling(keyStoreProperties, eformidlingMottakerInfoService, eformidlingMessagePackager);
+		final Eformidling eformidling = new AltinnEformidling(appCertificate, eformidlingMottakerInfoService, eformidlingMessagePackager);
 
 		final NavDokumentpakke navDokumentpakke = NavDokumentpakke.builder()
 				.conversationId("1")
