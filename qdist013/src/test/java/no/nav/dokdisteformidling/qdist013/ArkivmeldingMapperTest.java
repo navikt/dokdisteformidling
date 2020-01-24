@@ -469,6 +469,7 @@ class ArkivmeldingMapperTest {
 		Dokumentobjekt dokumentobjektVedlegg = dokumentbeskrivelseVedlegg.getDokumentobjekt().get(0);
 
 		assertEquals(dokumentobjektVedlegg.getOpprettetAv(), OPPRETTET_AV_UKJENT);
+		assertEquals(dokumentbeskrivelseVedlegg.getOpprettetAv(), OPPRETTET_AV_UKJENT);
 	}
 
 	private void assertArkivmelding(Arkivmelding arkivmelding) {
@@ -666,7 +667,7 @@ class ArkivmeldingMapperTest {
 	private LightweightSafJournalpostQdist013 createLightweightSafJournalpostQdist013NoJournalFoertAv() {
 		return LightweightSafJournalpostQdist013.builder()
 				.avsenderMottakerNavn(AVSENDER_MOTTAKER_NAVN_ORIG_JP)
-				.journalfortAvNavn("")
+				//.journalfortAvNavn(null)
 				.datoJournalfoert(DATO_JOURNALFOERT_ORIG_JP)
 				.build();
 	}

@@ -33,6 +33,7 @@ import no.nav.dokdisteformidling.consumer.aktoerregister.Aktoerregister;
 import no.nav.dokdisteformidling.consumer.ereg.Ereg;
 import no.nav.dokdisteformidling.consumer.saf.SafJournalpostQueryService;
 import no.nav.dokdisteformidling.consumer.tps.Tps;
+import no.nav.dokdisteformidling.exception.functional.SafJournalpostValidationException;
 import no.nav.dokdisteformidling.qdist013.saf.lightweight.LightweightSafJournalpostQdist013;
 import no.nav.dokdisteformidling.qdist013.saf.main.JournalpostQdist013;
 import org.springframework.stereotype.Component;
@@ -206,12 +207,18 @@ public class ArkivmeldingMapper {
 	}
 
 	private String getDokumentOpprettetAv(boolean isHoveddok, JournalpostQdist013 journalpostQdist013, JournalpostQdist013.DokumentInfo dokumentInfo) {
+
 		if (isHoveddok || isEmpty(dokumentInfo.getOriginalJournalpostId())) {
 			return journalpostQdist013.getJournalfortAvNavn();
 		} else {
-			LightweightSafJournalpostQdist013 lightweightSafJournalpostQdist013 = safJournalpostQueryService.hentJournalpost(dokumentInfo
-					.getOriginalJournalpostId());
-			if(!isEmpty(lightweightSafJournalpostQdist013.getJournalfortAvNavn())){
+			LightweightSafJournalpostQdist013 lightweightSafJournalpostQdist013 = null;
+			try {
+				lightweightSafJournalpostQdist013 = safJournalpostQueryService.hentJournalpost(dokumentInfo
+						.getOriginalJournalpostId());
+			} catch (SafJournalpostValidationException e) {
+				return UKJENT;
+			}
+			if (!isEmpty(lightweightSafJournalpostQdist013.getJournalfortAvNavn())) {
 				return lightweightSafJournalpostQdist013.getJournalfortAvNavn();
 			}
 			return UKJENT;
@@ -252,7 +259,8 @@ public class ArkivmeldingMapper {
 		if (dokumentInfoContainsSladdetDokumentvariant(dokumentInfo)) {
 			return VARIANTFORMAT_SLADDET;
 		} else {
-			JournalpostQdist013.DokumentInfo.Dokumentvariant dokumentvariantArkiv = dokumentInfo.getDokumentvarianter().stream()
+			JournalpostQdist013.DokumentInfo.Dokumentvariant dokumentvariantArkiv = dokumentInfo.getDokumentvarianter()
+					.stream()
 					.filter(dokumentvariant -> VARIANTFORMAT_ARKIV.equals(dokumentvariant.getVariantformat()))
 					.findAny()
 					.get(); //Ok, already validated in SafJournalpostValidatorQdist013.
