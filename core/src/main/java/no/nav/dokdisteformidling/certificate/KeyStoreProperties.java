@@ -4,6 +4,7 @@ import lombok.Data;
 import lombok.ToString;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.core.io.Resource;
+import org.springframework.validation.annotation.Validated;
 
 import javax.validation.constraints.NotNull;
 import java.security.KeyStore;
@@ -14,18 +15,20 @@ import java.security.KeyStore;
 @Data
 @ConfigurationProperties("virksomhetssertifikat")
 @ToString(exclude = "password")
+@Validated
 public class KeyStoreProperties {
-
 	/**
 	 * Type of KeyStore
 	 * <p>
 	 * Examples: JKS, Windows-MY
 	 */
+	@NotNull
 	private String type = KeyStore.getDefaultType();
 
 	/**
 	 * Keystore alias for key.
 	 */
+	@NotNull
 	private String alias;
 
 	/**
@@ -33,6 +36,7 @@ public class KeyStoreProperties {
 	 * <p>
 	 * May be empty if type = Windows-MY
 	 */
+	@NotNull
 	private Resource path;
 
 	/**
@@ -46,5 +50,4 @@ public class KeyStoreProperties {
 	 * keyStore for crypto operations on the keys from the keystore.
 	 */
 	private Boolean lockProvider = false;
-
 }
