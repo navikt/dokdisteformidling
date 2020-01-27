@@ -438,7 +438,9 @@ class ArkivmeldingMapperTest {
 	void happyPathIkkeFerdigstiltVedlegg() {
 		JournalpostQdist013 journalpostQdist013 = createJournalpostQdist013Builder()
 				.dokumenter(Arrays.asList(createHoveddokumentBuilder().build(),
-						createVedleggBuilder().dokumentInfoId(DOKUMENT_INFO_ID_VEDLEGG_2).dokumentstatus("UNDER_REDIGERING").build(),
+						createVedleggBuilder().dokumentInfoId(DOKUMENT_INFO_ID_VEDLEGG_2)
+								.dokumentstatus("UNDER_REDIGERING")
+								.build(),
 						createVedleggBuilder().build()))
 				.build();
 
@@ -693,7 +695,6 @@ class ArkivmeldingMapperTest {
 	private LightweightSafJournalpostQdist013 createLightweightSafJournalpostQdist013NoJournalFoertAv() {
 		return LightweightSafJournalpostQdist013.builder()
 				.avsenderMottakerNavn(AVSENDER_MOTTAKER_NAVN_ORIG_JP)
-				//.journalfortAvNavn(null)
 				.datoJournalfoert(DATO_JOURNALFOERT_ORIG_JP)
 				.build();
 	}
