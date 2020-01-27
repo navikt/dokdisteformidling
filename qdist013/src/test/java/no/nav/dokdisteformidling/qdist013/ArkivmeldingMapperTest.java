@@ -454,22 +454,25 @@ class ArkivmeldingMapperTest {
 
 	@Test
 	@DisplayName("Case for satt originalJournalPostId men ukjent journalfører")
-	void ukjentJournalFoertAv() {
+	void assertUkjentVedsafJournalpostgetJournalfortAvNavnErNull() {
 		when(safJournalpostQueryServiceMock.hentJournalpost(ORIGINAL_JPID_VEDLEGG)).thenReturn(createLightweightSafJournalpostQdist013NoJournalFoertAv());
 
-		JournalpostQdist013 journalpostQdist013 = createJournalpostQdist013Builder()
+		JournalpostQdist013 journalpostQdist013 = createJournalpostQdist013BuilderNoJournalFoertAv()
 				.dokumenter(Arrays.asList(createHoveddokumentBuilder().build(),
 						createVedleggBuilder().originalJournalpostId(ORIGINAL_JPID_VEDLEGG).build()))
 				.build();
 
 		JAXBElement<Arkivmelding> arkivmeldingJAXBElement = arkivmeldingMapper.createArkivMelding(journalpostQdist013, BESTILLINGS_ID);
-		Journalpost basisregistreringJp = (Journalpost) arkivmeldingJAXBElement.getValue().getMappe().get(0).getBasisregistrering().get(0);
-		Dokumentbeskrivelse dokumentbeskrivelseVedlegg = (Dokumentbeskrivelse) basisregistreringJp.getDokumentbeskrivelseAndDokumentobjekt()
-				.get(1);
-		Dokumentobjekt dokumentobjektVedlegg = dokumentbeskrivelseVedlegg.getDokumentobjekt().get(0);
+		Arkivmelding arkivmelding = arkivmeldingJAXBElement.getValue();
+		List<Mappe> mappeList = arkivmelding.getMappe();
+		Saksmappe saksmappe = (Saksmappe) mappeList.get(0);
+		Journalpost basisregistreringJp = (Journalpost) saksmappe.getBasisregistrering().get(0);
 
-		assertEquals(dokumentobjektVedlegg.getOpprettetAv(), OPPRETTET_AV_UKJENT);
-		assertEquals(dokumentbeskrivelseVedlegg.getOpprettetAv(), OPPRETTET_AV_UKJENT);
+		Dokumentbeskrivelse dokumentBeskrivelseVedlegg = (Dokumentbeskrivelse) basisregistreringJp.getDokumentbeskrivelseAndDokumentobjekt()
+				.get(1);
+		Dokumentobjekt dokumentVedlegg = dokumentBeskrivelseVedlegg.getDokumentobjekt().get(0);
+
+		assertEquals(dokumentVedlegg.getOpprettetAv(), OPPRETTET_AV_UKJENT);
 	}
 
 	private void assertArkivmelding(Arkivmelding arkivmelding) {
@@ -614,6 +617,29 @@ class ArkivmeldingMapperTest {
 				.datoOpprettet(DATO_OPPRETTET_JOURNALPOST)
 				.tittel(TITTEL)
 				.journalfortAvNavn(JOURNALFOERT_AV_NAVN)
+				.temanavn(TEMA_NAVN)
+				.journalposttype(UTGAAENDE)
+				.relevanteDatoer(Collections.singletonList(JournalpostQdist013.RelevantDato.builder()
+						.datotype(JournalpostQdist013.Datotype.DATO_JOURNALFOERT)
+						.dato(DATO_JOURNALFOERT)
+						.build()))
+				.dokumenter(Arrays.asList(createHoveddokumentBuilder().build(), createVedleggBuilder().build()
+				));
+	}
+
+	private JournalpostQdist013.JournalpostQdist013Builder createJournalpostQdist013BuilderNoJournalFoertAv() {
+		return JournalpostQdist013.builder()
+				.journalpostId(JOURNALPOST_ID)
+				.sak(JournalpostQdist013.Sak.builder()
+						.datoOpprettet(DATO_OPPRETTET_SAK)
+						.build())
+				.opprettetAvNavn(OPPRETTET_AV_NAVN)
+				.bruker(JournalpostQdist013.Bruker.builder()
+						.id(BRUKER_ID_FNR)
+						.type(BRUKER_TYPE_FNR)
+						.build())
+				.datoOpprettet(DATO_OPPRETTET_JOURNALPOST)
+				.tittel(TITTEL)
 				.temanavn(TEMA_NAVN)
 				.journalposttype(UTGAAENDE)
 				.relevanteDatoer(Collections.singletonList(JournalpostQdist013.RelevantDato.builder()
