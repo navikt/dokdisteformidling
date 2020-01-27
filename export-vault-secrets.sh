@@ -47,5 +47,5 @@ fi
 if test -f /secrets/virksomhetssertifikat/key.p12.b64
 then
     echo "Setting virksomhetssertifikat_path"
-    export virksomhetssertifikat_path="/secrets/virksomhetssertifikat/key.p12.b64"
+    export virksomhetssertifikat_path="file:///secrets/virksomhetssertifikat/key.p12.b64"
 fi
