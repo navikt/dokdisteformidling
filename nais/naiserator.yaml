@@ -113,3 +113,4 @@ spec:
         mountPath: "/secrets/virksomhetssertifikat"
       - kvPath: {{ DPO_LOGIN_VAULT }}
         mountPath: "/secrets/dpo"
+  webproxy: true
