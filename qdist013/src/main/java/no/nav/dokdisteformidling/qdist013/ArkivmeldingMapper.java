@@ -207,17 +207,11 @@ public class ArkivmeldingMapper {
 	}
 
 	private String getDokumentOpprettetAv(boolean isHoveddok, JournalpostQdist013 journalpostQdist013, JournalpostQdist013.DokumentInfo dokumentInfo) {
-
 		if (isHoveddok || isEmpty(dokumentInfo.getOriginalJournalpostId())) {
 			return journalpostQdist013.getJournalfortAvNavn();
 		} else {
-			LightweightSafJournalpostQdist013 lightweightSafJournalpostQdist013 = null;
-			try {
-				lightweightSafJournalpostQdist013 = safJournalpostQueryService.hentJournalpost(dokumentInfo
-						.getOriginalJournalpostId());
-			} catch (SafJournalpostValidationException e) {
-				return UKJENT;
-			}
+			LightweightSafJournalpostQdist013 lightweightSafJournalpostQdist013 = safJournalpostQueryService.hentJournalpost(dokumentInfo
+					.getOriginalJournalpostId());
 			if (!isEmpty(lightweightSafJournalpostQdist013.getJournalfortAvNavn())) {
 				return lightweightSafJournalpostQdist013.getJournalfortAvNavn();
 			}
