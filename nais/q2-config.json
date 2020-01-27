@@ -22,9 +22,17 @@
   "VIRKSOMHET_DIGITALKONTAKINFORMASJON_V1_ENDPOINTURL": "https://dkif.nais.preprod.local/ws/DigitalKontaktinformasjon/v1",
   "AKTOERREGISTER_API_V1_URL": "https://app-q2.adeo.no/aktoerregister/api/v1",
   "EREG_API_URL": "https://modapp-q2.adeo.no/ereg/api",
+  "INTEGRASJONSPUNKT_API_URL": "https://integrasjonspunkt.nais.preprod.local/api",
+  "LAGREJURIDISKLOGG_REST_URL": "https://app-q1.adeo.no/juridisklogg/api/rest/logg",
+  "TPSPROXY_API_URL": "https://tps-proxy-q2.nais.preprod.local/api",
+  "MASKINPORTEN_URL": "https://oidc-ver1.difi.no/idporten-oidc-provider/token",
+  "MASKINPORTEN_AUDIENCE": "https://oidc-ver1.difi.no/idporten-oidc-provider/",
+  "SERVICEREGISTRY_URL": "https://qa-meldingsutveksling.difi.no/serviceregistry/",
   "INGRESSES": "https://dokdisteformidling-q2.nais.preprod.local",
   "SRVDOKDISTEFORMIDLING": "/serviceuser/data/dev/srvdokdisteformidling",
   "SFTP_PRIVATE_KEY": "/kv/preprod/fss/dokdisteformidling/privateKey",
   "DOKDISTEFORMIDLING_VAULT": "/kv/preprod/fss/dokdisteformidling/q2",
+  "VIRKSOMHETSSERTIFIKAT_VAULT": "/kv/secret/virksomhetssertifikat/preprod/shared/",
+  "DPO_LOGIN_VAULT": "/kv/secret/dpo-eformidling-altinn/dpo",
   "NAMESPACE": "q2"
 }
