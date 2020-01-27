@@ -65,6 +65,8 @@ spec:
       value: {{ LAGREJURIDISKLOGG_REST_URL }}
     - name: TPSPROXY_API_URL
       value: {{ TPSPROXY_API_URL }}
+    - name: SAF_GRAPHQL_URL
+      value: {{ SAF_GRAPHQL_URL }}
     - name: MASKINPORTEN_URL
       value: {{ MASKINPORTEN_URL }}
     - name: MASKINPORTEN_AUDIENCE

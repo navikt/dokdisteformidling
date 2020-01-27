@@ -25,6 +25,7 @@
   "INTEGRASJONSPUNKT_API_URL": "https://integrasjonspunkt.nais.preprod.local/api",
   "LAGREJURIDISKLOGG_REST_URL": "https://app-q1.adeo.no/juridisklogg/api/rest/logg",
   "TPSPROXY_API_URL": "https://tps-proxy-q1.nais.preprod.local/api",
+  "SAF_GRAPHQL_URL": "https://saf-q1.nais.preprod.local/graphql",
   "MASKINPORTEN_URL": "https://oidc-ver1.difi.no/idporten-oidc-provider/token",
   "MASKINPORTEN_AUDIENCE": "https://oidc-ver1.difi.no/idporten-oidc-provider/",
   "SERVICEREGISTRY_URL": "https://qa-meldingsutveksling.difi.no/serviceregistry/",
