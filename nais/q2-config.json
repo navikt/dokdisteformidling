@@ -32,7 +32,7 @@
   "SRVDOKDISTEFORMIDLING": "/serviceuser/data/dev/srvdokdisteformidling",
   "SFTP_PRIVATE_KEY": "/kv/preprod/fss/dokdisteformidling/privateKey",
   "DOKDISTEFORMIDLING_VAULT": "/kv/preprod/fss/dokdisteformidling/q2",
-  "VIRKSOMHETSSERTIFIKAT_VAULT": "/kv/secret/virksomhetssertifikat/preprod/shared/",
-  "DPO_LOGIN_VAULT": "/kv/secret/dpo-eformidling-altinn/dpo",
+  "VIRKSOMHETSSERTIFIKAT_VAULT": "/secret/virksomhetssertifikat/preprod/shared/",
+  "DPO_LOGIN_VAULT": "/secret/dpo-eformidling-altinn/dpo",
   "NAMESPACE": "q2"
 }
