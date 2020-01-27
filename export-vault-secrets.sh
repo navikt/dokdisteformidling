@@ -25,4 +25,27 @@ then
     export  dokdisteformidling_s3_creds_***passord=gammelt_passord***)
     echo "Setting dokdistmellomlager_s3_storage_crypto_password"
     export  dokdistmellomlager_s3_storage_crypto_***passord=gammelt_passord***)
+    echo "Setting maskinporten_clientid"
+    export  maskinporten_clientid=$(cat /var/run/secrets/nais.io/vault/maskinporten_clientid)
+fi
+if test -f /secrets/dpo/dpo.json
+then
+    echo "Setting dpo_username"
+    export dpo_username="$(cat /secrets/dpo/dpo.json | jq -r '.username')"
+    echo "Setting dpo_password"
+    export dpo_***passord=gammelt_passord***')"
+fi
+if test -f /secrets/virksomhetssertifikat/credentials.json
+then
+    echo "Setting virksomhetssertifikat_alias"
+    export virksomhetssertifikat_alias="$(cat /secrets/virksomhetssertifikat/credentials.json | jq -r '.alias')"
+    echo "Setting virksomhetssertifikat_password"
+    export virksomhetssertifikat_***passord=gammelt_passord***')"
+    echo "Setting virksomhetssertifikat_type"
+    export virksomhetssertifikat_type="$(cat /secrets/virksomhetssertifikat/credentials.json | jq -r '.type')"
+fi
+if test -f /secrets/virksomhetssertifikat/key.p12.b64
+then
+    echo "Setting virksomhetssertifikat_path"
+    export virksomhetssertifikat_path="file:///secrets/virksomhetssertifikat/key.p12.b64"
 fi
