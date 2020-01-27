@@ -38,11 +38,11 @@ fi
 if test -f /secrets/virksomhetssertifikat/credentials.json
 then
     echo "Setting virksomhetssertifikat_alias"
-    export virksomhetssertifikat_alias="$(cat credentials.json | jq -r '.alias')"
+    export virksomhetssertifikat_alias="$(cat /secrets/virksomhetssertifikat/credentials.json | jq -r '.alias')"
     echo "Setting virksomhetssertifikat_password"
     export virksomhetssertifikat_***passord=gammelt_passord***')"
     echo "Setting virksomhetssertifikat_type"
-    export virksomhetssertifikat_type="$(cat credentials.json | jq -r '.type')"
+    export virksomhetssertifikat_type="$(cat /secrets/virksomhetssertifikat/credentials.json | jq -r '.type')"
 fi
 if test -f /secrets/virksomhetssertifikat/key.p12.b64
 then
