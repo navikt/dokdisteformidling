@@ -29,12 +29,14 @@ then
     export  maskinporten_clientid=$(cat /var/run/secrets/nais.io/vault/maskinporten_clientid)
 fi
 if test -f /secrets/dpo/dpo.json
+then
     echo "Setting dpo_username"
     export dpo_username="$(cat /secrets/dpo/dpo.json | jq -r '.username')"
     echo "Setting dpo_password"
     export dpo_***passord=gammelt_passord***')"
 fi
 if test -f /secrets/virksomhetssertifikat/credentials.json
+then
     echo "Setting virksomhetssertifikat_alias"
     export virksomhetssertifikat_alias="$(cat credentials.json | jq -r '.alias')"
     echo "Setting virksomhetssertifikat_password"
@@ -43,6 +45,7 @@ if test -f /secrets/virksomhetssertifikat/credentials.json
     export virksomhetssertifikat_type="$(cat credentials.json | jq -r '.type')"
 fi
 if test -f /secrets/virksomhetssertifikat/key.p12.b64
+then
     echo "Setting virksomhetssertifikat_path"
     export virksomhetssertifikat_path="/secrets/virksomhetssertifikat/key.p12.b64"
 fi
