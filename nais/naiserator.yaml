@@ -59,6 +59,20 @@ spec:
       value: {{ EREG_API_URL }}
     - name: sftp_privateKey
       value: "/secrets/privateKey/privateKeyFile"
+    - name: INTEGRASJONSPUNKT_API_URL
+      value: {{ INTEGRASJONSPUNKT_API_URL }}
+    - name: LAGREJURIDISKLOGG_REST_URL
+      value: {{ LAGREJURIDISKLOGG_REST_URL }}
+    - name: TPSPROXY_API_URL
+      value: {{ TPSPROXY_API_URL }}
+    - name: SAF_GRAPHQL_URL
+      value: {{ SAF_GRAPHQL_URL }}
+    - name: MASKINPORTEN_URL
+      value: {{ MASKINPORTEN_URL }}
+    - name: MASKINPORTEN_AUDIENCE
+      value: {{ MASKINPORTEN_AUDIENCE }}
+    - name: SERVICEREGISTRY_URL
+      value: {{ SERVICEREGISTRY_URL }}
   image: {{ image }}
   ingresses:
     - {{ INGRESSES }}
@@ -97,3 +111,8 @@ spec:
         mountPath: "/secrets/privateKey"
       - kvPath: {{ DOKDISTEFORMIDLING_VAULT }}
         mountPath: "/var/run/secrets/nais.io/vault"
+      - kvPath: {{ VIRKSOMHETSSERTIFIKAT_VAULT }}
+        mountPath: "/secrets/virksomhetssertifikat"
+      - kvPath: {{ DPO_LOGIN_VAULT }}
+        mountPath: "/secrets/dpo"
+  webproxy: true
