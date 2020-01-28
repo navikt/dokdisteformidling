@@ -1,0 +1,41 @@
+{
+  "standardBusinessDocumentHeader" : {
+    "headerVersion" : "1.0",
+    "sender" : [ {
+      "identifier" : {
+        "value" : "0192:889640782",
+        "authority" : "iso6523-actorid-upis"
+      },
+      "contactInformation" : [ ]
+    } ],
+    "receiver" : [ {
+      "identifier" : {
+        "value" : "0192:974761084",
+        "authority" : "iso6523-actorid-upis"
+      },
+      "contactInformation" : [ ]
+    } ],
+    "documentIdentification" : {
+      "standard" : "urn:no:difi:arkivmelding:xsd::arkivmelding",
+      "typeVersion" : "1.0",
+      "instanceIdentifier" : "2",
+      "type" : "arkivmelding",
+      "multipleType" : true,
+      "creationDateAndTime" : "2020-01-01T12:59:50+01:00"
+    },
+    "businessScope" : {
+      "scope" : [ {
+        "type" : "ConversationId",
+        "instanceIdentifier" : "1",
+        "identifier" : "urn:no:difi:profile:arkivmelding:administrasjon:ver1.0",
+        "scopeInformation" : [ {
+          "expectedResponseDateTime" : "2020-01-01T17:00:00+01:00"
+        } ]
+      } ]
+    }
+  },
+  "arkivmelding" : {
+    "sikkerhetsnivaa" : 4,
+    "hoveddokument" : "arkivmelding.xml"
+  }
+}

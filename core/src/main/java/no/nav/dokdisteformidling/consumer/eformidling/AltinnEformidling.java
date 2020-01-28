@@ -33,10 +33,10 @@ class AltinnEformidling implements Eformidling {
 	@Override
 	public void send(NavDokumentpakke navDokumentpakke) {
 		final MottakerInfo mottakerInfo = eformidlingMottakerInfoService.hentMottakerInfoTrygderetten();
-		final InputStream kryptertEformidlingDokumentpakke = eformidlingMessagePackager.createEformidlingMessage(navDokumentpakke,
+		final InputStream sbdZip = eformidlingMessagePackager.packageMessage(navDokumentpakke,
 				appCertificate, mottakerInfo.getX509Certificate());
 
-		// TODO Altinn BrokerServiceExternalEC2.InitiateBrokerServiceEC
-		// TODO Altinn BrokerServiceExternalEC2Streamed.UploadFileStreamedEC
+		// TODO Altinn BrokerServiceExternalEC2.InitiateBrokerServiceEC(navDokumentpakke, mottakerInfo)
+		// TODO Altinn BrokerServiceExternalEC2Streamed.UploadFileStreamedEC(sbdZip)
 	}
 }
