@@ -17,7 +17,6 @@ public class NavDokumentpakke {
 	private final String conversationId;
 	private final String bestillingsId;
 
-	private final StandardBusinessDocumentHeader standardBusinessDocumentHeader;
 	private final NavDokument arkivmelding;
 	@Builder.Default
 	private final List<NavDokument> navDokumenter = new ArrayList<>();

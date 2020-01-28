@@ -25,6 +25,8 @@ import java.util.stream.Stream;
 /**
  * Endret og tilpasset for NAV sin bruk fra https://github.com/difi/move-integrasjonspunkt
  *
+ * Lager asic og signerer denne med virksomhetssertifikat.
+ *
  * @author Joakim Bjørnstad, Jbit AS
  */
 @Slf4j
@@ -35,7 +37,7 @@ class AsiceCreator {
 		xmlManifestCreator = new XmlManifestCreator();
 	}
 
-	public OutputStream createAsiceStreamed(NavDokument arkivmelding,
+	OutputStream createAsiceStreamed(NavDokument arkivmelding,
 											Stream<? extends NavDokument> dokumenter,
 											AppCertificate appCertificate) throws IOException {
 		ByteArrayOutputStream asiceArchive = new ByteArrayOutputStream();

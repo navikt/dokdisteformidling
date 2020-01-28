@@ -32,11 +32,18 @@ import java.security.cert.X509Certificate;
 import java.util.Collection;
 import java.util.Iterator;
 
+/**
+ * Endret og tilpasset for NAV sin bruk fra https://github.com/difi/move-integrasjonspunkt
+ *
+ * Krypterer innhold til CMS (Cryptographic Message Syntax).
+ *
+ * https://difi.github.io/felleslosninger/eformidling_nm_sikkerhet.html
+ */
 class CmsUtil {
 	private final ASN1ObjectIdentifier cmsEncryptionAlgorithm;
 	private final AlgorithmIdentifier keyEncryptionScheme;
 
-	public CmsUtil() {
+	CmsUtil() {
 		if (Security.getProvider(BouncyCastleProvider.PROVIDER_NAME) == null) {
 			Security.addProvider(new BouncyCastleProvider());
 		}
