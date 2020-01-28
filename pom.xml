@@ -36,13 +36,15 @@
 		<dokkat-api>10.4.0</dokkat-api>
 		<wmq.version>9.1.3.0</wmq.version>
 		<cxf.version>3.3.4</cxf.version>
-		<commons-io.version>2.4</commons-io.version>
 		<dokkat-schemas.version>10.4.2</dokkat-schemas.version>
 		<melding-virksomhet-dokdistfordeling.version>2.0.4</melding-virksomhet-dokdistfordeling.version>
 		<nav-digitalKontaktinformasjon-v1-tjenestespesifikasjon>2.0.0</nav-digitalKontaktinformasjon-v1-tjenestespesifikasjon>
 		<sdpkanal-tjenestespesifikasjon.version>1.1.0</sdpkanal-tjenestespesifikasjon.version>
 		<jaxb2-basics-runtime.version>1.11.1</jaxb2-basics-runtime.version>
 		<commons-lang3.version>3.7</commons-lang3.version>
+		<commons-io.version>2.6</commons-io.version>
+		<commons-asic.version>0.9.3</commons-asic.version>
+		<nimbus-jose-jwt.version>8.4</nimbus-jose-jwt.version>
 		<!-- test -->
 		<awaitility.version>3.1.2</awaitility.version>
 		<activemq.version>5.15.2</activemq.version>
@@ -172,6 +174,21 @@
 				<version>${cxf.version}</version>
 			</dependency>
 			<dependency>
+				<groupId>no.difi.commons</groupId>
+				<artifactId>commons-asic</artifactId>
+				<version>${commons-asic.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>commons-io</groupId>
+				<artifactId>commons-io</artifactId>
+				<version>${commons-io.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.nimbusds</groupId>
+				<artifactId>nimbus-jose-jwt</artifactId>
+				<version>${nimbus-jose-jwt.version}</version>
+			</dependency>
+			<dependency>
 				<groupId>org.projectlombok</groupId>
 				<artifactId>lombok</artifactId>
 				<version>${lombok.version}</version>
@@ -247,12 +264,6 @@
 				<groupId>org.apache.sshd</groupId>
 				<artifactId>sshd-sftp</artifactId>
 				<version>${sshd-sftp.version}</version>
-				<scope>test</scope>
-			</dependency>
-			<dependency>
-				<groupId>commons-io</groupId>
-				<artifactId>commons-io</artifactId>
-				<version>${commons-io.version}</version>
 				<scope>test</scope>
 			</dependency>
 			<dependency>
