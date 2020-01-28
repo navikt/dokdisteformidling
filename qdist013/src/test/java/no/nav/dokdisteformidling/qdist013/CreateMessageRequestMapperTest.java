@@ -1,11 +1,14 @@
 package no.nav.dokdisteformidling.qdist013;
 
 
+import static no.nav.dokdisteformidling.consumer.eformidling.EformidlingConstants.NAV_ORGNUMMER;
+import static no.nav.dokdisteformidling.consumer.eformidling.EformidlingConstants.TRYGDERETTEN_ORGNUMMER;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import no.nav.dokdisteformidling.consumer.integrasjonspunkt.CreateMessageRequest;
+import no.nav.dokdisteformidling.consumer.integrasjonspunkt.StandardBusinessDocumentHeader;
 import no.nav.dokdisteformidling.consumer.rdist001.HentForsendelseResponseTo;
 import org.junit.jupiter.api.Test;
 
@@ -18,7 +21,6 @@ class CreateMessageRequestMapperTest {
 
 	private final static String CONVERSATION_ID = "convId";
 	private final static String CONVERSATION_ID_TYPE = "ConversationId";
-	private final static String ORGNR_FOR_ENHET = "889640782";
 	private final static String HEADER_VERSION = "1.0";
 	private final static String TYPE_VERSION = "1.0";
 	private final static String IDENTIFIER_AUTHORITY = "iso6523-actorid-upis";
@@ -28,7 +30,6 @@ class CreateMessageRequestMapperTest {
 	private final static String CONVERSATION_ID_IDENTIFIER = "urn:no:difi:profile:arkivmelding:administrasjon:ver1.0";
 	private final static String BESTILLINGS_ID = "bestillingsId";
 	private final static String MOTTAKER_ID = "mottakerId";
-	private static final String TRYGDERETTEN_ORG_NR = "974761084";
 	private final static String HOVEDDOKUMENT_ARKIVMELDING = "arkivmelding.xml";
 	private final static int SIKKERHETSNIVAA = 4;
 
@@ -53,7 +54,7 @@ class CreateMessageRequestMapperTest {
 		assertEquals(SIKKERHETSNIVAA, arkivmelding.getSikkerhetsnivaa());
 	}
 
-	private void assertStandardBusinessDocumentHeader(CreateMessageRequest.StandardBusinessDocumentHeader standardBusinessDocumentHeader) {
+	private void assertStandardBusinessDocumentHeader(StandardBusinessDocumentHeader standardBusinessDocumentHeader) {
 		assertNotNull(standardBusinessDocumentHeader);
 		assertScope(standardBusinessDocumentHeader.getBusinessScope());
 		assertDocumentIdentification(standardBusinessDocumentHeader.getDocumentIdentification());
@@ -63,21 +64,21 @@ class CreateMessageRequestMapperTest {
 
 	}
 
-	private void assertReceiver(Set<CreateMessageRequest.StandardBusinessDocumentHeader.Receiver> receiver) {
+	private void assertReceiver(Set<StandardBusinessDocumentHeader.Receiver> receiver) {
 		assertTrue(receiver != null && receiver.size() == 1);
 		assertNotNull(receiver.iterator().next());
 		assertEquals(IDENTIFIER_AUTHORITY, receiver.iterator().next().getIdentifier().getAuthority());
-		assertEquals(PREFIX_IDENTIFIER_VALUE + TRYGDERETTEN_ORG_NR, receiver.iterator().next().getIdentifier().getValue());
+		assertEquals(PREFIX_IDENTIFIER_VALUE + TRYGDERETTEN_ORGNUMMER, receiver.iterator().next().getIdentifier().getValue());
 	}
 
-	private void assertSender(Set<CreateMessageRequest.StandardBusinessDocumentHeader.Sender> senders) {
+	private void assertSender(Set<StandardBusinessDocumentHeader.Sender> senders) {
 		assertTrue(senders != null && senders.size() == 1);
 		assertNotNull(senders.iterator().next());
 		assertEquals(IDENTIFIER_AUTHORITY, senders.iterator().next().getIdentifier().getAuthority());
-		assertEquals(PREFIX_IDENTIFIER_VALUE + ORGNR_FOR_ENHET, senders.iterator().next().getIdentifier().getValue());
+		assertEquals(PREFIX_IDENTIFIER_VALUE + NAV_ORGNUMMER, senders.iterator().next().getIdentifier().getValue());
 	}
 
-	private void assertDocumentIdentification(CreateMessageRequest.StandardBusinessDocumentHeader.DocumentIdentification documentIdentification) {
+	private void assertDocumentIdentification(StandardBusinessDocumentHeader.DocumentIdentification documentIdentification) {
 		assertNotNull(documentIdentification);
 		assertNotNull(documentIdentification.getCreationDateAndTime());
 		assertEquals(BESTILLINGS_ID, documentIdentification.getInstanceIdentifier());
@@ -88,11 +89,11 @@ class CreateMessageRequestMapperTest {
 	}
 
 
-	private void assertScope(CreateMessageRequest.StandardBusinessDocumentHeader.BusinessScope businessScope) {
+	private void assertScope(StandardBusinessDocumentHeader.BusinessScope businessScope) {
 		assertNotNull(businessScope);
 		assertTrue(businessScope.getScope() != null && businessScope.getScope().size() == 1);
 
-		CreateMessageRequest.StandardBusinessDocumentHeader.BusinessScope.Scope scopeConvId = businessScope.getScope()
+		StandardBusinessDocumentHeader.BusinessScope.Scope scopeConvId = businessScope.getScope()
 				.iterator().next();
 		assertEquals(CONVERSATION_ID, scopeConvId.getInstanceIdentifier());
 		assertEquals(CONVERSATION_ID_TYPE, scopeConvId.getType());

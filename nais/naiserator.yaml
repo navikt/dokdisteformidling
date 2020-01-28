@@ -1,0 +1,118 @@
+kind: Application
+apiVersion: nais.io/v1alpha1
+metadata:
+  name: dokdisteformidling
+  namespace: {{ NAMESPACE }}
+  labels:
+    team: teamdokumenthandtering
+spec:
+  env:
+    - name: SFTP_URL
+      value: {{ SFTP_URL }}
+    - name: DOKUMENTTYPEINFO_V4_URL
+      value: {{ DOKUMENTTYPEINFO_V4_URL }}
+    - name: VARSELINFO_V1_URL
+      value: {{ VARSELINFO_V1_URL }}
+    - name: ADMINISTRERFORSENDELSE_V1_URL
+      value: {{ ADMINISTRERFORSENDELSE_V1_URL }}
+    - name: SECURITYTOKENSERVICE_URL
+      value: {{ SECURITYTOKENSERVICE_URL }}
+    - name: SECURITY_TOKEN_SERVICE_TOKEN_URL
+      value: {{ SECURITY_TOKEN_SERVICE_TOKEN_URL }}
+    - name: DOKDISTEFORMIDLING_CHANNEL_QUEUEMANAGER
+      value: {{ DOKDISTEFORMIDLING_CHANNEL_QUEUEMANAGER }}
+    - name: DOKDISTEFORMIDLING_CHANNEL_NAME
+      value: {{ DOKDISTEFORMIDLING_CHANNEL_NAME }}
+    - name: MQGATEWAY01_NAME
+      value: {{ MQGATEWAY01_NAME }}
+    - name: MQGATEWAY01_HOSTNAME
+      value: {{ MQGATEWAY01_HOSTNAME }}
+    - name: MQGATEWAY01_PORT
+      value: "{{ MQGATEWAY01_PORT }}"
+    - name: DOKDISTEFORMIDLING_QDIST011_DIST_TIL_DPI_QUEUENAME
+      value: {{ DOKDISTEFORMIDLING_QDIST011_DIST_TIL_DPI_QUEUENAME }}
+    - name: DOKDISTEFORMIDLING_QDIST011_DIST_TIL_DPI_QUEUEMANAGER
+      value: {{ DOKDISTEFORMIDLING_QDIST011_DIST_TIL_DPI_QUEUEMANAGER }}
+    - name: DOKDISTEFORMIDLING_QDIST011_FUNK_FEIL_QUEUENAME
+      value: {{ DOKDISTEFORMIDLING_QDIST011_FUNK_FEIL_QUEUENAME }}
+    - name: DOKDISTEFORMIDLING_QDIST011_FUNK_FEIL_QUEUEMANAGER
+      value: {{ DOKDISTEFORMIDLING_QDIST011_FUNK_FEIL_QUEUEMANAGER }}
+    - name: DOKDISTEFORMIDLING_QDIST013_DIST_TRYGDERETTEN_QUEUEMANAGER
+      value: {{ DOKDISTEFORMIDLING_QDIST013_DIST_TRYGDERETTEN_QUEUEMANAGER }}
+    - name: DOKDISTEFORMIDLING_QDIST013_DIST_TRYGDERETTEN_QUEUENAME
+      value: {{ DOKDISTEFORMIDLING_QDIST013_DIST_TRYGDERETTEN_QUEUENAME }}
+    - name: DOKDISTEFORMIDLING_QDIST013_FUNK_FEIL_QUEUENAME
+      value: {{ DOKDISTEFORMIDLING_QDIST013_FUNK_FEIL_QUEUENAME }}
+    - name: DOKDISTEFORMIDLING_QDIST013_FUNK_FEIL_QUEUEMANAGER
+      value: {{ DOKDISTEFORMIDLING_QDIST013_FUNK_FEIL_QUEUEMANAGER }}
+    - name: DOKDISTSDPBATCHINTERN_QUEUENAME
+      value: {{ DOKDISTSDPBATCHINTERN_QUEUENAME }}
+    - name: VIRKSOMHET_DIGITALKONTAKINFORMASJON_V1_WSDLURL
+      value: "http://maven.adeo.no/nexus/service/local/artifact/maven/redirect?a=nav-digitalKontaktinformasjon-v1-tjenestespesifikasjon&e=zip&g=no.nav.tjenester.fim&r=m2internal&v=2.0.0"
+    - name: VIRKSOMHET_DIGITALKONTAKINFORMASJON_V1_SECURITYTOKEN
+      value: "SAML"
+    - name: VIRKSOMHET_DIGITALKONTAKINFORMASJON_V1_ENDPOINTURL
+      value: {{ VIRKSOMHET_DIGITALKONTAKINFORMASJON_V1_ENDPOINTURL }}
+    - name: AKTOERREGISTER_API_V1_URL
+      value: {{ AKTOERREGISTER_API_V1_URL }}
+    - name: EREG_API_URL
+      value: {{ EREG_API_URL }}
+    - name: sftp_privateKey
+      value: "/secrets/privateKey/privateKeyFile"
+    - name: INTEGRASJONSPUNKT_API_URL
+      value: {{ INTEGRASJONSPUNKT_API_URL }}
+    - name: LAGREJURIDISKLOGG_REST_URL
+      value: {{ LAGREJURIDISKLOGG_REST_URL }}
+    - name: TPSPROXY_API_URL
+      value: {{ TPSPROXY_API_URL }}
+    - name: SAF_GRAPHQL_URL
+      value: {{ SAF_GRAPHQL_URL }}
+    - name: MASKINPORTEN_URL
+      value: {{ MASKINPORTEN_URL }}
+    - name: MASKINPORTEN_AUDIENCE
+      value: {{ MASKINPORTEN_AUDIENCE }}
+    - name: SERVICEREGISTRY_URL
+      value: {{ SERVICEREGISTRY_URL }}
+  image: {{ image }}
+  ingresses:
+    - {{ INGRESSES }}
+  leaderElection: true
+  liveness:
+    path: /isAlive
+    port: 8080
+    initialDelay: 30
+    failureThreshold: 10
+  port: 8080
+  prometheus:
+    enabled: true
+    path: /actuator/prometheus
+  readiness:
+    path: /isReady
+    port: 8080
+    initialDelay: 30
+    timeout: 3
+  replicas:
+    min: 1
+    max: 6
+    cpuThresholdPercentage: 50
+  resources:
+    limits:
+      cpu: 3000m
+      memory: 2560Mi
+    requests:
+      cpu: 60m
+      memory: 1024Mi
+  vault:
+    enabled: true
+    paths:
+      - kvPath: {{ SRVDOKDISTEFORMIDLING }}
+        mountPath: "/secrets/serviceuser/srvdokdisteformidling"
+      - kvPath: {{ SFTP_PRIVATE_KEY }}
+        mountPath: "/secrets/privateKey"
+      - kvPath: {{ DOKDISTEFORMIDLING_VAULT }}
+        mountPath: "/var/run/secrets/nais.io/vault"
+      - kvPath: {{ VIRKSOMHETSSERTIFIKAT_VAULT }}
+        mountPath: "/secrets/virksomhetssertifikat"
+      - kvPath: {{ DPO_LOGIN_VAULT }}
+        mountPath: "/secrets/dpo"
+  webproxy: true

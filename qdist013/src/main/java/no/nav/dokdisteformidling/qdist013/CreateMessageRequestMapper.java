@@ -5,7 +5,9 @@ import static java.time.temporal.ChronoUnit.SECONDS;
 import static no.nav.dokdisteformidling.qdist013.Qdist013Service.ARKIVMELDING;
 import static no.nav.dokdisteformidling.qdist013.Qdist013Service.ARKIVMELDING_XML;
 
+import no.nav.dokdisteformidling.consumer.eformidling.EformidlingConstants;
 import no.nav.dokdisteformidling.consumer.integrasjonspunkt.CreateMessageRequest;
+import no.nav.dokdisteformidling.consumer.integrasjonspunkt.StandardBusinessDocumentHeader;
 import no.nav.dokdisteformidling.consumer.rdist001.HentForsendelseResponseTo;
 import org.springframework.stereotype.Component;
 
@@ -23,8 +25,6 @@ public class CreateMessageRequestMapper {
 	private static final String TYPE_VERSION = "1.0";
 	private static final String IDENTIFIER_AUTHORITY = "iso6523-actorid-upis";
 	private static final String PREFIX_IDENTIFIER_VALUE = "0192:";
-	private static final String NAV_ORG_NR = "889640782"; // hardkodet inntil videre fordi DPO-bruker er knyttet til denne (MMA-3834)
-	private static final String TRYGDERETTEN_ORG_NR = "974761084";
 	private static final String DOCUMENT_IDENTIFICATOR_STANDARD = "urn:no:difi:arkivmelding:xsd::arkivmelding";
 	private static final String CONVERSATION_ID_SCOPE_IDENTIFIER = "urn:no:difi:profile:arkivmelding:administrasjon:ver1.0";
 	private static final String CONVERSATION_ID = "ConversationId";
@@ -40,14 +40,14 @@ public class CreateMessageRequestMapper {
 				.build();
 	}
 
-	private CreateMessageRequest.StandardBusinessDocumentHeader mapStandardBusinessDocumentHeader(String konversasjonsId, HentForsendelseResponseTo hentForsendelseResponseTo) {
-		return CreateMessageRequest.StandardBusinessDocumentHeader.builder()
-				.businessScope(CreateMessageRequest.StandardBusinessDocumentHeader.BusinessScope.builder()
-						.scope(new HashSet<>(Collections.singletonList(CreateMessageRequest.StandardBusinessDocumentHeader.BusinessScope.Scope
+	private StandardBusinessDocumentHeader mapStandardBusinessDocumentHeader(String konversasjonsId, HentForsendelseResponseTo hentForsendelseResponseTo) {
+		return StandardBusinessDocumentHeader.builder()
+				.businessScope(StandardBusinessDocumentHeader.BusinessScope.builder()
+						.scope(new HashSet<>(Collections.singletonList(StandardBusinessDocumentHeader.BusinessScope.Scope
 								.builder()
 								.identifier(CONVERSATION_ID_SCOPE_IDENTIFIER)
 								.instanceIdentifier(konversasjonsId)
-								.scopeInformation(new HashSet<>(Collections.singletonList(CreateMessageRequest.StandardBusinessDocumentHeader.BusinessScope.Scope.CorrelationInformation
+								.scopeInformation(new HashSet<>(Collections.singletonList(StandardBusinessDocumentHeader.BusinessScope.Scope.CorrelationInformation
 										.builder()
 										.expectedResponseDateTime(OffsetDateTime.now().plus(4, HOURS))
 										.build())))
@@ -55,7 +55,7 @@ public class CreateMessageRequestMapper {
 								.build()
 						)))
 						.build())
-				.documentIdentification(CreateMessageRequest.StandardBusinessDocumentHeader.DocumentIdentification.builder()
+				.documentIdentification(StandardBusinessDocumentHeader.DocumentIdentification.builder()
 						.creationDateAndTime(OffsetDateTime.now().minus(10, SECONDS))
 						.instanceIdentifier(hentForsendelseResponseTo.getBestillingsId())
 						.multipleType(Boolean.TRUE)
@@ -64,16 +64,16 @@ public class CreateMessageRequestMapper {
 						.typeVersion(TYPE_VERSION)
 						.build())
 				.headerVersion(HEADER_VERSION)
-				.receiver(new HashSet<>(Collections.singletonList(CreateMessageRequest.StandardBusinessDocumentHeader.Receiver.builder()
-						.identifier(CreateMessageRequest.StandardBusinessDocumentHeader.Partner.PartnerIdentification.builder()
+				.receiver(new HashSet<>(Collections.singletonList(StandardBusinessDocumentHeader.Receiver.builder()
+						.identifier(StandardBusinessDocumentHeader.Partner.PartnerIdentification.builder()
 								.authority(IDENTIFIER_AUTHORITY)
-								.value(PREFIX_IDENTIFIER_VALUE + TRYGDERETTEN_ORG_NR)
+								.value(PREFIX_IDENTIFIER_VALUE + EformidlingConstants.TRYGDERETTEN_ORGNUMMER)
 								.build())
 						.build())))
-				.sender(new HashSet<>(Collections.singletonList(CreateMessageRequest.StandardBusinessDocumentHeader.Sender.builder()
-						.identifier(CreateMessageRequest.StandardBusinessDocumentHeader.Partner.PartnerIdentification.builder()
+				.sender(new HashSet<>(Collections.singletonList(StandardBusinessDocumentHeader.Sender.builder()
+						.identifier(StandardBusinessDocumentHeader.Partner.PartnerIdentification.builder()
 								.authority(IDENTIFIER_AUTHORITY)
-								.value(PREFIX_IDENTIFIER_VALUE + NAV_ORG_NR)
+								.value(PREFIX_IDENTIFIER_VALUE + EformidlingConstants.NAV_ORGNUMMER)
 								.build())
 						.build())))
 				.build();
