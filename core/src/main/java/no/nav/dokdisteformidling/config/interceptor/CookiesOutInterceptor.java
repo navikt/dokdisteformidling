@@ -1,0 +1,29 @@
+package no.nav.dokdisteformidling.config.interceptor;
+
+import lombok.extern.slf4j.Slf4j;
+import org.apache.cxf.interceptor.Fault;
+import org.apache.cxf.message.Message;
+import org.apache.cxf.phase.AbstractPhaseInterceptor;
+import org.apache.cxf.phase.Phase;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+
+@Slf4j
+public class CookiesOutInterceptor extends AbstractPhaseInterceptor {
+
+    public CookiesOutInterceptor() {
+        super(Phase.PRE_PROTOCOL);
+
+    }
+
+    @Override
+    public void handleMessage(Message message) throws Fault {
+        Map<String, List> headers = (Map<String, List>) message.get(Message.PROTOCOL_HEADERS);
+        if(CookieStore.getCookie()!= null){
+            log.info(("CookiesInInterceptor -- cookies to attach to header:" + CookieStore.getCookie()));
+            headers.put("Cookie", Collections.singletonList(CookieStore.getCookie()));
+        }
+    }
+}

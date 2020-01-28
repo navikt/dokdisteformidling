@@ -1,12 +1,8 @@
 package no.nav.dokdisteformidling;
 
 import no.nav.dokdisteformidling.certificate.KeyStoreProperties;
-import no.nav.dokdisteformidling.config.alias.DigitalKontaktinformasjonV1Alias;
-import no.nav.dokdisteformidling.config.alias.MqGatewayAlias;
-import no.nav.dokdisteformidling.config.alias.ServiceuserAlias;
-import no.nav.dokdisteformidling.config.props.MaskinportenProperties;
-import no.nav.dokdisteformidling.config.props.ServiceRegistryProperties;
-import no.nav.dokdisteformidling.config.props.SrvAppserverProperties;
+import no.nav.dokdisteformidling.config.alias.*;
+import no.nav.dokdisteformidling.config.props.*;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -16,7 +12,9 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @SpringBootApplication
 @EnableRetry
 @EnableScheduling
-@EnableConfigurationProperties({ServiceuserAlias.class,
+@EnableConfigurationProperties({ServiceuserAlias.class, DpoUserProperties.class,
+		BrokerServiceExternalEC2Properties.class,
+		BrokerServiceExternalECStreamedProperties.class,
 		KeyStoreProperties.class,
 		MqGatewayAlias.class,
 		SrvAppserverProperties.class,

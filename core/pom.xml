@@ -16,6 +16,10 @@
 			<artifactId>dokkat-schemas</artifactId>
 		</dependency>
 		<dependency>
+			<groupId>no.nav.dokdisteformidling</groupId>
+			<artifactId>schemas</artifactId>
+		</dependency>
+		<dependency>
 			<groupId>org.jvnet.jaxb2_commons</groupId>
 			<artifactId>jaxb2-basics-runtime</artifactId>
 		</dependency>
