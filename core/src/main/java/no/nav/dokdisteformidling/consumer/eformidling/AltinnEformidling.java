@@ -3,6 +3,7 @@ package no.nav.dokdisteformidling.consumer.eformidling;
 
 import lombok.extern.slf4j.Slf4j;
 import no.nav.dokdisteformidling.certificate.AppCertificate;
+import no.nav.dokdisteformidling.consumer.eformidling.brokerserviceexternalec2.services.BrokerServiceExternalEC2Service;
 import no.nav.dokdisteformidling.consumer.eformidling.dokumentpakker.EformidlingMessagePackager;
 import no.nav.dokdisteformidling.consumer.eformidling.serviceregistry.EformidlingMottakerInfoService;
 import no.nav.dokdisteformidling.consumer.eformidling.serviceregistry.MottakerInfo;
@@ -20,14 +21,16 @@ class AltinnEformidling implements Eformidling {
 	private final AppCertificate appCertificate;
 	private final EformidlingMottakerInfoService eformidlingMottakerInfoService;
 	private final EformidlingMessagePackager eformidlingMessagePackager;
+	private final BrokerServiceExternalEC2Service brokerServiceExternalEC2Service;
 
 	@Inject
 	AltinnEformidling(AppCertificate appCertificate,
 					  EformidlingMottakerInfoService eformidlingMottakerInfoService,
-					  EformidlingMessagePackager eformidlingMessagePackager) {
+					  EformidlingMessagePackager eformidlingMessagePackager, BrokerServiceExternalEC2Service brokerServiceExternalEC2Service) {
 		this.appCertificate = appCertificate;
 		this.eformidlingMottakerInfoService = eformidlingMottakerInfoService;
 		this.eformidlingMessagePackager = eformidlingMessagePackager;
+		this.brokerServiceExternalEC2Service = brokerServiceExternalEC2Service;
 	}
 
 	@Override

@@ -17,5 +17,5 @@ public class SearchCriteria {
 
     private BrokerServiceAvailableFileStatus availableFileStatus;
     private Date minSentDate;
-    private Date maxSentDAte;
+    private Date maxSentDate;
 }
