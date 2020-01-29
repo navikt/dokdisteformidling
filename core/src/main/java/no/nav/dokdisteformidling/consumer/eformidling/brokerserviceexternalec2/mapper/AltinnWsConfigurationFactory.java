@@ -6,7 +6,6 @@ import no.nav.dokdisteformidling.config.props.BrokerServiceExternalECStreamedPro
 import no.nav.dokdisteformidling.config.props.DpoUserProperties;
 import no.nav.dokdisteformidling.consumer.eformidling.brokerserviceexternalec2.to.AltinnWsConfiguration;
 import no.nav.dokdisteformidling.consumer.eformidling.serviceregistry.EformidlingMottakerInfoService;
-import no.nav.dokdisteformidling.consumer.eformidling.serviceregistry.MottakerInfo;
 import no.nav.dokdisteformidling.exception.functional.AltinnWsConfigurationException;
 import org.springframework.stereotype.Component;
 
