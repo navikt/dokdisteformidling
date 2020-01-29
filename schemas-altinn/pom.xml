@@ -33,16 +33,16 @@
 										<extraarg>-p</extraarg>
 										<extraarg>no.altinn.brokerserviceexternaec2</extraarg>
 									</extraargs>
-									<wsdlLocation>/wsdl/BrokerServiceExternalEC2.wsdl</wsdlLocation>
+									<wsdlLocation>classpath:wsdl/BrokerServiceExternalEC2.wsdl</wsdlLocation>
 								</wsdlOption>
 								<wsdlOption>
-									<wsdl>${basedir}/src/main/resources/wsdl/brokerserviceexternalec2streamed.wsdl</wsdl>
+									<wsdl>${basedir}/src/main/resources/wsdl/IBrokerServiceExternalEC2Streamed.wsdl</wsdl>
 									<extraargs>
 										<extraarg>-autoNameResolution</extraarg>
 										<extraarg>-p</extraarg>
 										<extraarg>no.altinn.brokerserviceexternalec2streamed</extraarg>
 									</extraargs>
-									<wsdlLocation>/wsdl/brokerserviceexternalec2streamed.wsdl</wsdlLocation>
+									<wsdlLocation>classpath:wsdl/IBrokerServiceExternalEC2Streamed.wsdl</wsdlLocation>
 								</wsdlOption>
 							</wsdlOptions>
 						</configuration>
