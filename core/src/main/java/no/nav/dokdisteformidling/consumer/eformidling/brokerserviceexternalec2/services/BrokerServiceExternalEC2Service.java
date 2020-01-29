@@ -1,14 +1,30 @@
 package no.nav.dokdisteformidling.consumer.eformidling.brokerserviceexternalec2.services;
 
+import static no.nav.dokdisteformidling.consumer.eformidling.EformidlingConstants.NAV_ORGNUMMER;
+
 import lombok.extern.slf4j.Slf4j;
 import net.logstash.logback.marker.LogstashMarker;
 import net.logstash.logback.marker.Markers;
-import no.altinn.brokerserviceexternaec2.*;
+import no.altinn.brokerserviceexternaec2.ArrayOfFile;
+import no.altinn.brokerserviceexternaec2.ArrayOfProperty;
+import no.altinn.brokerserviceexternaec2.ArrayOfRecipient;
+import no.altinn.brokerserviceexternaec2.BrokerServiceAvailableFileList;
+import no.altinn.brokerserviceexternaec2.BrokerServiceAvailableFileStatus;
+import no.altinn.brokerserviceexternaec2.BrokerServiceInitiation;
+import no.altinn.brokerserviceexternaec2.BrokerServiceSearch;
+import no.altinn.brokerserviceexternaec2.File;
+import no.altinn.brokerserviceexternaec2.IBrokerServiceExternalEC2;
+import no.altinn.brokerserviceexternaec2.IBrokerServiceExternalEC2ConfirmDownloadedECAltinnFaultFaultFaultMessage;
+import no.altinn.brokerserviceexternaec2.IBrokerServiceExternalEC2GetAvailableFilesECAltinnFaultFaultFaultMessage;
+import no.altinn.brokerserviceexternaec2.IBrokerServiceExternalEC2InitiateBrokerServiceECAltinnFaultFaultFaultMessage;
+import no.altinn.brokerserviceexternaec2.IBrokerServiceExternalEC2TestAltinnFaultFaultFaultMessage;
+import no.altinn.brokerserviceexternaec2.Manifest;
+import no.altinn.brokerserviceexternaec2.ObjectFactory;
+import no.altinn.brokerserviceexternaec2.Property;
+import no.altinn.brokerserviceexternaec2.Recipient;
 import no.altinn.brokerserviceexternalec2streamed.ReceiptExternalStreamedBE;
-import no.nav.dokdisteformidling.certificate.SecurityCredential;
 import no.nav.dokdisteformidling.config.props.DpoUserProperties;
 import no.nav.dokdisteformidling.consumer.eformidling.EformidlingConstants;
-import no.nav.dokdisteformidling.consumer.eformidling.brokerserviceexternalec2.AltinnBrokerServiceConsumerFactory;
 import no.nav.dokdisteformidling.consumer.eformidling.brokerserviceexternalec2.to.AltinnResonFactory;
 import no.nav.dokdisteformidling.consumer.eformidling.brokerserviceexternalec2.to.SearchCriteria;
 import no.nav.dokdisteformidling.consumer.eformidling.brokerserviceexternalec2.to.UploadManifest;
@@ -19,8 +35,6 @@ import javax.xml.datatype.DatatypeConfigurationException;
 import java.util.Optional;
 import java.util.stream.IntStream;
 
-import static no.nav.dokdisteformidling.consumer.eformidling.EformidlingConstants.NAV_ORGNUMMER;
-
 @Slf4j
 public class BrokerServiceExternalEC2Service {
 
@@ -30,20 +44,16 @@ public class BrokerServiceExternalEC2Service {
 
     private final IBrokerServiceExternalEC2 iBrokerServiceExternalEC2;
     private final ObjectFactory objectFactory;
-    private final SecurityCredential credential;
     private final DpoUserProperties dpoUserProperties;
 
-    public BrokerServiceExternalEC2Service(final AltinnBrokerServiceConsumerFactory brokerServiceConsumerFactory,
-                                           SecurityCredential credential) {
-        this.credential = credential;
-        this.iBrokerServiceExternalEC2 = brokerServiceConsumerFactory.getBrokerServiceClient(credential);
+    public BrokerServiceExternalEC2Service(final IBrokerServiceExternalEC2 iBrokerServiceExternalEC2,
+                                           final DpoUserProperties dpoUserProperties) {
+        this.iBrokerServiceExternalEC2 = iBrokerServiceExternalEC2;
+        this.dpoUserProperties = dpoUserProperties;
         this.objectFactory = new ObjectFactory();
-        this.dpoUserProperties = credential.getDpoUserProperties();
-
     }
 
     public void intiateBrokerService(UploadManifest uploadManifest) throws IBrokerServiceExternalEC2InitiateBrokerServiceECAltinnFaultFaultFaultMessage {
-        DpoUserProperties dpoUserProperties = credential.getDpoUserProperties();
         iBrokerServiceExternalEC2.initiateBrokerServiceEC(dpoUserProperties.getUsername(),
                 dpoUserProperties.getPassword(),
                 getBrokerServiceInitiation(uploadManifest));
@@ -70,6 +80,14 @@ public class BrokerServiceExternalEC2Service {
         return getFileReferences(criteria, mottakerInfo).get();
     }
 
+    public void test() throws IBrokerServiceExternalEC2TestAltinnFaultFaultFaultMessage {
+        try {
+            iBrokerServiceExternalEC2.test();
+        } catch (IBrokerServiceExternalEC2TestAltinnFaultFaultFaultMessage e) {
+            log.error("Testkall mot altinn feilet.", e);
+            throw e;
+        }
+    }
 
     private BrokerServiceInitiation getBrokerServiceInitiation(UploadManifest uploadManifest) {
         BrokerServiceInitiation brokerServiceInitiation = objectFactory.createBrokerServiceInitiation();

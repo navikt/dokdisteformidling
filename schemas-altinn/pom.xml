@@ -33,7 +33,7 @@
 										<extraarg>-p</extraarg>
 										<extraarg>no.altinn.brokerserviceexternaec2</extraarg>
 									</extraargs>
-									<wsdlLocation>/wsdl/IBrokerServiceExternalEC2.wsdl</wsdlLocation>
+									<wsdlLocation>/wsdl/BrokerServiceExternalEC2.wsdl</wsdlLocation>
 								</wsdlOption>
 								<wsdlOption>
 									<wsdl>${basedir}/src/main/resources/wsdl/brokerserviceexternalec2streamed.wsdl</wsdl>

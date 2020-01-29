@@ -13,14 +13,16 @@ import org.apache.cxf.ws.security.tokenstore.TokenStoreUtils;
 import javax.xml.namespace.QName;
 import java.util.List;
 
+/**
+ * Kopiert fra https://github.com/Altinn/ec-client-java-cxf
+ *
+ * Interceptor for å håndtere feil med context token.
+ */
 @Slf4j
-@SuppressWarnings("rawtypes")
-public class BadTokenInFaultInterceptor extends AbstractPhaseInterceptor {
-
+public class BadContextTokenInFaultInterceptor extends AbstractPhaseInterceptor {
     private static final String ERROR_CODE_BAD_CONTEXT_TOKEN = "BadContextToken";
 
-    @SuppressWarnings("unchecked")
-    public BadTokenInFaultInterceptor() {
+    public BadContextTokenInFaultInterceptor() {
         super(Phase.UNMARSHAL);
         getAfter().add(Soap12FaultInInterceptor.class.getName());
     }
@@ -29,31 +31,29 @@ public class BadTokenInFaultInterceptor extends AbstractPhaseInterceptor {
     public void handleMessage(Message message) throws Fault {
         Exception exception = message.getContent(Exception.class);
         if (exception instanceof SoapFault) {
-            log.error("Det feilet, skal sende soapfault ..");
+            log.error("Server Gods not happy, sent you a soapFault.. Trying to recover..");
             SoapFault soapFault = (SoapFault) exception;
-            List<QName> faultSubCodes = soapFault.getSubCodes();
-            faultSubCodes.stream()
-                    .forEach(subCode -> {
-                        log.error("Fant soapfault subCode: {}", subCode.getLocalPart());
-                        if (subCode.getLocalPart().equalsIgnoreCase(ERROR_CODE_BAD_CONTEXT_TOKEN)) {
-                            String tokenId = (String) message.getContextualProperty(SecurityConstants.TOKEN_ID);
-                            sletteTokenFramMessageAndTokenStore(message, tokenId);
-                            CookieStore.setCookie(null);
-                            soapFault.setMessage(String.format("Token med tokenId:%s har fjernet fra tokenstore, og nye token skal be om i neste kall", tokenId));
-                            message.setContent(Exception.class, soapFault);
-                        }
-
-                    });
+            List<QName> subCodes = soapFault.getSubCodes();
+            for (QName subCode : subCodes) {
+                log.error("Found subCode: " + subCode.getLocalPart());
+                if (subCode.getLocalPart().equalsIgnoreCase(ERROR_CODE_BAD_CONTEXT_TOKEN)) {
+                    String tokenId = (String)message.getContextualProperty(SecurityConstants.TOKEN_ID);
+                    removeTokenFromMessageAndTokenStore(message, tokenId);
+                    CookieStore.setCookie(null);
+                    soapFault.setMessage("Token " + tokenId + " is removed from tokenstore, a new one will be requested on your next call. Message from server: " + soapFault.getMessage());
+                    message.setContent(Exception.class, soapFault);
+                }
+            }
         }
-
     }
 
-    private void sletteTokenFramMessageAndTokenStore(Message message, String tokenId) {
+    private void removeTokenFromMessageAndTokenStore(Message message, String tokenId) {
         message.getExchange().getEndpoint().remove(SecurityConstants.TOKEN);
         message.getExchange().getEndpoint().remove(SecurityConstants.TOKEN_ID);
         message.getExchange().remove(SecurityConstants.TOKEN_ID);
         message.getExchange().remove(SecurityConstants.TOKEN);
         TokenStoreUtils.getTokenStore(message).remove(tokenId);
-        log.error("Token med tokenId: {} har fjernet fra meldingen og tokenStore ", tokenId);
+        log.error("Removed token " + tokenId + " from message and tokenStore");
     }
+
 }
