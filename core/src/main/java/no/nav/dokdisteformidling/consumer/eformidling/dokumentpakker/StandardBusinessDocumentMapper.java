@@ -1,0 +1,108 @@
+package no.nav.dokdisteformidling.consumer.eformidling.dokumentpakker;
+
+import static java.time.temporal.ChronoUnit.HOURS;
+import static no.nav.dokdisteformidling.consumer.eformidling.Organisasjonsnummer.asIso6523;
+
+import no.nav.dokdisteformidling.consumer.eformidling.EformidlingConstants;
+import no.nav.dokdisteformidling.consumer.eformidling.dokumentpakker.sbdh.BusinessScope;
+import no.nav.dokdisteformidling.consumer.eformidling.dokumentpakker.sbdh.CorrelationInformation;
+import no.nav.dokdisteformidling.consumer.eformidling.dokumentpakker.sbdh.DocumentIdentification;
+import no.nav.dokdisteformidling.consumer.eformidling.dokumentpakker.sbdh.PartnerIdentification;
+import no.nav.dokdisteformidling.consumer.eformidling.dokumentpakker.sbdh.Receiver;
+import no.nav.dokdisteformidling.consumer.eformidling.dokumentpakker.sbdh.Scope;
+import no.nav.dokdisteformidling.consumer.eformidling.dokumentpakker.sbdh.Sender;
+import no.nav.dokdisteformidling.consumer.eformidling.dokumentpakker.sbdh.StandardBusinessDocument;
+import no.nav.dokdisteformidling.consumer.eformidling.dokumentpakker.sbdh.StandardBusinessDocumentHeader;
+import org.springframework.stereotype.Component;
+
+import javax.inject.Inject;
+import java.time.Clock;
+import java.time.OffsetDateTime;
+import java.time.temporal.ChronoUnit;
+
+/**
+ * Mapper til konvoluttene til eformidling meldingen.
+ *
+ * @author Joakim Bjørnstad, Jbit AS
+ */
+@Component
+public class StandardBusinessDocumentMapper {
+	static final String HEADER_VERSION = "1.0";
+	static final String TYPE_VERSION = "1.0";
+	static final String IDENTIFIER_AUTHORITY = "iso6523-actorid-upis";
+	static final String DOCUMENT_IDENTIFICATOR_STANDARD = "urn:no:difi:arkivmelding:xsd::arkivmelding";
+	static final String SCOPE_CONVERSATION_ID = "ConversationId";
+	static final String SCOPE_CONVERSATION_ID_IDENTIFIER = "urn:no:difi:profile:arkivmelding:administrasjon:ver1.0";
+	static final String ARKIVMELDING_FORRETNINGSMELDING = "arkivmelding";
+	public static final String ARKIVMELDING_XML = "arkivmelding.xml";
+	public static final int SIKKERHETSNIVAA = 4;
+
+	private final Clock clock;
+
+	@Inject
+	public StandardBusinessDocumentMapper(Clock clock) {
+		this.clock = clock;
+	}
+
+	StandardBusinessDocument mapArkivmeldingEnvelope(final String conversationId, final String bestillingsId) {
+		StandardBusinessDocumentHeader standardBusinessDocumentHeader = new StandardBusinessDocumentHeader();
+		standardBusinessDocumentHeader.setHeaderVersion(HEADER_VERSION);
+		standardBusinessDocumentHeader.addSender(createSender());
+		standardBusinessDocumentHeader.addReceiver(createReceiver());
+		standardBusinessDocumentHeader.setDocumentIdentification(createDocumentIdentification(bestillingsId));
+		BusinessScope businessScope = new BusinessScope();
+		businessScope.addScope(createConversationIdScope(conversationId));
+		standardBusinessDocumentHeader.setBusinessScope(businessScope);
+		StandardBusinessDocument standardBusinessDocument = new StandardBusinessDocument();
+		standardBusinessDocument.setStandardBusinessDocumentHeader(standardBusinessDocumentHeader);
+		standardBusinessDocument.setAny(createArkivmeldingMessage());
+		return standardBusinessDocument;
+	}
+
+	private DocumentIdentification createDocumentIdentification(final String instanceIdentifier) {
+		DocumentIdentification documentIdentification = new DocumentIdentification();
+		documentIdentification.setStandard(DOCUMENT_IDENTIFICATOR_STANDARD);
+		documentIdentification.setTypeVersion(TYPE_VERSION);
+		documentIdentification.setInstanceIdentifier(instanceIdentifier);
+		documentIdentification.setType(ARKIVMELDING_FORRETNINGSMELDING);
+		documentIdentification.setMultipleType(true);
+		documentIdentification.setCreationDateAndTime(OffsetDateTime.now(clock).minus(10, ChronoUnit.SECONDS));
+		return documentIdentification;
+	}
+
+	private Sender createSender() {
+		final Sender sender = new Sender();
+		final PartnerIdentification senderIdentification = new PartnerIdentification();
+		senderIdentification.setAuthority(IDENTIFIER_AUTHORITY);
+		senderIdentification.setValue(asIso6523(EformidlingConstants.NAV_ORGNUMMER));
+		sender.setIdentifier(senderIdentification);
+		return sender;
+	}
+
+	private Receiver createReceiver() {
+		final Receiver receiver = new Receiver();
+		final PartnerIdentification receiverIdentification = new PartnerIdentification();
+		receiverIdentification.setAuthority(IDENTIFIER_AUTHORITY);
+		receiverIdentification.setValue(asIso6523(EformidlingConstants.TRYGDERETTEN_ORGNUMMER));
+		receiver.setIdentifier(receiverIdentification);
+		return receiver;
+	}
+
+	private Scope createConversationIdScope(final String instanceIdentifier) {
+		Scope conversationIdScope = new Scope();
+		conversationIdScope.setType(SCOPE_CONVERSATION_ID);
+		conversationIdScope.setInstanceIdentifier(instanceIdentifier);
+		conversationIdScope.setIdentifier(SCOPE_CONVERSATION_ID_IDENTIFIER);
+		final CorrelationInformation correlationInformation = new CorrelationInformation();
+		correlationInformation.setExpectedResponseDateTime(OffsetDateTime.now(clock).plus(4, HOURS));
+		conversationIdScope.addScopeInformation(correlationInformation);
+		return conversationIdScope;
+	}
+
+	private ArkivmeldingMessage createArkivmeldingMessage() {
+		final ArkivmeldingMessage forretningsmelding = new ArkivmeldingMessage();
+		forretningsmelding.setHoveddokument(ARKIVMELDING_XML);
+		forretningsmelding.setSikkerhetsnivaa(SIKKERHETSNIVAA);
+		return forretningsmelding;
+	}
+}

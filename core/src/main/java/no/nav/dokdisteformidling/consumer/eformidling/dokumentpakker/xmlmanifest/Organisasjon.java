@@ -1,5 +1,8 @@
 package no.nav.dokdisteformidling.consumer.eformidling.dokumentpakker.xmlmanifest;
 
+import static no.nav.dokdisteformidling.consumer.eformidling.Organisasjonsnummer.ISO6523_AUTHORITY;
+import static no.nav.dokdisteformidling.consumer.eformidling.Organisasjonsnummer.ISO6523_PREFIX;
+
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
@@ -11,9 +14,6 @@ import javax.xml.bind.annotation.XmlValue;
 @XmlType(name = "organisasjon")
 @XmlRootElement(name = "organiasjon")
 public class Organisasjon {
-    private static final String ISO6523_AUTHORITY = "iso6523-actorid-upis";
-    private static final String ISO6523_PREFIX = "0192:";
-
     @XmlAttribute
     private String authority;
     @XmlValue
