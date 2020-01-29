@@ -43,7 +43,6 @@ public class BrokerServiceExternalEC2Config extends AbstractCxfEndpointConfig {
 		addOutInterceptor(new CookiesOutInterceptor());
 		addOutInterceptor(new HeaderOutInterceptor());
 		addInFaultInterceptor(new BadContextTokenInFaultInterceptor());
-		addOutInterceptor(new LoggingOutInterceptor());
 
 		IBrokerServiceExternalEC2 iBrokerServiceExternalEC2 = createPort(IBrokerServiceExternalEC2.class);
 		final Client client = ClientProxy.getClient(iBrokerServiceExternalEC2);
