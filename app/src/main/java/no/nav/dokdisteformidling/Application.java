@@ -4,6 +4,7 @@ import no.nav.dokdisteformidling.certificate.KeyStoreProperties;
 import no.nav.dokdisteformidling.config.alias.DigitalKontaktinformasjonV1Alias;
 import no.nav.dokdisteformidling.config.alias.MqGatewayAlias;
 import no.nav.dokdisteformidling.config.alias.ServiceuserAlias;
+import no.nav.dokdisteformidling.config.props.FeatureToggleProperties;
 import no.nav.dokdisteformidling.config.props.MaskinportenProperties;
 import no.nav.dokdisteformidling.config.props.ServiceRegistryProperties;
 import no.nav.dokdisteformidling.config.props.SrvAppserverProperties;
@@ -22,7 +23,8 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 		SrvAppserverProperties.class,
 		DigitalKontaktinformasjonV1Alias.class,
 		MaskinportenProperties.class,
-		ServiceRegistryProperties.class})
+		ServiceRegistryProperties.class,
+		FeatureToggleProperties.class})
 public class Application {
 
 	public static void main(String[] args) {

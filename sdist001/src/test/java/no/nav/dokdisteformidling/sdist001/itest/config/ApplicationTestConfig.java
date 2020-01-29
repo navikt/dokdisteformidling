@@ -5,6 +5,7 @@ import static org.mockito.Mockito.mock;
 import no.nav.dokdisteformidling.certificate.KeyStoreProperties;
 import no.nav.dokdisteformidling.config.alias.DigitalKontaktinformasjonV1Alias;
 import no.nav.dokdisteformidling.config.alias.ServiceuserAlias;
+import no.nav.dokdisteformidling.config.props.FeatureToggleProperties;
 import no.nav.dokdisteformidling.config.props.MaskinportenProperties;
 import no.nav.dokdisteformidling.config.props.ServiceRegistryProperties;
 import no.nav.dokdisteformidling.config.sts.STSConfig;
@@ -23,7 +24,8 @@ import org.springframework.context.annotation.Profile;
 		KeyStoreProperties.class,
 		DigitalKontaktinformasjonV1Alias.class,
 		MaskinportenProperties.class,
-		ServiceRegistryProperties.class})
+		ServiceRegistryProperties.class,
+		FeatureToggleProperties.class})
 @ComponentScan(basePackages = "no.nav.dokdisteformidling")
 public class ApplicationTestConfig {
 
