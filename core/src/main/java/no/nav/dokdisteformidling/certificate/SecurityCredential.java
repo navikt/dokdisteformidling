@@ -1,22 +1,22 @@
 package no.nav.dokdisteformidling.certificate;
 
 import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.Setter;
 import no.nav.dokdisteformidling.config.props.DpoUserProperties;
 
 import java.util.Properties;
 
 @Getter
-@NoArgsConstructor
+@Setter
 public class SecurityCredential {
-    private  KeyStoreProperties keyStoreProperties;
-    private  DpoUserProperties dpoUserProperties;
-    private Properties properties;
-    private String orgNummer;
 
-    public SecurityCredential(DpoUserProperties dpoUserProperties, KeyStoreProperties keyStoreProperties) throws KeystoreProviderException {
+    private final Properties properties;
+    private DpoUserProperties dpoUserProperties;
+    private String enhet;
+
+    public SecurityCredential(final KeyStoreProperties keyStoreProperties, String enhet, final DpoUserProperties dpoUserProperties) {
         this.dpoUserProperties = dpoUserProperties;
-        this.keyStoreProperties = keyStoreProperties;
+        this.enhet = enhet;
         properties = new Properties();
         properties.setProperty("org.apache.ws.security.crypto.provider", "org.apache.ws.security.components.crypto.Merlin");
         properties.setProperty("org.apache.ws.security.crypto.merlin.keystore.file", keyStoreProperties.getPath().getFilename());

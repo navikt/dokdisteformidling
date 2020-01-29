@@ -15,7 +15,7 @@ import javax.validation.constraints.NotBlank;
 @Validated
 public class DpoUserProperties {
     @NotBlank
-    private String user;
+    private String username;
     @NotBlank
     private String password;
 }
