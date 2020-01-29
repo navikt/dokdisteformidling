@@ -30,12 +30,15 @@ import no.nav.dokdisteformidling.consumer.eformidling.brokerserviceexternalec2.t
 import no.nav.dokdisteformidling.consumer.eformidling.brokerserviceexternalec2.to.UploadManifest;
 import no.nav.dokdisteformidling.consumer.eformidling.serviceregistry.MottakerInfo;
 import no.nav.dokdisteformidling.utils.DateConverterUtil;
+import org.springframework.stereotype.Component;
 
+import javax.inject.Inject;
 import javax.xml.datatype.DatatypeConfigurationException;
 import java.util.Optional;
 import java.util.stream.IntStream;
 
 @Slf4j
+@Component
 public class BrokerServiceExternalEC2Service {
 
 
@@ -46,6 +49,7 @@ public class BrokerServiceExternalEC2Service {
     private final ObjectFactory objectFactory;
     private final DpoUserProperties dpoUserProperties;
 
+    @Inject
     public BrokerServiceExternalEC2Service(final IBrokerServiceExternalEC2 iBrokerServiceExternalEC2,
                                            final DpoUserProperties dpoUserProperties) {
         this.iBrokerServiceExternalEC2 = iBrokerServiceExternalEC2;

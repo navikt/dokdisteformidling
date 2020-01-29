@@ -6,6 +6,7 @@ import no.nav.dokdisteformidling.config.props.BrokerServiceExternalEC2Properties
 import no.nav.dokdisteformidling.config.props.DpoUserProperties;
 import org.apache.cxf.bus.CXFBusFactory;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.core.io.FileSystemResource;
 
@@ -14,6 +15,7 @@ import java.net.MalformedURLException;
 /**
  * @author Joakim Bjørnstad, Jbit AS
  */
+@Disabled("Manuell test")
 class BrokerServiceExternalEC2ServiceManualTest {
 	private KeyStoreProperties keyStoreProperties = new KeyStoreProperties();
 	private DpoUserProperties dpoUserProperties = new DpoUserProperties();
