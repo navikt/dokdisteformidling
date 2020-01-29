@@ -59,7 +59,7 @@ class AltinnEformidlingManualTest {
 		ServiceRegistryConsumer serviceRegistryConsumer = new ServiceRegistryConsumer(serviceRegistryProperties, maskinportenTokenConsumer, new RestTemplateBuilder());
 		EformidlingMottakerInfoService eformidlingMottakerInfoService = new EformidlingMottakerInfoService(serviceRegistryConsumer);
 		EformidlingMessagePackager eformidlingMessagePackager = new EformidlingMessagePackager();
-		final Eformidling eformidling = new AltinnEformidling(appCertificate, eformidlingMottakerInfoService, eformidlingMessagePackager);
+		final Eformidling eformidling = new AltinnEformidling(appCertificate, eformidlingMottakerInfoService, eformidlingMessagePackager, null);
 
 		final NavDokumentpakke navDokumentpakke = NavDokumentpakke.builder()
 				.conversationId("1")
