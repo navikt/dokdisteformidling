@@ -3,7 +3,7 @@ package no.nav.dokdisteformidling.consumer.eformidling.brokerserviceexternalec2.
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
-import no.altinn.brokerserviceexternalec2streamed.ReceiptExternalStreamedBE;
+import no.altinn.brokerserviceexternalbasicstreamed.ReceiptExternalStreamedBE;
 
 @Getter
 @Setter

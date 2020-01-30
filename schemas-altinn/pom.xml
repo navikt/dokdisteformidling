@@ -27,22 +27,22 @@
 						<configuration>
 							<wsdlOptions>
 								<wsdlOption>
-									<wsdl>${basedir}/src/main/resources/wsdl/BrokerServiceExternalEC2.wsdl</wsdl>
+									<wsdl>${basedir}/src/main/resources/wsdl/BrokerServiceExternal.wsdl</wsdl>
 									<extraargs>
 										<extraarg>-autoNameResolution</extraarg>
 										<extraarg>-p</extraarg>
-										<extraarg>no.altinn.brokerserviceexternaec2</extraarg>
+										<extraarg>no.altinn.brokerserviceexternal</extraarg>
 									</extraargs>
-									<wsdlLocation>classpath:wsdl/BrokerServiceExternalEC2.wsdl</wsdlLocation>
+									<wsdlLocation>classpath:wsdl/BrokerServiceExternal.wsdl</wsdlLocation>
 								</wsdlOption>
 								<wsdlOption>
-									<wsdl>${basedir}/src/main/resources/wsdl/BrokerServiceExternalEC2Streamed.wsdl</wsdl>
+									<wsdl>${basedir}/src/main/resources/wsdl/BrokerServiceExternalBasicStreamed.wsdl</wsdl>
 									<extraargs>
 										<extraarg>-autoNameResolution</extraarg>
 										<extraarg>-p</extraarg>
-										<extraarg>no.altinn.brokerserviceexternalec2streamed</extraarg>
+										<extraarg>no.altinn.brokerserviceexternalbasicstreamed</extraarg>
 									</extraargs>
-									<wsdlLocation>classpath:wsdl/BrokerServiceExternalEC2Streamed.wsdl</wsdlLocation>
+									<wsdlLocation>classpath:wsdl/BrokerServiceExternalBasicStreamed.wsdl</wsdlLocation>
 								</wsdlOption>
 							</wsdlOptions>
 						</configuration>

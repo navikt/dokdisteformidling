@@ -5,9 +5,9 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
-import no.altinn.brokerserviceexternaec2.BrokerServiceAvailableFileStatus;
+import no.altinn.brokerserviceexternal.BrokerServiceAvailableFileStatus;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -16,6 +16,6 @@ import java.util.Date;
 public class SearchCriteria {
 
     private BrokerServiceAvailableFileStatus availableFileStatus;
-    private Date minSentDate;
-    private Date maxSentDate;
+    private LocalDateTime minSentDate;
+    private LocalDateTime maxSentDate;
 }

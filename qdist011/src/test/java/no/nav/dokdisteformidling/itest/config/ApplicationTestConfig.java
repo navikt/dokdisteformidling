@@ -26,8 +26,8 @@ import org.springframework.retry.annotation.EnableRetry;
 @Profile("itest")
 @EnableRetry
 @EnableConfigurationProperties({ServiceuserAlias.class, DpoUserProperties.class,
-		BrokerServiceExternalEC2Properties.class,
-		BrokerServiceExternalECStreamedProperties.class,
+		BrokerServiceExternalProperties.class,
+		BrokerServiceExternalStreamedProperties.class,
 		KeyStoreProperties.class,
 		MqGatewayAlias.class,
 		SrvAppserverProperties.class,

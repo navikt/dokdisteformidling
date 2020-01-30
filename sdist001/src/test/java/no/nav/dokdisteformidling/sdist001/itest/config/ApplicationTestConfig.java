@@ -19,8 +19,8 @@ import org.springframework.context.annotation.Profile;
 @Configuration
 @Profile("itest")
 @EnableConfigurationProperties({ServiceuserAlias.class, DpoUserProperties.class,
-		BrokerServiceExternalEC2Properties.class,
-		BrokerServiceExternalECStreamedProperties.class,
+		BrokerServiceExternalProperties.class,
+		BrokerServiceExternalStreamedProperties.class,
 		KeyStoreProperties.class,
 		DigitalKontaktinformasjonV1Alias.class,
 		MaskinportenProperties.class,

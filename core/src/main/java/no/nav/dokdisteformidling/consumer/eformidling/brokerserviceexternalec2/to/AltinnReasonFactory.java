@@ -1,16 +1,17 @@
 package no.nav.dokdisteformidling.consumer.eformidling.brokerserviceexternalec2.to;
 
 import lombok.experimental.UtilityClass;
-import no.altinn.brokerserviceexternaec2.IBrokerServiceExternalEC2ConfirmDownloadedECAltinnFaultFaultFaultMessage;
-import no.altinn.brokerserviceexternaec2.IBrokerServiceExternalEC2GetAvailableFilesECAltinnFaultFaultFaultMessage;
-import no.altinn.brokerserviceexternaec2.IBrokerServiceExternalEC2InitiateBrokerServiceECAltinnFaultFaultFaultMessage;
-import no.altinn.brokerserviceexternalec2streamed.IBrokerServiceExternalEC2StreamedDownloadFileStreamedECAltinnFaultFaultFaultMessage;
-import no.altinn.brokerserviceexternalec2streamed.IBrokerServiceExternalEC2StreamedUploadFileStreamedECAltinnFaultFaultFaultMessage;
+import no.altinn.brokerserviceexternal.IBrokerServiceExternalConfirmDownloadedAltinnFaultFaultFaultMessage;
+import no.altinn.brokerserviceexternal.IBrokerServiceExternalGetAvailableFilesAltinnFaultFaultFaultMessage;
+import no.altinn.brokerserviceexternal.IBrokerServiceExternalInitiateBrokerServiceAltinnFaultFaultFaultMessage;
+import no.altinn.brokerserviceexternal.IBrokerServiceExternalTestAltinnFaultFaultFaultMessage;
+import no.altinn.brokerserviceexternalbasicstreamed.IBrokerServiceExternalBasicStreamedDownloadFileStreamedBasicAltinnFaultFaultFaultMessage;
+import no.altinn.brokerserviceexternalbasicstreamed.IBrokerServiceExternalBasicStreamedUploadFileStreamedBasicAltinnFaultFaultFaultMessage;
 
 @UtilityClass
-public class AltinnResonFactory {
+public class AltinnReasonFactory {
 
-    public static AltinnReason from(IBrokerServiceExternalEC2InitiateBrokerServiceECAltinnFaultFaultFaultMessage initateAltinnFault) {
+    public static AltinnReason from(IBrokerServiceExternalInitiateBrokerServiceAltinnFaultFaultFaultMessage initateAltinnFault) {
         String message = initateAltinnFault.getFaultInfo().getAltinnErrorMessage().getValue();
         Integer id = initateAltinnFault.getFaultInfo().getErrorID();
         String userId = initateAltinnFault.getFaultInfo().getUserId().getValue();
@@ -18,7 +19,7 @@ public class AltinnResonFactory {
         return new AltinnReason(id, message, userId, localized);
     }
 
-    public static AltinnReason from(IBrokerServiceExternalEC2GetAvailableFilesECAltinnFaultFaultFaultMessage availableFilesFault) {
+    public static AltinnReason from(IBrokerServiceExternalGetAvailableFilesAltinnFaultFaultFaultMessage availableFilesFault) {
         String message = availableFilesFault.getFaultInfo().getAltinnErrorMessage().getValue();
         Integer id = availableFilesFault.getFaultInfo().getErrorID();
         String userId = availableFilesFault.getFaultInfo().getUserId().getValue();
@@ -26,7 +27,7 @@ public class AltinnResonFactory {
         return new AltinnReason(id, message, userId, localized);
     }
 
-    public static AltinnReason from(IBrokerServiceExternalEC2StreamedUploadFileStreamedECAltinnFaultFaultFaultMessage uploadFault) {
+    public static AltinnReason from(IBrokerServiceExternalBasicStreamedUploadFileStreamedBasicAltinnFaultFaultFaultMessage uploadFault) {
         String message = uploadFault.getFaultInfo().getAltinnErrorMessage().getValue();
         Integer id = uploadFault.getFaultInfo().getErrorID();
         String userId = uploadFault.getFaultInfo().getUserId().getValue();
@@ -34,7 +35,7 @@ public class AltinnResonFactory {
         return new AltinnReason(id, message, userId, localized);
     }
 
-    public static AltinnReason from(IBrokerServiceExternalEC2StreamedDownloadFileStreamedECAltinnFaultFaultFaultMessage downloadFault) {
+    public static AltinnReason from(IBrokerServiceExternalBasicStreamedDownloadFileStreamedBasicAltinnFaultFaultFaultMessage downloadFault) {
         String message = downloadFault.getFaultInfo().getAltinnErrorMessage().getValue();
         Integer id = downloadFault.getFaultInfo().getErrorID();
         String userId = downloadFault.getFaultInfo().getUserId().getValue();
@@ -42,7 +43,7 @@ public class AltinnResonFactory {
         return new AltinnReason(id, message, userId, localized);
     }
 
-    public static AltinnReason from(IBrokerServiceExternalEC2ConfirmDownloadedECAltinnFaultFaultFaultMessage confirmFault) {
+    public static AltinnReason from(IBrokerServiceExternalConfirmDownloadedAltinnFaultFaultFaultMessage confirmFault) {
 
         final String message = confirmFault.getFaultInfo().getAltinnErrorMessage().getValue();
         final Integer id = confirmFault.getFaultInfo().getErrorID();
@@ -51,6 +52,14 @@ public class AltinnResonFactory {
         return new AltinnReason(id, message, userId, localized);
     }
 
+    public static AltinnReason from(IBrokerServiceExternalTestAltinnFaultFaultFaultMessage confirmFault) {
+
+        final String message = confirmFault.getFaultInfo().getAltinnErrorMessage().getValue();
+        final Integer id = confirmFault.getFaultInfo().getErrorID();
+        final String userId = confirmFault.getFaultInfo().getUserId().getValue();
+        final String localized = confirmFault.getFaultInfo().getAltinnLocalizedErrorMessage().getValue();
+        return new AltinnReason(id, message, userId, localized);
+    }
 
 
 }

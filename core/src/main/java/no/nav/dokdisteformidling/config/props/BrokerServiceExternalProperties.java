@@ -9,11 +9,12 @@ import org.springframework.validation.annotation.Validated;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotEmpty;
 
+
 @Getter
 @Setter
-@ConfigurationProperties("altinn.brokerserviceexternalecstreamed.url")
+@ConfigurationProperties("altinn.brokerserviceexternal")
 @Validated
-public class BrokerServiceExternalECStreamedProperties {
+public class BrokerServiceExternalProperties {
 
     @NotEmpty
     private String endpointurl;
