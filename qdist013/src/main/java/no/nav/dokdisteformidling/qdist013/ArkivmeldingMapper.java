@@ -211,7 +211,7 @@ public class ArkivmeldingMapper {
 		} else {
 			LightweightSafJournalpostQdist013 lightweightSafJournalpostQdist013 = safJournalpostQueryService.hentJournalpost(dokumentInfo
 					.getOriginalJournalpostId());
-			if(!isEmpty(lightweightSafJournalpostQdist013.getJournalfortAvNavn())){
+			if (!isEmpty(lightweightSafJournalpostQdist013.getJournalfortAvNavn())) {
 				return lightweightSafJournalpostQdist013.getJournalfortAvNavn();
 			}
 			return UKJENT;
@@ -252,7 +252,8 @@ public class ArkivmeldingMapper {
 		if (dokumentInfoContainsSladdetDokumentvariant(dokumentInfo)) {
 			return VARIANTFORMAT_SLADDET;
 		} else {
-			JournalpostQdist013.DokumentInfo.Dokumentvariant dokumentvariantArkiv = dokumentInfo.getDokumentvarianter().stream()
+			JournalpostQdist013.DokumentInfo.Dokumentvariant dokumentvariantArkiv = dokumentInfo.getDokumentvarianter()
+					.stream()
 					.filter(dokumentvariant -> VARIANTFORMAT_ARKIV.equals(dokumentvariant.getVariantformat()))
 					.findAny()
 					.get(); //Ok, already validated in SafJournalpostValidatorQdist013.

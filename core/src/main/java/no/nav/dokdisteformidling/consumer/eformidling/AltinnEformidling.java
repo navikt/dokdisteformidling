@@ -3,6 +3,9 @@ package no.nav.dokdisteformidling.consumer.eformidling;
 
 import lombok.extern.slf4j.Slf4j;
 import no.nav.dokdisteformidling.certificate.AppCertificate;
+import no.nav.dokdisteformidling.consumer.eformidling.altinn.services.BrokerServiceExternalService;
+import no.nav.dokdisteformidling.consumer.eformidling.altinn.to.ServiceCode;
+import no.nav.dokdisteformidling.consumer.eformidling.altinn.to.UploadManifest;
 import no.nav.dokdisteformidling.consumer.eformidling.dokumentpakker.EformidlingMessagePackager;
 import no.nav.dokdisteformidling.consumer.eformidling.serviceregistry.EformidlingMottakerInfoService;
 import no.nav.dokdisteformidling.consumer.eformidling.serviceregistry.MottakerInfo;
@@ -10,6 +13,7 @@ import org.springframework.stereotype.Component;
 
 import javax.inject.Inject;
 import java.io.InputStream;
+import java.util.List;
 
 /**
  * @author Joakim Bjørnstad, Jbit AS
@@ -20,14 +24,17 @@ class AltinnEformidling implements Eformidling {
 	private final AppCertificate appCertificate;
 	private final EformidlingMottakerInfoService eformidlingMottakerInfoService;
 	private final EformidlingMessagePackager eformidlingMessagePackager;
+	private final BrokerServiceExternalService brokerServiceExternalService;
+	private static final String FILE_NAME = "sbd.zip";
 
 	@Inject
 	AltinnEformidling(AppCertificate appCertificate,
 					  EformidlingMottakerInfoService eformidlingMottakerInfoService,
-					  EformidlingMessagePackager eformidlingMessagePackager) {
+					  EformidlingMessagePackager eformidlingMessagePackager, BrokerServiceExternalService brokerServiceExternalService) {
 		this.appCertificate = appCertificate;
 		this.eformidlingMottakerInfoService = eformidlingMottakerInfoService;
 		this.eformidlingMessagePackager = eformidlingMessagePackager;
+		this.brokerServiceExternalService = brokerServiceExternalService;
 	}
 
 	@Override
@@ -38,5 +45,27 @@ class AltinnEformidling implements Eformidling {
 
 		// TODO Altinn BrokerServiceExternalEC2.InitiateBrokerServiceEC(navDokumentpakke, mottakerInfo)
 		// TODO Altinn BrokerServiceExternalEC2Streamed.UploadFileStreamedEC(sbdZip)
+	}
+
+
+
+	public UploadManifest mapUploadManifest(List<String> fileList, String senderReference) {
+		MottakerInfo mottakerInfo = eformidlingMottakerInfoService.hentMottakerInfoTrygderetten();
+		return UploadManifest.builder()
+				.serviceCode(mottakerInfo.getServiceCode())
+				.serviceEditionCode(mottakerInfo.getServiceEditionCode())
+				.fileZipName(FILE_NAME)
+				.files(fileList)
+				.senderReference(senderReference)
+				.build();
+
+	}
+
+	public ServiceCode getServiceCode() {
+		MottakerInfo mottakerInfo = eformidlingMottakerInfoService.hentMottakerInfoTrygderetten();
+		return ServiceCode.builder()
+				.externalServiceCode(mottakerInfo.getServiceCode())
+				.externalServiceEdictionCode(Integer.valueOf(mottakerInfo.getServiceEditionCode()))
+				.build();
 	}
 }
