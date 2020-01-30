@@ -8,9 +8,7 @@ import no.nav.dokdisteformidling.config.alias.DigitalKontaktinformasjonV1Alias;
 import no.nav.dokdisteformidling.config.alias.MqGatewayAlias;
 import no.nav.dokdisteformidling.config.alias.ServiceuserAlias;
 import no.nav.dokdisteformidling.config.cache.LokalCacheConfig;
-import no.nav.dokdisteformidling.config.props.MaskinportenProperties;
-import no.nav.dokdisteformidling.config.props.ServiceRegistryProperties;
-import no.nav.dokdisteformidling.config.props.SrvAppserverProperties;
+import no.nav.dokdisteformidling.config.props.*;
 import no.nav.dokdisteformidling.storage.S3Storage;
 import no.nav.dokdisteformidling.storage.Storage;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -27,7 +25,9 @@ import org.springframework.retry.annotation.EnableRetry;
 @Configuration
 @Profile("itest")
 @EnableRetry
-@EnableConfigurationProperties({ServiceuserAlias.class,
+@EnableConfigurationProperties({ServiceuserAlias.class, DpoUserProperties.class,
+		BrokerServiceExternalProperties.class,
+		BrokerServiceExternalStreamedProperties.class,
 		KeyStoreProperties.class,
 		MqGatewayAlias.class,
 		SrvAppserverProperties.class,
