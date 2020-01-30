@@ -102,10 +102,10 @@ spec:
   resources:
     limits:
       cpu: 3000m
-      memory: 2560Mi
+      memory: 3076Mi
     requests:
       cpu: 60m
-      memory: 1024Mi
+      memory: 2048Mi
   vault:
     enabled: true
     paths:
