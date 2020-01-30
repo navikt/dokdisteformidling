@@ -56,9 +56,6 @@ public class LightweightSafJournalpostQueryServiceImplQdist013 implements SafJou
 				.variables(Collections.singletonMap("queryJournalpostId", journalpostId))
 				.build());
 
-		if (isEmpty(safJournalpost.getJournalfortAvNavn())) {
-			throw new SafJournalpostValidationException(format("JournalfoertAvNavn er null eller tom i respons fra SAF på journalpostId=%s", journalpostId));
-		}
 		if (safJournalpost.getAvsenderMottaker() == null || isEmpty(safJournalpost.getAvsenderMottaker().getNavn())) {
 			log.warn("AvsenderMottakerNavn er null eller tom i respons fra SAF på journalpostId={}", journalpostId);
 		}

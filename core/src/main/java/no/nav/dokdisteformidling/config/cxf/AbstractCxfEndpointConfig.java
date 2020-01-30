@@ -9,6 +9,7 @@ import org.apache.cxf.message.Message;
 import javax.xml.namespace.QName;
 import java.net.URL;
 import java.util.HashMap;
+import java.util.Properties;
 
 /**
  * Abstract helper class for Cxf Endpoints
@@ -52,8 +53,20 @@ public abstract class AbstractCxfEndpointConfig {
 		factoryBean.getOutInterceptors().add(interceptor);
 	}
 
+	protected void addInInterceptor(Interceptor<? extends Message> interceptor) {
+		factoryBean.getInInterceptors().add(interceptor);
+	}
+
+	protected void addInFaultInterceptor(Interceptor<? extends Message> interceptor) {
+		factoryBean.getInFaultInterceptors().add(interceptor);
+	}
+
 	protected void addHandler(javax.xml.ws.handler.Handler handler) {
 		factoryBean.getHandlers().add(handler);
+	}
+
+	protected void addProperty(String propertyKey, String propertyValue) {
+		factoryBean.getProperties().put(propertyKey, propertyValue);
 	}
 
 	<T> T createPort(Class<T> portType) {
