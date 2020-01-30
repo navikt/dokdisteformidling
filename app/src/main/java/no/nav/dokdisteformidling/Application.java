@@ -4,6 +4,7 @@ import no.nav.dokdisteformidling.certificate.KeyStoreProperties;
 import no.nav.dokdisteformidling.config.alias.DigitalKontaktinformasjonV1Alias;
 import no.nav.dokdisteformidling.config.alias.MqGatewayAlias;
 import no.nav.dokdisteformidling.config.alias.ServiceuserAlias;
+import no.nav.dokdisteformidling.config.props.FeatureToggleProperties;
 import no.nav.dokdisteformidling.config.props.BrokerServiceExternalProperties;
 import no.nav.dokdisteformidling.config.props.BrokerServiceExternalStreamedProperties;
 import no.nav.dokdisteformidling.config.props.DpoUserProperties;
@@ -19,7 +20,8 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @SpringBootApplication
 @EnableRetry
 @EnableScheduling
-@EnableConfigurationProperties({ServiceuserAlias.class, DpoUserProperties.class,
+@EnableConfigurationProperties({ServiceuserAlias.class,
+		DpoUserProperties.class,
         BrokerServiceExternalProperties.class,
         BrokerServiceExternalStreamedProperties.class,
         KeyStoreProperties.class,
@@ -27,7 +29,8 @@ import org.springframework.scheduling.annotation.EnableScheduling;
         SrvAppserverProperties.class,
         DigitalKontaktinformasjonV1Alias.class,
         MaskinportenProperties.class,
-        ServiceRegistryProperties.class})
+        ServiceRegistryProperties.class,
+		FeatureToggleProperties.class})
 public class Application {
 
     public static void main(String[] args) {

@@ -16,7 +16,7 @@ import javax.validation.constraints.NotEmpty;
  */
 @Getter
 @Setter
-@ToString
+@ToString(exclude = "password")
 @ConfigurationProperties("srvappserver")
 @Validated
 public class SrvAppserverProperties {
