@@ -1,8 +1,7 @@
-package no.nav.dokdisteformidling.consumer.eformidling.brokerserviceexternalec2.services;
+package no.nav.dokdisteformidling.consumer.eformidling.altinn.services;
 
 import lombok.extern.slf4j.Slf4j;
 import no.altinn.brokerserviceexternal.ArrayOfFile;
-import no.altinn.brokerserviceexternal.ArrayOfProperty;
 import no.altinn.brokerserviceexternal.ArrayOfRecipient;
 import no.altinn.brokerserviceexternal.BrokerServiceAvailableFileList;
 import no.altinn.brokerserviceexternal.BrokerServiceInitiation;
@@ -15,14 +14,13 @@ import no.altinn.brokerserviceexternal.IBrokerServiceExternalInitiateBrokerServi
 import no.altinn.brokerserviceexternal.IBrokerServiceExternalTestAltinnFaultFaultFaultMessage;
 import no.altinn.brokerserviceexternal.Manifest;
 import no.altinn.brokerserviceexternal.ObjectFactory;
-import no.altinn.brokerserviceexternal.Property;
 import no.altinn.brokerserviceexternal.Recipient;
 import no.nav.dokdisteformidling.config.props.DpoUserProperties;
 import no.nav.dokdisteformidling.consumer.eformidling.EformidlingConstants;
-import no.nav.dokdisteformidling.consumer.eformidling.brokerserviceexternalec2.mapper.ManifestBuilder;
-import no.nav.dokdisteformidling.consumer.eformidling.brokerserviceexternalec2.to.AltinnReasonFactory;
-import no.nav.dokdisteformidling.consumer.eformidling.brokerserviceexternalec2.to.SearchCriteria;
-import no.nav.dokdisteformidling.consumer.eformidling.brokerserviceexternalec2.to.UploadManifest;
+import no.nav.dokdisteformidling.consumer.eformidling.altinn.mapper.ManifestBuilder;
+import no.nav.dokdisteformidling.consumer.eformidling.altinn.to.AltinnReasonFactory;
+import no.nav.dokdisteformidling.consumer.eformidling.altinn.to.SearchCriteria;
+import no.nav.dokdisteformidling.consumer.eformidling.altinn.to.UploadManifest;
 import no.nav.dokdisteformidling.consumer.eformidling.serviceregistry.MottakerInfo;
 import no.nav.dokdisteformidling.exception.technical.AltinnBrokerServiceWsException;
 import org.springframework.stereotype.Component;
@@ -33,7 +31,7 @@ import java.util.Optional;
 
 import static no.nav.dokdisteformidling.common.FunctionalUtils.convertLocalDateTimeToXmlGregorianCalendar;
 import static no.nav.dokdisteformidling.consumer.eformidling.EformidlingConstants.NAV_ORGNUMMER;
-import static no.nav.dokdisteformidling.consumer.eformidling.brokerserviceexternalec2.to.AltinnReasonFactory.from;
+import static no.nav.dokdisteformidling.consumer.eformidling.altinn.to.AltinnReasonFactory.from;
 
 @Slf4j
 @Component

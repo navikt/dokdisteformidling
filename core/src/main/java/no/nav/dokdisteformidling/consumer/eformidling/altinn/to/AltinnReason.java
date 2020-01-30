@@ -1,4 +1,4 @@
-package no.nav.dokdisteformidling.consumer.eformidling.brokerserviceexternalec2.to;
+package no.nav.dokdisteformidling.consumer.eformidling.altinn.to;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

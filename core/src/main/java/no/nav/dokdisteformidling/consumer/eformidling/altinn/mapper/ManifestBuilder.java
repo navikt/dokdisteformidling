@@ -1,4 +1,4 @@
-package no.nav.dokdisteformidling.consumer.eformidling.brokerserviceexternalec2.mapper;
+package no.nav.dokdisteformidling.consumer.eformidling.altinn.mapper;
 
 import no.altinn.brokerserviceexternal.Manifest;
 

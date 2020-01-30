@@ -3,9 +3,9 @@ package no.nav.dokdisteformidling.consumer.eformidling;
 
 import lombok.extern.slf4j.Slf4j;
 import no.nav.dokdisteformidling.certificate.AppCertificate;
-import no.nav.dokdisteformidling.consumer.eformidling.brokerserviceexternalec2.services.BrokerServiceExternalService;
-import no.nav.dokdisteformidling.consumer.eformidling.brokerserviceexternalec2.to.ServiceCode;
-import no.nav.dokdisteformidling.consumer.eformidling.brokerserviceexternalec2.to.UploadManifest;
+import no.nav.dokdisteformidling.consumer.eformidling.altinn.services.BrokerServiceExternalService;
+import no.nav.dokdisteformidling.consumer.eformidling.altinn.to.ServiceCode;
+import no.nav.dokdisteformidling.consumer.eformidling.altinn.to.UploadManifest;
 import no.nav.dokdisteformidling.consumer.eformidling.dokumentpakker.EformidlingMessagePackager;
 import no.nav.dokdisteformidling.consumer.eformidling.serviceregistry.EformidlingMottakerInfoService;
 import no.nav.dokdisteformidling.consumer.eformidling.serviceregistry.MottakerInfo;

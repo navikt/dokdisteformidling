@@ -1,6 +1,5 @@
-package no.nav.dokdisteformidling.consumer.eformidling.brokerserviceexternalec2.services;
+package no.nav.dokdisteformidling.consumer.eformidling.altinn.services;
 
-import no.nav.dokdisteformidling.certificate.KeyStoreProperties;
 import no.nav.dokdisteformidling.config.cxf.BrokerServiceExternalConfig;
 import no.nav.dokdisteformidling.config.props.BrokerServiceExternalProperties;
 import no.nav.dokdisteformidling.config.props.DpoUserProperties;
@@ -8,7 +7,6 @@ import org.apache.cxf.bus.CXFBusFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
-import org.springframework.core.io.FileSystemResource;
 
 import java.net.MalformedURLException;
 

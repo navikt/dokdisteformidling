@@ -1,6 +1,6 @@
 package no.nav.dokdisteformidling.exception.technical;
 
-import no.nav.dokdisteformidling.consumer.eformidling.brokerserviceexternalec2.to.AltinnReason;
+import no.nav.dokdisteformidling.consumer.eformidling.altinn.to.AltinnReason;
 
 public class AltinnBrokerServiceWsException extends RuntimeException {
 
