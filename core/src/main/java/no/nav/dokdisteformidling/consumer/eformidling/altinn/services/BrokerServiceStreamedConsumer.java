@@ -1,4 +1,4 @@
-package no.nav.dokdisteformidling.consumer.eformidling.brokerserviceexternalec2.services;
+package no.nav.dokdisteformidling.consumer.eformidling.altinn.services;
 
 import lombok.extern.slf4j.Slf4j;
 import no.altinn.brokerserviceexternalstreamed.IBrokerServiceExternalStreamed;

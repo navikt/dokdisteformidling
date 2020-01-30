@@ -1,7 +1,6 @@
-package no.nav.dokdisteformidling.consumer.eformidling.brokerserviceexternalec2.to;
+package no.nav.dokdisteformidling.consumer.eformidling.altinn.to;
 
 import lombok.*;
-import no.nav.dokdisteformidling.consumer.eformidling.serviceregistry.MottakerInfo;
 
 import java.util.List;
 import java.util.Map;
