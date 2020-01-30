@@ -11,7 +11,7 @@ import javax.validation.constraints.NotEmpty;
 
 @Getter
 @Setter
-@ConfigurationProperties("altinn.brokerserviceexternalecstreamed")
+@ConfigurationProperties("altinn.brokerserviceexternalstreamed")
 @Validated
 public class BrokerServiceExternalStreamedProperties {
 

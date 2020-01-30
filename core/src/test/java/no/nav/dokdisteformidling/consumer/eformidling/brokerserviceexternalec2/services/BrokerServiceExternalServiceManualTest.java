@@ -17,7 +17,6 @@ import java.net.MalformedURLException;
  */
 @Disabled("Manuell test")
 class BrokerServiceExternalServiceManualTest {
-	private KeyStoreProperties keyStoreProperties = new KeyStoreProperties();
 	private DpoUserProperties dpoUserProperties = new DpoUserProperties();
 
 	@BeforeEach
@@ -26,17 +25,11 @@ class BrokerServiceExternalServiceManualTest {
 		//
 		// javax.net.ssl.trustStore
 		// javax.net.ssl.trustStorePassword
-		// virksomhetssertifikat.type
-		// virksomhetssertifikat.alias
-		// virksomhetssertifikat.password
-		// virksomhetssertifikat.path
+		// dpo.username
+		// dpo.password
 		System.setProperty("https.proxyHost", "webproxy-utvikler.nav.no");
 		System.setProperty("https.proxyPort", "8088");
 		System.setProperty("https.nonProxyHosts", "*.155.55.|*.192.168.|*.10.|*.local|*.rtv.gov|*.adeo.no|*.nav.no|*.aetat.no|*.devillo.no|*.oera.no");
-		keyStoreProperties.setType(System.getProperty("virksomhetssertifikat.type"));
-		keyStoreProperties.setAlias(System.getProperty("virksomhetssertifikat.alias"));
-		keyStoreProperties.setPassword(System.getProperty("virksomhetssertifikat.password"));
-		keyStoreProperties.setPath(new FileSystemResource(System.getProperty("virksomhetssertifikat.path")));
 		dpoUserProperties.setUsername(System.getProperty("dpo.username"));
 		dpoUserProperties.setPassword(System.getProperty("dpo.password"));
 	}
@@ -44,8 +37,8 @@ class BrokerServiceExternalServiceManualTest {
 	@Test
 	void shouldTest() throws Exception {
 		BrokerServiceExternalProperties brokerServiceExternalProperties = new BrokerServiceExternalProperties();
-//		brokerServiceExternalEC2Properties.setEndpointurl("https://www.altinn.no/ServiceEngineExternal/BrokerServiceExternalEC2.svc");
-		brokerServiceExternalProperties.setEndpointurl("https://tt02.altinn.no/ServiceEngineExternal/BrokerServiceExternalEC2.svc");
+		brokerServiceExternalProperties.setEndpointurl("https://www.altinn.no/ServiceEngineExternal/BrokerServiceExternal.svc");
+//		brokerServiceExternalProperties.setEndpointurl("https://tt02.altinn.no/ServiceEngineExternal/BrokerServiceExternal.svc");
 		brokerServiceExternalProperties.setConnecttimeoutms(5000);
 		brokerServiceExternalProperties.setReadtimeoutms(30000);
 

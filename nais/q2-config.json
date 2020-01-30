@@ -29,6 +29,8 @@
   "MASKINPORTEN_URL": "https://oidc-ver1.difi.no/idporten-oidc-provider/token",
   "MASKINPORTEN_AUDIENCE": "https://oidc-ver1.difi.no/idporten-oidc-provider/",
   "SERVICEREGISTRY_URL": "https://qa-meldingsutveksling.difi.no/serviceregistry/",
+  "ALTINN_BROKERSERVICEEXTERNAL_ENDPOINTURL": "https://www.altinn.no/ServiceEngineExternal/BrokerServiceExternal.svc",
+  "ALTINN_BROKERSERVICEEXTERNALSTREAMED_ENDPOINTURL": "https://www.altinn.no/ServiceEngineExternal/BrokerServiceExternalStreamed.svc",
   "INGRESSES": "https://dokdisteformidling-q2.nais.preprod.local",
   "SRVDOKDISTEFORMIDLING": "/serviceuser/data/dev/srvdokdisteformidling",
   "SFTP_PRIVATE_KEY": "/kv/preprod/fss/dokdisteformidling/privateKey",

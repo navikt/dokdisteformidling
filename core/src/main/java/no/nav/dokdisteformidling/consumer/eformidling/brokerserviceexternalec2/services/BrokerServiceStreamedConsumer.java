@@ -1,9 +1,9 @@
 package no.nav.dokdisteformidling.consumer.eformidling.brokerserviceexternalec2.services;
 
 import lombok.extern.slf4j.Slf4j;
-import no.altinn.brokerserviceexternalbasicstreamed.IBrokerServiceExternalBasicStreamed;
-import no.altinn.brokerserviceexternalbasicstreamed.ObjectFactory;
-import no.altinn.brokerserviceexternalbasicstreamed.ReceiptExternalStreamedBE;
+import no.altinn.brokerserviceexternalstreamed.IBrokerServiceExternalStreamed;
+import no.altinn.brokerserviceexternalstreamed.ObjectFactory;
+import no.altinn.brokerserviceexternalstreamed.ReceiptExternalStreamedBE;
 import no.nav.dokdisteformidling.config.cxf.WssX509PropertyFactory;
 
 import javax.activation.DataHandler;
@@ -11,7 +11,7 @@ import javax.activation.DataHandler;
 @Slf4j
 public class BrokerServiceStreamedConsumer {
 
-    private IBrokerServiceExternalBasicStreamed brokerServiceStreamed;
+    private IBrokerServiceExternalStreamed brokerServiceStreamed;
     private WssX509PropertyFactory credential;
     private ObjectFactory objectFactory;
 
