@@ -1,12 +1,12 @@
-<wsdl:definitions xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:wsam="http://www.w3.org/2007/05/addressing/metadata" xmlns:wsx="http://schemas.xmlsoap.org/ws/2004/09/mex" xmlns:wsap="http://schemas.xmlsoap.org/ws/2004/08/addressing/policy" xmlns:msc="http://schemas.microsoft.com/ws/2005/12/wsdl/contract" xmlns:wsp="http://schemas.xmlsoap.org/ws/2004/09/policy" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:tns="http://www.altinn.no/services/ServiceEngine/Broker/2015/06" xmlns:wsa10="http://www.w3.org/2005/08/addressing" xmlns:wsaw="http://www.w3.org/2006/05/addressing/wsdl" xmlns:wsa="http://schemas.xmlsoap.org/ws/2004/08/addressing" name="BrokerServiceExternalEC2SF" targetNamespace="http://www.altinn.no/services/ServiceEngine/Broker/2015/06">
-    <wsp:Policy wsu:Id="CustomBinding_IBrokerServiceExternalEC2_policy">
+<wsdl:definitions xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:wsam="http://www.w3.org/2007/05/addressing/metadata" xmlns:wsx="http://schemas.xmlsoap.org/ws/2004/09/mex" xmlns:wsap="http://schemas.xmlsoap.org/ws/2004/08/addressing/policy" xmlns:msc="http://schemas.microsoft.com/ws/2005/12/wsdl/contract" xmlns:wsp="http://schemas.xmlsoap.org/ws/2004/09/policy" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:tns="http://www.altinn.no/services/ServiceEngine/Broker/2015/06" xmlns:wsa10="http://www.w3.org/2005/08/addressing" xmlns:wsaw="http://www.w3.org/2006/05/addressing/wsdl" xmlns:wsa="http://schemas.xmlsoap.org/ws/2004/08/addressing" name="BrokerServiceExternalSF" targetNamespace="http://www.altinn.no/services/ServiceEngine/Broker/2015/06">
+    <wsp:Policy wsu:Id="CustomBinding_IBrokerServiceExternal_policy">
         <wsp:ExactlyOne>
             <wsp:All>
                 <sp:TransportBinding xmlns:sp="http://schemas.xmlsoap.org/ws/2005/07/securitypolicy">
                     <wsp:Policy>
                         <sp:TransportToken>
                             <wsp:Policy>
-<!--                                <sp:HttpToken/>-->
+                                <sp:HttpToken/>
                             </wsp:Policy>
                         </sp:TransportToken>
                         <sp:AlgorithmSuite>
@@ -22,77 +22,15 @@
                         <sp:IncludeTimestamp/>
                     </wsp:Policy>
                 </sp:TransportBinding>
-                <sp:EndorsingSupportingTokens xmlns:sp="http://schemas.xmlsoap.org/ws/2005/07/securitypolicy">
+                <sp:SignedSupportingTokens xmlns:sp="http://schemas.xmlsoap.org/ws/2005/07/securitypolicy">
                     <wsp:Policy>
-                        <sp:SecureConversationToken sp:IncludeToken="http://schemas.xmlsoap.org/ws/2005/07/securitypolicy/IncludeToken/AlwaysToRecipient">
+                        <sp:UsernameToken sp:IncludeToken="http://schemas.xmlsoap.org/ws/2005/07/securitypolicy/IncludeToken/AlwaysToRecipient">
                             <wsp:Policy>
-                                <mssp:MustNotSendCancel xmlns:mssp="http://schemas.microsoft.com/ws/2005/07/securitypolicy"/>
-                                <sp:BootstrapPolicy>
-                                    <wsp:Policy>
-                                        <sp:SignedParts>
-                                            <sp:Body/>
-                                            <sp:Header Name="To" Namespace="http://www.w3.org/2005/08/addressing"/>
-                                            <sp:Header Name="From" Namespace="http://www.w3.org/2005/08/addressing"/>
-                                            <sp:Header Name="FaultTo" Namespace="http://www.w3.org/2005/08/addressing"/>
-                                            <sp:Header Name="ReplyTo" Namespace="http://www.w3.org/2005/08/addressing"/>
-                                            <sp:Header Name="MessageID" Namespace="http://www.w3.org/2005/08/addressing"/>
-                                            <sp:Header Name="RelatesTo" Namespace="http://www.w3.org/2005/08/addressing"/>
-                                            <sp:Header Name="Action" Namespace="http://www.w3.org/2005/08/addressing"/>
-                                        </sp:SignedParts>
-                                        <sp:EncryptedParts>
-                                            <sp:Body/>
-                                        </sp:EncryptedParts>
-                                        <sp:TransportBinding>
-                                            <wsp:Policy>
-                                                <sp:TransportToken>
-                                                    <wsp:Policy>
-<!--                                                        <sp:HttpToken/>-->
-                                                    </wsp:Policy>
-                                                </sp:TransportToken>
-                                                <sp:AlgorithmSuite>
-                                                    <wsp:Policy>
-                                                        <sp:Basic256/>
-                                                    </wsp:Policy>
-                                                </sp:AlgorithmSuite>
-                                                <sp:Layout>
-                                                    <wsp:Policy>
-                                                        <sp:Strict/>
-                                                    </wsp:Policy>
-                                                </sp:Layout>
-                                                <sp:IncludeTimestamp/>
-                                            </wsp:Policy>
-                                        </sp:TransportBinding>
-                                        <sp:EndorsingSupportingTokens>
-                                            <wsp:Policy>
-                                                <sp:X509Token sp:IncludeToken="http://schemas.xmlsoap.org/ws/2005/07/securitypolicy/IncludeToken/AlwaysToRecipient">
-                                                    <wsp:Policy>
-                                                        <sp:RequireThumbprintReference/>
-                                                        <sp:WssX509V3Token10/>
-                                                    </wsp:Policy>
-                                                </sp:X509Token>
-                                                <sp:SignedParts>
-                                                    <sp:Header Name="To" Namespace="http://www.w3.org/2005/08/addressing"/>
-                                                </sp:SignedParts>
-                                            </wsp:Policy>
-                                        </sp:EndorsingSupportingTokens>
-                                        <sp:Wss11>
-                                            <wsp:Policy>
-                                                <sp:MustSupportRefThumbprint/>
-                                            </wsp:Policy>
-                                        </sp:Wss11>
-                                        <sp:Trust10>
-                                            <wsp:Policy>
-                                                <sp:MustSupportIssuedTokens/>
-                                                <sp:RequireClientEntropy/>
-                                                <sp:RequireServerEntropy/>
-                                            </wsp:Policy>
-                                        </sp:Trust10>
-                                    </wsp:Policy>
-                                </sp:BootstrapPolicy>
+                                <sp:WssUsernameToken10/>
                             </wsp:Policy>
-                        </sp:SecureConversationToken>
+                        </sp:UsernameToken>
                     </wsp:Policy>
-                </sp:EndorsingSupportingTokens>
+                </sp:SignedSupportingTokens>
                 <sp:Wss11 xmlns:sp="http://schemas.xmlsoap.org/ws/2005/07/securitypolicy">
                     <wsp:Policy/>
                 </sp:Wss11>
@@ -232,49 +170,43 @@
         </xs:schema>
         <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" targetNamespace="http://www.altinn.no/services/ServiceEngine/Broker/2015/06">
             <xs:import namespace="http://schemas.altinn.no/services/ServiceEngine/Broker/2015/06"/>
-            <xs:element name="InitiateBrokerServiceEC">
+            <xs:element name="InitiateBrokerService">
                 <xs:complexType>
                     <xs:sequence>
-                        <xs:element minOccurs="1" name="userName" type="xs:string"/>
-                        <xs:element minOccurs="1" name="***passord=gammelt_passord***"/>
                         <xs:element xmlns:q1="http://schemas.altinn.no/services/ServiceEngine/Broker/2015/06" minOccurs="1" name="brokerServiceInitiation" type="q1:BrokerServiceInitiation"/>
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
-            <xs:element name="InitiateBrokerServiceECResponse">
+            <xs:element name="InitiateBrokerServiceResponse">
                 <xs:complexType>
                     <xs:sequence>
-                        <xs:element minOccurs="0" name="InitiateBrokerServiceECResult" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="InitiateBrokerServiceResult" nillable="true" type="xs:string"/>
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
-            <xs:element name="GetAvailableFilesEC">
+            <xs:element name="GetAvailableFiles">
                 <xs:complexType>
                     <xs:sequence>
-                        <xs:element minOccurs="1" name="userName" type="xs:string"/>
-                        <xs:element minOccurs="1" name="***passord=gammelt_passord***"/>
                         <xs:element xmlns:q2="http://schemas.altinn.no/services/ServiceEngine/Broker/2015/06" minOccurs="1" name="searchParameters" type="q2:BrokerServiceSearch"/>
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
-            <xs:element name="GetAvailableFilesECResponse">
+            <xs:element name="GetAvailableFilesResponse">
                 <xs:complexType>
                     <xs:sequence>
-                        <xs:element xmlns:q3="http://schemas.altinn.no/services/ServiceEngine/Broker/2015/06" minOccurs="0" name="GetAvailableFilesECResult" nillable="true" type="q3:BrokerServiceAvailableFileList"/>
+                        <xs:element xmlns:q3="http://schemas.altinn.no/services/ServiceEngine/Broker/2015/06" minOccurs="0" name="GetAvailableFilesResult" nillable="true" type="q3:BrokerServiceAvailableFileList"/>
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
-            <xs:element name="ConfirmDownloadedEC">
+            <xs:element name="ConfirmDownloaded">
                 <xs:complexType>
                     <xs:sequence>
-                        <xs:element minOccurs="1" name="userName" type="xs:string"/>
-                        <xs:element minOccurs="1" name="***passord=gammelt_passord***"/>
-                        <xs:element minOccurs="0" name="fileReference" nillable="true" type="xs:string"/>
-                        <xs:element minOccurs="0" name="reportee" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="1" name="fileReference" type="xs:string"/>
+                        <xs:element minOccurs="1" name="reportee" type="xs:string"/>
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
-            <xs:element name="ConfirmDownloadedECResponse">
+            <xs:element name="ConfirmDownloadedResponse">
                 <xs:complexType>
                     <xs:sequence/>
                 </xs:complexType>
@@ -659,78 +591,78 @@
             <xs:element name="BrokerServiceAvailableFileStatus" nillable="true" type="tns:BrokerServiceAvailableFileStatus"/>
         </xs:schema>
     </wsdl:types>
-    <wsdl:message name="IBrokerServiceExternalEC2_Test_InputMessage">
+    <wsdl:message name="IBrokerServiceExternal_Test_InputMessage">
         <wsdl:part xmlns:q1="http://www.altinn.no/services/2009/10" name="parameters" element="q1:Test"/>
     </wsdl:message>
-    <wsdl:message name="IBrokerServiceExternalEC2_Test_OutputMessage">
+    <wsdl:message name="IBrokerServiceExternal_Test_OutputMessage">
         <wsdl:part xmlns:q2="http://www.altinn.no/services/2009/10" name="parameters" element="q2:TestResponse"/>
     </wsdl:message>
-    <wsdl:message name="IBrokerServiceExternalEC2_Test_AltinnFaultFault_FaultMessage">
+    <wsdl:message name="IBrokerServiceExternal_Test_AltinnFaultFault_FaultMessage">
         <wsdl:part xmlns:q3="http://www.altinn.no/services/common/fault/2009/10" name="detail" element="q3:AltinnFault"/>
     </wsdl:message>
-    <wsdl:message name="IBrokerServiceExternalEC2_InitiateBrokerServiceEC_InputMessage">
-        <wsdl:part name="parameters" element="tns:InitiateBrokerServiceEC"/>
+    <wsdl:message name="IBrokerServiceExternal_InitiateBrokerService_InputMessage">
+        <wsdl:part name="parameters" element="tns:InitiateBrokerService"/>
     </wsdl:message>
-    <wsdl:message name="IBrokerServiceExternalEC2_InitiateBrokerServiceEC_OutputMessage">
-        <wsdl:part name="parameters" element="tns:InitiateBrokerServiceECResponse"/>
+    <wsdl:message name="IBrokerServiceExternal_InitiateBrokerService_OutputMessage">
+        <wsdl:part name="parameters" element="tns:InitiateBrokerServiceResponse"/>
     </wsdl:message>
-    <wsdl:message name="IBrokerServiceExternalEC2_InitiateBrokerServiceEC_AltinnFaultFault_FaultMessage">
+    <wsdl:message name="IBrokerServiceExternal_InitiateBrokerService_AltinnFaultFault_FaultMessage">
         <wsdl:part xmlns:q4="http://www.altinn.no/services/common/fault/2009/10" name="detail" element="q4:AltinnFault"/>
     </wsdl:message>
-    <wsdl:message name="IBrokerServiceExternalEC2_GetAvailableFilesEC_InputMessage">
-        <wsdl:part name="parameters" element="tns:GetAvailableFilesEC"/>
+    <wsdl:message name="IBrokerServiceExternal_GetAvailableFiles_InputMessage">
+        <wsdl:part name="parameters" element="tns:GetAvailableFiles"/>
     </wsdl:message>
-    <wsdl:message name="IBrokerServiceExternalEC2_GetAvailableFilesEC_OutputMessage">
-        <wsdl:part name="parameters" element="tns:GetAvailableFilesECResponse"/>
+    <wsdl:message name="IBrokerServiceExternal_GetAvailableFiles_OutputMessage">
+        <wsdl:part name="parameters" element="tns:GetAvailableFilesResponse"/>
     </wsdl:message>
-    <wsdl:message name="IBrokerServiceExternalEC2_GetAvailableFilesEC_AltinnFaultFault_FaultMessage">
+    <wsdl:message name="IBrokerServiceExternal_GetAvailableFiles_AltinnFaultFault_FaultMessage">
         <wsdl:part xmlns:q5="http://www.altinn.no/services/common/fault/2009/10" name="detail" element="q5:AltinnFault"/>
     </wsdl:message>
-    <wsdl:message name="IBrokerServiceExternalEC2_ConfirmDownloadedEC_InputMessage">
-        <wsdl:part name="parameters" element="tns:ConfirmDownloadedEC"/>
+    <wsdl:message name="IBrokerServiceExternal_ConfirmDownloaded_InputMessage">
+        <wsdl:part name="parameters" element="tns:ConfirmDownloaded"/>
     </wsdl:message>
-    <wsdl:message name="IBrokerServiceExternalEC2_ConfirmDownloadedEC_OutputMessage">
-        <wsdl:part name="parameters" element="tns:ConfirmDownloadedECResponse"/>
+    <wsdl:message name="IBrokerServiceExternal_ConfirmDownloaded_OutputMessage">
+        <wsdl:part name="parameters" element="tns:ConfirmDownloadedResponse"/>
     </wsdl:message>
-    <wsdl:message name="IBrokerServiceExternalEC2_ConfirmDownloadedEC_AltinnFaultFault_FaultMessage">
+    <wsdl:message name="IBrokerServiceExternal_ConfirmDownloaded_AltinnFaultFault_FaultMessage">
         <wsdl:part xmlns:q6="http://www.altinn.no/services/common/fault/2009/10" name="detail" element="q6:AltinnFault"/>
     </wsdl:message>
-    <wsdl:portType name="IBrokerServiceExternalEC2">
+    <wsdl:portType name="IBrokerServiceExternal">
         <wsdl:documentation>
-            <summary> External interface for exposing service operations for Broker Service with certificates. Used for end user systems to handle file operations. </summary>
+            <summary> External interface for exposing service operations for Broker Service on WS binding. Used for end user systems to handle file operations. </summary>
         </wsdl:documentation>
         <wsdl:operation name="Test">
-            <wsdl:input wsaw:Action="http://www.altinn.no/services/2009/10/IAltinnContractBase/Test" message="tns:IBrokerServiceExternalEC2_Test_InputMessage"/>
-            <wsdl:output wsaw:Action="http://www.altinn.no/services/2009/10/IAltinnContractBase/TestResponse" message="tns:IBrokerServiceExternalEC2_Test_OutputMessage"/>
-            <wsdl:fault wsaw:Action="http://www.altinn.no/services/2009/10/IAltinnContractBase/TestAltinnFaultFault" name="AltinnFaultFault" message="tns:IBrokerServiceExternalEC2_Test_AltinnFaultFault_FaultMessage"/>
+            <wsdl:input wsaw:Action="http://www.altinn.no/services/2009/10/IAltinnContractBase/Test" message="tns:IBrokerServiceExternal_Test_InputMessage"/>
+            <wsdl:output wsaw:Action="http://www.altinn.no/services/2009/10/IAltinnContractBase/TestResponse" message="tns:IBrokerServiceExternal_Test_OutputMessage"/>
+            <wsdl:fault wsaw:Action="http://www.altinn.no/services/2009/10/IAltinnContractBase/TestAltinnFaultFault" name="AltinnFaultFault" message="tns:IBrokerServiceExternal_Test_AltinnFaultFault_FaultMessage"/>
         </wsdl:operation>
-        <wsdl:operation name="InitiateBrokerServiceEC">
+        <wsdl:operation name="InitiateBrokerService">
             <wsdl:documentation>
-                <summary> Operation for initiating a broker service. </summary> <param name="userName"> User name is the relevant user name for the enterprise certificate user - mandatory parameter </param> <param name="***passord=gammelt_passord***>
+                <summary> Operation for initiating a broker service. </summary> <param name="brokerServiceInitiation"> Defines the manifest data and recipient list needed for initiating the broker service. Contains information as ... - mandatory parameter </param> <returns> A Senders Reference for the initiated broker service </returns>
             </wsdl:documentation>
-            <wsdl:input wsaw:Action="http://www.altinn.no/services/ServiceEngine/Broker/2015/06/IBrokerServiceExternalEC/InitiateBrokerServiceEC" message="tns:IBrokerServiceExternalEC2_InitiateBrokerServiceEC_InputMessage"/>
-            <wsdl:output wsaw:Action="http://www.altinn.no/services/ServiceEngine/Broker/2015/06/IBrokerServiceExternalEC/InitiateBrokerServiceECResponse" message="tns:IBrokerServiceExternalEC2_InitiateBrokerServiceEC_OutputMessage"/>
-            <wsdl:fault wsaw:Action="http://www.altinn.no/services/ServiceEngine/Broker/2015/06/IBrokerServiceExternalEC/InitiateBrokerServiceECAltinnFaultFault" name="AltinnFaultFault" message="tns:IBrokerServiceExternalEC2_InitiateBrokerServiceEC_AltinnFaultFault_FaultMessage"/>
+            <wsdl:input wsaw:Action="http://www.altinn.no/services/ServiceEngine/Broker/2015/06/IBrokerServiceExternal/InitiateBrokerService" message="tns:IBrokerServiceExternal_InitiateBrokerService_InputMessage"/>
+            <wsdl:output wsaw:Action="http://www.altinn.no/services/ServiceEngine/Broker/2015/06/IBrokerServiceExternal/InitiateBrokerServiceResponse" message="tns:IBrokerServiceExternal_InitiateBrokerService_OutputMessage"/>
+            <wsdl:fault wsaw:Action="http://www.altinn.no/services/ServiceEngine/Broker/2015/06/IBrokerServiceExternal/InitiateBrokerServiceAltinnFaultFault" name="AltinnFaultFault" message="tns:IBrokerServiceExternal_InitiateBrokerService_AltinnFaultFault_FaultMessage"/>
         </wsdl:operation>
-        <wsdl:operation name="GetAvailableFilesEC">
+        <wsdl:operation name="GetAvailableFiles">
             <wsdl:documentation>
-                <summary> Operation for retrieving a list of available files for download from the broker service. </summary> <param name="userName"> User name is the relevant user name for the enterprise certificate user - mandatory parameter </param> <param name="***passord=gammelt_passord***>
+                <summary> Operation for retrieving a list of available files for download from the broker service. </summary> <param name="searchParameters"> Set of parameters to perform the lookup based on </param> <returns> A list of available BrokerServiceFileBE entities for download </returns>
             </wsdl:documentation>
-            <wsdl:input wsaw:Action="http://www.altinn.no/services/ServiceEngine/Broker/2015/06/IBrokerServiceExternalEC/GetAvailableFilesEC" message="tns:IBrokerServiceExternalEC2_GetAvailableFilesEC_InputMessage"/>
-            <wsdl:output wsaw:Action="http://www.altinn.no/services/ServiceEngine/Broker/2015/06/IBrokerServiceExternalEC/GetAvailableFilesECResponse" message="tns:IBrokerServiceExternalEC2_GetAvailableFilesEC_OutputMessage"/>
-            <wsdl:fault wsaw:Action="http://www.altinn.no/services/ServiceEngine/Broker/2015/06/IBrokerServiceExternalEC/GetAvailableFilesECAltinnFaultFault" name="AltinnFaultFault" message="tns:IBrokerServiceExternalEC2_GetAvailableFilesEC_AltinnFaultFault_FaultMessage"/>
+            <wsdl:input wsaw:Action="http://www.altinn.no/services/ServiceEngine/Broker/2015/06/IBrokerServiceExternal/GetAvailableFiles" message="tns:IBrokerServiceExternal_GetAvailableFiles_InputMessage"/>
+            <wsdl:output wsaw:Action="http://www.altinn.no/services/ServiceEngine/Broker/2015/06/IBrokerServiceExternal/GetAvailableFilesResponse" message="tns:IBrokerServiceExternal_GetAvailableFiles_OutputMessage"/>
+            <wsdl:fault wsaw:Action="http://www.altinn.no/services/ServiceEngine/Broker/2015/06/IBrokerServiceExternal/GetAvailableFilesAltinnFaultFault" name="AltinnFaultFault" message="tns:IBrokerServiceExternal_GetAvailableFiles_AltinnFaultFault_FaultMessage"/>
         </wsdl:operation>
-        <wsdl:operation name="ConfirmDownloadedEC">
+        <wsdl:operation name="ConfirmDownloaded">
             <wsdl:documentation>
-                <summary> Performs an update of the status of the file recipient and sets it to <c>Downloaded</c> so that the file sender can see that the recipient has obtained the file. </summary> <param name="userName"> User name is the relevant user name for the enterprise certificate user - mandatory parameter </param> <param name="***passord=gammelt_passord***>
+                <summary> Performs an update of the status of the file recipient and sets it to <c>Downloaded</c> so that the file sender can see that the recipient has obtained the file. </summary> <param name="fileReference"> The file reference value of the file that should be updated with the downloaded state. </param> <param name="reportee"> The social security number or organization number of the file recipient. </param>
             </wsdl:documentation>
-            <wsdl:input wsaw:Action="http://www.altinn.no/services/ServiceEngine/Broker/2015/06/IBrokerServiceExternalEC/ConfirmDownloadedEC" message="tns:IBrokerServiceExternalEC2_ConfirmDownloadedEC_InputMessage"/>
-            <wsdl:output wsaw:Action="http://www.altinn.no/services/ServiceEngine/Broker/2015/06/IBrokerServiceExternalEC/ConfirmDownloadedECResponse" message="tns:IBrokerServiceExternalEC2_ConfirmDownloadedEC_OutputMessage"/>
-            <wsdl:fault wsaw:Action="http://www.altinn.no/services/ServiceEngine/Broker/2015/06/IBrokerServiceExternalEC/ConfirmDownloadedECAltinnFaultFault" name="AltinnFaultFault" message="tns:IBrokerServiceExternalEC2_ConfirmDownloadedEC_AltinnFaultFault_FaultMessage"/>
+            <wsdl:input wsaw:Action="http://www.altinn.no/services/ServiceEngine/Broker/2015/06/IBrokerServiceExternal/ConfirmDownloaded" message="tns:IBrokerServiceExternal_ConfirmDownloaded_InputMessage"/>
+            <wsdl:output wsaw:Action="http://www.altinn.no/services/ServiceEngine/Broker/2015/06/IBrokerServiceExternal/ConfirmDownloadedResponse" message="tns:IBrokerServiceExternal_ConfirmDownloaded_OutputMessage"/>
+            <wsdl:fault wsaw:Action="http://www.altinn.no/services/ServiceEngine/Broker/2015/06/IBrokerServiceExternal/ConfirmDownloadedAltinnFaultFault" name="AltinnFaultFault" message="tns:IBrokerServiceExternal_ConfirmDownloaded_AltinnFaultFault_FaultMessage"/>
         </wsdl:operation>
     </wsdl:portType>
-    <wsdl:binding name="CustomBinding_IBrokerServiceExternalEC2" type="tns:IBrokerServiceExternalEC2">
-        <wsp:PolicyReference URI="#CustomBinding_IBrokerServiceExternalEC2_policy"/>
+    <wsdl:binding name="CustomBinding_IBrokerServiceExternal" type="tns:IBrokerServiceExternal">
+        <wsp:PolicyReference URI="#CustomBinding_IBrokerServiceExternal_policy"/>
         <soap12:binding transport="http://schemas.xmlsoap.org/soap/http"/>
         <wsdl:operation name="Test">
             <soap12:operation soapAction="http://www.altinn.no/services/2009/10/IAltinnContractBase/Test" style="document"/>
@@ -744,8 +676,8 @@
                 <soap12:fault use="literal" name="AltinnFaultFault" namespace=""/>
             </wsdl:fault>
         </wsdl:operation>
-        <wsdl:operation name="InitiateBrokerServiceEC">
-            <soap12:operation soapAction="http://www.altinn.no/services/ServiceEngine/Broker/2015/06/IBrokerServiceExternalEC/InitiateBrokerServiceEC" style="document"/>
+        <wsdl:operation name="InitiateBrokerService">
+            <soap12:operation soapAction="http://www.altinn.no/services/ServiceEngine/Broker/2015/06/IBrokerServiceExternal/InitiateBrokerService" style="document"/>
             <wsdl:input>
                 <soap12:body use="literal"/>
             </wsdl:input>
@@ -756,8 +688,8 @@
                 <soap12:fault use="literal" name="AltinnFaultFault" namespace=""/>
             </wsdl:fault>
         </wsdl:operation>
-        <wsdl:operation name="GetAvailableFilesEC">
-            <soap12:operation soapAction="http://www.altinn.no/services/ServiceEngine/Broker/2015/06/IBrokerServiceExternalEC/GetAvailableFilesEC" style="document"/>
+        <wsdl:operation name="GetAvailableFiles">
+            <soap12:operation soapAction="http://www.altinn.no/services/ServiceEngine/Broker/2015/06/IBrokerServiceExternal/GetAvailableFiles" style="document"/>
             <wsdl:input>
                 <soap12:body use="literal"/>
             </wsdl:input>
@@ -768,8 +700,8 @@
                 <soap12:fault use="literal" name="AltinnFaultFault" namespace=""/>
             </wsdl:fault>
         </wsdl:operation>
-        <wsdl:operation name="ConfirmDownloadedEC">
-            <soap12:operation soapAction="http://www.altinn.no/services/ServiceEngine/Broker/2015/06/IBrokerServiceExternalEC/ConfirmDownloadedEC" style="document"/>
+        <wsdl:operation name="ConfirmDownloaded">
+            <soap12:operation soapAction="http://www.altinn.no/services/ServiceEngine/Broker/2015/06/IBrokerServiceExternal/ConfirmDownloaded" style="document"/>
             <wsdl:input>
                 <soap12:body use="literal"/>
             </wsdl:input>
@@ -781,12 +713,12 @@
             </wsdl:fault>
         </wsdl:operation>
     </wsdl:binding>
-    <wsdl:service name="BrokerServiceExternalEC2SF">
-        <wsdl:port name="CustomBinding_IBrokerServiceExternalEC2" binding="tns:CustomBinding_IBrokerServiceExternalEC2">
-            <soap12:address location="https://www.altinn.no/ServiceEngineExternal/BrokerServiceExternalEC2.svc"/>
+    <wsdl:service name="BrokerServiceExternalSF">
+        <wsdl:port name="CustomBinding_IBrokerServiceExternal" binding="tns:CustomBinding_IBrokerServiceExternal">
+            <soap12:address location="https://www.altinn.no/ServiceEngineExternal/BrokerServiceExternal.svc"/>
             <wsa10:EndpointReference>
                 <wsa10:Address>
-                    https://www.altinn.no/ServiceEngineExternal/BrokerServiceExternalEC2.svc
+                    https://www.altinn.no/ServiceEngineExternal/BrokerServiceExternal.svc
                 </wsa10:Address>
             </wsa10:EndpointReference>
         </wsdl:port>

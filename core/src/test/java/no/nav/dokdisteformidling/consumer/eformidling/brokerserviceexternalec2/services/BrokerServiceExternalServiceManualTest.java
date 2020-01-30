@@ -1,8 +1,8 @@
 package no.nav.dokdisteformidling.consumer.eformidling.brokerserviceexternalec2.services;
 
 import no.nav.dokdisteformidling.certificate.KeyStoreProperties;
-import no.nav.dokdisteformidling.config.cxf.BrokerServiceExternalEC2Config;
-import no.nav.dokdisteformidling.config.props.BrokerServiceExternalEC2Properties;
+import no.nav.dokdisteformidling.config.cxf.BrokerServiceExternalConfig;
+import no.nav.dokdisteformidling.config.props.BrokerServiceExternalProperties;
 import no.nav.dokdisteformidling.config.props.DpoUserProperties;
 import org.apache.cxf.bus.CXFBusFactory;
 import org.junit.jupiter.api.BeforeEach;
@@ -16,7 +16,7 @@ import java.net.MalformedURLException;
  * @author Joakim Bjørnstad, Jbit AS
  */
 @Disabled("Manuell test")
-class BrokerServiceExternalEC2ServiceManualTest {
+class BrokerServiceExternalServiceManualTest {
 	private KeyStoreProperties keyStoreProperties = new KeyStoreProperties();
 	private DpoUserProperties dpoUserProperties = new DpoUserProperties();
 
@@ -43,16 +43,16 @@ class BrokerServiceExternalEC2ServiceManualTest {
 
 	@Test
 	void shouldTest() throws Exception {
-		BrokerServiceExternalEC2Properties brokerServiceExternalEC2Properties = new BrokerServiceExternalEC2Properties();
+		BrokerServiceExternalProperties brokerServiceExternalProperties = new BrokerServiceExternalProperties();
 //		brokerServiceExternalEC2Properties.setEndpointurl("https://www.altinn.no/ServiceEngineExternal/BrokerServiceExternalEC2.svc");
-		brokerServiceExternalEC2Properties.setEndpointurl("https://tt02.altinn.no/ServiceEngineExternal/BrokerServiceExternalEC2.svc");
-		brokerServiceExternalEC2Properties.setConnecttimeoutms(5000);
-		brokerServiceExternalEC2Properties.setReadtimeoutms(30000);
+		brokerServiceExternalProperties.setEndpointurl("https://tt02.altinn.no/ServiceEngineExternal/BrokerServiceExternalEC2.svc");
+		brokerServiceExternalProperties.setConnecttimeoutms(5000);
+		brokerServiceExternalProperties.setReadtimeoutms(30000);
 
-		final BrokerServiceExternalEC2Config brokerServiceExternalEC2Config = new BrokerServiceExternalEC2Config(CXFBusFactory.getDefaultBus());
+		final BrokerServiceExternalConfig brokerServiceExternalConfig = new BrokerServiceExternalConfig(CXFBusFactory.getDefaultBus());
 
-		BrokerServiceExternalEC2Service brokerServiceExternalEC2Service = new BrokerServiceExternalEC2Service(
-				brokerServiceExternalEC2Config.iBrokerServiceExternalEC2(brokerServiceExternalEC2Properties, keyStoreProperties), dpoUserProperties);
-		brokerServiceExternalEC2Service.test();
+		BrokerServiceExternalService brokerServiceExternalService = new BrokerServiceExternalService(
+				brokerServiceExternalConfig.iBrokerServiceExternal(brokerServiceExternalProperties, dpoUserProperties), dpoUserProperties);
+		brokerServiceExternalService.test();
 	}
 }

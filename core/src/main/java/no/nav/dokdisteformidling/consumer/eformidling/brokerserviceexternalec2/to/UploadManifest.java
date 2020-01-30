@@ -13,10 +13,12 @@ import java.util.Map;
 @NoArgsConstructor
 public class UploadManifest {
 
-    private MottakerInfo mottakerInfo;
+    private String avgiver;
+    private String serviceCode;
+    private String serviceEditionCode;
     private List<String> files;
     private String fileZipName;
-    private String senderReference;
+    private String senderReference; //konversasjonId
     private Map<String,String> properties;
 
 }
