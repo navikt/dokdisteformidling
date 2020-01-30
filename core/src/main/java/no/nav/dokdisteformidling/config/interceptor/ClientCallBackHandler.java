@@ -19,7 +19,7 @@ public class ClientCallBackHandler implements CallbackHandler {
     }
 
     @Override
-    public void handle(Callback[] callbacks) throws IOException, UnsupportedCallbackException {
+    public void handle(Callback[] callbacks) {
         WS***passord=gammelt_passord***];
         wsPasswordCallback.setPassword(dpoUserProperties.getPassword());
     }

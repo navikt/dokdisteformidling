@@ -36,13 +36,13 @@
 									<wsdlLocation>classpath:wsdl/BrokerServiceExternal.wsdl</wsdlLocation>
 								</wsdlOption>
 								<wsdlOption>
-									<wsdl>${basedir}/src/main/resources/wsdl/BrokerServiceExternalBasicStreamed.wsdl</wsdl>
+									<wsdl>${basedir}/src/main/resources/wsdl/BrokerServiceExternalStreamed.wsdl</wsdl>
 									<extraargs>
 										<extraarg>-autoNameResolution</extraarg>
 										<extraarg>-p</extraarg>
-										<extraarg>no.altinn.brokerserviceexternalbasicstreamed</extraarg>
+										<extraarg>no.altinn.brokerserviceexternalstreamed</extraarg>
 									</extraargs>
-									<wsdlLocation>classpath:wsdl/BrokerServiceExternalBasicStreamed.wsdl</wsdlLocation>
+									<wsdlLocation>classpath:wsdl/BrokerServiceExternalStreamed.wsdl</wsdlLocation>
 								</wsdlOption>
 							</wsdlOptions>
 						</configuration>

@@ -46,9 +46,6 @@ then
 fi
 if test -f /secrets/virksomhetssertifikat/key.p12.b64
 then
-    echo "Decoding virksomhetssertifikat from base64"
-    base64 -d /secrets/virksomhetssertifikat/key.p12.b64 > /secrets/virksomhetssertifikat/key.p12
-    chmod 444 /secrets/virksomhetssertifikat/key.p12
     echo "Setting virksomhetssertifikat_path"
-    export virksomhetssertifikat_path="file:///secrets/virksomhetssertifikat/key.p12"
+    export virksomhetssertifikat_path="file:///secrets/virksomhetssertifikat/key.p12.b64"
 fi
