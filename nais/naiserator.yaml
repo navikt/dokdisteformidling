@@ -49,16 +49,12 @@ spec:
       value: {{ DOKDISTSDPBATCHINTERN_QUEUENAME }}
     - name: VIRKSOMHET_DIGITALKONTAKINFORMASJON_V1_WSDLURL
       value: "http://maven.adeo.no/nexus/service/local/artifact/maven/redirect?a=nav-digitalKontaktinformasjon-v1-tjenestespesifikasjon&e=zip&g=no.nav.tjenester.fim&r=m2internal&v=2.0.0"
-    - name: VIRKSOMHET_DIGITALKONTAKINFORMASJON_V1_SECURITYTOKEN
-      value: "SAML"
     - name: VIRKSOMHET_DIGITALKONTAKINFORMASJON_V1_ENDPOINTURL
       value: {{ VIRKSOMHET_DIGITALKONTAKINFORMASJON_V1_ENDPOINTURL }}
     - name: AKTOERREGISTER_API_V1_URL
       value: {{ AKTOERREGISTER_API_V1_URL }}
     - name: EREG_API_URL
       value: {{ EREG_API_URL }}
-    - name: sftp_privateKey
-      value: "/secrets/privateKey/privateKeyFile"
     - name: INTEGRASJONSPUNKT_API_URL
       value: {{ INTEGRASJONSPUNKT_API_URL }}
     - name: LAGREJURIDISKLOGG_REST_URL
