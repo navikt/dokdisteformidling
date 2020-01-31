@@ -80,6 +80,7 @@ class AltinnEformidling implements Eformidling {
 	public UploadManifest mapUploadManifest(List<String> fileList, String senderReference) {
 		MottakerInfo mottakerInfo = eformidlingMottakerInfoService.hentMottakerInfoTrygderetten();
 		return UploadManifest.builder()
+				.avgiver(EformidlingConstants.NAV_ORGNUMMER)
 				.serviceCode(mottakerInfo.getServiceCode())
 				.serviceEditionCode(mottakerInfo.getServiceEditionCode())
 				.fileZipName(FILE_NAME)
