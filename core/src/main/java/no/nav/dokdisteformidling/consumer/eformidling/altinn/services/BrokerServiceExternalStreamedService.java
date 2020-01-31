@@ -33,7 +33,7 @@ public class BrokerServiceExternalStreamedService {
         this.objectFactory = new ObjectFactory();
     }
 
-    public ReceiptExternalStreamedBE uploadFileToAltinn(String fileReference, String file, DataHandler dataHandler) throws IBrokerServiceExternalStreamedUploadFileStreamedAltinnFaultFaultFaultMessage {
+    public ReceiptExternalStreamedBE uploadFileToAltinn(String fileReference, String fileName, DataHandler dataHandler) throws IBrokerServiceExternalStreamedUploadFileStreamedAltinnFaultFaultFaultMessage {
         List<Header> headerList = new ArrayList<>();
         Header reportee = null;
         Header reference = null;
@@ -41,7 +41,7 @@ public class BrokerServiceExternalStreamedService {
         try {
             reportee = new Header(new QName("http://www.altinn.no/services/ServiceEngine/Broker/2015/06", "Reportee"), REPORTEE, new JAXBDataBinding(String.class));
             reference = new Header(new QName("http://www.altinn.no/services/ServiceEngine/Broker/2015/06", "Reference"), fileReference, new JAXBDataBinding(String.class));
-            filename = new Header(new QName("http://www.altinn.no/services/ServiceEngine/Broker/2015/06", "FileName"), file, new JAXBDataBinding(String.class));
+            filename = new Header(new QName("http://www.altinn.no/services/ServiceEngine/Broker/2015/06", "FileName"), fileName, new JAXBDataBinding(String.class));
         } catch (JAXBException e) {
             log.error("Feil i uploadFileToAltinn:", e);
         }
