@@ -31,8 +31,8 @@ import java.util.zip.ZipOutputStream;
  */
 @Component
 public class EformidlingMessagePackager {
-	static final String EFORMIDLING_SBD = "sbd.json";
-	static final String EFORMIDLING_ASIC = "asic.zip";
+	public static final String EFORMIDLING_SBD = "sbd.json";
+	public static final String EFORMIDLING_ASIC = "asic.zip";
 
 	private final ObjectMapper objectMapper;
 	private final StandardBusinessDocumentMapper standardBusinessDocumentMapper;
