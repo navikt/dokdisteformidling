@@ -39,10 +39,10 @@ public class BrokerServiceExternalService {
 
 
     private static final String FILE_NAME = "sbd.zip";
-    private static final String AVAILABLE_FILES_ERROR_MESSAGE = "Det fant ikke filer fra Altinn";
-    private static final String FAILED_TO_INITATE_ALTINN_BROKER_SERVICE = "Failed to initate Altinn broker service";
-    private static final String CANNOT_DOWNLOAD_FILE = "Kan ikke laste ned filen";
-    private static final String NEDLASTING_KAN_IKKE_BEKREFTE = "Nedlastingen kan ikke  bekrefte";
+    private static final String AVAILABLE_FILES_ERROR_MESSAGE = "Det fant ikke filer fra Altinn: {}";
+    private static final String FAILED_TO_INITATE_ALTINN_BROKER_SERVICE = "Failed to initate Altinn broker service: {}";
+    private static final String CANNOT_DOWNLOAD_FILE = "Kan ikke laste ned filen: {}";
+    private static final String NEDLASTING_KAN_IKKE_BEKREFTE = "Nedlastingen kan ikke  bekrefte: {}";
 
     private final IBrokerServiceExternal brokerServiceExternal;
     private final ObjectFactory objectFactory;

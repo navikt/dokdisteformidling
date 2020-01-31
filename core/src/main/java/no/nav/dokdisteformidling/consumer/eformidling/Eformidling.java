@@ -7,5 +7,5 @@ import no.nav.dokdisteformidling.consumer.eformidling.altinn.to.UploadResponse;
  * @author Joakim Bjørnstad, Jbit AS
  */
 public interface Eformidling {
-	UploadResponse send(NavDokumentpakke navDokumentpakke) throws IBrokerServiceExternalStreamedUploadFileStreamedAltinnFaultFaultFaultMessage;
+	UploadResponse send(NavDokumentpakke navDokumentpakke);
 }

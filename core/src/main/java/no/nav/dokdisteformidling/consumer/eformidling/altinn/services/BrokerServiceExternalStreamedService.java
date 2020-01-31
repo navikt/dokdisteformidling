@@ -1,11 +1,18 @@
 package no.nav.dokdisteformidling.consumer.eformidling.altinn.services;
 
+import static no.nav.dokdisteformidling.consumer.eformidling.EformidlingConstants.NAV_ORGNUMMER;
+import static no.nav.dokdisteformidling.consumer.eformidling.altinn.to.AltinnReasonFactory.from;
+
 import lombok.extern.slf4j.Slf4j;
 import no.altinn.brokerserviceexternalstreamed.IBrokerServiceExternalStreamed;
 import no.altinn.brokerserviceexternalstreamed.IBrokerServiceExternalStreamedUploadFileStreamedAltinnFaultFaultFaultMessage;
 import no.altinn.brokerserviceexternalstreamed.ObjectFactory;
 import no.altinn.brokerserviceexternalstreamed.ReceiptExternalStreamedBE;
 import no.altinn.brokerserviceexternalstreamed.StreamedPayloadExternalBE;
+import no.nav.dokdisteformidling.consumer.eformidling.EformidlingConstants;
+import no.nav.dokdisteformidling.consumer.eformidling.altinn.to.AltinnReasonFactory;
+import no.nav.dokdisteformidling.consumer.eformidling.altinn.to.ReceiptTo;
+import no.nav.dokdisteformidling.exception.technical.AltinnBrokerServiceWsException;
 import org.apache.cxf.headers.Header;
 import org.apache.cxf.jaxb.JAXBDataBinding;
 import org.springframework.stereotype.Component;
@@ -21,11 +28,10 @@ import java.util.List;
 @Slf4j
 @Component
 public class BrokerServiceExternalStreamedService {
+    private static final String ALTINN_OPPLASTING_FEILET = "Altinn opplasting feilet: {}";
 
-    private static final String REPORTEE = "NAV";
-
-    private IBrokerServiceExternalStreamed brokerServiceExternalStreamed;
-    private ObjectFactory objectFactory;
+    private final IBrokerServiceExternalStreamed brokerServiceExternalStreamed;
+    private final ObjectFactory objectFactory;
 
     @Inject
     public BrokerServiceExternalStreamedService(final IBrokerServiceExternalStreamed brokerServiceExternalStreamed) {
@@ -33,13 +39,13 @@ public class BrokerServiceExternalStreamedService {
         this.objectFactory = new ObjectFactory();
     }
 
-    public ReceiptExternalStreamedBE uploadFileToAltinn(String fileReference, String fileName, DataHandler dataHandler) throws IBrokerServiceExternalStreamedUploadFileStreamedAltinnFaultFaultFaultMessage {
+    public ReceiptTo uploadFileToAltinn(String fileReference, String fileName, DataHandler dataHandler) {
         List<Header> headerList = new ArrayList<>();
         Header reportee = null;
         Header reference = null;
         Header filename = null;
         try {
-            reportee = new Header(new QName("http://www.altinn.no/services/ServiceEngine/Broker/2015/06", "Reportee"), REPORTEE, new JAXBDataBinding(String.class));
+            reportee = new Header(new QName("http://www.altinn.no/services/ServiceEngine/Broker/2015/06", "Reportee"), NAV_ORGNUMMER, new JAXBDataBinding(String.class));
             reference = new Header(new QName("http://www.altinn.no/services/ServiceEngine/Broker/2015/06", "Reference"), fileReference, new JAXBDataBinding(String.class));
             filename = new Header(new QName("http://www.altinn.no/services/ServiceEngine/Broker/2015/06", "FileName"), fileName, new JAXBDataBinding(String.class));
         } catch (JAXBException e) {
@@ -52,6 +58,24 @@ public class BrokerServiceExternalStreamedService {
         ((BindingProvider) brokerServiceExternalStreamed).getRequestContext().put(Header.HEADER_LIST, headerList);
         StreamedPayloadExternalBE streamedPayloadExternalBE = objectFactory.createStreamedPayloadExternalBE();
         streamedPayloadExternalBE.setDataStream(dataHandler);
-        return brokerServiceExternalStreamed.uploadFileStreamed(streamedPayloadExternalBE);
+        try {
+            final ReceiptExternalStreamedBE receiptExternalStreamedBE = brokerServiceExternalStreamed.uploadFileStreamed(streamedPayloadExternalBE);
+            return mapReceipt(receiptExternalStreamedBE);
+        } catch (IBrokerServiceExternalStreamedUploadFileStreamedAltinnFaultFaultFaultMessage e) {
+            log.error(ALTINN_OPPLASTING_FEILET, from(e));
+            throw new AltinnBrokerServiceWsException(ALTINN_OPPLASTING_FEILET, AltinnReasonFactory.from(e),e);
+        }
+    }
+
+    private ReceiptTo mapReceipt(ReceiptExternalStreamedBE receiptExternalStreamedBE) {
+        return ReceiptTo.builder()
+                .lastChanged(receiptExternalStreamedBE.getLastChanged().getValue())
+                .parentReceiptId(receiptExternalStreamedBE.getParentReceiptId())
+                .receiptHistory(receiptExternalStreamedBE.getReceiptHistory().getValue())
+                .receiptId(receiptExternalStreamedBE.getReceiptId())
+                .receiptStatusCode(receiptExternalStreamedBE.getReceiptStatusCode().getValue())
+                .receiptText(receiptExternalStreamedBE.getReceiptText().getValue())
+                .receiptTypeName(receiptExternalStreamedBE.getReceiptTypeName().getValue())
+                .build();
     }
 }
