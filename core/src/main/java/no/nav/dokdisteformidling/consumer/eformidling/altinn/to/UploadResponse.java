@@ -12,4 +12,9 @@ public class UploadResponse {
 
     private String fileReference;
     private ReceiptExternalStreamedBE receiptExternalStreamedBE;
+
+    public UploadResponse(String fileReference, ReceiptExternalStreamedBE receiptExternalStreamedBE) {
+        this.fileReference = fileReference;
+        this.receiptExternalStreamedBE = receiptExternalStreamedBE;
+    }
 }
