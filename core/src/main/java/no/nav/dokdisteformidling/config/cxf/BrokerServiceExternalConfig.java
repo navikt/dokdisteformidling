@@ -38,9 +38,6 @@ public class BrokerServiceExternalConfig extends AbstractCxfEndpointConfig {
         setReceiveTimeout(brokerServiceExternalProperties.getReadtimeoutms());
         setConnectTimeout(brokerServiceExternalProperties.getConnecttimeoutms());
 
-        addInInterceptor(new LoggingInInterceptor());
-        addOutInterceptor(new LoggingOutInterceptor());
-
         addInInterceptor(new CookiesInInterceptor());
         addOutInterceptor(new HeaderOutInterceptor());
         addOutInterceptor(new CookiesOutInterceptor());

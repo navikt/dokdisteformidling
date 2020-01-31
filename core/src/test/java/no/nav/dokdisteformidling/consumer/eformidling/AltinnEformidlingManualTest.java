@@ -70,7 +70,7 @@ class AltinnEformidlingManualTest {
 				new JacksonConfig().eformidlingObjectMapper(),
 				new StandardBusinessDocumentMapper(SYSTEM_CLOCK),
 				new EformidlingContentPackager());
-		final Eformidling eformidling = new AltinnEformidling(appCertificate, eformidlingMottakerInfoService, eformidlingMessagePackager, null);
+		final Eformidling eformidling = new AltinnEformidling(appCertificate, eformidlingMottakerInfoService, eformidlingMessagePackager, null, null);
 
 		final NavDokumentpakke navDokumentpakke = NavDokumentpakke.builder()
 				.conversationId("1")

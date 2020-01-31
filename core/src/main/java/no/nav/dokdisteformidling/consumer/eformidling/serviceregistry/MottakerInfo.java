@@ -1,6 +1,7 @@
 package no.nav.dokdisteformidling.consumer.eformidling.serviceregistry;
 
 import lombok.Getter;
+import lombok.ToString;
 import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.cert.jcajce.JcaX509CertificateConverter;
 import org.bouncycastle.openssl.PEMParser;
@@ -17,6 +18,7 @@ import java.security.cert.X509Certificate;
  * @author Joakim Bjørnstad, Jbit AS
  */
 @Getter
+@ToString(exclude = {"pemCertificate", "x509Certificate"})
 public class MottakerInfo {
 	private final String pemCertificate;
 	private X509Certificate x509Certificate;
