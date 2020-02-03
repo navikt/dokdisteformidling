@@ -1,6 +1,7 @@
 package no.nav.dokdisteformidling.consumer.eformidling.dokumentpakker;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.extern.slf4j.Slf4j;
 import no.nav.dokdisteformidling.certificate.AppCertificate;
 import no.nav.dokdisteformidling.consumer.eformidling.NavDokumentpakke;
 import no.nav.dokdisteformidling.consumer.eformidling.dokumentpakker.sbdh.StandardBusinessDocument;
@@ -29,6 +30,7 @@ import java.util.zip.ZipOutputStream;
  *
  * @author Joakim Bjørnstad, Jbit AS
  */
+@Slf4j
 @Component
 public class EformidlingMessagePackager {
 	public static final String EFORMIDLING_SBD = "sbd.json";
@@ -55,7 +57,10 @@ public class EformidlingMessagePackager {
 		final InputStream content = eformidlingContentPackager.packageContent(navDokumentpakke, appCertificate, mottakerCertificate);
 		final ByteArrayOutputStream zipfile = new ByteArrayOutputStream();
 		writeZip(envelope, content, zipfile);
-		return new ByteArrayInputStream(zipfile.toByteArray());
+		final byte[] zip = zipfile.toByteArray();
+		log.info("Laget eformidling dokumentpakke zip. filstørrelse={}, conversationId={}, bestillingsId={}", zip.length,
+				navDokumentpakke.getConversationId(), navDokumentpakke.getBestillingsId());
+		return new ByteArrayInputStream(zip);
 	}
 
 	private void writeZip(StandardBusinessDocument konvolutt, InputStream innhold, OutputStream outputStream) {
