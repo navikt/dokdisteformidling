@@ -1,5 +1,9 @@
 package no.nav.dokdisteformidling.consumer.eformidling.altinn.services;
 
+import static no.nav.dokdisteformidling.common.FunctionalUtils.convertLocalDateTimeToXmlGregorianCalendar;
+import static no.nav.dokdisteformidling.consumer.eformidling.EformidlingConstants.NAV_ORGNUMMER;
+import static no.nav.dokdisteformidling.consumer.eformidling.altinn.to.AltinnReasonFactory.from;
+
 import lombok.extern.slf4j.Slf4j;
 import no.altinn.brokerserviceexternal.ArrayOfFile;
 import no.altinn.brokerserviceexternal.ArrayOfRecipient;
@@ -27,15 +31,10 @@ import no.nav.dokdisteformidling.exception.technical.AltinnBrokerServiceWsExcept
 import org.springframework.stereotype.Component;
 
 import javax.inject.Inject;
-import javax.xml.datatype.DatatypeConfigurationException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-
-import static no.nav.dokdisteformidling.common.FunctionalUtils.convertLocalDateTimeToXmlGregorianCalendar;
-import static no.nav.dokdisteformidling.consumer.eformidling.EformidlingConstants.NAV_ORGNUMMER;
-import static no.nav.dokdisteformidling.consumer.eformidling.altinn.to.AltinnReasonFactory.from;
 
 @Slf4j
 @Component
@@ -47,6 +46,7 @@ public class BrokerServiceExternalService {
     private static final String FAILED_TO_INITATE_ALTINN_BROKER_SERVICE = "Failed to initate Altinn broker service: {}";
     private static final String CANNOT_DOWNLOAD_FILE = "Kan ikke laste ned filen: {}";
     private static final String NEDLASTING_KAN_IKKE_BEKREFTE = "Nedlastingen kan ikke  bekrefte: {}";
+    private static final String ALTINN_TESTKALL_FEILET = "Testkall mot altinn feilet.";
 
     private final IBrokerServiceExternal brokerServiceExternal;
     private final ObjectFactory objectFactory;
@@ -64,7 +64,7 @@ public class BrokerServiceExternalService {
         try {
             return brokerServiceExternal.initiateBrokerService(getBrokerServiceInitiation(uploadManifest));
         } catch (IBrokerServiceExternalInitiateBrokerServiceAltinnFaultFaultFaultMessage e) {
-            log.error("FAILED_TO_INITATE_ALTINN_BROKER_SERVICE", from(e));
+            log.error(FAILED_TO_INITATE_ALTINN_BROKER_SERVICE, from(e));
             throw new AltinnBrokerServiceWsException(FAILED_TO_INITATE_ALTINN_BROKER_SERVICE, AltinnReasonFactory.from(e), e);
         }
     }
@@ -74,28 +74,28 @@ public class BrokerServiceExternalService {
         try {
             return Optional.of(brokerServiceExternal.getAvailableFiles(getBrokerServiceSearch(NAV_ORGNUMMER, serviceCode, criteria)));
         } catch (IBrokerServiceExternalGetAvailableFilesAltinnFaultFaultFaultMessage e) {
-            log.error("Fant ikke filer", from(e));
-            throw new AltinnBrokerServiceWsException("Fant ikke filer", AltinnReasonFactory.from(e),e);
+            log.error(AVAILABLE_FILES_ERROR_MESSAGE, from(e));
+            throw new AltinnBrokerServiceWsException(AVAILABLE_FILES_ERROR_MESSAGE, AltinnReasonFactory.from(e), e);
         }
 
     }
 
-    protected void confirmDownloaded(String fileReference) {
+    public void confirmDownloaded(String fileReference) {
         try {
             brokerServiceExternal.confirmDownloaded(fileReference, NAV_ORGNUMMER);
         } catch (IBrokerServiceExternalConfirmDownloadedAltinnFaultFaultFaultMessage e) {
             log.error(NEDLASTING_KAN_IKKE_BEKREFTE, from(e));
-            throw new AltinnBrokerServiceWsException("NEDLASTING_KAN_IKKE_BEKREFTE", AltinnReasonFactory.from(e),e);
+            throw new AltinnBrokerServiceWsException(NEDLASTING_KAN_IKKE_BEKREFTE, AltinnReasonFactory.from(e), e);
         }
 
     }
 
-    public List<FileReference> getAvailableFiles(SearchCriteria criteria, ServiceCode serviceCode) throws DatatypeConfigurationException, IBrokerServiceExternalGetAvailableFilesAltinnFaultFaultFaultMessage {
+    public List<FileReference> getAvailableFiles(SearchCriteria criteria, ServiceCode serviceCode) {
         return getFileReferences(criteria, serviceCode)
                 .map(BrokerServiceAvailableFileList::getBrokerServiceAvailableFile)
                 .orElse(Collections.emptyList())
                 .stream()
-                .map(file -> new FileReference(file.getFileReference(),file.getReceiptID()))
+                .map(file -> new FileReference(file.getFileReference(), file.getReceiptID()))
                 .collect(Collectors.toList());
     }
 
@@ -103,8 +103,8 @@ public class BrokerServiceExternalService {
         try {
             brokerServiceExternal.test();
         } catch (IBrokerServiceExternalTestAltinnFaultFaultFaultMessage e) {
-            log.error("Testkall mot altinn feilet.", e);
-            throw new AltinnBrokerServiceWsException("Testkall mot altinn feilet.",AltinnReasonFactory.from(e),e);
+            log.error(ALTINN_TESTKALL_FEILET, e);
+            throw new AltinnBrokerServiceWsException(ALTINN_TESTKALL_FEILET, AltinnReasonFactory.from(e), e);
         }
     }
 
