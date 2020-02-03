@@ -1,32 +1,11 @@
 package no.nav.dokdisteformidling.consumer.eformidling.altinn.services;
 
-import static no.nav.dokdisteformidling.common.FunctionalUtils.convertLocalDateTimeToXmlGregorianCalendar;
-import static no.nav.dokdisteformidling.consumer.eformidling.EformidlingConstants.NAV_ORGNUMMER;
-import static no.nav.dokdisteformidling.consumer.eformidling.altinn.to.AltinnReasonFactory.from;
-
 import lombok.extern.slf4j.Slf4j;
-import no.altinn.brokerserviceexternal.ArrayOfFile;
-import no.altinn.brokerserviceexternal.ArrayOfRecipient;
-import no.altinn.brokerserviceexternal.BrokerServiceAvailableFileList;
-import no.altinn.brokerserviceexternal.BrokerServiceInitiation;
-import no.altinn.brokerserviceexternal.BrokerServiceSearch;
-import no.altinn.brokerserviceexternal.File;
-import no.altinn.brokerserviceexternal.IBrokerServiceExternal;
-import no.altinn.brokerserviceexternal.IBrokerServiceExternalConfirmDownloadedAltinnFaultFaultFaultMessage;
-import no.altinn.brokerserviceexternal.IBrokerServiceExternalGetAvailableFilesAltinnFaultFaultFaultMessage;
-import no.altinn.brokerserviceexternal.IBrokerServiceExternalInitiateBrokerServiceAltinnFaultFaultFaultMessage;
-import no.altinn.brokerserviceexternal.IBrokerServiceExternalTestAltinnFaultFaultFaultMessage;
-import no.altinn.brokerserviceexternal.Manifest;
-import no.altinn.brokerserviceexternal.ObjectFactory;
-import no.altinn.brokerserviceexternal.Recipient;
+import no.altinn.brokerserviceexternal.*;
 import no.nav.dokdisteformidling.config.props.DpoUserProperties;
 import no.nav.dokdisteformidling.consumer.eformidling.EformidlingConstants;
 import no.nav.dokdisteformidling.consumer.eformidling.altinn.mapper.ManifestBuilder;
-import no.nav.dokdisteformidling.consumer.eformidling.altinn.to.AltinnReasonFactory;
-import no.nav.dokdisteformidling.consumer.eformidling.altinn.to.FileReference;
-import no.nav.dokdisteformidling.consumer.eformidling.altinn.to.SearchCriteria;
-import no.nav.dokdisteformidling.consumer.eformidling.altinn.to.ServiceCode;
-import no.nav.dokdisteformidling.consumer.eformidling.altinn.to.UploadManifest;
+import no.nav.dokdisteformidling.consumer.eformidling.altinn.to.*;
 import no.nav.dokdisteformidling.exception.technical.AltinnBrokerServiceWsException;
 import org.springframework.stereotype.Component;
 
@@ -35,6 +14,10 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
+import static no.nav.dokdisteformidling.common.FunctionalUtils.convertLocalDateTimeToXmlGregorianCalendar;
+import static no.nav.dokdisteformidling.consumer.eformidling.EformidlingConstants.NAV_ORGNUMMER;
+import static no.nav.dokdisteformidling.consumer.eformidling.altinn.to.AltinnReasonFactory.from;
 
 @Slf4j
 @Component
@@ -70,7 +53,7 @@ public class BrokerServiceExternalService {
     }
 
 
-    protected Optional<BrokerServiceAvailableFileList> getFileReferences(SearchCriteria criteria, ServiceCode serviceCode)  {
+    protected Optional<BrokerServiceAvailableFileList> getFileReferences(SearchCriteria criteria, ServiceCode serviceCode) {
         try {
             return Optional.of(brokerServiceExternal.getAvailableFiles(getBrokerServiceSearch(NAV_ORGNUMMER, serviceCode, criteria)));
         } catch (IBrokerServiceExternalGetAvailableFilesAltinnFaultFaultFaultMessage e) {
@@ -99,7 +82,7 @@ public class BrokerServiceExternalService {
                 .collect(Collectors.toList());
     }
 
-    public void test(){
+    public void test() {
         try {
             brokerServiceExternal.test();
         } catch (IBrokerServiceExternalTestAltinnFaultFaultFaultMessage e) {
@@ -125,7 +108,7 @@ public class BrokerServiceExternalService {
                 .withFilename(uploadManifest.getFileZipName())
                 .withSenderReference(uploadManifest.getSenderReference())
                 .build();
-       
+
     }
 
     private ArrayOfFile getArrayOfFile(UploadManifest uploadManifest) {

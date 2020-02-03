@@ -8,5 +8,5 @@ import java.util.List;
 @Value
 @Builder
 public class DownloadResponse {
-	private final List<DownloadedFileFromAltinn> downloadedFileFromAltinn;
+    private final List<DownloadedFileFromAltinn> downloadedFileFromAltinn;
 }

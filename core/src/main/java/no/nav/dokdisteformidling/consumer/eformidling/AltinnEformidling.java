@@ -1,22 +1,13 @@
 package no.nav.dokdisteformidling.consumer.eformidling;
 
 
-import static no.nav.dokdisteformidling.consumer.eformidling.dokumentpakker.EformidlingMessagePackager.EFORMIDLING_ASIC;
-import static no.nav.dokdisteformidling.consumer.eformidling.dokumentpakker.EformidlingMessagePackager.EFORMIDLING_SBD;
-
 import lombok.extern.slf4j.Slf4j;
 import no.altinn.brokerserviceexternal.BrokerServiceAvailableFileStatus;
 import no.nav.dokdisteformidling.certificate.AppCertificate;
 import no.nav.dokdisteformidling.consumer.eformidling.altinn.mapper.InputStreamDataSource;
 import no.nav.dokdisteformidling.consumer.eformidling.altinn.services.BrokerServiceExternalService;
 import no.nav.dokdisteformidling.consumer.eformidling.altinn.services.BrokerServiceExternalStreamedService;
-import no.nav.dokdisteformidling.consumer.eformidling.altinn.to.DownloadResponse;
-import no.nav.dokdisteformidling.consumer.eformidling.altinn.to.FileReference;
-import no.nav.dokdisteformidling.consumer.eformidling.altinn.to.ReceiptTo;
-import no.nav.dokdisteformidling.consumer.eformidling.altinn.to.SearchCriteria;
-import no.nav.dokdisteformidling.consumer.eformidling.altinn.to.ServiceCode;
-import no.nav.dokdisteformidling.consumer.eformidling.altinn.to.UploadManifest;
-import no.nav.dokdisteformidling.consumer.eformidling.altinn.to.UploadResponse;
+import no.nav.dokdisteformidling.consumer.eformidling.altinn.to.*;
 import no.nav.dokdisteformidling.consumer.eformidling.dokumentpakker.EformidlingMessagePackager;
 import no.nav.dokdisteformidling.consumer.eformidling.serviceregistry.EformidlingMottakerInfoService;
 import no.nav.dokdisteformidling.consumer.eformidling.serviceregistry.MottakerInfo;
@@ -28,6 +19,9 @@ import java.io.InputStream;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
+
+import static no.nav.dokdisteformidling.consumer.eformidling.dokumentpakker.EformidlingMessagePackager.EFORMIDLING_ASIC;
+import static no.nav.dokdisteformidling.consumer.eformidling.dokumentpakker.EformidlingMessagePackager.EFORMIDLING_SBD;
 
 /**
  * @author Joakim Bjørnstad, Jbit AS
@@ -58,6 +52,7 @@ class AltinnEformidling implements Eformidling {
 
 	@Override
 	public UploadResponse send(NavDokumentpakke navDokumentpakke) {
+		//TODO: Logging av filstørrelsen på dokumentpakken, metrikker som teller antall kall og timing
 		log.info("Henter mottakerInfo for Trygderetten. conversationId={}, bestillingsId={}", navDokumentpakke.getConversationId(), navDokumentpakke
 				.getBestillingsId());
 		final MottakerInfo mottakerInfo = eformidlingMottakerInfoService.hentMottakerInfoTrygderetten();

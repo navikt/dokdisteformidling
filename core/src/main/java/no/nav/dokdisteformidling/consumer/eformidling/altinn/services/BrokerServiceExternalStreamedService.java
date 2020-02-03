@@ -1,22 +1,8 @@
 package no.nav.dokdisteformidling.consumer.eformidling.altinn.services;
 
-import static java.util.stream.Collectors.toList;
-import static no.nav.dokdisteformidling.consumer.eformidling.EformidlingConstants.ALTINN_BROKERSERVICE_NAMESPACE;
-import static no.nav.dokdisteformidling.consumer.eformidling.EformidlingConstants.NAV_ORGNUMMER;
-import static no.nav.dokdisteformidling.consumer.eformidling.altinn.to.AltinnReasonFactory.from;
-
 import lombok.extern.slf4j.Slf4j;
-import no.altinn.brokerserviceexternalstreamed.IBrokerServiceExternalStreamed;
-import no.altinn.brokerserviceexternalstreamed.IBrokerServiceExternalStreamedDownloadFileStreamedAltinnFaultFaultFaultMessage;
-import no.altinn.brokerserviceexternalstreamed.IBrokerServiceExternalStreamedUploadFileStreamedAltinnFaultFaultFaultMessage;
-import no.altinn.brokerserviceexternalstreamed.ObjectFactory;
-import no.altinn.brokerserviceexternalstreamed.ReceiptExternalStreamedBE;
-import no.altinn.brokerserviceexternalstreamed.StreamedPayloadExternalBE;
-import no.nav.dokdisteformidling.consumer.eformidling.altinn.to.AltinnReasonFactory;
-import no.nav.dokdisteformidling.consumer.eformidling.altinn.to.DownloadResponse;
-import no.nav.dokdisteformidling.consumer.eformidling.altinn.to.DownloadedFileFromAltinn;
-import no.nav.dokdisteformidling.consumer.eformidling.altinn.to.FileReference;
-import no.nav.dokdisteformidling.consumer.eformidling.altinn.to.ReceiptTo;
+import no.altinn.brokerserviceexternalstreamed.*;
+import no.nav.dokdisteformidling.consumer.eformidling.altinn.to.*;
 import no.nav.dokdisteformidling.exception.technical.AltinnBrokerServiceWsException;
 import org.apache.cxf.headers.Header;
 import org.apache.cxf.jaxb.JAXBDataBinding;
@@ -29,6 +15,11 @@ import javax.xml.namespace.QName;
 import javax.xml.ws.BindingProvider;
 import java.util.ArrayList;
 import java.util.List;
+
+import static java.util.stream.Collectors.toList;
+import static no.nav.dokdisteformidling.consumer.eformidling.EformidlingConstants.ALTINN_BROKERSERVICE_NAMESPACE;
+import static no.nav.dokdisteformidling.consumer.eformidling.EformidlingConstants.NAV_ORGNUMMER;
+import static no.nav.dokdisteformidling.consumer.eformidling.altinn.to.AltinnReasonFactory.from;
 
 @Slf4j
 @Component
