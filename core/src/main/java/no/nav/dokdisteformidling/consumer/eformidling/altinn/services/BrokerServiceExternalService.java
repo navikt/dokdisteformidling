@@ -1,12 +1,10 @@
 package no.nav.dokdisteformidling.consumer.eformidling.altinn.services;
 
 import lombok.extern.slf4j.Slf4j;
-import no.altinn.brokerserviceexternal.ArrayOfFile;
 import no.altinn.brokerserviceexternal.ArrayOfRecipient;
 import no.altinn.brokerserviceexternal.BrokerServiceAvailableFileList;
 import no.altinn.brokerserviceexternal.BrokerServiceInitiation;
 import no.altinn.brokerserviceexternal.BrokerServiceSearch;
-import no.altinn.brokerserviceexternal.File;
 import no.altinn.brokerserviceexternal.IBrokerServiceExternal;
 import no.altinn.brokerserviceexternal.IBrokerServiceExternalConfirmDownloadedAltinnFaultFaultFaultMessage;
 import no.altinn.brokerserviceexternal.IBrokerServiceExternalGetAvailableFilesAltinnFaultFaultFaultMessage;
@@ -15,7 +13,6 @@ import no.altinn.brokerserviceexternal.IBrokerServiceExternalTestAltinnFaultFaul
 import no.altinn.brokerserviceexternal.Manifest;
 import no.altinn.brokerserviceexternal.ObjectFactory;
 import no.altinn.brokerserviceexternal.Recipient;
-import no.nav.dokdisteformidling.consumer.eformidling.EformidlingConstants;
 import no.nav.dokdisteformidling.consumer.eformidling.altinn.mapper.ManifestBuilder;
 import no.nav.dokdisteformidling.consumer.eformidling.altinn.to.AltinnReasonFactory;
 import no.nav.dokdisteformidling.consumer.eformidling.altinn.to.FileReference;
@@ -26,7 +23,6 @@ import no.nav.dokdisteformidling.exception.technical.AltinnBrokerServiceWsExcept
 import org.springframework.stereotype.Component;
 
 import javax.inject.Inject;
-import javax.xml.datatype.DatatypeConfigurationException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -39,9 +35,6 @@ import static no.nav.dokdisteformidling.consumer.eformidling.EformidlingConstant
 @Slf4j
 @Component
 public class BrokerServiceExternalService {
-
-
-    private static final String FILE_NAME = "sbd.zip";
     private static final String INITIATE_BROKER_SERVICE_FEILET = "Kall til BrokerService.initiateBrokerService feilet.";
     private static final String GET_AVAILABLE_FILES_FEILET = "Kall til BrokerService.getAvailableFiles feilet.";
     private static final String CONFIRM_DOWNLOADED_FEILET = "Kall til BrokerService.confirmDownloaded feilet";
@@ -80,7 +73,7 @@ public class BrokerServiceExternalService {
         }
     }
 
-    public List<FileReference> getAvailableFiles(SearchCriteria criteria, ServiceCode serviceCode) throws DatatypeConfigurationException, IBrokerServiceExternalGetAvailableFilesAltinnFaultFaultFaultMessage {
+    public List<FileReference> getAvailableFiles(SearchCriteria criteria, ServiceCode serviceCode) {
         return getFileReferences(criteria, serviceCode)
                 .map(BrokerServiceAvailableFileList::getBrokerServiceAvailableFile)
                 .orElse(Collections.emptyList())
@@ -105,7 +98,6 @@ public class BrokerServiceExternalService {
         return brokerServiceInitiation;
     }
 
-
     private Manifest getManifest(UploadManifest uploadManifest) {
         return new ManifestBuilder()
                 .withSender(uploadManifest.getAvsender())
@@ -120,6 +112,7 @@ public class BrokerServiceExternalService {
         ArrayOfRecipient arrayOfRecipient = objectFactory.createArrayOfRecipient();
         Recipient recipient = objectFactory.createRecipient();
         recipient.setPartyNumber(orgnr);
+        arrayOfRecipient.getRecipient().add(recipient);
         return arrayOfRecipient;
     }
 
@@ -129,7 +122,7 @@ public class BrokerServiceExternalService {
         brokerServiceSearch.setReportee(orgnr);
         ObjectFactory objectFactory = new ObjectFactory();
         brokerServiceSearch.setExternalServiceCode(objectFactory.createBrokerServiceSearchExternalServiceCode(serviceCode.getServiceCode()));
-        brokerServiceSearch.setExternalServiceEditionCode(Integer.valueOf(serviceCode.getServiceEditionCode()));
+        brokerServiceSearch.setExternalServiceEditionCode(serviceCode.getServiceEditionCode());
         brokerServiceSearch.setMinSentDateTime(convertLocalDateTimeToXmlGregorianCalendar(criteria.getMinSentDate()));
         brokerServiceSearch.setMaxSentDateTime(convertLocalDateTimeToXmlGregorianCalendar(criteria.getMaxSentDate()));
         return brokerServiceSearch;
