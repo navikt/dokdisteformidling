@@ -14,6 +14,6 @@ import lombok.Setter;
 @NoArgsConstructor
 public class ServiceCode {
 
-    private String externalServiceCode;
-    private int externalServiceEdictionCode;
+    private String serviceCode;
+    private int serviceEditionCode;
 }

@@ -19,15 +19,19 @@ import no.nav.dokdisteformidling.config.props.DpoUserProperties;
 import no.nav.dokdisteformidling.consumer.eformidling.EformidlingConstants;
 import no.nav.dokdisteformidling.consumer.eformidling.altinn.mapper.ManifestBuilder;
 import no.nav.dokdisteformidling.consumer.eformidling.altinn.to.AltinnReasonFactory;
+import no.nav.dokdisteformidling.consumer.eformidling.altinn.to.FileReference;
 import no.nav.dokdisteformidling.consumer.eformidling.altinn.to.SearchCriteria;
+import no.nav.dokdisteformidling.consumer.eformidling.altinn.to.ServiceCode;
 import no.nav.dokdisteformidling.consumer.eformidling.altinn.to.UploadManifest;
-import no.nav.dokdisteformidling.consumer.eformidling.serviceregistry.MottakerInfo;
 import no.nav.dokdisteformidling.exception.technical.AltinnBrokerServiceWsException;
 import org.springframework.stereotype.Component;
 
 import javax.inject.Inject;
 import javax.xml.datatype.DatatypeConfigurationException;
+import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static no.nav.dokdisteformidling.common.FunctionalUtils.convertLocalDateTimeToXmlGregorianCalendar;
 import static no.nav.dokdisteformidling.consumer.eformidling.EformidlingConstants.NAV_ORGNUMMER;
@@ -66,9 +70,9 @@ public class BrokerServiceExternalService {
     }
 
 
-    protected Optional<BrokerServiceAvailableFileList> getFileReferences(SearchCriteria criteria, MottakerInfo mottakerInfo)  {
+    protected Optional<BrokerServiceAvailableFileList> getFileReferences(SearchCriteria criteria, ServiceCode serviceCode)  {
         try {
-            return Optional.of(brokerServiceExternal.getAvailableFiles(getBrokerServiceSearch(NAV_ORGNUMMER, mottakerInfo, criteria)));
+            return Optional.of(brokerServiceExternal.getAvailableFiles(getBrokerServiceSearch(NAV_ORGNUMMER, serviceCode, criteria)));
         } catch (IBrokerServiceExternalGetAvailableFilesAltinnFaultFaultFaultMessage e) {
             log.error("Fant ikke filer", from(e));
             throw new AltinnBrokerServiceWsException("Fant ikke filer", AltinnReasonFactory.from(e),e);
@@ -86,8 +90,13 @@ public class BrokerServiceExternalService {
 
     }
 
-    public BrokerServiceAvailableFileList getAvailableFiles(SearchCriteria criteria, MottakerInfo mottakerInfo) throws DatatypeConfigurationException, IBrokerServiceExternalGetAvailableFilesAltinnFaultFaultFaultMessage {
-        return getFileReferences(criteria, mottakerInfo).get();
+    public List<FileReference> getAvailableFiles(SearchCriteria criteria, ServiceCode serviceCode) throws DatatypeConfigurationException, IBrokerServiceExternalGetAvailableFilesAltinnFaultFaultFaultMessage {
+        return getFileReferences(criteria, serviceCode)
+                .map(BrokerServiceAvailableFileList::getBrokerServiceAvailableFile)
+                .orElse(Collections.emptyList())
+                .stream()
+                .map(file -> new FileReference(file.getFileReference(),file.getReceiptID()))
+                .collect(Collectors.toList());
     }
 
     public void test(){
@@ -110,7 +119,7 @@ public class BrokerServiceExternalService {
     private Manifest getManifest(UploadManifest uploadManifest) {
 
         return new ManifestBuilder()
-                .withSender(uploadManifest.getAvgiver())
+                .withSender(uploadManifest.getAvsender())
                 .withExternalServiceCode(uploadManifest.getServiceCode())
                 .withExternalServiceEditionCode(Integer.valueOf(uploadManifest.getServiceEditionCode()))
                 .withFilename(uploadManifest.getFileZipName())
@@ -138,15 +147,13 @@ public class BrokerServiceExternalService {
     }
 
 
-    private BrokerServiceSearch getBrokerServiceSearch(String orgnr, MottakerInfo mottakerInfo, SearchCriteria criteria) {
+    private BrokerServiceSearch getBrokerServiceSearch(String orgnr, ServiceCode serviceCode, SearchCriteria criteria) {
         BrokerServiceSearch brokerServiceSearch = new BrokerServiceSearch();
         brokerServiceSearch.setFileStatus(criteria.getAvailableFileStatus());
         brokerServiceSearch.setReportee(orgnr);
         ObjectFactory objectFactory = new ObjectFactory();
-        brokerServiceSearch.setExternalServiceCode(objectFactory.createBrokerServiceSearchExternalServiceCode(mottakerInfo.getServiceCode()));
-        brokerServiceSearch.setExternalServiceEditionCode(Integer.valueOf(mottakerInfo.getServiceEditionCode()));
-        brokerServiceSearch.setReportee(orgnr);
-        brokerServiceSearch.setFileStatus(criteria.getAvailableFileStatus());
+        brokerServiceSearch.setExternalServiceCode(objectFactory.createBrokerServiceSearchExternalServiceCode(serviceCode.getServiceCode()));
+        brokerServiceSearch.setExternalServiceEditionCode(Integer.valueOf(serviceCode.getServiceEditionCode()));
         brokerServiceSearch.setMinSentDateTime(convertLocalDateTimeToXmlGregorianCalendar(criteria.getMinSentDate()));
         brokerServiceSearch.setMaxSentDateTime(convertLocalDateTimeToXmlGregorianCalendar(criteria.getMaxSentDate()));
         return brokerServiceSearch;

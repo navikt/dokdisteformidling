@@ -12,7 +12,7 @@ import java.util.Map;
 @NoArgsConstructor
 public class UploadManifest {
 
-    private String avgiver;
+    private String avsender;
     private String serviceCode;
     private String serviceEditionCode;
     private List<String> files;
