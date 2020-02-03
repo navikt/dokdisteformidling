@@ -1,6 +1,6 @@
 package no.nav.dokdisteformidling.consumer.eformidling;
 
-import no.altinn.brokerserviceexternalstreamed.IBrokerServiceExternalStreamedUploadFileStreamedAltinnFaultFaultFaultMessage;
+import no.nav.dokdisteformidling.consumer.eformidling.altinn.to.DownloadResponse;
 import no.nav.dokdisteformidling.consumer.eformidling.altinn.to.UploadResponse;
 
 /**
@@ -8,4 +8,6 @@ import no.nav.dokdisteformidling.consumer.eformidling.altinn.to.UploadResponse;
  */
 public interface Eformidling {
 	UploadResponse send(NavDokumentpakke navDokumentpakke);
+
+	DownloadResponse hent();
 }
