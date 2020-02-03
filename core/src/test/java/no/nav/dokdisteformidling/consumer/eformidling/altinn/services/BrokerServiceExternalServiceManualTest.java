@@ -43,7 +43,7 @@ class BrokerServiceExternalServiceManualTest {
 		final BrokerServiceExternalConfig brokerServiceExternalConfig = new BrokerServiceExternalConfig(CXFBusFactory.getDefaultBus());
 
 		BrokerServiceExternalService brokerServiceExternalService = new BrokerServiceExternalService(
-				brokerServiceExternalConfig.iBrokerServiceExternal(brokerServiceExternalProperties, dpoUserProperties), dpoUserProperties);
+				brokerServiceExternalConfig.iBrokerServiceExternal(brokerServiceExternalProperties, dpoUserProperties));
 		brokerServiceExternalService.test();
 	}
 }
