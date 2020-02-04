@@ -10,6 +10,9 @@ public final class EformidlingConstants {
 	public static final String TRYGDERETTEN_ORGNUMMER = "889640782";
 	public static final String ARKIVMELDING_PROCESS = "urn:no:difi:profile:arkivmelding:administrasjon:ver1.0";
 	public static final String ALTINN_BROKERSERVICE_NAMESPACE = "http://www.altinn.no/services/ServiceEngine/Broker/2015/06";
+	public static final String EFORMIDLING_SBD = "sbd.json";
+	public static final String EFORMIDLING_ASIC = "asic.zip";
+
 
 	private EformidlingConstants() {
 

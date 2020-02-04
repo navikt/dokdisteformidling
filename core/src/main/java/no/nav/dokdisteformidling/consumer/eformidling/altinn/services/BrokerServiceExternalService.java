@@ -1,32 +1,13 @@
 package no.nav.dokdisteformidling.consumer.eformidling.altinn.services;
 
 import lombok.extern.slf4j.Slf4j;
-import no.altinn.brokerserviceexternal.ArrayOfFile;
-import no.altinn.brokerserviceexternal.ArrayOfRecipient;
-import no.altinn.brokerserviceexternal.BrokerServiceAvailableFileList;
-import no.altinn.brokerserviceexternal.BrokerServiceInitiation;
-import no.altinn.brokerserviceexternal.BrokerServiceSearch;
-import no.altinn.brokerserviceexternal.File;
-import no.altinn.brokerserviceexternal.IBrokerServiceExternal;
-import no.altinn.brokerserviceexternal.IBrokerServiceExternalConfirmDownloadedAltinnFaultFaultFaultMessage;
-import no.altinn.brokerserviceexternal.IBrokerServiceExternalGetAvailableFilesAltinnFaultFaultFaultMessage;
-import no.altinn.brokerserviceexternal.IBrokerServiceExternalInitiateBrokerServiceAltinnFaultFaultFaultMessage;
-import no.altinn.brokerserviceexternal.IBrokerServiceExternalTestAltinnFaultFaultFaultMessage;
-import no.altinn.brokerserviceexternal.Manifest;
-import no.altinn.brokerserviceexternal.ObjectFactory;
-import no.altinn.brokerserviceexternal.Recipient;
-import no.nav.dokdisteformidling.consumer.eformidling.EformidlingConstants;
+import no.altinn.brokerserviceexternal.*;
 import no.nav.dokdisteformidling.consumer.eformidling.altinn.mapper.ManifestBuilder;
-import no.nav.dokdisteformidling.consumer.eformidling.altinn.to.AltinnReasonFactory;
-import no.nav.dokdisteformidling.consumer.eformidling.altinn.to.FileReference;
-import no.nav.dokdisteformidling.consumer.eformidling.altinn.to.SearchCriteria;
-import no.nav.dokdisteformidling.consumer.eformidling.altinn.to.ServiceCode;
-import no.nav.dokdisteformidling.consumer.eformidling.altinn.to.UploadManifest;
+import no.nav.dokdisteformidling.consumer.eformidling.altinn.to.*;
 import no.nav.dokdisteformidling.exception.technical.AltinnBrokerServiceWsException;
 import org.springframework.stereotype.Component;
 
 import javax.inject.Inject;
-import javax.xml.datatype.DatatypeConfigurationException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -81,7 +62,8 @@ public class BrokerServiceExternalService {
         }
     }
 
-    public List<FileReference> getAvailableFiles(SearchCriteria criteria, ServiceCode serviceCode) throws DatatypeConfigurationException, IBrokerServiceExternalGetAvailableFilesAltinnFaultFaultFaultMessage {
+    public List<FileReference> getAvailableFiles(SearchCriteria criteria, ServiceCode serviceCode) {
+        //TODO: Metrics and logging, number of files available for download, files + filerefence?
         return getFileReferences(criteria, serviceCode)
                 .map(BrokerServiceAvailableFileList::getBrokerServiceAvailableFile)
                 .orElse(Collections.emptyList())

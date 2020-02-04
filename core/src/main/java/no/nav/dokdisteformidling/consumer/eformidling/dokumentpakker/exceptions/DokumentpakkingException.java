@@ -1,4 +1,4 @@
-package no.nav.dokdisteformidling.consumer.eformidling.dokumentpakker;
+package no.nav.dokdisteformidling.consumer.eformidling.dokumentpakker.exceptions;
 
 import no.nav.dokdisteformidling.exception.technical.AbstractDokdisteformidlingTechnicalException;
 

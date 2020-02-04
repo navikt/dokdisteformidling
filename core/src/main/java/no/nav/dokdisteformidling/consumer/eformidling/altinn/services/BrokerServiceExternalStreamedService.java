@@ -2,7 +2,12 @@ package no.nav.dokdisteformidling.consumer.eformidling.altinn.services;
 
 import lombok.extern.slf4j.Slf4j;
 import no.altinn.brokerserviceexternalstreamed.*;
-import no.nav.dokdisteformidling.consumer.eformidling.altinn.to.*;
+import no.nav.dokdisteformidling.consumer.eformidling.altinn.to.AltinnReasonFactory;
+import no.nav.dokdisteformidling.consumer.eformidling.altinn.to.DownloadedFileFromAltinn;
+import no.nav.dokdisteformidling.consumer.eformidling.altinn.to.FileReference;
+import no.nav.dokdisteformidling.consumer.eformidling.altinn.to.ReceiptTo;
+import no.nav.dokdisteformidling.consumer.eformidling.dokumentpakker.EformidlingMessagePackager;
+import no.nav.dokdisteformidling.consumer.eformidling.dokumentpakker.sbdh.StandardBusinessDocument;
 import no.nav.dokdisteformidling.exception.technical.AltinnBrokerServiceWsException;
 import org.apache.cxf.headers.Header;
 import org.apache.cxf.jaxb.JAXBDataBinding;
@@ -76,14 +81,27 @@ public class BrokerServiceExternalStreamedService {
 				.build();
 	}
 
-	public DownloadResponse downloadFilesFromAltinn(List<FileReference> availableFiles) {
-		List<DownloadedFileFromAltinn> result = availableFiles.stream()
-				.map(fileReference -> mapResult(fileReference, downloadFile(fileReference.getFileReference())))
+	public List<DownloadedFileFromAltinn> downloadFilesFromAltinn(List<FileReference> availableFiles) {
+		return availableFiles.stream()
+				.map(fileReference -> mapReferenceToDownloadedFile(fileReference, downloadFile(fileReference.getFileReference())))
 				.collect(toList());
-		return DownloadResponse.builder().downloadedFileFromAltinn(result).build();
+		// convert to standarBusinessDocument
+//		List<StandardBusinessDocument> standardBusinessDocumentList = downloadedFiles.stream()
+//				.map(file -> convertToSdbh(file))
+//				.collect(toList())
+//
+//		return DownloadResponse.builder().standardBusinessDocuments(result).build();
 	}
 
-	private DownloadedFileFromAltinn mapResult(FileReference fileReference, DataHandler dataHandler) {
+	private StandardBusinessDocument convertToSdbh(DownloadedFileFromAltinn fileFromAltinn) {
+		EformidlingMessagePackager.unpackMessage(fileFromAltinn.getDataHandler().getInputStream());
+
+
+		return null;
+	}
+
+	private DownloadedFileFromAltinn mapReferenceToDownloadedFile(FileReference fileReference, DataHandler dataHandler) {
+		log.info("Lastet ned fil med referansenummer: " + fileReference);  // TODO: Verifisering?
 		return DownloadedFileFromAltinn.builder().fileReference(fileReference).dataHandler(dataHandler).build();
 	}
 

@@ -1,8 +1,5 @@
 package no.nav.dokdisteformidling.consumer.eformidling.dokumentpakker;
 
-import static no.nav.dokdisteformidling.consumer.eformidling.EformidlingConstants.NAV_ORGNUMMER;
-import static no.nav.dokdisteformidling.consumer.eformidling.EformidlingConstants.TRYGDERETTEN_ORGNUMMER;
-
 import lombok.extern.slf4j.Slf4j;
 import no.difi.asic.AsicWriter;
 import no.difi.asic.AsicWriterFactory;
@@ -10,21 +7,20 @@ import no.difi.asic.MimeType;
 import no.difi.asic.SignatureHelper;
 import no.nav.dokdisteformidling.certificate.AppCertificate;
 import no.nav.dokdisteformidling.consumer.eformidling.NavDokument;
+import no.nav.dokdisteformidling.consumer.eformidling.dokumentpakker.exceptions.DokumentpakkingException;
 import no.nav.dokdisteformidling.consumer.eformidling.dokumentpakker.xmlmanifest.XmlManifestCreator;
 
-import java.io.BufferedInputStream;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
 
+import static no.nav.dokdisteformidling.consumer.eformidling.EformidlingConstants.NAV_ORGNUMMER;
+import static no.nav.dokdisteformidling.consumer.eformidling.EformidlingConstants.TRYGDERETTEN_ORGNUMMER;
+
 /**
  * Endret og tilpasset for NAV sin bruk fra https://github.com/difi/move-integrasjonspunkt
- *
+ * <p>
  * Lager asic og signerer denne med virksomhetssertifikat.
  *
  * @author Joakim Bjørnstad, Jbit AS
