@@ -7,10 +7,7 @@ import no.nav.dokdisteformidling.certificate.AppCertificate;
 import no.nav.dokdisteformidling.consumer.eformidling.altinn.mapper.InputStreamDataSource;
 import no.nav.dokdisteformidling.consumer.eformidling.altinn.services.BrokerServiceExternalService;
 import no.nav.dokdisteformidling.consumer.eformidling.altinn.services.BrokerServiceExternalStreamedService;
-import no.nav.dokdisteformidling.consumer.eformidling.altinn.to.ReceiptTo;
-import no.nav.dokdisteformidling.consumer.eformidling.altinn.to.ServiceCode;
-import no.nav.dokdisteformidling.consumer.eformidling.altinn.to.UploadManifest;
-import no.nav.dokdisteformidling.consumer.eformidling.altinn.to.UploadResponse;
+import no.nav.dokdisteformidling.consumer.eformidling.altinn.to.*;
 import no.nav.dokdisteformidling.consumer.eformidling.dokumentpakker.EformidlingMessagePackager;
 import no.nav.dokdisteformidling.consumer.eformidling.serviceregistry.EformidlingMottakerInfoService;
 import no.nav.dokdisteformidling.consumer.eformidling.serviceregistry.MottakerInfo;
@@ -20,11 +17,9 @@ import javax.activation.DataHandler;
 import javax.inject.Inject;
 import java.io.InputStream;
 import java.time.LocalDateTime;
-import java.util.Arrays;
+import java.util.List;
 
 import static no.nav.dokdisteformidling.consumer.eformidling.EformidlingConstants.NAV_ORGNUMMER;
-import static no.nav.dokdisteformidling.consumer.eformidling.dokumentpakker.EformidlingMessagePackager.EFORMIDLING_ASIC;
-import static no.nav.dokdisteformidling.consumer.eformidling.dokumentpakker.EformidlingMessagePackager.EFORMIDLING_SBD;
 
 /**
  * @author Joakim Bjørnstad, Jbit AS
@@ -86,34 +81,34 @@ class AltinnEformidling implements Eformidling {
                 .build();
     }
 
-	public ServiceCode getServiceCode() {
-		MottakerInfo mottakerInfo = eformidlingMottakerInfoService.hentMottakerInfoTrygderetten();
-		return ServiceCode.builder()
-				.serviceCode(mottakerInfo.getServiceCode())
-				.serviceEditionCode(Integer.parseInt(mottakerInfo.getServiceEditionCode()))
-				.build();
-	}
+    public ServiceCode getServiceCode() {
+        MottakerInfo mottakerInfo = eformidlingMottakerInfoService.hentMottakerInfoTrygderetten();
+        return ServiceCode.builder()
+                .serviceCode(mottakerInfo.getServiceCode())
+                .serviceEditionCode(Integer.parseInt(mottakerInfo.getServiceEditionCode()))
+                .build();
+    }
 
-	@Override
-	public DownloadResponse hent() {
-		log.info("Henter tilgjengelige filer til NAV fra Trygderetten gjennom formidlingstjenesten");
-		List<FileReference> availableFiles = brokerServiceExternalService.getAvailableFiles(getSearchCriteria(), getServiceCode());
+    @Override
+    public DownloadResponse hent() {
+        log.info("Henter tilgjengelige filer til NAV fra Trygderetten gjennom formidlingstjenesten");
+        List<FileReference> availableFiles = brokerServiceExternalService.getAvailableFiles(getSearchCriteria(), getServiceCode());
 
-		DownloadResponse response = brokerServiceExternalStreamedService.downloadFilesFromAltinn(availableFiles);
-		confirmDownloaded(response);
-		return response;
-	}
+        DownloadResponse response = brokerServiceExternalStreamedService.downloadFilesFromAltinn(availableFiles);
+        confirmDownloaded(response);
+        return response;
+    }
 
-	private SearchCriteria getSearchCriteria() {
-		return SearchCriteria.builder()
-				.availableFileStatus(BrokerServiceAvailableFileStatus.UPLOADED)
-				.minSentDate(LocalDateTime.MIN)   //TODO: Fiks riktige verdier
-				.maxSentDate(LocalDateTime.MAX)   //TODO: Fiks riktige verdier
-				.build();
-	}
+    private SearchCriteria getSearchCriteria() {
+        return SearchCriteria.builder()
+                .availableFileStatus(BrokerServiceAvailableFileStatus.UPLOADED)
+                .minSentDate(LocalDateTime.MIN)   //TODO: Fiks riktige verdier
+                .maxSentDate(LocalDateTime.MAX)   //TODO: Fiks riktige verdier
+                .build();
+    }
 
-	private void confirmDownloaded(DownloadResponse downloadResponse) {
-		downloadResponse.getDownloadedFileFromAltinn().forEach(downloadedFileFromAltinn ->
-				brokerServiceExternalService.confirmDownloaded(downloadedFileFromAltinn.getFileReference().getFileReference()));
-	}
+    private void confirmDownloaded(DownloadResponse downloadResponse) {
+        downloadResponse.getDownloadedFileFromAltinn().forEach(downloadedFileFromAltinn ->
+                brokerServiceExternalService.confirmDownloaded(downloadedFileFromAltinn.getFileReference().getFileReference()));
+    }
 }
