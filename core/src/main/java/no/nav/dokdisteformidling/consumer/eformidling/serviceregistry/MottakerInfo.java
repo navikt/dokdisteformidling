@@ -20,12 +20,14 @@ import java.security.cert.X509Certificate;
 @Getter
 @ToString(exclude = {"pemCertificate", "x509Certificate"})
 public class MottakerInfo {
+	private final String orgnummer;
 	private final String pemCertificate;
 	private X509Certificate x509Certificate;
 	private final String serviceCode;
 	private final String serviceEditionCode;
 
-	public MottakerInfo(String pemCertificate, String serviceCode, String serviceEditionCode) {
+	public MottakerInfo(String orgnummer, String pemCertificate, String serviceCode, String serviceEditionCode) {
+		this.orgnummer = orgnummer;
 		this.pemCertificate = pemCertificate;
 		this.serviceCode = serviceCode;
 		this.serviceEditionCode = serviceEditionCode;

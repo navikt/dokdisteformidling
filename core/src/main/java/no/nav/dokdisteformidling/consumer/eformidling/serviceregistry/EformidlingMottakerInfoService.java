@@ -26,7 +26,8 @@ public class EformidlingMottakerInfoService {
 		final ServiceRecord serviceRecord = anyServiceRecord
 				.orElseThrow(() -> new MottakerInfoIkkeFunnetException("Fant ikke mottakerinfo for organisation=" + TRYGDERETTEN_ORGNUMMER + " og process=" + ARKIVMELDING_PROCESS));
 		final Service service = serviceRecord.getService();
-		return new MottakerInfo(serviceRecord.getPemCertificate(),
+		return new MottakerInfo(serviceRecord.getOrganisationNumber(),
+				serviceRecord.getPemCertificate(),
 				service.getServiceCode(),
 				service.getServiceEditionCode());
 	}
