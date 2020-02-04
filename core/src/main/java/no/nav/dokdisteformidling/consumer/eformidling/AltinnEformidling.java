@@ -16,7 +16,6 @@ import org.springframework.stereotype.Component;
 import javax.activation.DataHandler;
 import javax.inject.Inject;
 import java.io.InputStream;
-import java.time.LocalDateTime;
 import java.util.List;
 
 import static no.nav.dokdisteformidling.consumer.eformidling.EformidlingConstants.NAV_ORGNUMMER;
@@ -70,7 +69,6 @@ class AltinnEformidling implements Eformidling {
                 .build();
     }
 
-
     UploadManifest mapUploadManifest(final MottakerInfo mottakerInfo, final String senderReference) {
         return UploadManifest.builder()
                 .avsender(NAV_ORGNUMMER)
@@ -94,7 +92,8 @@ class AltinnEformidling implements Eformidling {
         log.info("Henter tilgjengelige filer til NAV fra Trygderetten gjennom formidlingstjenesten");
         List<FileReference> availableFiles = brokerServiceExternalService.getAvailableFiles(getSearchCriteria(), getServiceCode());
 
-        DownloadResponse response = brokerServiceExternalStreamedService.downloadFilesFromAltinn(availableFiles);
+        List<DownloadedFileFromAltinn> filesFromAltinn = brokerServiceExternalStreamedService.downloadFilesFromAltinn(availableFiles);
+        DownloadResponse response = eformidlingMessagePackager.unpackMessage(filesFromAltinn);
         confirmDownloaded(response);
         return response;
     }
@@ -102,13 +101,11 @@ class AltinnEformidling implements Eformidling {
     private SearchCriteria getSearchCriteria() {
         return SearchCriteria.builder()
                 .availableFileStatus(BrokerServiceAvailableFileStatus.UPLOADED)
-                .minSentDate(LocalDateTime.MIN)   //TODO: Fiks riktige verdier
-                .maxSentDate(LocalDateTime.MAX)   //TODO: Fiks riktige verdier
                 .build();
     }
 
     private void confirmDownloaded(DownloadResponse downloadResponse) {
-        downloadResponse.getDownloadedFileFromAltinn().forEach(downloadedFileFromAltinn ->
-                brokerServiceExternalService.confirmDownloaded(downloadedFileFromAltinn.getFileReference().getFileReference()));
+        downloadResponse.getStandardBusinessDocuments().forEach(downloadedFileFromAltinn ->
+                brokerServiceExternalService.confirmDownloaded(downloadedFileFromAltinn.));
     }
 }

@@ -3,21 +3,25 @@ package no.nav.dokdisteformidling.consumer.eformidling.dokumentpakker;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.dokdisteformidling.certificate.AppCertificate;
+import no.nav.dokdisteformidling.consumer.eformidling.AltinnPackage;
 import no.nav.dokdisteformidling.consumer.eformidling.NavDokumentpakke;
+import no.nav.dokdisteformidling.consumer.eformidling.altinn.to.DownloadedFileFromAltinn;
+import no.nav.dokdisteformidling.consumer.eformidling.dokumentpakker.exceptions.DokumentpakkingException;
 import no.nav.dokdisteformidling.consumer.eformidling.dokumentpakker.sbdh.StandardBusinessDocument;
 import org.apache.commons.io.IOUtils;
 import org.springframework.stereotype.Component;
 
 import javax.inject.Inject;
 import javax.inject.Named;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.security.cert.X509Certificate;
+import java.util.List;
+import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
+
+import static no.nav.dokdisteformidling.consumer.eformidling.EformidlingConstants.EFORMIDLING_ASIC;
+import static no.nav.dokdisteformidling.consumer.eformidling.EformidlingConstants.EFORMIDLING_SBD;
 
 /**
  * Pakker NAV dokumentpakke til eformidling melding.
@@ -33,8 +37,6 @@ import java.util.zip.ZipOutputStream;
 @Slf4j
 @Component
 public class EformidlingMessagePackager {
-	public static final String EFORMIDLING_SBD = "sbd.json";
-	public static final String EFORMIDLING_ASIC = "asic.zip";
 
 	private final ObjectMapper objectMapper;
 	private final StandardBusinessDocumentMapper standardBusinessDocumentMapper;
@@ -77,5 +79,24 @@ public class EformidlingMessagePackager {
 		} catch (IOException e) {
 			throw new DokumentpakkingException("Klarte ikke lage sbd.zip", e);
 		}
+	}
+
+	public TrygderettDokumentpakke unpackMessage(List<AltinnPackage> trygderettDokumenter) {
+		trygderettDokumenter.stream().map(altinnPackage -> altinnPackage.)
+
+		downloadedFileFromAltinns.stream().map(this::createSbd).collect(Collectors.toList());
+
+	}
+
+	private StandardBusinessDocument createSbd(DownloadedFileFromAltinn fileFromAltinn) throws IOException {
+		ByteArrayOutputStream buffOS = new ByteArrayOutputStream();
+		fileFromAltinn.getDataHandler().writeTo(buffOS);
+
+		File outFile = File.createTempFile(fileFromAltinn.getFileReference().getFileReference(), ".zip");
+		try (FileOutputStream fos = new FileOutputStream(outFile)) {
+			fos.write(buffOS.toByteArray());
+		}
+
+		log.info("Skrev til fil " + outFile.getAbsolutePath());
 	}
 }
