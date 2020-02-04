@@ -4,3 +4,4 @@ naiseratorPipeline {
     deployEnvironmentQ = ""
     deployEnvironmentT = "t8"
 }
+echo("Hei!")
