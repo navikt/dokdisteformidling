@@ -1,17 +1,5 @@
 package no.nav.dokdisteformidling.consumer.eformidling.dokumentpakker;
 
-import static no.nav.dokdisteformidling.constants.DomainConstants.DEFAULT_ZONE_ID;
-import static no.nav.dokdisteformidling.consumer.eformidling.EformidlingConstants.NAV_ORGNUMMER;
-import static no.nav.dokdisteformidling.consumer.eformidling.EformidlingConstants.TRYGDERETTEN_ORGNUMMER;
-import static no.nav.dokdisteformidling.consumer.eformidling.dokumentpakker.StandardBusinessDocumentMapper.ARKIVMELDING_FORRETNINGSMELDING;
-import static no.nav.dokdisteformidling.consumer.eformidling.dokumentpakker.StandardBusinessDocumentMapper.DOCUMENT_IDENTIFICATOR_STANDARD;
-import static no.nav.dokdisteformidling.consumer.eformidling.dokumentpakker.StandardBusinessDocumentMapper.HEADER_VERSION;
-import static no.nav.dokdisteformidling.consumer.eformidling.dokumentpakker.StandardBusinessDocumentMapper.IDENTIFIER_AUTHORITY;
-import static no.nav.dokdisteformidling.consumer.eformidling.dokumentpakker.StandardBusinessDocumentMapper.SCOPE_CONVERSATION_ID;
-import static no.nav.dokdisteformidling.consumer.eformidling.dokumentpakker.StandardBusinessDocumentMapper.SCOPE_CONVERSATION_ID_IDENTIFIER;
-import static no.nav.dokdisteformidling.consumer.eformidling.dokumentpakker.StandardBusinessDocumentMapper.TYPE_VERSION;
-import static org.assertj.core.api.Assertions.assertThat;
-
 import no.nav.dokdisteformidling.consumer.eformidling.Organisasjonsnummer;
 import no.nav.dokdisteformidling.consumer.eformidling.dokumentpakker.sbdh.CorrelationInformation;
 import no.nav.dokdisteformidling.consumer.eformidling.dokumentpakker.sbdh.PartnerIdentification;
@@ -25,6 +13,18 @@ import java.time.Clock;
 import java.time.Instant;
 import java.time.OffsetDateTime;
 
+import static no.nav.dokdisteformidling.constants.DomainConstants.DEFAULT_ZONE_ID;
+import static no.nav.dokdisteformidling.consumer.eformidling.EformidlingConstants.NAV_ORGNUMMER;
+import static no.nav.dokdisteformidling.consumer.eformidling.EformidlingConstants.TRYGDERETTEN_ORGNUMMER;
+import static no.nav.dokdisteformidling.consumer.eformidling.dokumentpakker.StandardBusinessDocumentMapper.ARKIVMELDING_FORRETNINGSMELDING;
+import static no.nav.dokdisteformidling.consumer.eformidling.dokumentpakker.StandardBusinessDocumentMapper.DOCUMENT_IDENTIFICATOR_STANDARD;
+import static no.nav.dokdisteformidling.consumer.eformidling.dokumentpakker.StandardBusinessDocumentMapper.HEADER_VERSION;
+import static no.nav.dokdisteformidling.consumer.eformidling.dokumentpakker.StandardBusinessDocumentMapper.IDENTIFIER_AUTHORITY;
+import static no.nav.dokdisteformidling.consumer.eformidling.dokumentpakker.StandardBusinessDocumentMapper.SCOPE_CONVERSATION_ID;
+import static no.nav.dokdisteformidling.consumer.eformidling.dokumentpakker.StandardBusinessDocumentMapper.SCOPE_CONVERSATION_ID_IDENTIFIER;
+import static no.nav.dokdisteformidling.consumer.eformidling.dokumentpakker.StandardBusinessDocumentMapper.TYPE_VERSION;
+import static org.assertj.core.api.Assertions.assertThat;
+
 /**
  * @author Joakim Bjørnstad, Jbit AS
  */
@@ -33,7 +33,7 @@ class StandardBusinessDocumentMapperTest {
 	private static final String BESTILLINGS_ID = "bestillingsId1";
 	private static final String FIXED_TIME = "2020-01-01T12:00:00Z";
 	private static final String TEN_SECONDS_BEFORE = "2020-01-01T12:59:50+01:00";
-	private static final String FOUR_HOURS_LATER = "2020-01-01T17:00:00+01:00";
+	private static final String TWENTY_FOUR_HOURS_LATER = "2020-01-02T13:00:00+01:00";
 	private final StandardBusinessDocumentMapper mapper = new StandardBusinessDocumentMapper(Clock.fixed(Instant.parse(FIXED_TIME), DEFAULT_ZONE_ID));
 
 	@Test
@@ -68,7 +68,7 @@ class StandardBusinessDocumentMapperTest {
 				.anyMatch(scope -> SCOPE_CONVERSATION_ID.equals(scope.getType()))
 				.flatExtracting(Scope::getScopeInformation)
 				.extracting(CorrelationInformation::getExpectedResponseDateTime)
-				.contains(OffsetDateTime.parse(FOUR_HOURS_LATER));
+				.contains(OffsetDateTime.parse(TWENTY_FOUR_HOURS_LATER));
 		assertThat(sbd.getAny()).isInstanceOf(ArkivmeldingMessage.class);
 	}
 }
