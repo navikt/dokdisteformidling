@@ -4,11 +4,14 @@ package no.nav.dokdisteformidling.consumer.eformidling;
 import lombok.extern.slf4j.Slf4j;
 import no.altinn.brokerserviceexternal.BrokerServiceAvailableFileStatus;
 import no.nav.dokdisteformidling.certificate.AppCertificate;
+import no.nav.dokdisteformidling.consumer.eformidling.altinn.from.AltinnDokument;
+import no.nav.dokdisteformidling.consumer.eformidling.altinn.from.DownloadedMessageFromAltinn;
 import no.nav.dokdisteformidling.consumer.eformidling.altinn.mapper.InputStreamDataSource;
 import no.nav.dokdisteformidling.consumer.eformidling.altinn.services.BrokerServiceExternalService;
 import no.nav.dokdisteformidling.consumer.eformidling.altinn.services.BrokerServiceExternalStreamedService;
 import no.nav.dokdisteformidling.consumer.eformidling.altinn.to.*;
 import no.nav.dokdisteformidling.consumer.eformidling.dokumentpakker.EformidlingMessagePackager;
+import no.nav.dokdisteformidling.consumer.eformidling.dokumentpakker.EformidlingMessageUnpackager;
 import no.nav.dokdisteformidling.consumer.eformidling.serviceregistry.EformidlingMottakerInfoService;
 import no.nav.dokdisteformidling.consumer.eformidling.serviceregistry.MottakerInfo;
 import org.springframework.stereotype.Component;
@@ -29,6 +32,7 @@ class AltinnEformidling implements Eformidling {
     private final AppCertificate appCertificate;
     private final EformidlingMottakerInfoService eformidlingMottakerInfoService;
     private final EformidlingMessagePackager eformidlingMessagePackager;
+    private final EformidlingMessageUnpackager eformidlingMessageUnpackager;
     private final BrokerServiceExternalService brokerServiceExternalService;
     private final BrokerServiceExternalStreamedService brokerServiceExternalStreamedService;
     private static final String FILE_NAME = "sbd.zip";
@@ -37,11 +41,12 @@ class AltinnEformidling implements Eformidling {
     AltinnEformidling(AppCertificate appCertificate,
                       EformidlingMottakerInfoService eformidlingMottakerInfoService,
                       EformidlingMessagePackager eformidlingMessagePackager,
-                      BrokerServiceExternalService brokerServiceExternalService,
+                      EformidlingMessageUnpackager eformidlingMessageUnpackager, BrokerServiceExternalService brokerServiceExternalService,
                       BrokerServiceExternalStreamedService brokerServiceExternalStreamedService) {
         this.appCertificate = appCertificate;
         this.eformidlingMottakerInfoService = eformidlingMottakerInfoService;
         this.eformidlingMessagePackager = eformidlingMessagePackager;
+        this.eformidlingMessageUnpackager = eformidlingMessageUnpackager;
         this.brokerServiceExternalService = brokerServiceExternalService;
         this.brokerServiceExternalStreamedService = brokerServiceExternalStreamedService;
     }
@@ -88,14 +93,13 @@ class AltinnEformidling implements Eformidling {
     }
 
     @Override
-    public DownloadResponse hent() {
+    public void hent() {
         log.info("Henter tilgjengelige filer til NAV fra Trygderetten gjennom formidlingstjenesten");
         List<FileReference> availableFiles = brokerServiceExternalService.getAvailableFiles(getSearchCriteria(), getServiceCode());
 
-        List<DownloadedFileFromAltinn> filesFromAltinn = brokerServiceExternalStreamedService.downloadFilesFromAltinn(availableFiles);
-        DownloadResponse response = eformidlingMessagePackager.unpackMessage(filesFromAltinn);
-        confirmDownloaded(response);
-        return response;
+        List<DownloadedMessageFromAltinn> messagesFromAltinn = brokerServiceExternalStreamedService.downloadFilesFromAltinn(availableFiles);
+        List<AltinnDokument> altinnDokuments = eformidlingMessageUnpackager.unpackageMessages(messagesFromAltinn);
+        confirmDownloaded(altinnDokuments);
     }
 
     private SearchCriteria getSearchCriteria() {
@@ -104,8 +108,11 @@ class AltinnEformidling implements Eformidling {
                 .build();
     }
 
-    private void confirmDownloaded(DownloadResponse downloadResponse) {
-        downloadResponse.getStandardBusinessDocuments().forEach(downloadedFileFromAltinn ->
-                brokerServiceExternalService.confirmDownloaded(downloadedFileFromAltinn.));
+    private void confirmDownloaded(List<AltinnDokument> altinnDokuments) {
+        altinnDokuments.forEach(altinnDokument -> {
+            // TODO: Verifisere download --> SDIST001?
+            brokerServiceExternalService.confirmDownloaded(altinnDokument.getFileReferance());
+        });
+
     }
 }
