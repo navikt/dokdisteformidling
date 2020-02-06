@@ -1,8 +1,5 @@
 package no.nav.dokdisteformidling.consumer.eformidling.dokumentpakker;
 
-import static java.time.temporal.ChronoUnit.HOURS;
-import static no.nav.dokdisteformidling.consumer.eformidling.Organisasjonsnummer.asIso6523;
-
 import no.nav.dokdisteformidling.consumer.eformidling.EformidlingConstants;
 import no.nav.dokdisteformidling.consumer.eformidling.dokumentpakker.sbdh.BusinessScope;
 import no.nav.dokdisteformidling.consumer.eformidling.dokumentpakker.sbdh.CorrelationInformation;
@@ -17,8 +14,12 @@ import org.springframework.stereotype.Component;
 
 import javax.inject.Inject;
 import java.time.Clock;
+import java.time.Duration;
 import java.time.OffsetDateTime;
 import java.time.temporal.ChronoUnit;
+
+import static java.time.Duration.ofHours;
+import static no.nav.dokdisteformidling.consumer.eformidling.Organisasjonsnummer.asIso6523;
 
 /**
  * Mapper til konvoluttene til eformidling meldingen.
@@ -36,6 +37,7 @@ public class StandardBusinessDocumentMapper {
 	static final String ARKIVMELDING_FORRETNINGSMELDING = "arkivmelding";
 	public static final String ARKIVMELDING_XML = "arkivmelding.xml";
 	public static final int SIKKERHETSNIVAA = 4;
+	public static final Duration EXPECTED_RESPONSE_WITHIN_HOURS = ofHours(24);
 
 	private final Clock clock;
 
@@ -94,7 +96,7 @@ public class StandardBusinessDocumentMapper {
 		conversationIdScope.setInstanceIdentifier(instanceIdentifier);
 		conversationIdScope.setIdentifier(SCOPE_CONVERSATION_ID_IDENTIFIER);
 		final CorrelationInformation correlationInformation = new CorrelationInformation();
-		correlationInformation.setExpectedResponseDateTime(OffsetDateTime.now(clock).plus(4, HOURS));
+		correlationInformation.setExpectedResponseDateTime(OffsetDateTime.now(clock).plus(EXPECTED_RESPONSE_WITHIN_HOURS));
 		conversationIdScope.addScopeInformation(correlationInformation);
 		return conversationIdScope;
 	}

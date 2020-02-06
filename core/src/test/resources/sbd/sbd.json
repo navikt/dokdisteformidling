@@ -10,7 +10,7 @@
     } ],
     "receiver" : [ {
       "identifier" : {
-        "value" : "0192:889640782",
+        "value" : "0192:974761084",
         "authority" : "iso6523-actorid-upis"
       },
       "contactInformation" : [ ]
@@ -29,7 +29,7 @@
         "instanceIdentifier" : "1",
         "identifier" : "urn:no:difi:profile:arkivmelding:administrasjon:ver1.0",
         "scopeInformation" : [ {
-          "expectedResponseDateTime" : "2020-01-01T17:00:00+01:00"
+          "expectedResponseDateTime" : "2020-01-02T13:00:00+01:00"
         } ]
       } ]
     }
