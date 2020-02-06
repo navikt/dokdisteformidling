@@ -1,15 +1,6 @@
 package no.nav.dokdisteformidling.qdist013;
 
-import static java.lang.String.format;
-import static no.nav.dokdisteformidling.common.FunctionalUtils.deserializeS3JsonPayloadToDokdistDokument;
-import static no.nav.dokdisteformidling.common.FunctionalUtils.generateRandomUUID;
-import static no.nav.dokdisteformidling.common.FunctionalUtils.validateThatForsendelseStatusIsKlarForDist;
-import static no.nav.dokdisteformidling.constants.RouteConstants.PROPERTY_ANTALL_DOK;
-import static no.nav.dokdisteformidling.constants.RouteConstants.PROPERTY_BESTILLINGS_ID;
-import static no.nav.dokdisteformidling.constants.RouteConstants.PROPERTY_CONVERSATION_ID;
-import static no.nav.dokdisteformidling.consumer.eformidling.NavDokument.fromArkivmelding;
-import static no.nav.dokdisteformidling.consumer.eformidling.NavDokument.fromVedlegg;
-
+import lombok.extern.slf4j.Slf4j;
 import no.arkivverket.standarder.noark5.arkivmelding.Arkivmelding;
 import no.arkivverket.standarder.noark5.arkivmelding.Dokumentbeskrivelse;
 import no.arkivverket.standarder.noark5.arkivmelding.Journalpost;
@@ -43,9 +34,20 @@ import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static java.lang.String.format;
+import static no.nav.dokdisteformidling.common.FunctionalUtils.deserializeS3JsonPayloadToDokdistDokument;
+import static no.nav.dokdisteformidling.common.FunctionalUtils.generateRandomUUID;
+import static no.nav.dokdisteformidling.common.FunctionalUtils.validateThatForsendelseStatusIsKlarForDist;
+import static no.nav.dokdisteformidling.constants.RouteConstants.PROPERTY_ANTALL_DOK;
+import static no.nav.dokdisteformidling.constants.RouteConstants.PROPERTY_BESTILLINGS_ID;
+import static no.nav.dokdisteformidling.constants.RouteConstants.PROPERTY_CONVERSATION_ID;
+import static no.nav.dokdisteformidling.consumer.eformidling.NavDokument.fromArkivmelding;
+import static no.nav.dokdisteformidling.consumer.eformidling.NavDokument.fromVedlegg;
+
 /**
  * @author Sigurd Midttun, Visma Consulting.
  */
+@Slf4j
 @Service
 public class Qdist013Service {
 
@@ -89,8 +91,8 @@ public class Qdist013Service {
 	public void processForsendelse(DistribuerForsendelseTilTrygderetten distribuerForsendelseTilTrygderetten, Exchange exchange) {
 		final String conversationId = generateRandomUUID(); //
 		exchange.setProperty(PROPERTY_CONVERSATION_ID, conversationId);
-		final HentForsendelseResponseTo hentForsendelseResponseTo = administrerForsendelse.hentForsendelse(distribuerForsendelseTilTrygderetten
-				.getForsendelseId());
+		final String forsendelseId = distribuerForsendelseTilTrygderetten.getForsendelseId();
+		final HentForsendelseResponseTo hentForsendelseResponseTo = administrerForsendelse.hentForsendelse(forsendelseId);
 		final String bestillingsId = hentForsendelseResponseTo.getBestillingsId();
 		exchange.setProperty(PROPERTY_BESTILLINGS_ID, bestillingsId);
 		validateThatForsendelseStatusIsKlarForDist(hentForsendelseResponseTo.getForsendelseStatus());
@@ -104,6 +106,8 @@ public class Qdist013Service {
 		final CreateMessageRequest createMessageRequest = createMessageRequestMapper.map(conversationId, hentForsendelseResponseTo);
 
 		if (featureToggleProperties.isUsealtinnformidlingstjenesten()) {
+			log.info("Sender eformidling forsendelse direkte til Altinn formidlingstjenesten. forsendelseId={}, konversasjonsId={}, bestillingsId={}",
+					forsendelseId, conversationId, bestillingsId);
 			eformidling.send(NavDokumentpakke.builder()
 					.conversationId(conversationId)
 					.bestillingsId(bestillingsId)
@@ -115,6 +119,8 @@ public class Qdist013Service {
 					.build());
 			juridiskLogg.lagreJuridiskLogg(lagreJuridiskLoggMapper.map(hentForsendelseResponseTo, arkivmeldingXmlString.getBytes()));
 		} else {
+			log.info("Sender eformidling forsendelse til integrasjonspunktet til NAV. forsendelseId={}, konversasjonsId={}, bestillingsId={}",
+					forsendelseId, conversationId, bestillingsId);
 			integrasjonspunkt.opprettMelding(createMessageRequest, conversationId);
 			uploadDocuments(dokdistDokumentList, arkivmeldingJAXBElement.getValue(), journalpostQdist013.getJournalpostId(), bestillingsId);
 			uploadArkivmelding(arkivmeldingXmlString, bestillingsId);

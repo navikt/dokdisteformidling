@@ -1,13 +1,5 @@
 package no.nav.dokdisteformidling.consumer.eformidling.dokumentpakker;
 
-import static no.nav.dokdisteformidling.AppTestUtils.zipEntries;
-import static no.nav.dokdisteformidling.CertTestUtils.itestPemCertificate;
-import static no.nav.dokdisteformidling.CertTestUtils.itestVirksomhetssertifikatProperties;
-import static no.nav.dokdisteformidling.constants.DomainConstants.DEFAULT_ZONE_ID;
-import static no.nav.dokdisteformidling.consumer.eformidling.dokumentpakker.EformidlingMessagePackager.EFORMIDLING_ASIC;
-import static no.nav.dokdisteformidling.consumer.eformidling.dokumentpakker.EformidlingMessagePackager.EFORMIDLING_SBD;
-import static org.assertj.core.api.Assertions.assertThat;
-
 import no.nav.dokdisteformidling.AppTestUtils;
 import no.nav.dokdisteformidling.certificate.AppCertificate;
 import no.nav.dokdisteformidling.consumer.eformidling.NavDokument;
@@ -20,6 +12,15 @@ import java.time.Clock;
 import java.time.Instant;
 import java.util.Collections;
 import java.util.List;
+
+import static no.nav.dokdisteformidling.AppTestUtils.zipEntries;
+import static no.nav.dokdisteformidling.CertTestUtils.itestPemCertificate;
+import static no.nav.dokdisteformidling.CertTestUtils.itestVirksomhetssertifikatProperties;
+import static no.nav.dokdisteformidling.constants.DomainConstants.DEFAULT_ZONE_ID;
+import static no.nav.dokdisteformidling.consumer.eformidling.dokumentpakker.EformidlingMessagePackager.EFORMIDLING_ASIC;
+import static no.nav.dokdisteformidling.consumer.eformidling.dokumentpakker.EformidlingMessagePackager.EFORMIDLING_SBD;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  * @author Joakim Bjørnstad, Jbit AS
@@ -50,5 +51,22 @@ class EformidlingMessagePackagerTest {
 		final AppTestUtils.ZipFile sbdZip = zipEntries.stream().filter(z -> EFORMIDLING_SBD.equals(z.getName())).findFirst().orElseThrow(IllegalStateException::new);
 		assertThat(sbdZip.getContentsAsString()).isEqualToIgnoringWhitespace(AppTestUtils.classpathToString("sbd/sbd.json"));
 		zipEntries.stream().filter(z -> EFORMIDLING_ASIC.equals(z.getName())).findFirst().orElseThrow(IllegalStateException::new);
+	}
+
+	@Test
+	void shouldThrowDokumentpakkingExceptionWhenNullArkivmeldingInputStream() throws Exception {
+		final NavDokumentpakke navDokumentpakke = NavDokumentpakke.builder()
+				.conversationId("1")
+				.bestillingsId("2")
+				.arkivmelding(NavDokument.fromArkivmelding(null))
+				.navDokumenter(Collections.singletonList(NavDokument.fromVedlegg("test1.pdf", new ByteArrayInputStream("test1pdf".getBytes()))))
+				.build();
+
+		final DokumentpakkingException dokumentpakkingException = assertThrows(DokumentpakkingException.class, () -> {
+			eformidlingMessagePackager.packageMessage(navDokumentpakke,
+					new AppCertificate(itestVirksomhetssertifikatProperties()),
+					itestPemCertificate());
+		});
+		assertThat(dokumentpakkingException.getMessage()).isEqualTo("Klarte ikke lage asic eller kryptere dokumentpakke.");
 	}
 }
