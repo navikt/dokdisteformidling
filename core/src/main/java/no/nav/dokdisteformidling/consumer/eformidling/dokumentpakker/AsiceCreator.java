@@ -20,7 +20,7 @@ import static no.nav.dokdisteformidling.consumer.eformidling.EformidlingConstant
 
 /**
  * Endret og tilpasset for NAV sin bruk fra https://github.com/difi/move-integrasjonspunkt
- * <p>
+ *
  * Lager asic og signerer denne med virksomhetssertifikat.
  *
  * @author Joakim Bjørnstad, Jbit AS
