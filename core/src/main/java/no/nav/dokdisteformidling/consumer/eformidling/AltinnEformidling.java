@@ -99,20 +99,11 @@ class AltinnEformidling implements Eformidling {
 
         List<DownloadedMessageFromAltinn> messagesFromAltinn = brokerServiceExternalStreamedService.downloadFilesFromAltinn(availableFiles);
         List<AltinnDokument> altinnDokuments = eformidlingMessageUnpackager.unpackageMessages(messagesFromAltinn);
-        confirmDownloaded(altinnDokuments);
     }
 
     private SearchCriteria getSearchCriteria() {
         return SearchCriteria.builder()
                 .availableFileStatus(BrokerServiceAvailableFileStatus.UPLOADED)
                 .build();
-    }
-
-    private void confirmDownloaded(List<AltinnDokument> altinnDokuments) {
-        altinnDokuments.forEach(altinnDokument -> {
-            // TODO: Verifisere download --> SDIST001?
-            brokerServiceExternalService.confirmDownloaded(altinnDokument.getFileReferance());
-        });
-
     }
 }
