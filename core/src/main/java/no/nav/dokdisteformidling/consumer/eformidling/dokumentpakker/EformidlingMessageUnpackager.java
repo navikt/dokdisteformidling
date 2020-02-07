@@ -67,7 +67,7 @@ public class EformidlingMessageUnpackager {
 
     private AltinnDokument unpack(DownloadedMessageFromAltinn melding) throws JAXBException, IOException {
         log.info("Pakker ut fil med referansenummer: " + melding.getFileReference().getFileReference());
-        ZipInputStream zipInputStream = new ZipInputStream(melding.getDataHandler().getInputStream());
+        ZipInputStream zipInputStream = new ZipInputStream(melding.getInputStream());
         ArkivmeldingKvitteringMessage arkivmeldingKvitteringMessage;
         StandardBusinessDocumentHeader sbdh;
         StandardBusinessDocument sbd;

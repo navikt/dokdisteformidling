@@ -4,11 +4,11 @@ import lombok.Builder;
 import lombok.Value;
 import no.nav.dokdisteformidling.consumer.eformidling.altinn.to.FileReference;
 
-import javax.activation.DataHandler;
+import java.io.InputStream;
 
 @Value
 @Builder
 public class DownloadedMessageFromAltinn {
     private final FileReference fileReference;
-    private final DataHandler dataHandler;
+    private final InputStream inputStream;
 }
