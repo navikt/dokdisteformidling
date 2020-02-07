@@ -11,18 +11,22 @@ import org.springframework.stereotype.Component;
 
 import javax.inject.Inject;
 import javax.inject.Named;
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.security.cert.X509Certificate;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 /**
  * Pakker NAV dokumentpakke til eformidling melding.
- *
+ * <p>
  * Melding består av:
  * Konvolutt (StandardBusinessDocumentHeader, Forretningsmelding)
  * Innhold (Kryptert ASIC-E)
- *
+ * <p>
  * https://difi.github.io/felleslosninger/eformidling_nm_message.html
  *
  * @author Joakim Bjørnstad, Jbit AS

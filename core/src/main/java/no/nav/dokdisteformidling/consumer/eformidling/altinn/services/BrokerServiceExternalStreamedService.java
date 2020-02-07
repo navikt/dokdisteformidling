@@ -1,7 +1,12 @@
 package no.nav.dokdisteformidling.consumer.eformidling.altinn.services;
 
 import lombok.extern.slf4j.Slf4j;
-import no.altinn.brokerserviceexternalstreamed.*;
+import no.altinn.brokerserviceexternalstreamed.IBrokerServiceExternalStreamed;
+import no.altinn.brokerserviceexternalstreamed.IBrokerServiceExternalStreamedDownloadFileStreamedAltinnFaultFaultFaultMessage;
+import no.altinn.brokerserviceexternalstreamed.IBrokerServiceExternalStreamedUploadFileStreamedAltinnFaultFaultFaultMessage;
+import no.altinn.brokerserviceexternalstreamed.ObjectFactory;
+import no.altinn.brokerserviceexternalstreamed.ReceiptExternalStreamedBE;
+import no.altinn.brokerserviceexternalstreamed.StreamedPayloadExternalBE;
 import no.nav.dokdisteformidling.consumer.eformidling.altinn.from.DownloadedMessageFromAltinn;
 import no.nav.dokdisteformidling.consumer.eformidling.altinn.to.AltinnReasonFactory;
 import no.nav.dokdisteformidling.consumer.eformidling.altinn.to.FileReference;
