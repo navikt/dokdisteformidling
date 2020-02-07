@@ -1,6 +1,10 @@
 package no.nav.dokdisteformidling.consumer.eformidling.dokumentpakker;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 import net.minidev.json.annotate.JsonIgnore;
 
 import javax.xml.bind.annotation.XmlRootElement;

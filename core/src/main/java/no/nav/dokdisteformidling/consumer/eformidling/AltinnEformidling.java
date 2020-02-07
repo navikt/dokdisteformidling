@@ -9,7 +9,12 @@ import no.nav.dokdisteformidling.consumer.eformidling.altinn.from.DownloadedMess
 import no.nav.dokdisteformidling.consumer.eformidling.altinn.mapper.InputStreamDataSource;
 import no.nav.dokdisteformidling.consumer.eformidling.altinn.services.BrokerServiceExternalService;
 import no.nav.dokdisteformidling.consumer.eformidling.altinn.services.BrokerServiceExternalStreamedService;
-import no.nav.dokdisteformidling.consumer.eformidling.altinn.to.*;
+import no.nav.dokdisteformidling.consumer.eformidling.altinn.to.FileReference;
+import no.nav.dokdisteformidling.consumer.eformidling.altinn.to.ReceiptTo;
+import no.nav.dokdisteformidling.consumer.eformidling.altinn.to.SearchCriteria;
+import no.nav.dokdisteformidling.consumer.eformidling.altinn.to.ServiceCode;
+import no.nav.dokdisteformidling.consumer.eformidling.altinn.to.UploadManifest;
+import no.nav.dokdisteformidling.consumer.eformidling.altinn.to.UploadResponse;
 import no.nav.dokdisteformidling.consumer.eformidling.dokumentpakker.EformidlingMessagePackager;
 import no.nav.dokdisteformidling.consumer.eformidling.dokumentpakker.EformidlingMessageUnpackager;
 import no.nav.dokdisteformidling.consumer.eformidling.serviceregistry.EformidlingMottakerInfoService;
