@@ -22,11 +22,11 @@ import java.util.zip.ZipOutputStream;
 
 /**
  * Pakker NAV dokumentpakke til eformidling melding.
- * <p>
+ *
  * Melding består av:
  * Konvolutt (StandardBusinessDocumentHeader, Forretningsmelding)
  * Innhold (Kryptert ASIC-E)
- * <p>
+ *
  * https://difi.github.io/felleslosninger/eformidling_nm_message.html
  *
  * @author Joakim Bjørnstad, Jbit AS

@@ -1,7 +1,5 @@
 package no.nav.dokdisteformidling.consumer.eformidling;
 
-import static no.nav.dokdisteformidling.constants.DomainConstants.DEFAULT_ZONE_ID;
-
 import no.nav.dokdisteformidling.certificate.AppCertificate;
 import no.nav.dokdisteformidling.certificate.KeyStoreProperties;
 import no.nav.dokdisteformidling.config.props.MaskinportenProperties;
@@ -24,6 +22,8 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.time.Clock;
 import java.util.Collections;
+
+import static no.nav.dokdisteformidling.constants.DomainConstants.DEFAULT_ZONE_ID;
 
 /**
  * @author Joakim Bjørnstad, Jbit AS
@@ -70,7 +70,7 @@ class AltinnEformidlingManualTest {
 				new JacksonConfig().eformidlingObjectMapper(),
 				new StandardBusinessDocumentMapper(SYSTEM_CLOCK),
 				new EformidlingContentPackager());
-		final Eformidling eformidling = new AltinnEformidling(appCertificate, eformidlingMottakerInfoService, eformidlingMessagePackager, null, null);
+//		final Eformidling eformidling = new AltinnEformidling(appCertificate, eformidlingMottakerInfoService, eformidlingMessagePackager, null, null);
 
 		final NavDokumentpakke navDokumentpakke = NavDokumentpakke.builder()
 				.conversationId("1")
@@ -79,6 +79,6 @@ class AltinnEformidlingManualTest {
 				.navDokumenter(Collections.singletonList(NavDokument.fromVedlegg("test1.pdf", new ByteArrayInputStream("test1pdf".getBytes()))))
 				.build();
 
-		eformidling.send(navDokumentpakke);
+//		eformidling.send(navDokumentpakke);
 	}
 }
