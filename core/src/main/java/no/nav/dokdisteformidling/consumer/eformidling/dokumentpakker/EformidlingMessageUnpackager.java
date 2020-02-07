@@ -6,8 +6,6 @@ import no.nav.dokdisteformidling.consumer.eformidling.altinn.from.DownloadedMess
 import no.nav.dokdisteformidling.consumer.eformidling.dokumentpakker.exceptions.DokumentpakkingException;
 import no.nav.dokdisteformidling.consumer.eformidling.dokumentpakker.sbdh.StandardBusinessDocument;
 import no.nav.dokdisteformidling.consumer.eformidling.dokumentpakker.sbdh.StandardBusinessDocumentHeader;
-import org.apache.commons.compress.archivers.ArchiveEntry;
-import org.apache.commons.compress.archivers.zip.ZipArchiveInputStream;
 import org.springframework.stereotype.Component;
 
 import javax.xml.bind.JAXBContext;
@@ -21,10 +19,12 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
 /**
  * Pakker ut en eformidling melding fra Altinn.
- * <p>
+ *
  * Meldingen består av:
  * Konvolutt (StandardBusinessDocumentHeader, ArkivmeldingKvittering)
  * Innhold (Kryptert ASIC-E)
@@ -67,7 +67,7 @@ public class EformidlingMessageUnpackager {
 
     private AltinnDokument unpack(DownloadedMessageFromAltinn melding) throws JAXBException, IOException {
         log.info("Pakker ut fil med referansenummer: " + melding.getFileReference().getFileReference());
-        ZipArchiveInputStream zipInputStream = new ZipArchiveInputStream(melding.getDataHandler().getInputStream());
+        ZipInputStream zipInputStream = new ZipInputStream(melding.getDataHandler().getInputStream());
         ArkivmeldingKvitteringMessage arkivmeldingKvitteringMessage;
         StandardBusinessDocumentHeader sbdh;
         StandardBusinessDocument sbd;
@@ -80,7 +80,7 @@ public class EformidlingMessageUnpackager {
         }) {
             Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
 
-            ArchiveEntry zipEntry;
+            ZipEntry zipEntry;
             arkivmeldingKvitteringMessage = null;
             sbdh = null;
             sbd = null;

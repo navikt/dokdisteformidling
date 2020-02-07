@@ -11,7 +11,7 @@ import lombok.ToString;
 @ToString
 @AllArgsConstructor
 @NoArgsConstructor
-public class KvitteringStatusMessage extends AbstractEntity<Long> {
+public class KvitteringStatusMessage {
     private String code;
     private String text;
 }
