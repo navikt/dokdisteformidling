@@ -21,6 +21,8 @@ import javax.inject.Inject;
 import javax.xml.bind.JAXBException;
 import javax.xml.namespace.QName;
 import javax.xml.ws.BindingProvider;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -90,10 +92,15 @@ public class BrokerServiceExternalStreamedService {
 				.collect(toList());
 	}
 
-
 	private DownloadedMessageFromAltinn mapReferenceToDownloadedFile(FileReference fileReference, DataHandler dataHandler) {
 		log.info("Lastet ned fil med referansenummer: " + fileReference);
-		return DownloadedMessageFromAltinn.builder().fileReference(fileReference).dataHandler(dataHandler).build();
+		InputStream inputStream = null;
+		try {
+			inputStream = dataHandler.getInputStream();
+		} catch (IOException e) {
+			log.error("Feil ved avlesing av melding fra Altinn", e);
+		}
+		return DownloadedMessageFromAltinn.builder().fileReference(fileReference).inputStream(inputStream).build();
 	}
 
 	public DataHandler downloadFile(String fileReference) {
