@@ -27,7 +27,6 @@ import java.util.zip.ZipInputStream;
  *
  * Meldingen består av:
  * Konvolutt (StandardBusinessDocumentHeader, ArkivmeldingKvittering)
- * Innhold (Kryptert ASIC-E)
  */
 @Slf4j
 @Component
