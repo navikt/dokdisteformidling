@@ -68,8 +68,6 @@ public class EformidlingMessageUnpackager {
     private AltinnDokument unpack(DownloadedMessageFromAltinn melding) throws JAXBException, IOException {
         log.info("Pakker ut fil med referansenummer: " + melding.getFileReference().getFileReference());
         ZipInputStream zipInputStream = new ZipInputStream(melding.getInputStream());
-        ArkivmeldingKvitteringMessage arkivmeldingKvitteringMessage;
-        StandardBusinessDocumentHeader sbdh;
         StandardBusinessDocument sbd;
 
         try (InputStream inputStreamProxy = new FilterInputStream(zipInputStream) {
@@ -81,18 +79,10 @@ public class EformidlingMessageUnpackager {
             Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
 
             ZipEntry zipEntry;
-            arkivmeldingKvitteringMessage = null;
-            sbdh = null;
             sbd = null;
 
             while ((zipEntry = zipInputStream.getNextEntry()) != null) {
                 switch (zipEntry.getName()) {
-                    case AltinnDokument.STANDARDBUSINESSDOCUMENTHEADER:
-                        sbdh = (StandardBusinessDocumentHeader) unmarshaller.unmarshal(inputStreamProxy);
-                        break;
-                    case AltinnDokument.ARKIVMELDINGKVITTERING_XML_FILENAME:
-                        arkivmeldingKvitteringMessage = (ArkivmeldingKvitteringMessage) unmarshaller.unmarshal(inputStreamProxy);
-                        break;
                     case AltinnDokument.CONTENT_XML:
                         Source source = new StreamSource(inputStreamProxy);
                         sbd = unmarshaller.unmarshal(source, StandardBusinessDocument.class).getValue();
@@ -105,8 +95,6 @@ public class EformidlingMessageUnpackager {
         return AltinnDokument.builder()
                 .fileReferance(melding.getFileReference().getFileReference())
                 .sbd(sbd)
-                .sbdh(sbdh)
-                .arkivmeldingKvitteringMessage(arkivmeldingKvitteringMessage)
                 .build();
     }
 
