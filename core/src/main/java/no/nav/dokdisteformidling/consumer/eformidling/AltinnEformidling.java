@@ -5,7 +5,9 @@ import lombok.extern.slf4j.Slf4j;
 import no.altinn.brokerserviceexternal.BrokerServiceAvailableFileStatus;
 import no.nav.dokdisteformidling.certificate.AppCertificate;
 import no.nav.dokdisteformidling.consumer.eformidling.altinn.from.AltinnDokument;
+import no.nav.dokdisteformidling.consumer.eformidling.altinn.from.DownloadResponse;
 import no.nav.dokdisteformidling.consumer.eformidling.altinn.from.DownloadedMessageFromAltinn;
+import no.nav.dokdisteformidling.consumer.eformidling.altinn.mapper.DownloadResponseBuilder;
 import no.nav.dokdisteformidling.consumer.eformidling.altinn.mapper.InputStreamDataSource;
 import no.nav.dokdisteformidling.consumer.eformidling.altinn.services.BrokerServiceExternalService;
 import no.nav.dokdisteformidling.consumer.eformidling.altinn.services.BrokerServiceExternalStreamedService;
@@ -25,6 +27,7 @@ import javax.activation.DataHandler;
 import javax.inject.Inject;
 import java.io.InputStream;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static no.nav.dokdisteformidling.consumer.eformidling.EformidlingConstants.NAV_ORGNUMMER;
 
@@ -104,11 +107,16 @@ class AltinnEformidling implements Eformidling {
 
         List<DownloadedMessageFromAltinn> messagesFromAltinn = brokerServiceExternalStreamedService.downloadFilesFromAltinn(availableFiles);
         List<AltinnDokument> altinnDokuments = eformidlingMessageUnpackager.unpackageMessages(messagesFromAltinn);
+        List<DownloadResponse> downloadResponses = getDownloadResponses(altinnDokuments);
     }
 
     private SearchCriteria getSearchCriteria() {
         return SearchCriteria.builder()
                 .availableFileStatus(BrokerServiceAvailableFileStatus.UPLOADED)
                 .build();
+    }
+
+    private List<DownloadResponse> getDownloadResponses(List<AltinnDokument> altinnDokuments) {
+        return altinnDokuments.stream().map(altinnDokument -> new DownloadResponseBuilder().withStandardBusinessDocument(altinnDokument.getSbd()).build()).collect(Collectors.toList());
     }
 }
