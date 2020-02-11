@@ -174,7 +174,7 @@ public class Qdist013ForAltinnIT {
         stubPostIntiateBrokerService();
         sendStringMessage(qdist013, classpathToString("qdist013/qdist013-happy.xml"));
 
-        await().atMost(20, SECONDS).untilAsserted(() -> {
+        await().atMost(10, SECONDS).untilAsserted(() -> {
             verifyIntiateBrokerServiceStubs("", "***gammelt_fnr***", "***gammelt_fnr***09", 8);
         });
 
@@ -199,7 +199,7 @@ public class Qdist013ForAltinnIT {
 
         sendStringMessage(qdist013, classpathToString("qdist013/qdist013-happy.xml"));
 
-        await().atMost(20, SECONDS).untilAsserted(() -> {
+        await().atMost(10, SECONDS).untilAsserted(() -> {
             verifyAllStubs("", "***gammelt_fnr***", "***gammelt_fnr***09", 8);
         });
 
@@ -782,7 +782,7 @@ public class Qdist013ForAltinnIT {
 
 
     @Test
-    public void AltinnUploadFileshouldThrowTechnicalExceptionLast() {
+    public void altinnUploadFileshouldThrowTechnicalExceptionLast() {
         stubGetForsendelse("__files/rjoark001/getForsendelse-happy.json");
         stubGetSecurityToken();
         stubPostSafJournalpost("queryJournalpostId\":\"123\"", "saf/safQdist013GraphQlResponse-orgnr.json");
