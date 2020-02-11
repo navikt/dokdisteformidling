@@ -116,15 +116,15 @@ public class BrokerServiceExternalService {
         return arrayOfRecipient;
     }
 
-    private BrokerServiceSearch getBrokerServiceSearch(String orgnr, ServiceCode serviceCode, SearchCriteria criteria) {
+    public BrokerServiceSearch getBrokerServiceSearch(String orgnr, ServiceCode serviceCode, SearchCriteria criteria) {
         BrokerServiceSearch brokerServiceSearch = new BrokerServiceSearch();
         brokerServiceSearch.setFileStatus(criteria.getAvailableFileStatus());
         brokerServiceSearch.setReportee(orgnr);
         ObjectFactory objectFactory = new ObjectFactory();
         brokerServiceSearch.setExternalServiceCode(objectFactory.createBrokerServiceSearchExternalServiceCode(serviceCode.getServiceCode()));
         brokerServiceSearch.setExternalServiceEditionCode(serviceCode.getServiceEditionCode());
-        brokerServiceSearch.setMinSentDateTime(convertLocalDateTimeToXmlGregorianCalendar(criteria.getMinSentDate()));
-        brokerServiceSearch.setMaxSentDateTime(convertLocalDateTimeToXmlGregorianCalendar(criteria.getMaxSentDate()));
+        brokerServiceSearch.setMinSentDateTime(criteria.getMinSentDate() == null ? null : convertLocalDateTimeToXmlGregorianCalendar(criteria.getMinSentDate()));
+        brokerServiceSearch.setMaxSentDateTime(criteria.getMaxSentDate() == null ? null : convertLocalDateTimeToXmlGregorianCalendar(criteria.getMaxSentDate()));
         return brokerServiceSearch;
     }
 }

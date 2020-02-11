@@ -9,7 +9,6 @@ import org.apache.cxf.message.Message;
 import javax.xml.namespace.QName;
 import java.net.URL;
 import java.util.HashMap;
-import java.util.Properties;
 
 /**
  * Abstract helper class for Cxf Endpoints
@@ -23,29 +22,29 @@ public abstract class AbstractCxfEndpointConfig {
 	private int connectTimeout = DEFAULT_TIMEOUT;
 	private final JaxWsProxyFactoryBean factoryBean;
 
-	AbstractCxfEndpointConfig(Bus bus) {
+	public AbstractCxfEndpointConfig(Bus bus) {
 		factoryBean = new JaxWsProxyFactoryBean();
 		factoryBean.setProperties(new HashMap<>());
 		factoryBean.setBus(bus);
 	}
 
-	void setAddress(String aktoerUrl) {
+	protected void setAddress(String aktoerUrl) {
 		factoryBean.setAddress(aktoerUrl);
 	}
 
-	void setWsdlUrl(String classPathResourceWsdlUrl) {
+	protected void setWsdlUrl(String classPathResourceWsdlUrl) {
 		factoryBean.setWsdlURL(getUrlFromClasspathResource(classPathResourceWsdlUrl));
 	}
 
-	void setEndpointName(QName endpointName) {
+	protected void setEndpointName(QName endpointName) {
 		factoryBean.setEndpointName(endpointName);
 	}
 
-	void setServiceName(QName serviceName) {
+	protected void setServiceName(QName serviceName) {
 		factoryBean.setServiceName(serviceName);
 	}
 
-	void addFeature(Feature feature) {
+	protected void addFeature(Feature feature) {
 		factoryBean.getFeatures().add(feature);
 	}
 
@@ -69,7 +68,7 @@ public abstract class AbstractCxfEndpointConfig {
 		factoryBean.getProperties().put(propertyKey, propertyValue);
 	}
 
-	<T> T createPort(Class<T> portType) {
+	protected <T> T createPort(Class<T> portType) {
 		factoryBean.getFeatures().add(new TimeoutFeature(receiveTimeout, connectTimeout));
 		return factoryBean.create(portType);
 	}
@@ -82,11 +81,11 @@ public abstract class AbstractCxfEndpointConfig {
 		throw new IllegalStateException("Failed to find resource: " + classpathResource);
 	}
 
-	void setReceiveTimeout(int receiveTimeout) {
+	protected void setReceiveTimeout(int receiveTimeout) {
 		this.receiveTimeout = receiveTimeout;
 	}
 
-	void setConnectTimeout(int connectTimeout) {
+	protected void setConnectTimeout(int connectTimeout) {
 		this.connectTimeout = connectTimeout;
 	}
 

@@ -12,15 +12,15 @@ import no.nav.dokdisteformidling.config.props.DpoUserProperties;
 import org.apache.cxf.Bus;
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.frontend.ClientProxy;
-import org.apache.cxf.interceptor.LoggingInInterceptor;
-import org.apache.cxf.interceptor.LoggingOutInterceptor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 
 import javax.inject.Inject;
 import java.io.IOException;
 
 @Configuration
+@Profile("nais")
 public class BrokerServiceExternalConfig extends AbstractCxfEndpointConfig {
     @Inject
     public BrokerServiceExternalConfig(Bus bus) {
