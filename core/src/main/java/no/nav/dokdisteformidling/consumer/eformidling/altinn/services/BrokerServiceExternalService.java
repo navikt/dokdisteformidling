@@ -116,7 +116,7 @@ public class BrokerServiceExternalService {
         return arrayOfRecipient;
     }
 
-    public BrokerServiceSearch getBrokerServiceSearch(String orgnr, ServiceCode serviceCode, SearchCriteria criteria) {
+    private BrokerServiceSearch getBrokerServiceSearch(String orgnr, ServiceCode serviceCode, SearchCriteria criteria) {
         BrokerServiceSearch brokerServiceSearch = new BrokerServiceSearch();
         brokerServiceSearch.setFileStatus(criteria.getAvailableFileStatus());
         brokerServiceSearch.setReportee(orgnr);
