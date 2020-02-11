@@ -1,13 +1,13 @@
-package no.nav.dokdisteformidling.config.cxf;
+package no.nav.dokdisteformidling.qdist013.itest.config;
 
-
-import no.altinn.brokerserviceexternal.BrokerServiceExternalSF;
-import no.altinn.brokerserviceexternal.IBrokerServiceExternal;
+import no.altinn.brokerserviceexternalstreamed.BrokerServiceExternalStreamedSF;
+import no.altinn.brokerserviceexternalstreamed.IBrokerServiceExternalStreamed;
+import no.nav.dokdisteformidling.config.cxf.AbstractCxfEndpointConfig;
 import no.nav.dokdisteformidling.config.interceptor.ClientCallBackHandler;
 import no.nav.dokdisteformidling.config.interceptor.CookiesInInterceptor;
 import no.nav.dokdisteformidling.config.interceptor.CookiesOutInterceptor;
 import no.nav.dokdisteformidling.config.interceptor.HeaderOutInterceptor;
-import no.nav.dokdisteformidling.config.props.BrokerServiceExternalProperties;
+import no.nav.dokdisteformidling.config.props.BrokerServiceExternalStreamedProperties;
 import no.nav.dokdisteformidling.config.props.DpoUserProperties;
 import org.apache.cxf.Bus;
 import org.apache.cxf.endpoint.Client;
@@ -16,37 +16,35 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 
-import javax.inject.Inject;
 import java.io.IOException;
 
 @Configuration
-@Profile("nais")
-public class BrokerServiceExternalConfig extends AbstractCxfEndpointConfig {
-    @Inject
-    public BrokerServiceExternalConfig(Bus bus) {
+@Profile("itest")
+public class BrokerServiceExternalStreamedConfigTest extends AbstractCxfEndpointConfig {
+
+    public BrokerServiceExternalStreamedConfigTest(Bus bus) {
         super(bus);
     }
 
-    @SuppressWarnings("unchecked")
     @Bean
-    public IBrokerServiceExternal iBrokerServiceExternal(BrokerServiceExternalProperties brokerServiceExternalProperties,
-                                                         DpoUserProperties dpoUserProperties) throws IOException {
-        setWsdlUrl("wsdl/BrokerServiceExternal.wsdl");
-        setServiceName(BrokerServiceExternalSF.SERVICE);
-        setEndpointName(BrokerServiceExternalSF.CustomBindingIBrokerServiceExternal);
-        setAddress(brokerServiceExternalProperties.getEndpointurl());
-        setReceiveTimeout(brokerServiceExternalProperties.getReadtimeoutms());
-        setConnectTimeout(brokerServiceExternalProperties.getConnecttimeoutms());
+    public IBrokerServiceExternalStreamed iBrokerServiceExternalStreamed(BrokerServiceExternalStreamedProperties brokerServiceExternalStreamedProperties, DpoUserProperties dpoUserProperties) throws IOException {
+        setWsdlUrl("wsdl/BrokerServiceExternalStreamedTest.wsdl");
+        setServiceName(BrokerServiceExternalStreamedSF.SERVICE);
+        setEndpointName(BrokerServiceExternalStreamedSF.CustomBindingIBrokerServiceExternalStreamed);
+        setAddress(brokerServiceExternalStreamedProperties.getEndpointurl());
+        setReceiveTimeout(brokerServiceExternalStreamedProperties.getReadtimeoutms());
+        setConnectTimeout(brokerServiceExternalStreamedProperties.getConnecttimeoutms());
 
         addInInterceptor(new CookiesInInterceptor());
         addOutInterceptor(new HeaderOutInterceptor());
         addOutInterceptor(new CookiesOutInterceptor());
 
-        IBrokerServiceExternal iBrokerServiceExternalEC2 = createPort(IBrokerServiceExternal.class);
-        final Client client = ClientProxy.getClient(iBrokerServiceExternalEC2);
+        IBrokerServiceExternalStreamed iBrokerServiceExternalStreamed = createPort(IBrokerServiceExternalStreamed.class);
+        final Client client = ClientProxy.getClient(iBrokerServiceExternalStreamed);
         setRequestContext(client, dpoUserProperties);
-        return iBrokerServiceExternalEC2;
+        return iBrokerServiceExternalStreamed;
     }
+
 
     private void setRequestContext(final Client client, DpoUserProperties dpoUserProperties) {
         client.getRequestContext().put("ws-security.must-understand", Boolean.TRUE);
@@ -55,4 +53,5 @@ public class BrokerServiceExternalConfig extends AbstractCxfEndpointConfig {
         client.getRequestContext().put("org.apache.cxf.message.Message.MAINTAIN_SESSION", Boolean.TRUE);
         client.getRequestContext().put("javax.xml.ws.session.maintain", Boolean.TRUE);
     }
+
 }
