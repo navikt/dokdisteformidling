@@ -7,7 +7,6 @@ import no.nav.dokdisteformidling.consumer.eformidling.altinn.mapper.InputStreamD
 import no.nav.dokdisteformidling.consumer.eformidling.altinn.services.BrokerServiceExternalService;
 import no.nav.dokdisteformidling.consumer.eformidling.altinn.services.BrokerServiceExternalStreamedService;
 import no.nav.dokdisteformidling.consumer.eformidling.altinn.to.ReceiptTo;
-import no.nav.dokdisteformidling.consumer.eformidling.altinn.to.ServiceCode;
 import no.nav.dokdisteformidling.consumer.eformidling.altinn.to.UploadManifest;
 import no.nav.dokdisteformidling.consumer.eformidling.altinn.to.UploadResponse;
 import no.nav.dokdisteformidling.consumer.eformidling.dokumentpakker.EformidlingMessagePackager;
@@ -18,11 +17,8 @@ import org.springframework.stereotype.Component;
 import javax.activation.DataHandler;
 import javax.inject.Inject;
 import java.io.InputStream;
-import java.util.Arrays;
 
 import static no.nav.dokdisteformidling.consumer.eformidling.EformidlingConstants.NAV_ORGNUMMER;
-import static no.nav.dokdisteformidling.consumer.eformidling.dokumentpakker.EformidlingMessagePackager.EFORMIDLING_ASIC;
-import static no.nav.dokdisteformidling.consumer.eformidling.dokumentpakker.EformidlingMessagePackager.EFORMIDLING_SBD;
 
 /**
  * @author Joakim Bjørnstad, Jbit AS
@@ -84,11 +80,4 @@ class AltinnEformidling implements Eformidling {
                 .build();
     }
 
-    public ServiceCode getServiceCode() {
-        MottakerInfo mottakerInfo = eformidlingMottakerInfoService.hentMottakerInfoTrygderetten();
-        return ServiceCode.builder()
-                .serviceCode(mottakerInfo.getServiceCode())
-                .serviceEditionCode(Integer.valueOf(mottakerInfo.getServiceEditionCode()))
-                .build();
-    }
 }

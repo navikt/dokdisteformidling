@@ -1,17 +1,11 @@
 package no.nav.dokdisteformidling.consumer.eformidling.altinn.to;
 
 
-import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.Value;
 
-@Getter
-@Setter
+@Value
 @Builder
-@AllArgsConstructor
-@NoArgsConstructor
 public class ServiceCode {
 
     private String serviceCode;
