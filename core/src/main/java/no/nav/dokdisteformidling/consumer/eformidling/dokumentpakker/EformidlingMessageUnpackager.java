@@ -1,18 +1,16 @@
 package no.nav.dokdisteformidling.consumer.eformidling.dokumentpakker;
 
 import lombok.extern.slf4j.Slf4j;
+import no.altinn.schema.services.serviceengine.broker._2015._06.BrokerServiceManifest;
 import no.nav.dokdisteformidling.consumer.eformidling.altinn.from.AltinnDokument;
 import no.nav.dokdisteformidling.consumer.eformidling.altinn.from.DownloadedMessageFromAltinn;
 import no.nav.dokdisteformidling.consumer.eformidling.dokumentpakker.exceptions.DokumentpakkingException;
 import no.nav.dokdisteformidling.consumer.eformidling.dokumentpakker.sbdh.StandardBusinessDocument;
-import no.nav.dokdisteformidling.consumer.eformidling.dokumentpakker.sbdh.StandardBusinessDocumentHeader;
 import org.springframework.stereotype.Component;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
-import javax.xml.transform.Source;
-import javax.xml.transform.stream.StreamSource;
 import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -39,8 +37,7 @@ public class EformidlingMessageUnpackager {
 
     static {
         try {
-            jaxbContext = JAXBContext.newInstance(new Class[]{ArkivmeldingKvitteringMessage.class,
-                    StandardBusinessDocumentHeader.class, StandardBusinessDocument.class}, new HashMap());
+            jaxbContext = JAXBContext.newInstance(new Class[]{BrokerServiceManifest.class, StandardBusinessDocument.class}, new HashMap());
         } catch (JAXBException e) {
             log.error(JAXB_CONTEXTCREATION_EXCEPTION, e);
             throw new DokumentpakkingException(JAXB_CONTEXTCREATION_EXCEPTION, e);
@@ -68,6 +65,7 @@ public class EformidlingMessageUnpackager {
         log.info("Pakker ut fil med referansenummer: " + melding.getFileReference().getFileReference());
         ZipInputStream zipInputStream = new ZipInputStream(melding.getInputStream());
         StandardBusinessDocument sbd;
+        BrokerServiceManifest manifest;
 
         try (InputStream inputStreamProxy = new FilterInputStream(zipInputStream) {
             @Override
@@ -78,13 +76,15 @@ public class EformidlingMessageUnpackager {
             Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
 
             ZipEntry zipEntry;
+            manifest = null;
             sbd = null;
 
             while ((zipEntry = zipInputStream.getNextEntry()) != null) {
                 switch (zipEntry.getName()) {
-                    case AltinnDokument.CONTENT_XML:
-                        Source source = new StreamSource(inputStreamProxy);
-                        sbd = unmarshaller.unmarshal(source, StandardBusinessDocument.class).getValue();
+                    case AltinnDokument.MANIFEST_XML_FILENAME:
+                        manifest = (BrokerServiceManifest) unmarshaller.unmarshal(inputStreamProxy);
+                    case AltinnDokument.STANDARDBUSINESSDOCUMENT_JSON_FILENAME:
+                        sbd = (StandardBusinessDocument) unmarshaller.unmarshal(inputStreamProxy);
                         break;
                     default:
                         log.info("Hopper over fil: {}", zipEntry.getName());
@@ -92,7 +92,7 @@ public class EformidlingMessageUnpackager {
             }
         }
         return AltinnDokument.builder()
-                .fileReferance(melding.getFileReference().getFileReference())
+                .manifest(manifest)
                 .sbd(sbd)
                 .build();
     }

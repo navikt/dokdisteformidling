@@ -10,5 +10,7 @@ import java.util.Set;
 @Builder
 public class DownloadResponse {
     private final String conversationId;
+    private final String sendersReference;
+    private final String sendtDate;
     private final Set<KvitteringStatusMessage> kvitteringStatus;
 }

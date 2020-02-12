@@ -4,6 +4,7 @@ import no.nav.dokdisteformidling.AppTestUtils;
 import no.nav.dokdisteformidling.certificate.AppCertificate;
 import no.nav.dokdisteformidling.consumer.eformidling.NavDokument;
 import no.nav.dokdisteformidling.consumer.eformidling.NavDokumentpakke;
+import no.nav.dokdisteformidling.consumer.eformidling.dokumentpakker.exceptions.DokumentpakkingException;
 import org.junit.jupiter.api.Test;
 
 import java.io.ByteArrayInputStream;
@@ -20,6 +21,7 @@ import static no.nav.dokdisteformidling.constants.DomainConstants.DEFAULT_ZONE_I
 import static no.nav.dokdisteformidling.consumer.eformidling.dokumentpakker.EformidlingMessagePackager.EFORMIDLING_ASIC;
 import static no.nav.dokdisteformidling.consumer.eformidling.dokumentpakker.EformidlingMessagePackager.EFORMIDLING_SBD;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  * @author Joakim Bjørnstad, Jbit AS
@@ -53,7 +55,7 @@ class EformidlingMessagePackagerTest {
 	}
 
 	@Test
-	void shouldThrowDokumentpakkingExceptionWhenNullArkivmeldingInputStream() throws Exception {
+	void shouldThrowDokumentpakkingExceptionWhenNullArkivmeldingInputStream() {
 		final NavDokumentpakke navDokumentpakke = NavDokumentpakke.builder()
 				.conversationId("1")
 				.bestillingsId("2")
@@ -61,11 +63,11 @@ class EformidlingMessagePackagerTest {
 				.navDokumenter(Collections.singletonList(NavDokument.fromVedlegg("test1.pdf", new ByteArrayInputStream("test1pdf".getBytes()))))
 				.build();
 
-//		final DokumentpakkingException dokumentpakkingException = assertThrows(DokumentpakkingException.class, () -> {
-//			eformidlingMessagePackager.packageMessage(navDokumentpakke,
-//					new AppCertificate(itestVirksomhetssertifikatProperties()),
-//					itestPemCertificate());
-//		});
-//		assertThat(dokumentpakkingException.getMessage()).isEqualTo("Klarte ikke lage asic eller kryptere dokumentpakke.");
+		final DokumentpakkingException dokumentpakkingException = assertThrows(DokumentpakkingException.class, () -> {
+			eformidlingMessagePackager.packageMessage(navDokumentpakke,
+					new AppCertificate(itestVirksomhetssertifikatProperties()),
+					itestPemCertificate());
+		});
+		assertThat(dokumentpakkingException.getMessage()).isEqualTo("Klarte ikke lage asic eller kryptere dokumentpakke.");
 	}
 }

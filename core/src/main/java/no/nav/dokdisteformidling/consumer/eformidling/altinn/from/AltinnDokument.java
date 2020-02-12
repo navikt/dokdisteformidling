@@ -2,15 +2,15 @@ package no.nav.dokdisteformidling.consumer.eformidling.altinn.from;
 
 import lombok.Builder;
 import lombok.Value;
+import no.altinn.schema.services.serviceengine.broker._2015._06.BrokerServiceManifest;
 import no.nav.dokdisteformidling.consumer.eformidling.dokumentpakker.sbdh.StandardBusinessDocument;
 
 @Builder
 @Value
 public class AltinnDokument {
-    public static final String ARKIVMELDINGKVITTERING_XML_FILENAME = "arkivmelding_kvittering.xml";
-    public static final String STANDARDBUSINESSDOCUMENTHEADER = "standardBusinessDocumentHeader.xml";
-    public static final String CONTENT_XML = "content.xml";
+    public static final String MANIFEST_XML_FILENAME = "manifest.xml";
+    public static final String STANDARDBUSINESSDOCUMENT_JSON_FILENAME = "sbd.json";
 
-    private final String fileReferance;
+    private final BrokerServiceManifest manifest;
     private final StandardBusinessDocument sbd;
 }
