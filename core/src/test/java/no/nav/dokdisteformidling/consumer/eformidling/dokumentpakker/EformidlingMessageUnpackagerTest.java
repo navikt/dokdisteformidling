@@ -3,7 +3,7 @@ package no.nav.dokdisteformidling.consumer.eformidling.dokumentpakker;
 import no.nav.dokdisteformidling.consumer.eformidling.altinn.from.AltinnDokument;
 import no.nav.dokdisteformidling.consumer.eformidling.altinn.from.DownloadedMessageFromAltinn;
 import no.nav.dokdisteformidling.consumer.eformidling.altinn.to.FileReference;
-import no.nav.dokdisteformidling.consumer.eformidling.dokumentpakker.sbdh.BrokerServiceManifest;
+import no.nav.dokdisteformidling.consumer.eformidling.dokumentpakker.brokerservicemanifest.BrokerServiceManifest;
 import no.nav.dokdisteformidling.consumer.eformidling.dokumentpakker.sbdh.StandardBusinessDocument;
 import org.junit.jupiter.api.Test;
 

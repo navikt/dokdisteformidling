@@ -2,7 +2,7 @@ package no.nav.dokdisteformidling.consumer.eformidling.altinn.from;
 
 import lombok.Builder;
 import lombok.Value;
-import no.nav.dokdisteformidling.consumer.eformidling.dokumentpakker.sbdh.BrokerServiceManifest;
+import no.nav.dokdisteformidling.consumer.eformidling.dokumentpakker.brokerservicemanifest.BrokerServiceManifest;
 import no.nav.dokdisteformidling.consumer.eformidling.dokumentpakker.sbdh.StandardBusinessDocument;
 
 @Builder

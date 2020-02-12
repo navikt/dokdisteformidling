@@ -3,8 +3,8 @@ package no.nav.dokdisteformidling.consumer.eformidling.dokumentpakker;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.dokdisteformidling.consumer.eformidling.altinn.from.AltinnDokument;
 import no.nav.dokdisteformidling.consumer.eformidling.altinn.from.DownloadedMessageFromAltinn;
+import no.nav.dokdisteformidling.consumer.eformidling.dokumentpakker.brokerservicemanifest.BrokerServiceManifest;
 import no.nav.dokdisteformidling.consumer.eformidling.dokumentpakker.exceptions.DokumentpakkingException;
-import no.nav.dokdisteformidling.consumer.eformidling.dokumentpakker.sbdh.BrokerServiceManifest;
 import no.nav.dokdisteformidling.consumer.eformidling.dokumentpakker.sbdh.StandardBusinessDocument;
 import org.springframework.stereotype.Component;
 
@@ -15,7 +15,6 @@ import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -24,7 +23,7 @@ import java.util.zip.ZipInputStream;
  * Pakker ut en eformidling melding fra Altinn.
  *
  * Meldingen består av:
- * Konvolutt (StandardBusinessDocumentHeader, ArkivmeldingKvittering)
+ * Konvolutt ((StandardBusinessDocument)sbd.json, BrokerServiceManifest.xml)
  */
 @Slf4j
 @Component
@@ -37,7 +36,7 @@ public class EformidlingMessageUnpackager {
 
     static {
         try {
-            jaxbContext = JAXBContext.newInstance(new Class[]{BrokerServiceManifest.class, StandardBusinessDocument.class}, new HashMap());
+            jaxbContext = JAXBContext.newInstance(BrokerServiceManifest.class);
         } catch (JAXBException e) {
             log.error(JAXB_CONTEXTCREATION_EXCEPTION, e);
             throw new DokumentpakkingException(JAXB_CONTEXTCREATION_EXCEPTION, e);
