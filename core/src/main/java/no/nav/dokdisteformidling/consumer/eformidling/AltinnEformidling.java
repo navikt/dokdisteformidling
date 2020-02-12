@@ -117,6 +117,6 @@ class AltinnEformidling implements Eformidling {
     }
 
     private List<DownloadResponse> getDownloadResponses(List<AltinnDokument> altinnDokuments) {
-        return altinnDokuments.stream().map(altinnDokument -> new DownloadResponseBuilder().withStandardBusinessDocument(altinnDokument.getSbd()).build()).collect(Collectors.toList());
+        return altinnDokuments.stream().map(altinnDokument -> new DownloadResponseBuilder().withAltinnDokument(altinnDokument).build()).collect(Collectors.toList());
     }
 }
