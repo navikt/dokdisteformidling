@@ -1,9 +1,9 @@
 package no.nav.dokdisteformidling.consumer.eformidling.dokumentpakker;
 
-import no.altinn.schema.services.serviceengine.broker._2015._06.BrokerServiceManifest;
 import no.nav.dokdisteformidling.consumer.eformidling.altinn.from.AltinnDokument;
 import no.nav.dokdisteformidling.consumer.eformidling.altinn.from.DownloadedMessageFromAltinn;
 import no.nav.dokdisteformidling.consumer.eformidling.altinn.to.FileReference;
+import no.nav.dokdisteformidling.consumer.eformidling.dokumentpakker.sbdh.BrokerServiceManifest;
 import no.nav.dokdisteformidling.consumer.eformidling.dokumentpakker.sbdh.StandardBusinessDocument;
 import org.junit.jupiter.api.Test;
 
@@ -11,12 +11,9 @@ import java.io.BufferedInputStream;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -40,13 +37,13 @@ public class EformidlingMessageUnpackagerTest {
         try (FileInputStream fileInputStream = new FileInputStream(fileName)) {
             BufferedInputStream bufferedInputStream = new BufferedInputStream(fileInputStream);
 
-            ZipInputStream zipInputStream = new ZipInputStream(bufferedInputStream);
-            ZipEntry zipEntry;
-            while ((zipEntry = zipInputStream.getNextEntry()) != null) {
-                System.out.format("File: %s Size: %d Last Modified %s %n",
-                        zipEntry.getName(), zipEntry.getSize(),
-                        LocalDate.ofEpochDay(zipEntry.getTime() / MILLIS_IN_A_DAY));
-            }
+//            ZipInputStream zipInputStream = new ZipInputStream(bufferedInputStream);
+//            ZipEntry zipEntry;
+//            while ((zipEntry = zipInputStream.getNextEntry()) != null) {
+//                System.out.format("File: %s Size: %d Last Modified %s %n",
+//                        zipEntry.getName(), zipEntry.getSize(),
+//                        LocalDate.ofEpochDay(zipEntry.getTime() / MILLIS_IN_A_DAY));
+//            }
 
             messageFromAltinns.add(DownloadedMessageFromAltinn.builder()
                     .fileReference(createFileReference("fileReference"))

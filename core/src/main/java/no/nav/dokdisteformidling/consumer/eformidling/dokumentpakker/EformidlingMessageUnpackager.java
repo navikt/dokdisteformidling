@@ -1,10 +1,10 @@
 package no.nav.dokdisteformidling.consumer.eformidling.dokumentpakker;
 
 import lombok.extern.slf4j.Slf4j;
-import no.altinn.schema.services.serviceengine.broker._2015._06.BrokerServiceManifest;
 import no.nav.dokdisteformidling.consumer.eformidling.altinn.from.AltinnDokument;
 import no.nav.dokdisteformidling.consumer.eformidling.altinn.from.DownloadedMessageFromAltinn;
 import no.nav.dokdisteformidling.consumer.eformidling.dokumentpakker.exceptions.DokumentpakkingException;
+import no.nav.dokdisteformidling.consumer.eformidling.dokumentpakker.sbdh.BrokerServiceManifest;
 import no.nav.dokdisteformidling.consumer.eformidling.dokumentpakker.sbdh.StandardBusinessDocument;
 import org.springframework.stereotype.Component;
 
@@ -83,6 +83,7 @@ public class EformidlingMessageUnpackager {
                 switch (zipEntry.getName()) {
                     case AltinnDokument.MANIFEST_XML_FILENAME:
                         manifest = (BrokerServiceManifest) unmarshaller.unmarshal(inputStreamProxy);
+                        break;
                     case AltinnDokument.STANDARDBUSINESSDOCUMENT_JSON_FILENAME:
                         sbd = (StandardBusinessDocument) unmarshaller.unmarshal(inputStreamProxy);
                         break;
