@@ -23,7 +23,7 @@ import java.util.zip.ZipInputStream;
  * Pakker ut en eformidling melding fra Altinn.
  *
  * Meldingen består av:
- * Konvolutt ((StandardBusinessDocument)sbd.json, BrokerServiceManifest.xml)
+ * Konvolutt ((StandardBusinessDocument)sbd.json, manifest.xml)
  */
 @Slf4j
 @Component
