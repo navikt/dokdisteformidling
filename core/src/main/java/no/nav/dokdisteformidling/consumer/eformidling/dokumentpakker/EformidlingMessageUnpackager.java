@@ -52,20 +52,21 @@ public class EformidlingMessageUnpackager {
     }
 
     private AltinnDokument unpack(DownloadedMessageFromAltinn melding) {
-        log.info("Pakker ut zipfil med referansenummer: {}", melding.getFileReference().getFileReference());
+        String fileReference = melding.getFileReference().getFileReference();
+        log.info("Pakker ut zipfil med referansenummer: {}", fileReference);
 
         // Trenger tempFile for å lagre inputStream fra Altinn som fil. Får feilmelding hvis vi unmarshaller direkte fra Altinn meldingens inputStream.
         try (AutoCloseableTempFile tempFile = new AutoCloseableTempFile("altinn", "test")) {
             FileUtils.copyInputStreamToFile(melding.getInputStream(), tempFile.toFile());
 
-            return buildAltinnDokumentFromTempFile(tempFile.toFile());
+            return buildAltinnDokumentFromTempFile(tempFile.toFile(), fileReference);
         } catch (IOException e) {
             log.error(IO_EXCEPTION, e);
             throw new DokumentUnpackingException(IO_EXCEPTION, e);
         }
     }
 
-    private AltinnDokument buildAltinnDokumentFromTempFile(File tempFile) {
+    private AltinnDokument buildAltinnDokumentFromTempFile(File tempFile, String fileReference) {
         BrokerServiceManifest manifest = null;
         TrygderettenMelding trygderettenMelding = null;
 
@@ -86,7 +87,7 @@ public class EformidlingMessageUnpackager {
             log.error(UNMARSHALLING_EXCEPTION, e);
             throw new DokumentUnpackingException(UNMARSHALLING_EXCEPTION, e);
         }
-        return AltinnDokument.builder().manifest(manifest).trygderettenMelding(trygderettenMelding).build();
+        return AltinnDokument.builder().fileReference(fileReference).manifest(manifest).trygderettenMelding(trygderettenMelding).build();
 
     }
 

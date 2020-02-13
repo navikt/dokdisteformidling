@@ -11,6 +11,7 @@ public class AltinnDokument {
     public static final String MANIFEST_XML = "manifest.xml";
     public static final String SBD_JSON = "sbd.json";
 
+    private final String fileReference;
     private final BrokerServiceManifest manifest;
     private final TrygderettenMelding trygderettenMelding;
 }
