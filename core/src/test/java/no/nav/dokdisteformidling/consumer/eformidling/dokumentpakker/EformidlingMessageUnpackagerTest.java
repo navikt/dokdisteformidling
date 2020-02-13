@@ -3,8 +3,9 @@ package no.nav.dokdisteformidling.consumer.eformidling.dokumentpakker;
 import no.nav.dokdisteformidling.consumer.eformidling.altinn.from.AltinnDokument;
 import no.nav.dokdisteformidling.consumer.eformidling.altinn.from.DownloadedMessageFromAltinn;
 import no.nav.dokdisteformidling.consumer.eformidling.altinn.to.FileReference;
-import no.nav.dokdisteformidling.consumer.eformidling.dokumentpakker.brokerservicemanifest.BrokerServiceManifest;
-import no.nav.dokdisteformidling.consumer.eformidling.dokumentpakker.sbdh.StandardBusinessDocument;
+import no.nav.dokdisteformidling.consumer.eformidling.dokumentpakker.trygderetten.json.KvitteringStatus;
+import no.nav.dokdisteformidling.consumer.eformidling.dokumentpakker.trygderetten.json.TrygderettenMelding;
+import no.nav.dokdisteformidling.consumer.eformidling.dokumentpakker.trygderetten.xml.BrokerServiceManifest;
 import org.junit.jupiter.api.Test;
 
 import java.io.BufferedInputStream;
@@ -13,7 +14,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -50,12 +50,13 @@ public class EformidlingMessageUnpackagerTest {
         assertThat(actualManifest).isNotNull();
         assertThat(actualManifest.getSendersReference()).isEqualTo(SENDERS_REFERENCE);
 
-        StandardBusinessDocument actualSbd = altinnDokument.getSbd();
+        TrygderettenMelding actualSbd = altinnDokument.getTrygderettenMelding();
         assertThat(actualSbd).isNotNull();
         assertThat(actualSbd.getConversationId()).isEqualTo(CONVERSATION_ID);
 
-        Set<KvitteringStatusMessage> kvitteringStatusMessages = ((ArkivmeldingKvitteringMessage) actualSbd.getForretningsmelding()).getMessage();
-        assertThat(kvitteringStatusMessages.size()).isEqualTo(1);
+        KvitteringStatus status = actualSbd.getStatus();
+        assertThat(status).isNotNull();
+        assertThat(status.getStatus()).isEqualTo("MOTTATT");
 
     }
 

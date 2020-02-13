@@ -2,26 +2,23 @@ package no.nav.dokdisteformidling.consumer.eformidling.altinn.mapper;
 
 import no.nav.dokdisteformidling.consumer.eformidling.altinn.from.AltinnDokument;
 import no.nav.dokdisteformidling.consumer.eformidling.altinn.from.DownloadResponse;
-import no.nav.dokdisteformidling.consumer.eformidling.dokumentpakker.ArkivmeldingKvitteringMessage;
-import no.nav.dokdisteformidling.consumer.eformidling.dokumentpakker.KvitteringStatusMessage;
-import no.nav.dokdisteformidling.consumer.eformidling.dokumentpakker.sbdh.StandardBusinessDocument;
-
-import java.util.Set;
+import no.nav.dokdisteformidling.consumer.eformidling.dokumentpakker.trygderetten.json.KvitteringStatus;
+import no.nav.dokdisteformidling.consumer.eformidling.dokumentpakker.trygderetten.json.TrygderettenMelding;
 
 public class DownloadResponseBuilder {
 
     String conversationId;
     String sendersReference;
     String sendtDate;
-    Set<KvitteringStatusMessage> kvitteringStatus;
+    KvitteringStatus kvitteringStatus;
 
     public DownloadResponseBuilder withAltinnDokument(AltinnDokument altinnDokument) {
 
-        StandardBusinessDocument sbd = altinnDokument.getSbd();
-        this.conversationId = sbd.getConversationId();
+        TrygderettenMelding trygderettenMelding = altinnDokument.getTrygderettenMelding();
+        this.conversationId = trygderettenMelding.getConversationId();
         this.sendersReference = altinnDokument.getManifest().getSendersReference();
         this.sendtDate = altinnDokument.getManifest().getSentDate().toString();
-        this.kvitteringStatus = ((ArkivmeldingKvitteringMessage) sbd.getForretningsmelding()).getMessage();
+        this.kvitteringStatus = trygderettenMelding.getStatus();
         return this;
     }
 
