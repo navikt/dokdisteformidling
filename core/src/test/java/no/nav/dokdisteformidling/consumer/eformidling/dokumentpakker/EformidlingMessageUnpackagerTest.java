@@ -25,9 +25,9 @@ public class EformidlingMessageUnpackagerTest {
     @Test
     void shouldUnpackTestZipFile() throws Exception {
 
-        String fileName = "src/test/resources/zip/zipEgen.zip";
+        String fileName = "src/test/resources/zip/altinn_sbd_kvittering.zip";
         List<DownloadedMessageFromAltinn> messageFromAltinns = new ArrayList<>();
-        AltinnDokument altinnDokument = null;
+        AltinnDokument altinnDokument;
 
         try (FileInputStream fileInputStream = new FileInputStream(fileName)) {
             BufferedInputStream bufferedInputStream = new BufferedInputStream(fileInputStream);

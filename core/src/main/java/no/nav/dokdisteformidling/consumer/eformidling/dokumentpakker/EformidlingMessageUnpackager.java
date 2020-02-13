@@ -8,16 +8,19 @@ import no.nav.dokdisteformidling.consumer.eformidling.altinn.from.DownloadedMess
 import no.nav.dokdisteformidling.consumer.eformidling.dokumentpakker.exceptions.DokumentpakkingException;
 import no.nav.dokdisteformidling.consumer.eformidling.dokumentpakker.trygderetten.json.TrygderettenMelding;
 import no.nav.dokdisteformidling.consumer.eformidling.dokumentpakker.trygderetten.xml.BrokerServiceManifest;
+import org.apache.commons.io.FileUtils;
 import org.springframework.stereotype.Component;
 
 import javax.xml.bind.JAXBException;
-import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.List;
 import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
+import java.util.zip.ZipFile;
 
 /**
  * Pakker ut en eformidling melding fra Altinn.
@@ -31,6 +34,7 @@ public class EformidlingMessageUnpackager {
 
     private static final String IO_EXCEPTION = "Feil med IO ved unmarshalling";
     private static final String UNMARSHALLING_EXCEPTION = "Feil ved unmarshalling med JAXB";
+
 
     public List<AltinnDokument> unpackageMessages(List<DownloadedMessageFromAltinn> messageFromAltinns) {
         List<AltinnDokument> altinnDokuments = new ArrayList<>();
@@ -50,32 +54,26 @@ public class EformidlingMessageUnpackager {
     }
 
     private AltinnDokument unpack(DownloadedMessageFromAltinn melding) throws JAXBException, IOException {
-        log.info("Pakker ut fil med referansenummer: " + melding.getFileReference().getFileReference());
-        ZipInputStream zipInputStream = new ZipInputStream(melding.getInputStream());
+        String filReference = melding.getFileReference().getFileReference();
+        log.info("Pakker ut zipfil med referansenummer: " + filReference);
 
-        BrokerServiceManifest manifest;
-        TrygderettenMelding trygderettenMelding;
-        try (InputStream inputStreamProxy = new FilterInputStream(zipInputStream) {
-            @Override
-            public void close() {
-                // do nothing to avoid unmarshaller to close it before the Zip file is fully processed
-            }
-        }) {
+        final Path tempFile = Files.createTempFile("altinn", "test");
+        FileUtils.copyInputStreamToFile(this.getClass().getResourceAsStream("/zip/altinn_sbd_kvittering.zip"), tempFile.toFile());
+        BrokerServiceManifest manifest = null;
+        TrygderettenMelding trygderettenMelding = null;
 
-            ZipEntry zipEntry;
-            manifest = null;
-            trygderettenMelding = null;
-
-            while ((zipEntry = zipInputStream.getNextEntry()) != null) {
-                switch (zipEntry.getName()) {
-                    case AltinnDokument.MANIFEST_XML_FILENAME:
-                        manifest = XmlUtils.unmarshalXmlObject(inputStreamProxy, BrokerServiceManifest.class);
-                        break;
-                    case AltinnDokument.STANDARDBUSINESSDOCUMENT_JSON_FILENAME:
-                        trygderettenMelding = JsonUtils.toObject(inputStreamProxy, TrygderettenMelding.class);
-                        break;
-                    default:
-                        log.info("Hopper over fil: {}", zipEntry.getName());
+        try (ZipFile zipFile = new ZipFile(tempFile.toFile())) {
+            Enumeration<? extends ZipEntry> entries = zipFile.entries();
+            while (entries.hasMoreElements()) {
+                ZipEntry zipEntry = entries.nextElement();
+                log.info(filReference + " inneholder: " + zipEntry.getName());
+                final InputStream inputStream = zipFile.getInputStream(zipEntry);
+                if (AltinnDokument.MANIFEST_XML_FILENAME.equals(zipEntry.getName())) {
+                    manifest = XmlUtils.unmarshalXmlObject(inputStream, BrokerServiceManifest.class);
+                } else if (AltinnDokument.STANDARDBUSINESSDOCUMENT_JSON_FILENAME.equals(zipEntry.getName())) {
+                    trygderettenMelding = JsonUtils.toObject(inputStream, TrygderettenMelding.class);
+                } else {
+                    log.info("Hopper over fil " + zipEntry.getName());
                 }
             }
         }
@@ -84,5 +82,4 @@ public class EformidlingMessageUnpackager {
                 .trygderettenMelding(trygderettenMelding)
                 .build();
     }
-
 }
