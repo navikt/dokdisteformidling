@@ -67,7 +67,7 @@ class AltinnEformidlingManualTest {
 		ServiceRegistryConsumer serviceRegistryConsumer = new ServiceRegistryConsumer(serviceRegistryProperties, maskinportenTokenConsumer, new RestTemplateBuilder());
 		EformidlingMottakerInfoService eformidlingMottakerInfoService = new EformidlingMottakerInfoService(serviceRegistryConsumer);
 		EformidlingMessagePackager eformidlingMessagePackager = new EformidlingMessagePackager(
-				new JacksonConfig().eformidlingObjectMapper(),
+				new JacksonConfig().eformidlingObjectMapper(SYSTEM_CLOCK),
 				new StandardBusinessDocumentMapper(SYSTEM_CLOCK),
 				new EformidlingContentPackager());
 //		final Eformidling eformidling = new AltinnEformidling(appCertificate, eformidlingMottakerInfoService, eformidlingMessagePackager, null, null);
