@@ -8,8 +8,8 @@ import no.nav.dokdisteformidling.consumer.eformidling.dokumentpakker.trygderette
 @Builder
 @Value
 public class AltinnDokument {
-    public static final String MANIFEST_XML_FILENAME = "manifest.xml";
-    public static final String STANDARDBUSINESSDOCUMENT_JSON_FILENAME = "sbd.json";
+    public static final String MANIFEST_XML = "manifest.xml";
+    public static final String SBD_JSON = "sbd.json";
 
     private final BrokerServiceManifest manifest;
     private final TrygderettenMelding trygderettenMelding;
