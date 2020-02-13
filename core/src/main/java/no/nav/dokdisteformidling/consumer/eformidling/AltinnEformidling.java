@@ -99,6 +99,7 @@ class AltinnEformidling implements Eformidling {
 
         List<DownloadedMessageFromAltinn> messagesFromAltinn = brokerServiceExternalStreamedService.downloadFilesFromAltinn(availableFiles);
         List<AltinnDokument> altinnDokuments = eformidlingMessageUnpackager.unpackageMessages(messagesFromAltinn);
+        brokerServiceExternalService.confirmDownloaded(altinnDokuments);
         return getDownloadResponses(altinnDokuments);
     }
 
