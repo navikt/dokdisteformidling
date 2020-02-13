@@ -6,4 +6,4 @@
 //
 
 @javax.xml.bind.annotation.XmlSchema(namespace = "http://schema.altinn.no/services/ServiceEngine/Broker/2015/06", elementFormDefault = javax.xml.bind.annotation.XmlNsForm.QUALIFIED)
-package no.nav.dokdisteformidling.consumer.eformidling.dokumentpakker.brokerservicemanifest;
+package no.nav.dokdisteformidling.consumer.eformidling.dokumentpakker.trygderetten.xml;

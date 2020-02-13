@@ -13,6 +13,7 @@ import no.altinn.brokerserviceexternal.IBrokerServiceExternalTestAltinnFaultFaul
 import no.altinn.brokerserviceexternal.Manifest;
 import no.altinn.brokerserviceexternal.ObjectFactory;
 import no.altinn.brokerserviceexternal.Recipient;
+import no.nav.dokdisteformidling.consumer.eformidling.altinn.from.AltinnDokument;
 import no.nav.dokdisteformidling.consumer.eformidling.altinn.mapper.ManifestBuilder;
 import no.nav.dokdisteformidling.consumer.eformidling.altinn.to.AltinnReasonFactory;
 import no.nav.dokdisteformidling.consumer.eformidling.altinn.to.FileReference;
@@ -64,6 +65,10 @@ public class BrokerServiceExternalService {
         } catch (IBrokerServiceExternalGetAvailableFilesAltinnFaultFaultFaultMessage e) {
             throw new AltinnBrokerServiceWsException(GET_AVAILABLE_FILES_FEILET, AltinnReasonFactory.from(e), e);
         }
+    }
+
+    public void confirmDownloaded(List<AltinnDokument> altinnDokuments) {
+        altinnDokuments.forEach(altinnDokument -> confirmDownloaded(altinnDokument.getFileReference()));
     }
 
     protected void confirmDownloaded(String fileReference) {
