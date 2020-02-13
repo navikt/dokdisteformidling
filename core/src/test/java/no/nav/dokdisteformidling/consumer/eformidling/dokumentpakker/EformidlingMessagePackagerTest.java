@@ -31,7 +31,7 @@ class EformidlingMessagePackagerTest {
 	public static final Clock FIXED_CLOCK = Clock.fixed(Instant.parse(FIXED_TIME), DEFAULT_ZONE_ID);
 
 	private final EformidlingMessagePackager eformidlingMessagePackager = new EformidlingMessagePackager(
-			new JacksonConfig().eformidlingObjectMapper(),
+			new JacksonConfig().eformidlingObjectMapper(FIXED_CLOCK),
 			new StandardBusinessDocumentMapper(FIXED_CLOCK),
 			new EformidlingContentPackager());
 
