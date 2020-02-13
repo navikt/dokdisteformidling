@@ -13,8 +13,6 @@ import no.nav.dokdisteformidling.consumer.eformidling.altinn.services.BrokerServ
 import no.nav.dokdisteformidling.consumer.eformidling.altinn.services.BrokerServiceExternalStreamedService;
 import no.nav.dokdisteformidling.consumer.eformidling.altinn.to.FileReference;
 import no.nav.dokdisteformidling.consumer.eformidling.altinn.to.ReceiptTo;
-import no.nav.dokdisteformidling.consumer.eformidling.altinn.to.SearchCriteria;
-import no.nav.dokdisteformidling.consumer.eformidling.altinn.to.ServiceCode;
 import no.nav.dokdisteformidling.consumer.eformidling.altinn.to.UploadManifest;
 import no.nav.dokdisteformidling.consumer.eformidling.altinn.to.UploadResponse;
 import no.nav.dokdisteformidling.consumer.eformidling.dokumentpakker.EformidlingMessagePackager;
@@ -89,14 +87,6 @@ class AltinnEformidling implements Eformidling {
                 .serviceEditionCode(mottakerInfo.getServiceEditionCode())
                 .fileZipName(FILE_NAME)
                 .senderReference(senderReference)
-                .build();
-    }
-
-    public ServiceCode getServiceCode() {
-        MottakerInfo mottakerInfo = eformidlingMottakerInfoService.hentMottakerInfoTrygderetten();
-        return ServiceCode.builder()
-                .serviceCode(mottakerInfo.getServiceCode())
-                .serviceEditionCode(Integer.parseInt(mottakerInfo.getServiceEditionCode()))
                 .build();
     }
 
