@@ -125,8 +125,8 @@ public class BrokerServiceExternalService {
         ObjectFactory objectFactory = new ObjectFactory();
         brokerServiceSearch.setExternalServiceCode(objectFactory.createBrokerServiceSearchExternalServiceCode(serviceCode.getServiceCode()));
         brokerServiceSearch.setExternalServiceEditionCode(serviceCode.getServiceEditionCode());
-        brokerServiceSearch.setMinSentDateTime(convertLocalDateTimeToXmlGregorianCalendar(criteria.getMinSentDate()));
-        brokerServiceSearch.setMaxSentDateTime(convertLocalDateTimeToXmlGregorianCalendar(criteria.getMaxSentDate()));
+        brokerServiceSearch.setMinSentDateTime(criteria.getMinSentDate() == null ? null : convertLocalDateTimeToXmlGregorianCalendar(criteria.getMinSentDate()));
+        brokerServiceSearch.setMaxSentDateTime(criteria.getMaxSentDate() == null ? null : convertLocalDateTimeToXmlGregorianCalendar(criteria.getMaxSentDate()));
         return brokerServiceSearch;
     }
 }
