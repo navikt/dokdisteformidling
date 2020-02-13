@@ -101,13 +101,13 @@ class AltinnEformidling implements Eformidling {
     }
 
     @Override
-    public void hent() {
+    public List<DownloadResponse> hent() {
         log.info("Henter tilgjengelige filer til NAV fra Trygderetten gjennom formidlingstjenesten");
         List<FileReference> availableFiles = brokerServiceExternalService.getAvailableFiles(getSearchCriteria(), getServiceCode());
 
         List<DownloadedMessageFromAltinn> messagesFromAltinn = brokerServiceExternalStreamedService.downloadFilesFromAltinn(availableFiles);
         List<AltinnDokument> altinnDokuments = eformidlingMessageUnpackager.unpackageMessages(messagesFromAltinn);
-        List<DownloadResponse> downloadResponses = getDownloadResponses(altinnDokuments);
+        return getDownloadResponses(altinnDokuments);
     }
 
     private SearchCriteria getSearchCriteria() {

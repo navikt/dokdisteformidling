@@ -5,9 +5,9 @@ import no.nav.dokdisteformidling.common.JsonUtils;
 import no.nav.dokdisteformidling.common.XmlUtils;
 import no.nav.dokdisteformidling.consumer.eformidling.altinn.from.AltinnDokument;
 import no.nav.dokdisteformidling.consumer.eformidling.altinn.from.DownloadedMessageFromAltinn;
-import no.nav.dokdisteformidling.consumer.eformidling.dokumentpakker.brokerservicemanifest.BrokerServiceManifest;
 import no.nav.dokdisteformidling.consumer.eformidling.dokumentpakker.exceptions.DokumentpakkingException;
-import no.nav.dokdisteformidling.consumer.eformidling.dokumentpakker.sbdh.StandardBusinessDocument;
+import no.nav.dokdisteformidling.consumer.eformidling.dokumentpakker.trygderetten.json.TrygderettenMelding;
+import no.nav.dokdisteformidling.consumer.eformidling.dokumentpakker.trygderetten.xml.BrokerServiceManifest;
 import org.springframework.stereotype.Component;
 
 import javax.xml.bind.JAXBException;
@@ -54,7 +54,7 @@ public class EformidlingMessageUnpackager {
         ZipInputStream zipInputStream = new ZipInputStream(melding.getInputStream());
 
         BrokerServiceManifest manifest;
-        StandardBusinessDocument sbd;
+        TrygderettenMelding trygderettenMelding;
         try (InputStream inputStreamProxy = new FilterInputStream(zipInputStream) {
             @Override
             public void close() {
@@ -64,7 +64,7 @@ public class EformidlingMessageUnpackager {
 
             ZipEntry zipEntry;
             manifest = null;
-            sbd = null;
+            trygderettenMelding = null;
 
             while ((zipEntry = zipInputStream.getNextEntry()) != null) {
                 switch (zipEntry.getName()) {
@@ -72,7 +72,7 @@ public class EformidlingMessageUnpackager {
                         manifest = XmlUtils.unmarshalXmlObject(inputStreamProxy, BrokerServiceManifest.class);
                         break;
                     case AltinnDokument.STANDARDBUSINESSDOCUMENT_JSON_FILENAME:
-                        sbd = JsonUtils.toObject(inputStreamProxy, StandardBusinessDocument.class);
+                        trygderettenMelding = JsonUtils.toObject(inputStreamProxy, TrygderettenMelding.class);
                         break;
                     default:
                         log.info("Hopper over fil: {}", zipEntry.getName());
@@ -81,7 +81,7 @@ public class EformidlingMessageUnpackager {
         }
         return AltinnDokument.builder()
                 .manifest(manifest)
-                .sbd(sbd)
+                .trygderettenMelding(trygderettenMelding)
                 .build();
     }
 
