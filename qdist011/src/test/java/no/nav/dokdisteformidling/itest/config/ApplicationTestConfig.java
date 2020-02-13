@@ -8,6 +8,8 @@ import no.nav.dokdisteformidling.config.alias.DigitalKontaktinformasjonV1Alias;
 import no.nav.dokdisteformidling.config.alias.MqGatewayAlias;
 import no.nav.dokdisteformidling.config.alias.ServiceuserAlias;
 import no.nav.dokdisteformidling.config.cache.LokalCacheConfig;
+import no.nav.dokdisteformidling.config.cxf.BrokerServiceExternalConfig;
+import no.nav.dokdisteformidling.config.cxf.BrokerServiceExternalStreamedConfig;
 import no.nav.dokdisteformidling.config.props.BrokerServiceExternalProperties;
 import no.nav.dokdisteformidling.config.props.BrokerServiceExternalStreamedProperties;
 import no.nav.dokdisteformidling.config.props.DpoUserProperties;
@@ -44,7 +46,9 @@ import org.springframework.retry.annotation.EnableRetry;
 		FeatureToggleProperties.class})
 @Import({JmsItestConfig.class,
 		LokalCacheConfig.class,
-		STSTestConfig.class})
+		STSTestConfig.class,
+		BrokerServiceExternalTestConfig.class,
+		BrokerServiceExternalStreamedConfigTest.class})
 @ComponentScan(basePackages = "no.nav.dokdisteformidling")
 public class ApplicationTestConfig {
 

@@ -5,6 +5,7 @@ import static org.mockito.Mockito.mock;
 import no.nav.dokdisteformidling.certificate.KeyStoreProperties;
 import no.nav.dokdisteformidling.config.alias.DigitalKontaktinformasjonV1Alias;
 import no.nav.dokdisteformidling.config.alias.ServiceuserAlias;
+import no.nav.dokdisteformidling.config.cxf.BrokerServiceExternalStreamedConfig;
 import no.nav.dokdisteformidling.config.props.BrokerServiceExternalProperties;
 import no.nav.dokdisteformidling.config.props.BrokerServiceExternalStreamedProperties;
 import no.nav.dokdisteformidling.config.props.DpoUserProperties;
@@ -16,6 +17,7 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Profile;
 
 /**
@@ -32,6 +34,8 @@ import org.springframework.context.annotation.Profile;
 		MaskinportenProperties.class,
 		ServiceRegistryProperties.class,
 		FeatureToggleProperties.class})
+@Import({BrokerServiceExternalStreamedConfigTest.class,
+		BrokerServiceExternalTestConfig.class})
 @ComponentScan(basePackages = "no.nav.dokdisteformidling")
 public class ApplicationTestConfig {
 
