@@ -12,6 +12,7 @@ import no.nav.dokdisteformidling.consumer.eformidling.altinn.from.DownloadedMess
 import no.nav.dokdisteformidling.consumer.eformidling.altinn.to.AltinnReasonFactory;
 import no.nav.dokdisteformidling.consumer.eformidling.altinn.to.FileReference;
 import no.nav.dokdisteformidling.consumer.eformidling.altinn.to.ReceiptTo;
+import no.nav.dokdisteformidling.consumer.eformidling.dokumentpakker.exceptions.DokumentpakkingException;
 import no.nav.dokdisteformidling.exception.technical.AltinnBrokerServiceWsException;
 import org.apache.cxf.headers.Header;
 import org.apache.cxf.jaxb.JAXBDataBinding;
@@ -36,6 +37,7 @@ import static no.nav.dokdisteformidling.consumer.eformidling.altinn.to.AltinnRea
 public class BrokerServiceExternalStreamedService {
     private static final String ALTINN_OPPLASTING_FEILET = "Altinn opplasting feilet: {}";
     private static final String ALTINN_NEDLASTING_FEILET = "Altinn nedlasting feilet: {}";
+    private static final String ALTINN_AVLESING_AV_MELDING_FEILET = "Altinn avlesning av melding feilet: ";
     private static final String ALTINN_BROKERSERVICEEXTERNALSTREAMED_NAMESPACE = BrokerServiceExternalStreamedSF.SERVICE.getNamespaceURI();
 
     private final IBrokerServiceExternalStreamed brokerServiceExternalStreamed;
@@ -99,7 +101,8 @@ public class BrokerServiceExternalStreamedService {
         try {
             inputStream = dataHandler.getInputStream();
         } catch (IOException e) {
-            log.error("Feil ved avlesing av melding fra Altinn", e);
+            log.error(ALTINN_AVLESING_AV_MELDING_FEILET, e);
+            throw new DokumentpakkingException(ALTINN_AVLESING_AV_MELDING_FEILET, e);
         }
         return DownloadedMessageFromAltinn.builder().fileReference(fileReference).inputStream(inputStream).build();
     }
