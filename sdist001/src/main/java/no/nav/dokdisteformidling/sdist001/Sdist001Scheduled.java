@@ -30,7 +30,7 @@ public class Sdist001Scheduled {
         this.leaderElection = leaderElection;
     }
 
-    @Scheduled(fixedDelayString = "${sdist001.intervall:600000}")
+    @Scheduled(fixedDelayString = "${sdist001.intervall:200000}")
     public void triggerOppdatering() {
         if (leaderElection.isLeader()) {
             oppdaterEformidlingStatus();

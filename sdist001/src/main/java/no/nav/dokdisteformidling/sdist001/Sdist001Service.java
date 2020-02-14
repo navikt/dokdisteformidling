@@ -12,6 +12,7 @@ import no.nav.dokdisteformidling.consumer.rdist001.AdministrerForsendelse;
 import no.nav.dokdisteformidling.consumer.rdist001.HentEformidlingforsendelserResponseTo;
 import no.nav.dokdisteformidling.consumer.rdist001.HentForsendelseResponseTo;
 import no.nav.dokdisteformidling.exception.functional.KunneIkkeSerialisereEformidlingstatusoppdateringTilJson;
+import no.nav.dokdisteformidling.exception.technical.FantIkkeKvitteringFraAltinn;
 import no.nav.dokdisteformidling.sdist001.domain.EformidlingStatusOppdatering;
 import no.nav.dokdisteformidling.sdist001.domain.ForsendelseStatusEndringer;
 import no.nav.dokdisteformidling.sdist001.domain.to.AltinnKvitteringStatus;
@@ -59,8 +60,13 @@ public class Sdist001Service {
 
         KvitteringStatus altinnKvitteringStatus = eformidling.hent().stream()
                 .filter(downloadResponse -> konversasjonId.equals(downloadResponse.getConversationId()))
-                .map(downloadResponse -> downloadResponse.getKvitteringStatus()).filter(status -> status != null)
-                .findAny().get();
+                .map(downloadResponse ->  {
+                    log.info(String.format("Hentet kvittering status fra Altinn med konversasjonId=%s, ",
+                            downloadResponse.getConversationId(),downloadResponse.getSendersReference(),downloadResponse.getKvitteringStatus()));
+                   return downloadResponse.getKvitteringStatus();
+                })
+                .findAny()
+                .orElseThrow(()-> new FantIkkeKvitteringFraAltinn("Fant ikke kvittering status fra altinn"));
 
         if (OVERSENDT.name().equals(forsendelseStatus)) {
             kontrollerStatusOversendt(altinnKvitteringStatus.getStatus(), forsendelseId, konversasjonId, forsendelseStatusEndringer);
