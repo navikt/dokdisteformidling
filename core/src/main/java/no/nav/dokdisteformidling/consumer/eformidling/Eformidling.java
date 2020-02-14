@@ -12,4 +12,6 @@ public interface Eformidling {
     UploadResponse send(NavDokumentpakke navDokumentpakke);
 
     List<DownloadResponse> hent();
+
+    void bekreft(List<String> filreferanse);
 }
