@@ -18,49 +18,48 @@ import org.springframework.stereotype.Component;
 @Component
 public class Sdist001Scheduled {
 
-	private final AdministrerForsendelse administrerForsendelse;
-	private final Sdist001Service sdist001Service;
-	private final LeaderElection leaderElection;
+    private final AdministrerForsendelse administrerForsendelse;
+    private final Sdist001Service sdist001Service;
+    private final LeaderElection leaderElection;
 
-	public Sdist001Scheduled(AdministrerForsendelse administrerForsendelse,
-							 Sdist001Service sdist001Service,
-							 LeaderElection leaderElection) {
-		this.administrerForsendelse = administrerForsendelse;
-		this.sdist001Service = sdist001Service;
-		this.leaderElection = leaderElection;
-	}
+    public Sdist001Scheduled(AdministrerForsendelse administrerForsendelse,
+                             Sdist001Service sdist001Service,
+                             LeaderElection leaderElection) {
+        this.administrerForsendelse = administrerForsendelse;
+        this.sdist001Service = sdist001Service;
+        this.leaderElection = leaderElection;
+    }
 
-	@Scheduled(fixedDelayString = "${sdist001.intervall:600000}")
-	public void triggerOppdatering() {
-		if (leaderElection.isLeader()) {
-			oppdaterEformidlingStatus();
-		}
-	}
+    @Scheduled(fixedDelayString = "${sdist001.intervall:600000}")
+    public void triggerOppdatering() {
+        if (leaderElection.isLeader()) {
+            oppdaterEformidlingStatus();
+        }
+    }
 
-	@Monitor(value = "dok_metric", extraTags = {"process", "oppdaterEformidlingStatus"}, histogram = true)
-	public void oppdaterEformidlingStatus() {
-		log.info("sdist001 oppdaterer status for eFormidlingforsendelser");
+    @Monitor(value = "dok_metric", extraTags = {"process", "oppdaterEformidlingStatus"}, histogram = true)
+    public void oppdaterEformidlingStatus() {
+        log.info("sdist001 oppdaterer status for eFormidlingforsendelser");
+        ForsendelseStatusEndringer forsendelseStatusEndringer = new ForsendelseStatusEndringer();
 
-		ForsendelseStatusEndringer forsendelseStatusEndringer = new ForsendelseStatusEndringer();
+        try {
+            kontrollerOgOppdaterForsendelser(forsendelseStatusEndringer);
+            log.info("sdist001 har oppdatert status for eFormidlingforsendelser: {}", forsendelseStatusEndringer.toString());
+        } catch (Exception e) {
+            log.error("sdist001 feilet under oppdatering av status for eFormidlingforsendelser: " + e.getMessage(), e);
+            return;
+        }
+    }
 
-		try {
-			kontrollerOgOppdaterForsendelser(forsendelseStatusEndringer);
-		} catch (Exception e) {
-			log.error("sdist001 feilet under oppdatering av status for eFormidlingforsendelser: " + e.getMessage(), e);
-			return;
-		}
-
-		log.info("sdist001 har oppdatert status for eFormidlingforsendelser: {}", forsendelseStatusEndringer.toString());
-	}
-
-	private void kontrollerOgOppdaterForsendelser(ForsendelseStatusEndringer forsendelseStatusEndringer) {
-		HentEformidlingforsendelserResponseTo hentEformidlingforsendelserResponseTo = administrerForsendelse.hentEformidlingForsendelser();
-		for (HentEformidlingforsendelserResponseTo.ForsendelseTo forsendelseTo : hentEformidlingforsendelserResponseTo.getForsendelser()) {
-			try {
-				sdist001Service.kontrollerOgOppdaterStatus(forsendelseTo, forsendelseStatusEndringer);
-			} catch (AbstractDokdisteformidlingFunctionalException e) {
-				log.warn(e.getMessage() + ". ForsendelseId=" + forsendelseTo.getForsendelseId(), e);
-			}
-		}
-	}
+    private void kontrollerOgOppdaterForsendelser(ForsendelseStatusEndringer forsendelseStatusEndringer) {
+        HentEformidlingforsendelserResponseTo hentForsendelserResponseTo = administrerForsendelse.hentEformidlingForsendelser();
+        hentForsendelserResponseTo.getForsendelser().stream()
+                .forEach(forsendelseTo -> {
+                    try {
+                        sdist001Service.kontrollerOgOppdaterStatus(forsendelseTo, forsendelseStatusEndringer);
+                    } catch (AbstractDokdisteformidlingFunctionalException e) {
+                        log.warn(e.getMessage() + ". ForsendelseId=" + forsendelseTo.getForsendelseId(), e);
+                    }
+                });
+    }
 }

@@ -36,7 +36,7 @@ import static no.nav.dokdisteformidling.consumer.eformidling.EformidlingConstant
  */
 @Component
 @Slf4j
-class AltinnEformidling implements Eformidling {
+public class AltinnEformidling implements Eformidling {
     private final AppCertificate appCertificate;
     private final EformidlingMottakerInfoService eformidlingMottakerInfoService;
     private final EformidlingMessagePackager eformidlingMessagePackager;

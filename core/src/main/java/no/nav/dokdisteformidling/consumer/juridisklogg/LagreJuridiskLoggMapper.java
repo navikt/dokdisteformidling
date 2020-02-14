@@ -9,7 +9,6 @@ import org.springframework.stereotype.Component;
  * @author Sigurd Midttun, Visma Consulting.
  */
 
-@Component
 public class LagreJuridiskLoggMapper {
 
 	private static final Integer ANTALL_AAR_LAGRES = 10; //TODO: Denne må avklares

@@ -70,7 +70,6 @@ public class Qdist013Service {
 						   @Named("SafJournalpostQueryServiceQdist013") SafJournalpostQueryService<JournalpostQdist013> safJournalpostQueryService,
 						   JuridiskLogg juridiskLogg,
 						   Integrasjonspunkt integrasjonspunkt,
-						   LagreJuridiskLoggMapper lagreJuridiskLoggMapper,
 						   ArkivmeldingMapper arkivmeldingMapper,
 						   CreateMessageRequestMapper createMessageRequestMapper,
 						   FeatureToggleProperties featureToggleProperties,
@@ -80,7 +79,7 @@ public class Qdist013Service {
 		this.safJournalpostQueryService = safJournalpostQueryService;
 		this.juridiskLogg = juridiskLogg;
 		this.integrasjonspunkt = integrasjonspunkt;
-		this.lagreJuridiskLoggMapper = lagreJuridiskLoggMapper;
+		this.lagreJuridiskLoggMapper = new LagreJuridiskLoggMapper();
 		this.arkivmeldingMapper = arkivmeldingMapper;
 		this.createMessageRequestMapper = createMessageRequestMapper;
 		this.featureToggleProperties = featureToggleProperties;
