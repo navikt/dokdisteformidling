@@ -13,6 +13,7 @@ import no.altinn.brokerserviceexternal.IBrokerServiceExternalTestAltinnFaultFaul
 import no.altinn.brokerserviceexternal.Manifest;
 import no.altinn.brokerserviceexternal.ObjectFactory;
 import no.altinn.brokerserviceexternal.Recipient;
+import no.nav.dokdisteformidling.consumer.eformidling.altinn.from.AltinnDokument;
 import no.nav.dokdisteformidling.consumer.eformidling.altinn.mapper.ManifestBuilder;
 import no.nav.dokdisteformidling.consumer.eformidling.altinn.to.AltinnReasonFactory;
 import no.nav.dokdisteformidling.consumer.eformidling.altinn.to.FileReference;
@@ -38,6 +39,7 @@ public class BrokerServiceExternalService {
     private static final String INITIATE_BROKER_SERVICE_FEILET = "Kall til BrokerService.initiateBrokerService feilet.";
     private static final String GET_AVAILABLE_FILES_FEILET = "Kall til BrokerService.getAvailableFiles feilet.";
     private static final String CONFIRM_DOWNLOADED_FEILET = "Kall til BrokerService.confirmDownloaded feilet";
+    private static final String ALTINN_TESTKALL_FEILET = "Testkall mot altinn feilet.";
 
     private final IBrokerServiceExternal brokerServiceExternal;
     private final ObjectFactory objectFactory;
@@ -65,6 +67,10 @@ public class BrokerServiceExternalService {
         }
     }
 
+    public void confirmDownloaded(List<AltinnDokument> altinnDokuments) {
+        altinnDokuments.forEach(altinnDokument -> confirmDownloaded(altinnDokument.getFileReference()));
+    }
+
     protected void confirmDownloaded(String fileReference) {
         try {
             brokerServiceExternal.confirmDownloaded(fileReference, NAV_ORGNUMMER);
@@ -74,6 +80,7 @@ public class BrokerServiceExternalService {
     }
 
     public List<FileReference> getAvailableFiles(SearchCriteria criteria, ServiceCode serviceCode) {
+        //TODO: Metrics and logging, number of files available for download, files + filerefence?
         return getFileReferences(criteria, serviceCode)
                 .map(BrokerServiceAvailableFileList::getBrokerServiceAvailableFile)
                 .orElse(Collections.emptyList())
@@ -86,8 +93,8 @@ public class BrokerServiceExternalService {
         try {
             brokerServiceExternal.test();
         } catch (IBrokerServiceExternalTestAltinnFaultFaultFaultMessage e) {
-            log.error("Testkall mot altinn feilet:", e);
-            throw new AltinnBrokerServiceWsException("Testkall mot altinn feilet.", AltinnReasonFactory.from(e), e);
+            log.error(ALTINN_TESTKALL_FEILET, e);
+            throw new AltinnBrokerServiceWsException(ALTINN_TESTKALL_FEILET, AltinnReasonFactory.from(e), e);
         }
     }
 

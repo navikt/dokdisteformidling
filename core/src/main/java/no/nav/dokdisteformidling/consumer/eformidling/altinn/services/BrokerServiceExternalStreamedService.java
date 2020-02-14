@@ -1,17 +1,18 @@
 package no.nav.dokdisteformidling.consumer.eformidling.altinn.services;
 
-import static no.nav.dokdisteformidling.consumer.eformidling.EformidlingConstants.NAV_ORGNUMMER;
-import static no.nav.dokdisteformidling.consumer.eformidling.altinn.to.AltinnReasonFactory.from;
-
 import lombok.extern.slf4j.Slf4j;
+import no.altinn.brokerserviceexternalstreamed.BrokerServiceExternalStreamedSF;
 import no.altinn.brokerserviceexternalstreamed.IBrokerServiceExternalStreamed;
+import no.altinn.brokerserviceexternalstreamed.IBrokerServiceExternalStreamedDownloadFileStreamedAltinnFaultFaultFaultMessage;
 import no.altinn.brokerserviceexternalstreamed.IBrokerServiceExternalStreamedUploadFileStreamedAltinnFaultFaultFaultMessage;
 import no.altinn.brokerserviceexternalstreamed.ObjectFactory;
 import no.altinn.brokerserviceexternalstreamed.ReceiptExternalStreamedBE;
 import no.altinn.brokerserviceexternalstreamed.StreamedPayloadExternalBE;
-import no.nav.dokdisteformidling.consumer.eformidling.EformidlingConstants;
+import no.nav.dokdisteformidling.consumer.eformidling.altinn.from.DownloadedMessageFromAltinn;
 import no.nav.dokdisteformidling.consumer.eformidling.altinn.to.AltinnReasonFactory;
+import no.nav.dokdisteformidling.consumer.eformidling.altinn.to.FileReference;
 import no.nav.dokdisteformidling.consumer.eformidling.altinn.to.ReceiptTo;
+import no.nav.dokdisteformidling.consumer.eformidling.dokumentpakker.exceptions.DokumentpakkingException;
 import no.nav.dokdisteformidling.exception.technical.AltinnBrokerServiceWsException;
 import org.apache.cxf.headers.Header;
 import org.apache.cxf.jaxb.JAXBDataBinding;
@@ -22,13 +23,22 @@ import javax.inject.Inject;
 import javax.xml.bind.JAXBException;
 import javax.xml.namespace.QName;
 import javax.xml.ws.BindingProvider;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+
+import static java.util.stream.Collectors.toList;
+import static no.nav.dokdisteformidling.consumer.eformidling.EformidlingConstants.NAV_ORGNUMMER;
+import static no.nav.dokdisteformidling.consumer.eformidling.altinn.to.AltinnReasonFactory.from;
 
 @Slf4j
 @Component
 public class BrokerServiceExternalStreamedService {
     private static final String ALTINN_OPPLASTING_FEILET = "Altinn opplasting feilet: {}";
+    private static final String ALTINN_NEDLASTING_FEILET = "Altinn nedlasting feilet: {}";
+    private static final String ALTINN_AVLESING_AV_MELDING_FEILET = "Altinn avlesning av melding feilet: ";
+    private static final String ALTINN_BROKERSERVICEEXTERNALSTREAMED_NAMESPACE = BrokerServiceExternalStreamedSF.SERVICE.getNamespaceURI();
 
     private final IBrokerServiceExternalStreamed brokerServiceExternalStreamed;
     private final ObjectFactory objectFactory;
@@ -45,9 +55,9 @@ public class BrokerServiceExternalStreamedService {
         Header reference = null;
         Header filename = null;
         try {
-            reportee = new Header(new QName("http://www.altinn.no/services/ServiceEngine/Broker/2015/06", "Reportee"), NAV_ORGNUMMER, new JAXBDataBinding(String.class));
-            reference = new Header(new QName("http://www.altinn.no/services/ServiceEngine/Broker/2015/06", "Reference"), fileReference, new JAXBDataBinding(String.class));
-            filename = new Header(new QName("http://www.altinn.no/services/ServiceEngine/Broker/2015/06", "FileName"), fileName, new JAXBDataBinding(String.class));
+            reportee = new Header(new QName(ALTINN_BROKERSERVICEEXTERNALSTREAMED_NAMESPACE, "Reportee"), NAV_ORGNUMMER, new JAXBDataBinding(String.class));
+            reference = new Header(new QName(ALTINN_BROKERSERVICEEXTERNALSTREAMED_NAMESPACE, "Reference"), fileReference, new JAXBDataBinding(String.class));
+            filename = new Header(new QName(ALTINN_BROKERSERVICEEXTERNALSTREAMED_NAMESPACE, "FileName"), fileName, new JAXBDataBinding(String.class));
         } catch (JAXBException e) {
             log.error("Feil i uploadFileToAltinn:", e);
         }
@@ -63,7 +73,7 @@ public class BrokerServiceExternalStreamedService {
             return mapReceipt(receiptExternalStreamedBE);
         } catch (IBrokerServiceExternalStreamedUploadFileStreamedAltinnFaultFaultFaultMessage e) {
             log.error(ALTINN_OPPLASTING_FEILET, from(e));
-            throw new AltinnBrokerServiceWsException(ALTINN_OPPLASTING_FEILET, AltinnReasonFactory.from(e),e);
+            throw new AltinnBrokerServiceWsException(ALTINN_OPPLASTING_FEILET, AltinnReasonFactory.from(e), e);
         }
     }
 
@@ -77,5 +87,33 @@ public class BrokerServiceExternalStreamedService {
                 .receiptText(receiptExternalStreamedBE.getReceiptText().getValue())
                 .receiptTypeName(receiptExternalStreamedBE.getReceiptTypeName().getValue())
                 .build();
+    }
+
+    public List<DownloadedMessageFromAltinn> downloadFilesFromAltinn(List<FileReference> availableFiles) {
+        return availableFiles.stream()
+                .map(fileReference -> mapReferenceToDownloadedFile(fileReference, downloadFile(fileReference.getFileReference())))
+                .collect(toList());
+    }
+
+    private DownloadedMessageFromAltinn mapReferenceToDownloadedFile(FileReference fileReference, DataHandler dataHandler) {
+        log.info("Lastet ned fil med referansenummer: " + fileReference);
+        InputStream inputStream = null;
+        try {
+            inputStream = dataHandler.getInputStream();
+        } catch (IOException e) {
+            log.error(ALTINN_AVLESING_AV_MELDING_FEILET, e);
+            throw new DokumentpakkingException(ALTINN_AVLESING_AV_MELDING_FEILET, e);
+        }
+        return DownloadedMessageFromAltinn.builder().fileReference(fileReference).inputStream(inputStream).build();
+    }
+
+    public DataHandler downloadFile(String fileReference) {
+        log.info("Laster ned fil med referansenummer: " + fileReference);
+        try {
+            return brokerServiceExternalStreamed.downloadFileStreamed(fileReference, NAV_ORGNUMMER);// reportee = NAV_ORGNUMMER
+        } catch (IBrokerServiceExternalStreamedDownloadFileStreamedAltinnFaultFaultFaultMessage e) {
+            log.error(ALTINN_NEDLASTING_FEILET, from(e));
+            throw new AltinnBrokerServiceWsException(ALTINN_NEDLASTING_FEILET, AltinnReasonFactory.from(e), e);
+        }
     }
 }

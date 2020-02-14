@@ -4,6 +4,7 @@ import no.nav.dokdisteformidling.AppTestUtils;
 import no.nav.dokdisteformidling.certificate.AppCertificate;
 import no.nav.dokdisteformidling.consumer.eformidling.NavDokument;
 import no.nav.dokdisteformidling.consumer.eformidling.NavDokumentpakke;
+import no.nav.dokdisteformidling.consumer.eformidling.dokumentpakker.exceptions.DokumentpakkingException;
 import org.junit.jupiter.api.Test;
 
 import java.io.ByteArrayInputStream;
@@ -30,7 +31,7 @@ class EformidlingMessagePackagerTest {
 	public static final Clock FIXED_CLOCK = Clock.fixed(Instant.parse(FIXED_TIME), DEFAULT_ZONE_ID);
 
 	private final EformidlingMessagePackager eformidlingMessagePackager = new EformidlingMessagePackager(
-			new JacksonConfig().eformidlingObjectMapper(),
+			new JacksonConfig().eformidlingObjectMapper(FIXED_CLOCK),
 			new StandardBusinessDocumentMapper(FIXED_CLOCK),
 			new EformidlingContentPackager());
 
@@ -54,7 +55,7 @@ class EformidlingMessagePackagerTest {
 	}
 
 	@Test
-	void shouldThrowDokumentpakkingExceptionWhenNullArkivmeldingInputStream() throws Exception {
+	void shouldThrowDokumentpakkingExceptionWhenNullArkivmeldingInputStream() {
 		final NavDokumentpakke navDokumentpakke = NavDokumentpakke.builder()
 				.conversationId("1")
 				.bestillingsId("2")

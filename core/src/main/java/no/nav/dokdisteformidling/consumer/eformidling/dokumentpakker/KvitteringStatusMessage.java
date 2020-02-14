@@ -1,0 +1,17 @@
+package no.nav.dokdisteformidling.consumer.eformidling.dokumentpakker;
+
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
+
+@Getter
+@Setter
+@ToString
+@AllArgsConstructor
+@NoArgsConstructor
+public class KvitteringStatusMessage {
+    private String code;
+    private String text;
+}
