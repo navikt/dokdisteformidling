@@ -57,12 +57,12 @@ public class Sdist001Service {
             return;
         }
         String konversasjonId = forsendelseTo.getKonversasjonId();
-        log.info( String.format("Sdist001 kovnersajonId=%s", konversasjonId,forsendelseId));
+        log.info( String.format("Sdist001 kovnersajonId=%s og forsendelseId=%s", konversasjonId,forsendelseId));
 
         KvitteringStatus altinnKvitteringStatus = eformidling.hent().stream()
                 .filter(downloadResponse -> konversasjonId.equals(downloadResponse.getConversationId()))
                 .map(downloadResponse ->  {
-                    log.info(String.format("Hentet kvittering status fra Altinn med konversasjonId=%s, ",
+                    log.info(String.format("Hentet kvittering status fra Altinn med konversasjonId=%s, SendersReference=%s,KvitteringStatus=%s",
                             downloadResponse.getConversationId(),downloadResponse.getSendersReference(),downloadResponse.getKvitteringStatus()));
                    return downloadResponse.getKvitteringStatus();
                 })
