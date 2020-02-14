@@ -8,6 +8,7 @@ import no.nav.dokdisteformidling.consumer.eformidling.dokumentpakker.trygderette
 @Builder
 public class DownloadResponse {
     private final String conversationId;
+    private final String fileReference;
     private final String sendersReference;
     private final String sendtDate;
     private final KvitteringStatus kvitteringStatus;

@@ -13,7 +13,6 @@ import no.altinn.brokerserviceexternal.IBrokerServiceExternalTestAltinnFaultFaul
 import no.altinn.brokerserviceexternal.Manifest;
 import no.altinn.brokerserviceexternal.ObjectFactory;
 import no.altinn.brokerserviceexternal.Recipient;
-import no.nav.dokdisteformidling.consumer.eformidling.altinn.from.AltinnDokument;
 import no.nav.dokdisteformidling.consumer.eformidling.altinn.mapper.ManifestBuilder;
 import no.nav.dokdisteformidling.consumer.eformidling.altinn.to.AltinnReasonFactory;
 import no.nav.dokdisteformidling.consumer.eformidling.altinn.to.FileReference;
@@ -67,11 +66,7 @@ public class BrokerServiceExternalService {
         }
     }
 
-    public void confirmDownloaded(List<AltinnDokument> altinnDokuments) {
-        altinnDokuments.forEach(altinnDokument -> confirmDownloaded(altinnDokument.getFileReference()));
-    }
-
-    protected void confirmDownloaded(String fileReference) {
+    public void confirmDownloaded(String fileReference) {
         try {
             brokerServiceExternal.confirmDownloaded(fileReference, NAV_ORGNUMMER);
         } catch (IBrokerServiceExternalConfirmDownloadedAltinnFaultFaultFaultMessage e) {
