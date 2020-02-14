@@ -57,6 +57,7 @@ public class Sdist001Service {
             return;
         }
         String konversasjonId = forsendelseTo.getKonversasjonId();
+        log.info( String.format("Sdist001 kovnersajonId=%s", konversasjonId,forsendelseId));
 
         KvitteringStatus altinnKvitteringStatus = eformidling.hent().stream()
                 .filter(downloadResponse -> konversasjonId.equals(downloadResponse.getConversationId()))
