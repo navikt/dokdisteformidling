@@ -37,8 +37,8 @@ import static no.nav.dokdisteformidling.consumer.eformidling.altinn.from.AltinnD
 @Component
 public class EformidlingMessageUnpackager {
 
-    private static final String IO_EXCEPTION = "Feil med IO ved unmarshalling";
-    private static final String UNMARSHALLING_EXCEPTION = "Feil ved unmarshalling med JAXB";
+    private static final String TEMPFILE_EXCEPTION = "Feil ved innlesing/kopiering av inputStream til temporær fil";
+    private static final String UNMARSHALLING_EXCEPTION = "Feil ved unmarshalling av fil med filreferanse: ";
 
     private final ObjectMapper objectMapper;
 
@@ -60,8 +60,8 @@ public class EformidlingMessageUnpackager {
             FileUtils.copyInputStreamToFile(melding.getInputStream(), tempFile.toFile());
             return buildAltinnDokumentFromTempFile(tempFile.toFile(), fileReference);
         } catch (IOException e) {
-            log.error(IO_EXCEPTION, e);
-            throw new DokumentUnpackingException(IO_EXCEPTION, e);
+            log.error(TEMPFILE_EXCEPTION, e);
+            throw new DokumentUnpackingException(TEMPFILE_EXCEPTION, e);
         }
     }
 
@@ -83,8 +83,8 @@ public class EformidlingMessageUnpackager {
                 }
             }
         } catch (JAXBException | IOException e) {
-            log.error(UNMARSHALLING_EXCEPTION, e);
-            throw new DokumentUnpackingException(UNMARSHALLING_EXCEPTION, e);
+            log.error(UNMARSHALLING_EXCEPTION + fileReference, e);
+            throw new DokumentUnpackingException(UNMARSHALLING_EXCEPTION + fileReference, e);
         }
         return AltinnDokument.builder()
                 .fileReference(fileReference)

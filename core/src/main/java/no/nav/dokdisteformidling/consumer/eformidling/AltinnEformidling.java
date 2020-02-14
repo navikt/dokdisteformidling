@@ -99,7 +99,7 @@ public class AltinnEformidling implements Eformidling {
 
         List<DownloadedMessageFromAltinn> messagesFromAltinn = brokerServiceExternalStreamedService.downloadFilesFromAltinn(availableFiles);
         List<AltinnDokument> altinnDokuments = eformidlingMessageUnpackager.unpackageMessages(messagesFromAltinn);
-       // brokerServiceExternalService.confirmDownloaded(altinnDokuments);
+        brokerServiceExternalService.confirmDownloaded(altinnDokuments);
         return getDownloadResponses(altinnDokuments);
     }
 
@@ -119,5 +119,9 @@ public class AltinnEformidling implements Eformidling {
 
     private List<DownloadResponse> getDownloadResponses(List<AltinnDokument> altinnDokuments) {
         return altinnDokuments.stream().map(altinnDokument -> new DownloadResponseBuilder().withAltinnDokument(altinnDokument).build()).collect(Collectors.toList());
+    }
+
+    public void bekreft(List<String> filreferanse) {
+        filreferanse.forEach(brokerServiceExternalService::confirmDownloaded);
     }
 }
