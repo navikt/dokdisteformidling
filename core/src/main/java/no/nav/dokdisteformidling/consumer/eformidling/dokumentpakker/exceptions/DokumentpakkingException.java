@@ -1,4 +1,4 @@
-package no.nav.dokdisteformidling.consumer.eformidling.dokumentpakker;
+package no.nav.dokdisteformidling.consumer.eformidling.dokumentpakker.exceptions;
 
 import no.nav.dokdisteformidling.exception.technical.AbstractDokdisteformidlingTechnicalException;
 
@@ -8,11 +8,11 @@ import no.nav.dokdisteformidling.exception.technical.AbstractDokdisteformidlingT
  * @author Joakim Bjørnstad, Jbit AS
  */
 public class DokumentpakkingException extends AbstractDokdisteformidlingTechnicalException {
-	public DokumentpakkingException(String message) {
-		super(message);
-	}
+    public DokumentpakkingException(String message) {
+        super(message);
+    }
 
-	public DokumentpakkingException(String message, Throwable cause) {
-		super(message, cause);
-	}
+    public DokumentpakkingException(String message, Throwable cause) {
+        super(message, cause);
+    }
 }

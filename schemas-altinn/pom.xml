@@ -39,17 +39,16 @@
 									<wsdl>${basedir}/src/main/resources/wsdl/BrokerServiceExternalStreamed.wsdl</wsdl>
 									<extraargs>
 										<extraarg>-autoNameResolution</extraarg>
-										<extraarg>-p</extraarg>
-										<extraarg>no.altinn.brokerserviceexternalstreamed</extraarg>
-									</extraargs>
-									<wsdlLocation>classpath:wsdl/BrokerServiceExternalStreamed.wsdl</wsdlLocation>
-								</wsdlOption>
-							</wsdlOptions>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-
-		</plugins>
+                                        <extraarg>-p</extraarg>
+                                        <extraarg>no.altinn.brokerserviceexternalstreamed</extraarg>
+                                    </extraargs>
+                                    <wsdlLocation>classpath:wsdl/BrokerServiceExternalStreamed.wsdl</wsdlLocation>
+                                </wsdlOption>
+                            </wsdlOptions>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
 	</build>
 </project>
