@@ -11,10 +11,15 @@ import no.nav.dokdisteformidling.exception.technical.KunneIkkeHenteDagensDatoTec
 import no.nav.dokdisteformidling.exception.technical.KunneIkkeKonvertereTilXmlGregorianCalendarTechnicalException;
 import no.nav.dokdisteformidling.storage.DokdistDokument;
 import no.nav.dokdisteformidling.storage.JsonSerializer;
+import org.springframework.util.Assert;
 
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Unmarshaller;
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
+import java.io.InputStream;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.GregorianCalendar;
@@ -74,6 +79,14 @@ public final class FunctionalUtils {
 			throw new KunneIkkeKonvertereTilXmlGregorianCalendarTechnicalException(format("Kunne ikke konvertere fra localDateTime til XmlGregorianCalendar. Forsøkte å konvertere localDateTime=%s", localDateTime == null ? null : localDateTime
 					.toString()), e);
 		}
+	}
+
+	public static <T> T unmarshalXmlObject(InputStream inputStream, Class<T> tClass) throws JAXBException {
+		JAXBContext context = JAXBContext.newInstance(tClass);
+		Unmarshaller unmarshal = context.createUnmarshaller();
+		Object object = unmarshal.unmarshal(inputStream);
+		Assert.isInstanceOf(tClass, object);
+		return (T) object;
 	}
 
 	public static String generateRandomUUID() {

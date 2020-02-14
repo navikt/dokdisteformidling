@@ -19,6 +19,7 @@ import no.nav.dokdisteformidling.sdist001.Sdist001Scheduled;
 import no.nav.dokdisteformidling.sdist001.itest.config.ApplicationTestConfig;
 import org.apache.http.HttpHeaders;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
@@ -40,6 +41,7 @@ import java.util.UUID;
 		webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureWireMock(port = 0)
 @ActiveProfiles("itest")
+@Disabled("Skal endres tilpasse altinnborkerservice")
 public class Sdist001IT {
 
 	private static String CALL_ID;
