@@ -8,6 +8,7 @@ import no.nav.dokdisteformidling.consumer.eformidling.dokumentpakker.trygderette
 public class DownloadResponseBuilder {
 
     String conversationId;
+    String fileReference;
     String sendersReference;
     String sendtDate;
     KvitteringStatus kvitteringStatus;
@@ -16,6 +17,7 @@ public class DownloadResponseBuilder {
 
         TrygderettenMelding trygderettenMelding = altinnDokument.getTrygderettenMelding();
         this.conversationId = trygderettenMelding.getConversationId();
+        this.fileReference = altinnDokument.getFileReference();
         this.sendersReference = altinnDokument.getManifest().getSendersReference();
         this.sendtDate = altinnDokument.getManifest().getSentDate().toString();
         this.kvitteringStatus = trygderettenMelding.getStatus();
@@ -25,6 +27,7 @@ public class DownloadResponseBuilder {
     public DownloadResponse build() {
         return DownloadResponse.builder()
                 .conversationId(conversationId)
+                .fileReference(fileReference)
                 .sendersReference(sendersReference)
                 .sendtDate(sendtDate)
                 .kvitteringStatus(kvitteringStatus)
