@@ -1,8 +1,5 @@
 package no.nav.dokdisteformidling.consumer.integrasjonspunkt;
 
-import static java.lang.String.format;
-import static no.nav.dokdisteformidling.constants.RetryConstants.DELAY_SHORT;
-
 import no.nav.dokdisteformidling.exception.functional.IntegrasjonspunktRequestFunctionalException;
 import no.nav.dokdisteformidling.exception.technical.IntegrasjonspunktRequestTechnicalException;
 import no.nav.dokdisteformidling.metrics.Monitor;
@@ -24,6 +21,9 @@ import org.springframework.web.client.RestTemplate;
 
 import java.time.Duration;
 
+import static java.lang.String.format;
+import static no.nav.dokdisteformidling.constants.RetryConstants.DELAY_SHORT;
+
 /**
  * @author Heidi Elisabeth Sando, Visma Consulting
  */
@@ -32,7 +32,7 @@ public class IntegrasjonspunktConsumer implements Integrasjonspunkt {
 
 	private final RestTemplate restTemplate;
 	private final String integrasjonspunktUrl;
-	private final String MESSAGES_OUT_PATH = "/messages/out";
+	private static final String MESSAGES_OUT_PATH = "/messages/out";
 
 	public IntegrasjonspunktConsumer(RestTemplateBuilder restTemplateBuilder,
 									 @Value("${integrasjonspunkt_api_url}") String integrasjonspunktUrl) {

@@ -1,9 +1,8 @@
 package no.nav.dokdisteformidling.consumer.eformidling.altinn.to;
 
-import lombok.*;
-
-import java.util.List;
-import java.util.Map;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Value;
 
 @Value
 @Builder

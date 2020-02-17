@@ -122,7 +122,6 @@ public class BrokerServiceExternalService {
         BrokerServiceSearch brokerServiceSearch = new BrokerServiceSearch();
         brokerServiceSearch.setFileStatus(criteria.getAvailableFileStatus());
         brokerServiceSearch.setReportee(orgnr);
-        ObjectFactory objectFactory = new ObjectFactory();
         brokerServiceSearch.setExternalServiceCode(objectFactory.createBrokerServiceSearchExternalServiceCode(serviceCode.getServiceCode()));
         brokerServiceSearch.setExternalServiceEditionCode(serviceCode.getServiceEditionCode());
         brokerServiceSearch.setMinSentDateTime(criteria.getMinSentDate() == null ? null : convertLocalDateTimeToXmlGregorianCalendar(criteria.getMinSentDate()));
