@@ -23,7 +23,7 @@ import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
-import static no.nav.dokdisteformidling.common.FunctionalUtils.unmarshalXmlObject;
+import static no.nav.dokdisteformidling.utils.XmlUtils.unmarshalXmlObject;
 import static no.nav.dokdisteformidling.consumer.eformidling.altinn.from.AltinnDokument.MANIFEST_XML;
 import static no.nav.dokdisteformidling.consumer.eformidling.altinn.from.AltinnDokument.SBD_JSON;
 

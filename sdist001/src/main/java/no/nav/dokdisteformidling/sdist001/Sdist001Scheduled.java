@@ -30,36 +30,11 @@ public class Sdist001Scheduled {
         this.leaderElection = leaderElection;
     }
 
-    @Scheduled(fixedDelayString = "${sdist001.intervall:200000}")
+    @Scheduled(fixedDelayString = "${sdist001.intervall:600000}")
     public void triggerOppdatering() {
         if (leaderElection.isLeader()) {
-            oppdaterEformidlingStatus();
+            sdist001Service.oppdatertDokDistEformidlingStatus();
         }
     }
 
-    @Monitor(value = "dok_metric", extraTags = {"process", "oppdaterEformidlingStatus"}, histogram = true)
-    public void oppdaterEformidlingStatus() {
-        log.info("sdist001 oppdaterer status for eFormidlingforsendelser");
-        ForsendelseStatusEndringer forsendelseStatusEndringer = new ForsendelseStatusEndringer();
-
-        try {
-            kontrollerOgOppdaterForsendelser(forsendelseStatusEndringer);
-            log.info("sdist001 har oppdatert status for eFormidlingforsendelser: {}", forsendelseStatusEndringer.toString());
-        } catch (Exception e) {
-            log.error("sdist001 feilet under oppdatering av status for eFormidlingforsendelser: " + e.getMessage(), e);
-            return;
-        }
-    }
-
-    private void kontrollerOgOppdaterForsendelser(ForsendelseStatusEndringer forsendelseStatusEndringer) {
-        HentEformidlingforsendelserResponseTo hentForsendelserResponseTo = administrerForsendelse.hentEformidlingForsendelser();
-        hentForsendelserResponseTo.getForsendelser().stream()
-                .forEach(forsendelseTo -> {
-                    try {
-                        sdist001Service.kontrollerOgOppdaterStatus(forsendelseTo, forsendelseStatusEndringer);
-                    } catch (AbstractDokdisteformidlingFunctionalException e) {
-                        log.warn(e.getMessage() + ". ForsendelseId=" + forsendelseTo.getForsendelseId(), e);
-                    }
-                });
-    }
 }
