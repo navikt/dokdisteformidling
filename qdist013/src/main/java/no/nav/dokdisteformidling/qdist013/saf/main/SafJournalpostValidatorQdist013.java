@@ -1,19 +1,19 @@
 package no.nav.dokdisteformidling.qdist013.saf.main;
 
-import static java.lang.String.format;
-import static no.nav.dokdisteformidling.common.SafAssertionUtils.assertFieldOnSafDokumenterNotNullOrEmpty;
-import static no.nav.dokdisteformidling.common.SafAssertionUtils.assertFieldOnSafJournalpostBodyNotNullOrEmpty;
-import static no.nav.dokdisteformidling.common.SafAssertionUtils.assertObjectOnSafDokumenterNotNull;
-import static no.nav.dokdisteformidling.common.SafAssertionUtils.assertObjectOnSafJournalpostBodyNotNull;
-import static no.nav.dokdisteformidling.constants.DomainConstants.VARIANTFORMAT_ARKIV;
-import static no.nav.dokdisteformidling.constants.DomainConstants.VARIANTFORMAT_SLADDET;
-import static no.nav.dokdisteformidling.qdist013.saf.main.JournalpostQdist013.Datotype.DATO_JOURNALFOERT;
-
 import no.nav.dokdisteformidling.consumer.saf.journalpost.SafJournalpost;
 import no.nav.dokdisteformidling.exception.functional.SafJournalpostValidationException;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+
+import static java.lang.String.format;
+import static no.nav.dokdisteformidling.constants.DomainConstants.VARIANTFORMAT_ARKIV;
+import static no.nav.dokdisteformidling.constants.DomainConstants.VARIANTFORMAT_SLADDET;
+import static no.nav.dokdisteformidling.qdist013.saf.main.JournalpostQdist013.Datotype.DATO_JOURNALFOERT;
+import static no.nav.dokdisteformidling.utils.SafAssertionUtils.assertFieldOnSafDokumenterNotNullOrEmpty;
+import static no.nav.dokdisteformidling.utils.SafAssertionUtils.assertFieldOnSafJournalpostBodyNotNullOrEmpty;
+import static no.nav.dokdisteformidling.utils.SafAssertionUtils.assertObjectOnSafDokumenterNotNull;
+import static no.nav.dokdisteformidling.utils.SafAssertionUtils.assertObjectOnSafJournalpostBodyNotNull;
 
 @Component
 public class SafJournalpostValidatorQdist013 {
