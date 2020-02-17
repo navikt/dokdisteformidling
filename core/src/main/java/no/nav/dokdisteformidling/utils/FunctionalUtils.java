@@ -1,6 +1,4 @@
-package no.nav.dokdisteformidling.common;
-
-import static java.lang.String.format;
+package no.nav.dokdisteformidling.utils;
 
 import com.amazonaws.SdkClientException;
 import no.nav.dokdisteformidling.constants.DomainConstants;
@@ -20,6 +18,8 @@ import java.time.format.DateTimeFormatter;
 import java.util.GregorianCalendar;
 import java.util.UUID;
 import java.util.stream.Collectors;
+
+import static java.lang.String.format;
 
 /**
  * @author Heidi Elisabeth Sando, Visma Consulting.

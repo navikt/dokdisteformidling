@@ -1,26 +1,5 @@
 package no.nav.dokdisteformidling;
 
-import static no.nav.dokdisteformidling.common.FunctionalUtils.getNow;
-import static no.nav.dokdisteformidling.qdist011.constants.BridgeMotSDPMapperConstants.AUTHORITY;
-import static no.nav.dokdisteformidling.qdist011.constants.BridgeMotSDPMapperConstants.AUTHORITY_ENUM;
-import static no.nav.dokdisteformidling.qdist011.constants.BridgeMotSDPMapperConstants.BUSINESS_SCOPE_TYPE;
-import static no.nav.dokdisteformidling.qdist011.constants.BridgeMotSDPMapperConstants.DIGITAL_POST;
-import static no.nav.dokdisteformidling.qdist011.constants.BridgeMotSDPMapperConstants.DOKUMENT_MIME;
-import static no.nav.dokdisteformidling.qdist011.constants.BridgeMotSDPMapperConstants.ORGNR_NAV;
-import static no.nav.dokdisteformidling.qdist011.constants.BridgeMotSDPMapperConstants.ORG_PREFIX;
-import static no.nav.dokdisteformidling.qdist011.constants.BridgeMotSDPMapperConstants.SPRAAK_KODE;
-import static no.nav.dokdisteformidling.qdist011.constants.BridgeMotSDPMapperConstants.STANDARD;
-import static no.nav.dokdisteformidling.qdist011.constants.BridgeMotSDPMapperConstants.VERSION;
-import static no.nav.dokdisteformidling.testUtils.getDateOnly;
-import static no.nav.dokdisteformidling.testUtils.makePreferertKanalSet;
-import static no.nav.dokdisteformidling.testUtils.makeUgyldigDate;
-import static no.nav.dokdisteformidling.testUtils.varslingsTekster;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 import no.difi.begrep.sdp.schema_v10.DigitalPost;
 import no.difi.begrep.sdp.schema_v10.DigitalPostInfo;
 import no.difi.begrep.sdp.schema_v10.Manifest;
@@ -44,6 +23,27 @@ import javax.xml.bind.JAXBElement;
 import javax.xml.datatype.XMLGregorianCalendar;
 import java.util.Arrays;
 import java.util.List;
+
+import static no.nav.dokdisteformidling.qdist011.constants.BridgeMotSDPMapperConstants.AUTHORITY;
+import static no.nav.dokdisteformidling.qdist011.constants.BridgeMotSDPMapperConstants.AUTHORITY_ENUM;
+import static no.nav.dokdisteformidling.qdist011.constants.BridgeMotSDPMapperConstants.BUSINESS_SCOPE_TYPE;
+import static no.nav.dokdisteformidling.qdist011.constants.BridgeMotSDPMapperConstants.DIGITAL_POST;
+import static no.nav.dokdisteformidling.qdist011.constants.BridgeMotSDPMapperConstants.DOKUMENT_MIME;
+import static no.nav.dokdisteformidling.qdist011.constants.BridgeMotSDPMapperConstants.ORGNR_NAV;
+import static no.nav.dokdisteformidling.qdist011.constants.BridgeMotSDPMapperConstants.ORG_PREFIX;
+import static no.nav.dokdisteformidling.qdist011.constants.BridgeMotSDPMapperConstants.SPRAAK_KODE;
+import static no.nav.dokdisteformidling.qdist011.constants.BridgeMotSDPMapperConstants.STANDARD;
+import static no.nav.dokdisteformidling.qdist011.constants.BridgeMotSDPMapperConstants.VERSION;
+import static no.nav.dokdisteformidling.testUtils.getDateOnly;
+import static no.nav.dokdisteformidling.testUtils.makePreferertKanalSet;
+import static no.nav.dokdisteformidling.testUtils.makeUgyldigDate;
+import static no.nav.dokdisteformidling.testUtils.varslingsTekster;
+import static no.nav.dokdisteformidling.utils.FunctionalUtils.getNow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * @author Heidi Elisabeth Sando, Visma Consulting.

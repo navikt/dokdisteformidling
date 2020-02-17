@@ -1,9 +1,9 @@
 package no.nav.dokdisteformidling.qdist011.saf;
 
-import static no.nav.dokdisteformidling.common.SafAssertionUtils.assertFieldOnSafDokumenterNotNullOrEmpty;
-
 import no.nav.dokdisteformidling.consumer.saf.journalpost.SafJournalpost;
 import org.springframework.stereotype.Component;
+
+import static no.nav.dokdisteformidling.utils.SafAssertionUtils.assertFieldOnSafDokumenterNotNullOrEmpty;
 
 @Component
 public class SafJournalpostValidatorQdist011 {

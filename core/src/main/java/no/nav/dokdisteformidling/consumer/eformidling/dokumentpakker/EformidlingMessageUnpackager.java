@@ -3,12 +3,12 @@ package no.nav.dokdisteformidling.consumer.eformidling.dokumentpakker;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.dokdisteformidling.common.AutoCloseableTempFile;
-import no.nav.dokdisteformidling.common.XmlUtils;
 import no.nav.dokdisteformidling.consumer.eformidling.altinn.from.AltinnDokument;
 import no.nav.dokdisteformidling.consumer.eformidling.altinn.from.DownloadedMessageFromAltinn;
 import no.nav.dokdisteformidling.consumer.eformidling.dokumentpakker.exceptions.DokumentUnpackingException;
 import no.nav.dokdisteformidling.consumer.eformidling.dokumentpakker.trygderetten.json.TrygderettenMelding;
 import no.nav.dokdisteformidling.consumer.eformidling.dokumentpakker.trygderetten.xml.BrokerServiceManifest;
+import no.nav.dokdisteformidling.utils.XmlUtils;
 import org.apache.commons.io.FileUtils;
 import org.springframework.stereotype.Component;
 

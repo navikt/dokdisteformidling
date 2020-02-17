@@ -1,35 +1,5 @@
 package no.nav.dokdisteformidling.itest;
 
-import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
-import static com.github.tomakehurst.wiremock.client.WireMock.get;
-import static com.github.tomakehurst.wiremock.client.WireMock.getRequestedFor;
-import static com.github.tomakehurst.wiremock.client.WireMock.post;
-import static com.github.tomakehurst.wiremock.client.WireMock.postRequestedFor;
-import static com.github.tomakehurst.wiremock.client.WireMock.put;
-import static com.github.tomakehurst.wiremock.client.WireMock.putRequestedFor;
-import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
-import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
-import static com.github.tomakehurst.wiremock.client.WireMock.urlMatching;
-import static com.github.tomakehurst.wiremock.client.WireMock.verify;
-import static no.nav.dokdisteformidling.common.FunctionalUtils.getNow;
-import static no.nav.dokdisteformidling.config.cache.LokalCacheConfig.TKAT020_CACHE;
-import static no.nav.dokdisteformidling.config.cache.LokalCacheConfig.TKAT021_CACHE;
-import static no.nav.dokdisteformidling.constants.RetryConstants.MAX_ATTEMPTS_SHORT;
-import static no.nav.dokdisteformidling.itest.config.SftpConfig.startSshServer;
-import static no.nav.dokdisteformidling.storage.S3Configuration.BUCKET_NAME;
-import static no.nav.dokdisteformidling.testUtils.classpathToString;
-import static no.nav.dokdisteformidling.testUtils.fileToString;
-import static org.awaitility.Awaitility.await;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.reset;
-import static org.mockito.Mockito.when;
-import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE;
-import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
-
 import com.amazonaws.SdkClientException;
 import com.amazonaws.services.s3.AmazonS3;
 import com.github.tomakehurst.wiremock.client.WireMock;
@@ -71,6 +41,36 @@ import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
+import static com.github.tomakehurst.wiremock.client.WireMock.get;
+import static com.github.tomakehurst.wiremock.client.WireMock.getRequestedFor;
+import static com.github.tomakehurst.wiremock.client.WireMock.post;
+import static com.github.tomakehurst.wiremock.client.WireMock.postRequestedFor;
+import static com.github.tomakehurst.wiremock.client.WireMock.put;
+import static com.github.tomakehurst.wiremock.client.WireMock.putRequestedFor;
+import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
+import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
+import static com.github.tomakehurst.wiremock.client.WireMock.urlMatching;
+import static com.github.tomakehurst.wiremock.client.WireMock.verify;
+import static no.nav.dokdisteformidling.config.cache.LokalCacheConfig.TKAT020_CACHE;
+import static no.nav.dokdisteformidling.config.cache.LokalCacheConfig.TKAT021_CACHE;
+import static no.nav.dokdisteformidling.constants.RetryConstants.MAX_ATTEMPTS_SHORT;
+import static no.nav.dokdisteformidling.itest.config.SftpConfig.startSshServer;
+import static no.nav.dokdisteformidling.storage.S3Configuration.BUCKET_NAME;
+import static no.nav.dokdisteformidling.testUtils.classpathToString;
+import static no.nav.dokdisteformidling.testUtils.fileToString;
+import static no.nav.dokdisteformidling.utils.FunctionalUtils.getNow;
+import static org.awaitility.Awaitility.await;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.when;
+import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE;
+import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
 
 /**
  * @author Erik Bråten, Visma Consulting
