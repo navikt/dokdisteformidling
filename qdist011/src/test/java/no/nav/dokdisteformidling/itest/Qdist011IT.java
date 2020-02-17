@@ -11,7 +11,7 @@ import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlMatching;
 import static com.github.tomakehurst.wiremock.client.WireMock.verify;
-import static no.nav.dokdisteformidling.common.FunctionalUtils.getNow;
+import static no.nav.dokdisteformidling.utils.DateConverterUtil.getNow;
 import static no.nav.dokdisteformidling.config.cache.LokalCacheConfig.TKAT020_CACHE;
 import static no.nav.dokdisteformidling.config.cache.LokalCacheConfig.TKAT021_CACHE;
 import static no.nav.dokdisteformidling.constants.RetryConstants.MAX_ATTEMPTS_SHORT;

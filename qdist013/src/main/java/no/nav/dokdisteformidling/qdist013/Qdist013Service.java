@@ -35,9 +35,9 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static java.lang.String.format;
-import static no.nav.dokdisteformidling.common.FunctionalUtils.deserializeS3JsonPayloadToDokdistDokument;
-import static no.nav.dokdisteformidling.common.FunctionalUtils.generateRandomUUID;
-import static no.nav.dokdisteformidling.common.FunctionalUtils.validateThatForsendelseStatusIsKlarForDist;
+import static no.nav.dokdisteformidling.utils.FunctionalUtils.deserializeS3JsonPayloadToDokdistDokument;
+import static no.nav.dokdisteformidling.utils.FunctionalUtils.generateRandomUUID;
+import static no.nav.dokdisteformidling.utils.FunctionalUtils.validateThatForsendelseStatusIsKlarForDist;
 import static no.nav.dokdisteformidling.constants.RouteConstants.PROPERTY_ANTALL_DOK;
 import static no.nav.dokdisteformidling.constants.RouteConstants.PROPERTY_BESTILLINGS_ID;
 import static no.nav.dokdisteformidling.constants.RouteConstants.PROPERTY_CONVERSATION_ID;
@@ -70,6 +70,7 @@ public class Qdist013Service {
 						   @Named("SafJournalpostQueryServiceQdist013") SafJournalpostQueryService<JournalpostQdist013> safJournalpostQueryService,
 						   JuridiskLogg juridiskLogg,
 						   Integrasjonspunkt integrasjonspunkt,
+						   LagreJuridiskLoggMapper lagreJuridiskLoggMapper,
 						   ArkivmeldingMapper arkivmeldingMapper,
 						   CreateMessageRequestMapper createMessageRequestMapper,
 						   FeatureToggleProperties featureToggleProperties,
@@ -79,7 +80,7 @@ public class Qdist013Service {
 		this.safJournalpostQueryService = safJournalpostQueryService;
 		this.juridiskLogg = juridiskLogg;
 		this.integrasjonspunkt = integrasjonspunkt;
-		this.lagreJuridiskLoggMapper = new LagreJuridiskLoggMapper();
+		this.lagreJuridiskLoggMapper = lagreJuridiskLoggMapper;
 		this.arkivmeldingMapper = arkivmeldingMapper;
 		this.createMessageRequestMapper = createMessageRequestMapper;
 		this.featureToggleProperties = featureToggleProperties;

@@ -1,7 +1,7 @@
 package no.nav.dokdisteformidling;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
-import static no.nav.dokdisteformidling.common.FunctionalUtils.getNow;
+import static no.nav.dokdisteformidling.utils.DateConverterUtil.getNow;
 import static no.nav.dokdisteformidling.qdist011.constants.BridgeMotSDPMapperConstants.DATE_VALID_MONTHS;
 import static no.nav.dokdisteformidling.qdist011.constants.BridgeMotSDPMapperConstants.EPOST;
 import static no.nav.dokdisteformidling.qdist011.constants.BridgeMotSDPMapperConstants.SMS;

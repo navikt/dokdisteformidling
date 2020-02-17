@@ -1,7 +1,7 @@
 package no.nav.dokdisteformidling.qdist011;
 
 import static java.lang.String.format;
-import static no.nav.dokdisteformidling.common.FunctionalUtils.getNow;
+import static no.nav.dokdisteformidling.utils.DateConverterUtil.getNow;
 import static no.nav.dokdisteformidling.qdist011.constants.BridgeMotSDPMapperConstants.AUTHORITY;
 import static no.nav.dokdisteformidling.qdist011.constants.BridgeMotSDPMapperConstants.AUTHORITY_ENUM;
 import static no.nav.dokdisteformidling.qdist011.constants.BridgeMotSDPMapperConstants.BUSINESS_SCOPE_TYPE;

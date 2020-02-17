@@ -1,9 +1,9 @@
 package no.nav.dokdisteformidling.qdist013;
 
 import static java.lang.String.format;
-import static no.nav.dokdisteformidling.common.FunctionalUtils.convertLocalDateTimeToXmlGregorianCalendar;
-import static no.nav.dokdisteformidling.common.FunctionalUtils.generateRandomUUID;
-import static no.nav.dokdisteformidling.common.FunctionalUtils.getNow;
+import static no.nav.dokdisteformidling.utils.DateConverterUtil.convertLocalDateTimeToXmlGregorianCalendar;
+import static no.nav.dokdisteformidling.utils.FunctionalUtils.generateRandomUUID;
+import static no.nav.dokdisteformidling.utils.DateConverterUtil.getNow;
 import static no.nav.dokdisteformidling.constants.DomainConstants.APP_NAME;
 import static no.nav.dokdisteformidling.constants.DomainConstants.VARIANTFORMAT_ARKIV;
 import static no.nav.dokdisteformidling.constants.DomainConstants.VARIANTFORMAT_PRODUKSJON;

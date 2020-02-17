@@ -87,6 +87,8 @@ public class AdministrerForsendelseConsumer implements AdministrerForsendelse {
 				.queryParam("forsendelseStatus", forsendelseStatus)
 				.queryParam("konversasjonsId", konversasjonsId)
 				.toUriString();
+		log.info(String.format("Mottatt kall fra sdist001 til å oppdatere administrerforsendelse med forsendelseId:%s , konversasjonsId:%s til forsendelseStatus:%s",
+				forsendelseId, konversasjonsId, forsendelseStatus));
 		oppdaterForsendelse(uri);
 	}
 
