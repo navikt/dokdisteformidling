@@ -7,14 +7,17 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 
 public class DateConverterUtil {
+
+    private DateConverterUtil() {
+    }
+
     public static XMLGregorianCalendar convertToXMLGregorianCalendar(Date date) throws DatatypeConfigurationException {
-       if(date!=null ){
-                GregorianCalendar gregorianCalendar = new GregorianCalendar();
-                gregorianCalendar.setTime(date);
-                XMLGregorianCalendar xmlGregorianCalendar = DatatypeFactory.newInstance().newXMLGregorianCalendar(gregorianCalendar);
-                return xmlGregorianCalendar;
+        if (date != null) {
+            GregorianCalendar gregorianCalendar = new GregorianCalendar();
+            gregorianCalendar.setTime(date);
+            return DatatypeFactory.newInstance().newXMLGregorianCalendar(gregorianCalendar);
         } else {
-           return null;
-       }
+            return null;
+        }
     }
 }

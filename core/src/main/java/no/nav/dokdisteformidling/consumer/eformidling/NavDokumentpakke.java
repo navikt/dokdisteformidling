@@ -2,9 +2,7 @@ package no.nav.dokdisteformidling.consumer.eformidling;
 
 import lombok.Builder;
 import lombok.Value;
-import no.nav.dokdisteformidling.consumer.integrasjonspunkt.StandardBusinessDocumentHeader;
 
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 

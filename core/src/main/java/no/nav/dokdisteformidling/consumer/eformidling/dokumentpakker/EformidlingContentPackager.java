@@ -32,11 +32,10 @@ public class EformidlingContentPackager {
     InputStream packageContent(NavDokumentpakke navDokumentpakke,
                                AppCertificate appCertificate,
                                X509Certificate mottakerCertificate) {
-        try {
-            final OutputStream asiceStreamed = asiceCreator.createAsiceStreamed(
-                    navDokumentpakke.getArkivmelding(),
-                    navDokumentpakke.getNavDokumenter().stream(),
-                    appCertificate);
+        try (final OutputStream asiceStreamed = asiceCreator.createAsiceStreamed(
+                navDokumentpakke.getArkivmelding(),
+                navDokumentpakke.getNavDokumenter().stream(),
+                appCertificate)) {
             final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
             cmsUtil.createCMSStreamed(new ByteArrayInputStream(((ByteArrayOutputStream) asiceStreamed).toByteArray()),
                     outputStream, mottakerCertificate);

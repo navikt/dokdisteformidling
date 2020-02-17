@@ -1,12 +1,6 @@
 package no.nav.dokdisteformidling.consumer.eformidling.dokumentpakker.xmlmanifest;
 
 import no.nav.dokdisteformidling.consumer.eformidling.NavDokument;
-import no.nav.dokdisteformidling.consumer.eformidling.dokumentpakker.xmlmanifest.Avsender;
-import no.nav.dokdisteformidling.consumer.eformidling.dokumentpakker.xmlmanifest.HovedDokument;
-import no.nav.dokdisteformidling.consumer.eformidling.dokumentpakker.xmlmanifest.Manifest;
-import no.nav.dokdisteformidling.consumer.eformidling.dokumentpakker.xmlmanifest.MarshalManifest;
-import no.nav.dokdisteformidling.consumer.eformidling.dokumentpakker.xmlmanifest.Mottaker;
-import no.nav.dokdisteformidling.consumer.eformidling.dokumentpakker.xmlmanifest.Organisasjon;
 
 import java.io.ByteArrayOutputStream;
 import java.nio.charset.StandardCharsets;
