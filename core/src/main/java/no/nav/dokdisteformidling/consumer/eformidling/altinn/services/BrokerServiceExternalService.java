@@ -60,7 +60,7 @@ public class BrokerServiceExternalService {
     }
 
     @Monitor(value = "dok_metric", extraTags = {"process", "brokerServiceExternalServiceGetFileReferences"}, histogram = true, percentiles = {0.5, 0.95})
-    protected Optional<BrokerServiceAvailableFileList> getFileReferences(SearchCriteria criteria, ServiceCode serviceCode) {
+    public Optional<BrokerServiceAvailableFileList> getFileReferences(SearchCriteria criteria, ServiceCode serviceCode) {
         try {
             return Optional.of(brokerServiceExternal.getAvailableFiles(getBrokerServiceSearch(NAV_ORGNUMMER, serviceCode, criteria)));
         } catch (IBrokerServiceExternalGetAvailableFilesAltinnFaultFaultFaultMessage e) {
