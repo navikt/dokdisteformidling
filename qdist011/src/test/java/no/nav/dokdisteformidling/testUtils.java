@@ -1,5 +1,12 @@
 package no.nav.dokdisteformidling;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
+import static no.nav.dokdisteformidling.utils.DateConverterUtil.getNow;
+import static no.nav.dokdisteformidling.qdist011.constants.BridgeMotSDPMapperConstants.DATE_VALID_MONTHS;
+import static no.nav.dokdisteformidling.qdist011.constants.BridgeMotSDPMapperConstants.EPOST;
+import static no.nav.dokdisteformidling.qdist011.constants.BridgeMotSDPMapperConstants.SMS;
+import static org.apache.xml.security.stax.ext.XMLSecurityConstants.datatypeFactory;
+
 import no.nav.dokdisteformidling.exception.technical.KunneIkkeHenteDagensDatoTechnicalException;
 import org.apache.commons.io.IOUtils;
 import org.springframework.core.io.ClassPathResource;
@@ -20,13 +27,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-
-import static java.nio.charset.StandardCharsets.UTF_8;
-import static no.nav.dokdisteformidling.qdist011.constants.BridgeMotSDPMapperConstants.DATE_VALID_MONTHS;
-import static no.nav.dokdisteformidling.qdist011.constants.BridgeMotSDPMapperConstants.EPOST;
-import static no.nav.dokdisteformidling.qdist011.constants.BridgeMotSDPMapperConstants.SMS;
-import static no.nav.dokdisteformidling.utils.FunctionalUtils.getNow;
-import static org.apache.xml.security.stax.ext.XMLSecurityConstants.datatypeFactory;
 
 /**
  * @author Sigurd Midttun, Visma Consulting.

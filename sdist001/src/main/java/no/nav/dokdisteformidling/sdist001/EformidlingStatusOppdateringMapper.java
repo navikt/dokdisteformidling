@@ -7,14 +7,13 @@ import org.springframework.stereotype.Component;
 /**
  * @author Erik Bråten, Visma Consulting.
  */
-@Component
 public class EformidlingStatusOppdateringMapper {
 
-	public EformidlingStatusOppdatering map(String konversasjonId, String integrasjonspunktStatus) {
-		return EformidlingStatusOppdatering.builder()
-				.konversasjonId(konversasjonId)
-				.status(integrasjonspunktStatus)
-				.statusTidspunkt(LocalDateTime.now())
-				.build();
-	}
+    public EformidlingStatusOppdatering map(String konversasjonId, String trygderettenKvitteringStatus) {
+        return EformidlingStatusOppdatering.builder()
+                .konversasjonId(konversasjonId)
+                .status(trygderettenKvitteringStatus)
+                .statusTidspunkt(LocalDateTime.now())
+                .build();
+    }
 }

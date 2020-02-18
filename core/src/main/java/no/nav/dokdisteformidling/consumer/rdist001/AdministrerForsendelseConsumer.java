@@ -1,5 +1,6 @@
 package no.nav.dokdisteformidling.consumer.rdist001;
 
+import lombok.extern.slf4j.Slf4j;
 import no.nav.dokdisteformidling.config.alias.ServiceuserAlias;
 import no.nav.dokdisteformidling.constants.MdcConstants;
 import no.nav.dokdisteformidling.constants.RetryConstants;
@@ -32,6 +33,7 @@ import java.time.Duration;
 /**
  * @author Sigurd Midttun, Visma Consulting.
  */
+@Slf4j
 @Component
 public class AdministrerForsendelseConsumer implements AdministrerForsendelse {
 
@@ -85,6 +87,8 @@ public class AdministrerForsendelseConsumer implements AdministrerForsendelse {
 				.queryParam("forsendelseStatus", forsendelseStatus)
 				.queryParam("konversasjonsId", konversasjonsId)
 				.toUriString();
+		log.info(String.format("Mottatt kall fra sdist001 til å oppdatere administrerforsendelse med forsendelseId:%s , konversasjonsId:%s til forsendelseStatus:%s",
+				forsendelseId, konversasjonsId, forsendelseStatus));
 		oppdaterForsendelse(uri);
 	}
 

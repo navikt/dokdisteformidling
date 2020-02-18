@@ -1,5 +1,19 @@
 package no.nav.dokdisteformidling.qdist013;
 
+import static java.lang.String.format;
+import static no.nav.dokdisteformidling.utils.DateConverterUtil.convertLocalDateTimeToXmlGregorianCalendar;
+import static no.nav.dokdisteformidling.utils.FunctionalUtils.generateRandomUUID;
+import static no.nav.dokdisteformidling.utils.DateConverterUtil.getNow;
+import static no.nav.dokdisteformidling.constants.DomainConstants.APP_NAME;
+import static no.nav.dokdisteformidling.constants.DomainConstants.VARIANTFORMAT_ARKIV;
+import static no.nav.dokdisteformidling.constants.DomainConstants.VARIANTFORMAT_PRODUKSJON;
+import static no.nav.dokdisteformidling.constants.DomainConstants.VARIANTFORMAT_SLADDET;
+import static no.nav.dokdisteformidling.qdist013.util.ArkivMapperUtil.brukerTypeIsAktoerId;
+import static no.nav.dokdisteformidling.qdist013.util.ArkivMapperUtil.brukerTypeIsOrgnr;
+import static no.nav.dokdisteformidling.qdist013.util.ArkivMapperUtil.isHoveddokument;
+import static org.apache.commons.lang3.StringUtils.isBlank;
+import static org.apache.commons.lang3.StringUtils.isEmpty;
+
 import no.arkivverket.standarder.noark5.arkivmelding.Arkivmelding;
 import no.arkivverket.standarder.noark5.arkivmelding.Dokumentbeskrivelse;
 import no.arkivverket.standarder.noark5.arkivmelding.Dokumentobjekt;
@@ -29,20 +43,6 @@ import javax.xml.datatype.XMLGregorianCalendar;
 import java.math.BigInteger;
 import java.util.List;
 import java.util.stream.IntStream;
-
-import static java.lang.String.format;
-import static no.nav.dokdisteformidling.constants.DomainConstants.APP_NAME;
-import static no.nav.dokdisteformidling.constants.DomainConstants.VARIANTFORMAT_ARKIV;
-import static no.nav.dokdisteformidling.constants.DomainConstants.VARIANTFORMAT_PRODUKSJON;
-import static no.nav.dokdisteformidling.constants.DomainConstants.VARIANTFORMAT_SLADDET;
-import static no.nav.dokdisteformidling.qdist013.util.ArkivMapperUtil.brukerTypeIsAktoerId;
-import static no.nav.dokdisteformidling.qdist013.util.ArkivMapperUtil.brukerTypeIsOrgnr;
-import static no.nav.dokdisteformidling.qdist013.util.ArkivMapperUtil.isHoveddokument;
-import static no.nav.dokdisteformidling.utils.FunctionalUtils.convertLocalDateTimeToXmlGregorianCalendar;
-import static no.nav.dokdisteformidling.utils.FunctionalUtils.generateRandomUUID;
-import static no.nav.dokdisteformidling.utils.FunctionalUtils.getNow;
-import static org.apache.commons.lang3.StringUtils.isBlank;
-import static org.apache.commons.lang3.StringUtils.isEmpty;
 
 /**
  * @author Sigurd Midttun, Visma Consulting.
