@@ -109,9 +109,7 @@ public class AdministrerForsendelseConsumer implements AdministrerForsendelse {
 	@Retryable(include = AbstractDokdisteformidlingTechnicalException.class, backoff = @Backoff(delay = RetryConstants.DELAY_SHORT, multiplier = RetryConstants.MULTIPLIER_SHORT))
 	@Monitor(value = "dok_consumer", extraTags = {"process", "hentEformidlingForsendelser"}, histogram = true)
 	public HentEformidlingforsendelserResponseTo hentEformidlingForsendelser() {
-		MDC.put("hentEformidlingForsendelser",MdcConstants.CALL_ID);
 		try {
-			log.info(String.format("%s mottatt kall til å hente forsendelser til trygteretten",MDC.get(MdcConstants.CALL_ID)));
 			HttpEntity entity = new HttpEntity<>(createHeaders());
 			return restTemplate.exchange(this.administrerforsendelseV1Url + "/henteformidlingforsendelser", HttpMethod.GET, entity, HentEformidlingforsendelserResponseTo.class)
 					.getBody();
