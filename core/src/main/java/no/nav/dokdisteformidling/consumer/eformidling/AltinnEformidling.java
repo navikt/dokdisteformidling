@@ -20,10 +20,6 @@ import no.nav.dokdisteformidling.consumer.eformidling.dokumentpakker.Eformidling
 import no.nav.dokdisteformidling.consumer.eformidling.dokumentpakker.EformidlingMessageUnpackager;
 import no.nav.dokdisteformidling.consumer.eformidling.serviceregistry.EformidlingMottakerInfoService;
 import no.nav.dokdisteformidling.consumer.eformidling.serviceregistry.MottakerInfo;
-import no.nav.dokdisteformidling.exception.technical.AltinnEformidlingRequestTechnicalException;
-import no.nav.dokdisteformidling.metrics.Monitor;
-import org.springframework.retry.annotation.Backoff;
-import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Component;
 
 import javax.activation.DataHandler;
@@ -32,7 +28,6 @@ import java.io.InputStream;
 import java.util.List;
 
 import static java.util.stream.Collectors.toList;
-import static no.nav.dokdisteformidling.constants.RetryConstants.DELAY_SHORT;
 import static no.nav.dokdisteformidling.consumer.eformidling.EformidlingConstants.NAV_ORGNUMMER;
 
 /**
@@ -64,8 +59,6 @@ class AltinnEformidling implements Eformidling {
     }
 
     @Override
-    @Monitor(value = "dok_metric", extraTags = {"process", "altinnEformidlingSend"}, histogram = true, percentiles = {0.5, 0.95})
-    @Retryable(include = AltinnEformidlingRequestTechnicalException.class, backoff = @Backoff(delay = DELAY_SHORT))
     public UploadResponse send(NavDokumentpakke navDokumentpakke) {
         log.info("Henter mottakerInfo for Trygderetten. conversationId={}, bestillingsId={}", navDokumentpakke.getConversationId(), navDokumentpakke.getBestillingsId());
         final MottakerInfo mottakerInfo = eformidlingMottakerInfoService.hentMottakerInfoTrygderetten();
@@ -99,7 +92,6 @@ class AltinnEformidling implements Eformidling {
     }
 
     @Override
-    @Monitor(value = "dok_metric", extraTags = {"process", "altinnEformidlingHent"}, histogram = true, percentiles = {0.5, 0.95})
     public List<DownloadResponse> hent() {
         log.info("Henter filreferanser til meldinger fra Trygderetten som kan lastes ned gjennom Altinns formidlingstjeneste");
         List<String> filreferanser = brokerServiceExternalService.getAvailableFiles(getSearchCriteria(), getServiceCode());
@@ -134,8 +126,6 @@ class AltinnEformidling implements Eformidling {
     }
 
     @Override
-    @Monitor(value = "dok_metric", extraTags = {"process", "altinnEformidlingBekreft"}, histogram = true, percentiles = {0.5, 0.95})
-    @Retryable(include = AltinnEformidlingRequestTechnicalException.class, backoff = @Backoff(delay = DELAY_SHORT))
     public void bekreft(List<String> filreferanse) {
         filreferanse.forEach(brokerServiceExternalService::confirmDownloaded);
     }
