@@ -11,6 +11,7 @@ import no.nav.dokdisteformidling.consumer.rdist001.AdministrerForsendelse;
 import no.nav.dokdisteformidling.consumer.rdist001.HentEformidlingforsendelserResponseTo;
 import no.nav.dokdisteformidling.consumer.rdist001.HentForsendelseResponseTo;
 import no.nav.dokdisteformidling.exception.functional.KunneIkkeSerialisereEformidlingstatusoppdateringTilJson;
+import no.nav.dokdisteformidling.exception.technical.FantIkkeEformidlingforsendelserException;
 import no.nav.dokdisteformidling.metrics.Monitor;
 import no.nav.dokdisteformidling.sdist001.domain.EformidlingStatusOppdatering;
 import no.nav.dokdisteformidling.sdist001.domain.ForsendelseStatusEndringer;
@@ -18,6 +19,7 @@ import no.nav.dokdisteformidling.sdist001.domain.to.AltinnKvitteringStatus;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static no.nav.dokdisteformidling.sdist001.domain.to.ForsendelseStatus.BEKREFTET;
 import static no.nav.dokdisteformidling.sdist001.domain.to.ForsendelseStatus.EKSPEDERT;
@@ -54,7 +56,7 @@ public class Sdist001Service {
     @Monitor(value = "dok_metric", extraTags = {"process", "oppdatertDokDistEformidlingStatus"}, histogram = true)
     public void oppdatereDokDistEformidlingStatus() {
         forsendelseStatusEndringer.clear();
-        List<HentEformidlingforsendelserResponseTo.ForsendelseTo> forsendelserTo = administrerForsendelse.hentEformidlingForsendelser().getForsendelser();
+        List<HentEformidlingforsendelserResponseTo.ForsendelseTo> forsendelserTo = hentEformidlingforsendelserResponse();
         eformidling.hent().stream()
                 .forEach(downloadResponse -> {
                     log.info(String.format("Hentet trygderetten kvittering melding fra Altinn med konversasjonId=%s, SendersReference=%s,KvitteringStatus=%s",
@@ -84,7 +86,13 @@ public class Sdist001Service {
         }
         log.info("Sdist001 har mottatt kall med {}", forsendelseTo);
 
-        oppdaterEformidlingStatus(kvitteringStatus, konversasjonId, forsendelseId, forsendelseStatus);
+        try {
+            oppdaterEformidlingStatus(kvitteringStatus, konversasjonId, forsendelseId, forsendelseStatus);
+        } catch (Exception e) {
+            log.error("sdist001 feilet under oppdatering av status for eFormidlingforsendelser: " + e.getMessage(), e);
+            return;
+        }
+
     }
 
     private void oppdaterEformidlingStatus(String kvitteringStatus, String konversasjonId, String forsendelseId, String forsendelseStatus) {
@@ -133,6 +141,26 @@ public class Sdist001Service {
 
         administrerForsendelse.oppdaterForsendelseStatus(forsendelseId, EKSPEDERT.name());
 
+    }
+
+
+    private List<HentEformidlingforsendelserResponseTo.ForsendelseTo> hentEformidlingforsendelserResponse() {
+
+        log.info("Rdist001 mottatt kall til å hente Eformidlingforsendelser fra dokdist database ");
+        List<HentEformidlingforsendelserResponseTo.ForsendelseTo> forsendelseTos = administrerForsendelse.hentEformidlingForsendelser().getForsendelser();
+
+        if (forsendelseTos == null) {
+            log.warn("Kall mot rdist001 - fant ikke Eformidlingforsendelser  fra dokdist database");
+            throw new FantIkkeEformidlingforsendelserException("Kall mot rdist001 - fant ikke Eformidlingforsendelser  fra dokdist database.");
+        }
+
+       return forsendelseTos.stream()
+                .filter(forsendelse -> !EKSPEDERT.name().equals(forsendelse.getForsendelseStatus()))
+                .map(forsendelse -> {
+
+                            log.info("Kall mot rdist001 - Fant Eformidlingforsendelser fra dokdist database: {}", forsendelse);
+                            return forsendelse;
+                        }).collect(Collectors.toList());
     }
 
 }
