@@ -5,7 +5,6 @@ import lombok.extern.slf4j.Slf4j;
 import no.nav.dokdisteformidling.consumer.eformidling.AltinnEformidling;
 import no.nav.dokdisteformidling.consumer.eformidling.Eformidling;
 import no.nav.dokdisteformidling.consumer.eformidling.altinn.from.DownloadResponse;
-import no.nav.dokdisteformidling.consumer.eformidling.altinn.services.BrokerServiceExternalService;
 import no.nav.dokdisteformidling.consumer.eformidling.dokumentpakker.trygderetten.json.KvitteringStatus;
 import no.nav.dokdisteformidling.consumer.juridisklogg.JuridiskLogg;
 import no.nav.dokdisteformidling.consumer.juridisklogg.JuridiskLoggConsumer;
@@ -25,22 +24,19 @@ import org.springframework.core.io.ClassPathResource;
 import javax.inject.Inject;
 import java.io.IOException;
 import java.io.InputStream;
-import java.time.Clock;
-import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 
-import static no.nav.dokdisteformidling.constants.DomainConstants.DEFAULT_ZONE_ID;
-import static no.nav.dokdisteformidling.sdist001.domain.to.AltinnKvitteringStatus.FAIL;
 import static no.nav.dokdisteformidling.sdist001.domain.to.AltinnKvitteringStatus.LEVERT;
+import static no.nav.dokdisteformidling.sdist001.domain.to.AltinnKvitteringStatus.LEVETID_UTLOPT;
 import static no.nav.dokdisteformidling.sdist001.domain.to.AltinnKvitteringStatus.MOTTATT;
 import static no.nav.dokdisteformidling.sdist001.domain.to.AltinnKvitteringStatus.SENDT;
 import static no.nav.dokdisteformidling.sdist001.domain.to.ForsendelseStatus.BEKREFTET;
+import static no.nav.dokdisteformidling.sdist001.domain.to.ForsendelseStatus.EKSPEDERT;
 import static no.nav.dokdisteformidling.sdist001.domain.to.ForsendelseStatus.OVERSENDT;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -59,15 +55,10 @@ public class Sdist001ServiceTest {
     private final static String CONVERSATION_ID_3 = "f1b3002b-1dea-4c14-8072-8c191183d04c";
     private final static String CONVERSATION_ID_4 = "f1b3002b-1dea-4c14-8072-8c191183d04d";
 
-    private static final String FIXED_TIME = "2020-01-01T12:00:00Z";
     private static final String FORSENDELSE_ID_1 = "1231";
     private static final String FORSENDELSE_ID_2 = "1232";
     private static final String FORSENDELSE_ID_3 = "1233";
-
-
-    private static final String KVITTERING_STATUS_MOTTATT = "MOTTATT";
-
-
+    private static final String FORSENDELSE_ID_4 = "1234";
 
     @Inject
     private Eformidling eformidling;
@@ -82,9 +73,6 @@ public class Sdist001ServiceTest {
     @Inject
     private LagreJuridiskLoggMapper lagreJuridiskLoggMapper;
 
-    @Inject
-    private BrokerServiceExternalService brokerServiceExternalService;
-
     private ForsendelseStatusEndringer forsendelseStatusEndringer;
 
 
@@ -93,10 +81,10 @@ public class Sdist001ServiceTest {
         forsendelseStatusEndringer = new ForsendelseStatusEndringer();
         eformidling = mock(AltinnEformidling.class);
         administrerForsendelse = mock(AdministrerForsendelseConsumer.class);
-        brokerServiceExternalService = mock(BrokerServiceExternalService.class);
         lagreJuridiskLoggMapper = mock(LagreJuridiskLoggMapper.class);
         juridiskLogg = mock(JuridiskLoggConsumer.class);
-        sdist001Service = new Sdist001Service(administrerForsendelse, juridiskLogg, eformidling, lagreJuridiskLoggMapper, brokerServiceExternalService);
+        sdist001Service = new Sdist001Service(administrerForsendelse, juridiskLogg, eformidling, lagreJuridiskLoggMapper);
+        forsendelseStatusEndringer = new ForsendelseStatusEndringer();
 
     }
 
@@ -112,7 +100,7 @@ public class Sdist001ServiceTest {
         when(eformidling.hent()).thenReturn(getDownloadResponse());
         when(juridiskLogg.lagreJuridiskLogg(getLoggMeldingRequest())).thenReturn(getloggMeldingResponse());
 
-        sdist001Service.oppdatertDokDistEformidlingStatus();
+        sdist001Service.oppdatereDokDistEformidlingStatus();
 
         verify(administrerForsendelse, times(1)).hentEformidlingForsendelser();
         verify(administrerForsendelse, times(2)).hentForsendelse(anyString());
@@ -159,7 +147,7 @@ public class Sdist001ServiceTest {
                 DownloadResponse.builder()
                         .conversationId(CONVERSATION_ID_4)
                         .kvitteringStatus(KvitteringStatus.builder()
-                                .status(FAIL.name())
+                                .status(LEVETID_UTLOPT.name())
                                 .build())
                         .sendersReference(SENDERS_REFERENCE_4)
                         .sendtDate(LocalDateTime.now().toString())
@@ -190,6 +178,12 @@ public class Sdist001ServiceTest {
                                 .forsendelseStatus(OVERSENDT.name())
                                 .forsendelseId(FORSENDELSE_ID_3)
                                 .konversasjonId(CONVERSATION_ID_3)
+                                .build(),
+                        HentEformidlingforsendelserResponseTo.ForsendelseTo.builder()
+                                .distribusjonKanal("TRYGDERETTEN")
+                                .forsendelseStatus(EKSPEDERT.name())
+                                .forsendelseId(FORSENDELSE_ID_4)
+                                .konversasjonId(CONVERSATION_ID_4)
                                 .build()))
                 .build();
 

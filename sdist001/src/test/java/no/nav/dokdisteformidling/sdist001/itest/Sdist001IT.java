@@ -41,7 +41,7 @@ import java.util.UUID;
 		webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureWireMock(port = 0)
 @ActiveProfiles("itest")
-@Disabled("Skal endres testen til å bruke altinnborkerservice")
+@Disabled("Skal endres testen til å bruke AltinnBrokerService")
 public class Sdist001IT {
 
 	private static String CALL_ID;
@@ -65,7 +65,7 @@ public class Sdist001IT {
 				.withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE)
 				.withBody(classpathToString("__files/rdist001/henteformidlingforsendelser-empty.json"))));
 
-		sdist001Service.oppdatertDokDistEformidlingStatus();
+		sdist001Service.oppdatereDokDistEformidlingStatus();
 
 		verify(1, getRequestedFor(urlEqualTo(HENT_EFORMIDLINGSFORSENDELSER_URL)));
 	}
@@ -76,7 +76,7 @@ public class Sdist001IT {
 				.withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE)
 				.withBody(classpathToString("__files/rdist001/henteformidlingforsendelser-illegalStatus.json"))));
 
-		sdist001Service.oppdatertDokDistEformidlingStatus();
+		sdist001Service.oppdatereDokDistEformidlingStatus();
 
 
 		verify(1, getRequestedFor(urlEqualTo(HENT_EFORMIDLINGSFORSENDELSER_URL)));
@@ -94,7 +94,7 @@ public class Sdist001IT {
 		stubFor(put("/administrerforsendelse?forsendelseId=1&forsendelseStatus=FEILET")
 				.willReturn(aResponse().withStatus(HttpStatus.OK.value())));
 
-		sdist001Service.oppdatertDokDistEformidlingStatus();
+		sdist001Service.oppdatereDokDistEformidlingStatus();
 
 
 		verify(1, getRequestedFor(urlEqualTo(HENT_EFORMIDLINGSFORSENDELSER_URL)));
@@ -113,7 +113,7 @@ public class Sdist001IT {
 		stubFor(put("/administrerforsendelse?forsendelseId=1&forsendelseStatus=BEKREFTET")
 				.willReturn(aResponse().withStatus(HttpStatus.OK.value())));
 
-		sdist001Service.oppdatertDokDistEformidlingStatus();
+		sdist001Service.oppdatereDokDistEformidlingStatus();
 
 		verify(1, getRequestedFor(urlEqualTo(HENT_EFORMIDLINGSFORSENDELSER_URL)));
 		verify(1, getRequestedFor(urlEqualTo("/integrasjonspunkt/api/statuses?conversationId=101")));
@@ -138,7 +138,7 @@ public class Sdist001IT {
 		stubFor(put("/administrerforsendelse?forsendelseId=1&forsendelseStatus=EKSPEDERT")
 				.willReturn(aResponse().withStatus(HttpStatus.OK.value())));
 
-		sdist001Service.oppdatertDokDistEformidlingStatus();
+		sdist001Service.oppdatereDokDistEformidlingStatus();
 
 
 		verify(1, getRequestedFor(urlEqualTo(HENT_EFORMIDLINGSFORSENDELSER_URL)));
@@ -159,7 +159,7 @@ public class Sdist001IT {
 		stubFor(put("/administrerforsendelse?forsendelseId=1&forsendelseStatus=FEILET")
 				.willReturn(aResponse().withStatus(HttpStatus.OK.value())));
 
-		sdist001Service.oppdatertDokDistEformidlingStatus();
+		sdist001Service.oppdatereDokDistEformidlingStatus();
 
 
 		verify(1, getRequestedFor(urlEqualTo(HENT_EFORMIDLINGSFORSENDELSER_URL)));
@@ -203,7 +203,7 @@ public class Sdist001IT {
 				.withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE)
 				.withBody("{\"id\": \"123\"}")));
 
-		sdist001Service.oppdatertDokDistEformidlingStatus();
+		sdist001Service.oppdatereDokDistEformidlingStatus();
 
 
 		verify(1, getRequestedFor(urlEqualTo(HENT_EFORMIDLINGSFORSENDELSER_URL)));
@@ -238,7 +238,7 @@ public class Sdist001IT {
 				.withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE)
 				.withBody("{\"id\": \"123\"}")));
 
-		sdist001Service.oppdatertDokDistEformidlingStatus();
+		sdist001Service.oppdatereDokDistEformidlingStatus();
 
 
 		verify(1, getRequestedFor(urlEqualTo(HENT_EFORMIDLINGSFORSENDELSER_URL)));
@@ -259,7 +259,7 @@ public class Sdist001IT {
 		stubFor(get("/integrasjonspunkt/api/statuses?conversationId=101")
 				.willReturn(aResponse().withStatus(HttpStatus.SERVICE_UNAVAILABLE.value())));
 
-		sdist001Service.oppdatertDokDistEformidlingStatus();
+		sdist001Service.oppdatereDokDistEformidlingStatus();
 
 
 		verify(1, getRequestedFor(urlEqualTo(HENT_EFORMIDLINGSFORSENDELSER_URL)));
@@ -290,7 +290,7 @@ public class Sdist001IT {
 				.withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE)
 				.withBody("{\"id\": \"123\"}")));
 
-		sdist001Service.oppdatertDokDistEformidlingStatus();
+		sdist001Service.oppdatereDokDistEformidlingStatus();
 
 
 		verify(1, getRequestedFor(urlEqualTo(HENT_EFORMIDLINGSFORSENDELSER_URL)));

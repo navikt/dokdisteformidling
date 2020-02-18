@@ -123,7 +123,7 @@ public class AltinnEformidling implements Eformidling {
         return altinnDokuments.stream().map(altinnDokument -> new DownloadResponseBuilder().withAltinnDokument(altinnDokument).build()).collect(Collectors.toList());
     }
 
-    public void bekreft(List<String> filreferanse) {
-        filreferanse.forEach(brokerServiceExternalService::confirmDownloaded);
+    public void bekreft(String filreferanse) {
+       brokerServiceExternalService.confirmDownloaded(filreferanse);
     }
 }
