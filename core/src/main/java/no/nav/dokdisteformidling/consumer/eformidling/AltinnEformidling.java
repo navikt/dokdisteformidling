@@ -36,7 +36,7 @@ import static no.nav.dokdisteformidling.consumer.eformidling.EformidlingConstant
  */
 @Component
 @Slf4j
-class AltinnEformidling implements Eformidling {
+public class AltinnEformidling implements Eformidling {
     private final AppCertificate appCertificate;
     private final EformidlingMottakerInfoService eformidlingMottakerInfoService;
     private final EformidlingMessagePackager eformidlingMessagePackager;
@@ -99,7 +99,10 @@ class AltinnEformidling implements Eformidling {
 
         List<DownloadedMessageFromAltinn> messagesFromAltinn = brokerServiceExternalStreamedService.downloadFilesFromAltinn(availableFiles);
         List<AltinnDokument> altinnDokuments = eformidlingMessageUnpackager.unpackageMessages(messagesFromAltinn);
-        return getDownloadResponses(altinnDokuments);
+        List<DownloadResponse> downloadResponses = getDownloadResponses(altinnDokuments);
+        log.info("Meldinger fra Altinn={}", downloadResponses);
+
+        return downloadResponses;
     }
 
     private SearchCriteria getSearchCriteria() {
@@ -120,7 +123,7 @@ class AltinnEformidling implements Eformidling {
         return altinnDokuments.stream().map(altinnDokument -> new DownloadResponseBuilder().withAltinnDokument(altinnDokument).build()).collect(Collectors.toList());
     }
 
-    public void bekreft(List<String> filreferanse) {
-        filreferanse.forEach(brokerServiceExternalService::confirmDownloaded);
+    public void bekreft(String filreferanse) {
+       brokerServiceExternalService.confirmDownloaded(filreferanse);
     }
 }

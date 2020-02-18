@@ -1,11 +1,10 @@
 package no.nav.dokdisteformidling.qdist011;
 
-import static no.nav.dokdisteformidling.common.FunctionalUtils.deserializeS3JsonPayloadToDokdistDokument;
-import static no.nav.dokdisteformidling.common.FunctionalUtils.getDokumenttypeIdHoveddokument;
-import static no.nav.dokdisteformidling.common.FunctionalUtils.validateThatForsendelseStatusIsKlarForDist;
+import static no.nav.dokdisteformidling.utils.FunctionalUtils.deserializeS3JsonPayloadToDokdistDokument;
+import static no.nav.dokdisteformidling.utils.FunctionalUtils.getDokumenttypeIdHoveddokument;
+import static no.nav.dokdisteformidling.utils.FunctionalUtils.validateThatForsendelseStatusIsKlarForDist;
 import static no.nav.dokdisteformidling.constants.RouteConstants.PROPERTY_BESTILLINGS_ID;
 import static no.nav.dokdisteformidling.constants.RouteConstants.PROPERTY_CONVERSATION_ID;
-import static no.nav.dokdisteformidling.constants.RouteConstants.QDIST011_SERVICE_ID;
 import static no.nav.dokdisteformidling.metrics.MetricLabels.LABEL_PROCESS;
 import static no.nav.dokdisteformidling.qdist011.Qdist011MetricsRoutePolicy.QDIST011_PROCESS_TIMER;
 
