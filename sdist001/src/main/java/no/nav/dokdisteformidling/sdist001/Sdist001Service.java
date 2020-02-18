@@ -4,7 +4,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.dokdisteformidling.consumer.eformidling.Eformidling;
-import no.nav.dokdisteformidling.consumer.eformidling.altinn.services.BrokerServiceExternalService;
 import no.nav.dokdisteformidling.consumer.juridisklogg.JuridiskLogg;
 import no.nav.dokdisteformidling.consumer.juridisklogg.LagreJuridiskLoggMapper;
 import no.nav.dokdisteformidling.consumer.juridisklogg.LoggMeldingRequest;
@@ -38,98 +37,85 @@ public class Sdist001Service {
     private final LagreJuridiskLoggMapper lagreJuridiskLoggMapper;
     private final EformidlingStatusOppdateringMapper eformidlingStatusOppdateringMapper;
     private AltinnKvitteringStatus altinnKvitteringStatus;
-    private final BrokerServiceExternalService brokerServiceExternalService;
+    private final ForsendelseStatusEndringer forsendelseStatusEndringer;
 
     public Sdist001Service(AdministrerForsendelse administrerForsendelse,
                            JuridiskLogg juridiskLogg,
                            Eformidling eformidling,
-                           LagreJuridiskLoggMapper lagreJuridiskLoggMapper,
-                           BrokerServiceExternalService brokerServiceExternalService) {
+                           LagreJuridiskLoggMapper lagreJuridiskLoggMapper) {
         this.administrerForsendelse = administrerForsendelse;
         this.juridiskLogg = juridiskLogg;
         this.lagreJuridiskLoggMapper = lagreJuridiskLoggMapper;
         this.eformidlingStatusOppdateringMapper = new EformidlingStatusOppdateringMapper();
         this.eformidling = eformidling;
-        this.brokerServiceExternalService = brokerServiceExternalService;
+        this.forsendelseStatusEndringer = new ForsendelseStatusEndringer();
     }
 
-    public void kontrollerOgOppdaterStatus(String kvitteringStatus, HentEformidlingforsendelserResponseTo.ForsendelseTo forsendelseTo,
-                                           ForsendelseStatusEndringer forsendelseStatusEndringer) {
+    @Monitor(value = "dok_metric", extraTags = {"process", "oppdatertDokDistEformidlingStatus"}, histogram = true)
+    public void oppdatereDokDistEformidlingStatus() {
+        List<HentEformidlingforsendelserResponseTo.ForsendelseTo> forsendelserTo = administrerForsendelse.hentEformidlingForsendelser().getForsendelser();
+        eformidling.hent().stream()
+                .forEach(downloadResponse -> {
+                            log.info(String.format("Hentet trygderetten kvittering melding fra Altinn med konversasjonId=%s, SendersReference=%s,KvitteringStatus=%s",
+                                    downloadResponse.getConversationId(), downloadResponse.getSendersReference(), downloadResponse.getKvitteringStatus()));
+                            forsendelserTo.stream()
+                                    .filter(forsendelseTo -> downloadResponse.getConversationId().equals(forsendelseTo.getKonversasjonId()))
+                                    .forEach(forsendelse -> {
+                                        log.info(String.format("Sdist001 har mottatt kall til å oppdatere  forsendelse med forsendelseId:%s, konversasjonId=%s",
+                                                forsendelse.getForsendelseId(), forsendelse.getKonversasjonId()));
+                                        kontrollerEformidlingStatus(downloadResponse.getKvitteringStatus().getStatus(), forsendelse);
+                                        eformidling.bekreft(downloadResponse.getFileReference());
+                                    });
+                        }
+                );
+        log.info("sdist001 har oppdatert status for eFormidlingforsendelser: {}", forsendelseStatusEndringer.toString());
+
+    }
+
+    public void kontrollerEformidlingStatus(String kvitteringStatus, HentEformidlingforsendelserResponseTo.ForsendelseTo forsendelseTo) {
         String forsendelseStatus = forsendelseTo.getForsendelseStatus();
         String forsendelseId = forsendelseTo.getForsendelseId();
+        String konversasjonId = forsendelseTo.getKonversasjonId();
 
         if (!OVERSENDT.name().equals(forsendelseStatus) && !BEKREFTET.name().equals(forsendelseStatus)) {
             log.warn("ForsendelseId={} med status={} ble feilaktig returnert av hentEformidlingForsendelser.", forsendelseId, forsendelseStatus);
             return;
         }
-        String konversasjonId = forsendelseTo.getKonversasjonId();
-        log.info(String.format("Sdist001 har fått kall med kovnersajonId=%s og forsendelseId=%s,forsendelseStatus:%s", konversasjonId, forsendelseId, forsendelseStatus));
 
-        if (OVERSENDT.name().equals(forsendelseStatus)) {
-            kontrollerStatusOversendt(kvitteringStatus, forsendelseId, konversasjonId, forsendelseStatusEndringer);
-        } else {
-            kontrollerStatusBekreftet(kvitteringStatus, forsendelseId, konversasjonId, forsendelseStatusEndringer);
-        }
+        log.info("Sdist001 har mottatt kall med {}", forsendelseTo);
+
+        String status = oppdaterEformidlingStatus(kvitteringStatus, konversasjonId, forsendelseId, forsendelseStatus);
+        validereForsendelseStatusEndringer(status, forsendelseId);
     }
 
-    private void kontrollerStatusOversendt(String kvitteringStatus, String forsendelseId, String konversasjonId,
-                                           ForsendelseStatusEndringer forsendelseStatusEndringer) {
+    private String oppdaterEformidlingStatus(String kvitteringStatus, String konversasjonId, String forsendelseId, String forsendelseStatus) {
+
         altinnKvitteringStatus = AltinnKvitteringStatus.valueOf(kvitteringStatus);
         switch (altinnKvitteringStatus) {
             case SENDT:
                 administrerForsendelse.oppdaterForsendelseStatus(forsendelseId, BEKREFTET.name());
-                forsendelseStatusEndringer.getBekreftet().add(forsendelseId);
-                break;
+                return BEKREFTET.name();
             case MOTTATT:
             case LEVERT:
             case LEST:
                 oppdaterTilEkspedert(altinnKvitteringStatus.name(), forsendelseId, konversasjonId);
-                forsendelseStatusEndringer.getEkspedert().add(forsendelseId);
-                break;
+                return EKSPEDERT.name();
             case FAIL:
                 break;
             case LEVETID_UTLOPT:
                 log.error("Avvik har oppstått for forsendelseId={},konversasjonId={}. Forsendelsen settes til FEILET.", forsendelseId, konversasjonId);
                 administrerForsendelse.oppdaterForsendelseStatus(forsendelseId, FEIL.name());
-                forsendelseStatusEndringer.getFeilet().add(forsendelseId);
-                break;
+                return FEIL.name();
             default:
                 log.warn("Uventet status={} fra Altinn brokerservice for forsendelseId={} med forsendelseStatus={}.",
-                        altinnKvitteringStatus, forsendelseId, OVERSENDT);
+                        altinnKvitteringStatus, forsendelseId, forsendelseStatus);
                 break;
         }
 
-    }
-
-    private void kontrollerStatusBekreftet(String kvitteringStatus, String forsendelseId, String konversasjonId,
-                                           ForsendelseStatusEndringer forsendelseStatusEndringer) {
-
-        altinnKvitteringStatus = AltinnKvitteringStatus.valueOf(kvitteringStatus);
-        switch (altinnKvitteringStatus) {
-            case SENDT:
-                administrerForsendelse.oppdaterForsendelseStatus(forsendelseId, BEKREFTET.name());
-                forsendelseStatusEndringer.getBekreftet().add(forsendelseId);
-                break;
-            case FAIL:
-                break;
-            case MOTTATT:
-            case LEVERT:
-            case LEST:
-                oppdaterTilEkspedert(kvitteringStatus, forsendelseId, konversasjonId);
-                forsendelseStatusEndringer.getEkspedert().add(forsendelseId);
-                break;
-            case LEVETID_UTLOPT:
-                log.error("Avvik har oppstått for forsendelseId={}. Forsendelsen settes til FEILET.", forsendelseId);
-                administrerForsendelse.oppdaterForsendelseStatus(forsendelseId, FEIL.name());
-                forsendelseStatusEndringer.getFeilet().add(forsendelseId);
-                break;
-            default:
-                log.warn("Uventet status={} fra altinn for forsendelseId={} med forsendelseStatus={}.",
-                        kvitteringStatus, forsendelseId, BEKREFTET.name());
-                break;
-        }
+        return null;
 
     }
+
 
     private void oppdaterTilEkspedert(String trygderettenKvitteringStatus, String forsendelseId, String konversasjonId) {
         HentForsendelseResponseTo hentForsendelseResponseTo = administrerForsendelse.hentForsendelse(forsendelseId);
@@ -149,25 +135,18 @@ public class Sdist001Service {
 
     }
 
-    @Monitor(value = "dok_metric", extraTags = {"process", "oppdatertDokDistEformidlingStatus"}, histogram = true)
-    public void oppdatertDokDistEformidlingStatus() {
-        ForsendelseStatusEndringer forsendelseStatusEndringer = new ForsendelseStatusEndringer();
-        List<HentEformidlingforsendelserResponseTo.ForsendelseTo> forsendelserTo = administrerForsendelse.hentEformidlingForsendelser().getForsendelser();
-        eformidling.hent().stream()
-                .forEach(downloadResponse -> {
-                            log.info(String.format("Hentet trygderetten kvittering melding fra Altinn med konversasjonId=%s, SendersReference=%s,KvitteringStatus=%s",
-                                    downloadResponse.getConversationId(), downloadResponse.getSendersReference(), downloadResponse.getKvitteringStatus()));
-                            forsendelserTo.stream()
-                                    .filter(forsendelseTo -> downloadResponse.getConversationId().equals(forsendelseTo.getKonversasjonId()))
-                                    .forEach(forsendelse -> {
-                                        log.info(String.format("Sdist001 har mottatt kall til å oppdatere  forsendelse med forsendelseId:%s, konversasjonId=%s",
-                                                forsendelse.getForsendelseId(), forsendelse.getKonversasjonId()));
-                                        kontrollerOgOppdaterStatus(downloadResponse.getKvitteringStatus().getStatus(), forsendelse, forsendelseStatusEndringer);
-                                        brokerServiceExternalService.confirmDownloaded(downloadResponse.getFileReference());
-                                    });
-                        }
-                );
-        log.info("sdist001 har oppdatert status for eFormidlingforsendelser: {}", forsendelseStatusEndringer.toString());
 
+    private void validereForsendelseStatusEndringer(String status, String forsendelseId) {
+
+        if (EKSPEDERT.name().equals(status)) {
+            forsendelseStatusEndringer.getEkspedert().add(forsendelseId);
+        } else if (BEKREFTET.name().equals(status)) {
+            forsendelseStatusEndringer.getBekreftet().add(forsendelseId);
+        } else if (FEIL.name().equals(status)) {
+            forsendelseStatusEndringer.getFeilet().add(forsendelseId);
+        }
     }
+
+
 }
+

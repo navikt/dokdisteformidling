@@ -69,9 +69,9 @@ public class BrokerServiceExternalService {
     public void confirmDownloaded(String fileReference) {
         try {
             brokerServiceExternal.confirmDownloaded(fileReference, NAV_ORGNUMMER);
-            log.info("Det bekreftet at fil med fileReference: " + fileReference + "nedlastet");
+            log.info("Sender nedlasting bekreftelse for fileReference:{} til Altinn", fileReference);
         } catch (IBrokerServiceExternalConfirmDownloadedAltinnFaultFaultFaultMessage e) {
-            log.error(String.format("%s med fileReference:%s",CONFIRM_DOWNLOADED_FEILET,fileReference));
+            log.error(CONFIRM_DOWNLOADED_FEILET + "med fileReference: {}",fileReference);
             throw new AltinnBrokerServiceWsException(CONFIRM_DOWNLOADED_FEILET, AltinnReasonFactory.from(e), e);
         }
     }
