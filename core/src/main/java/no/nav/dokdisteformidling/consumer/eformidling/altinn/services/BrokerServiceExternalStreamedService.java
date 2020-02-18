@@ -13,6 +13,7 @@ import no.nav.dokdisteformidling.consumer.eformidling.altinn.to.AltinnReasonFact
 import no.nav.dokdisteformidling.consumer.eformidling.altinn.to.ReceiptTo;
 import no.nav.dokdisteformidling.consumer.eformidling.dokumentpakker.exceptions.DokumentpakkingException;
 import no.nav.dokdisteformidling.exception.technical.AltinnBrokerServiceWsException;
+import no.nav.dokdisteformidling.metrics.Monitor;
 import org.apache.cxf.headers.Header;
 import org.apache.cxf.jaxb.JAXBDataBinding;
 import org.springframework.stereotype.Component;
@@ -48,6 +49,7 @@ public class BrokerServiceExternalStreamedService {
         this.objectFactory = new ObjectFactory();
     }
 
+    @Monitor(value = "dok_metric", extraTags = {"process", "brokerServiceExternalStreamedServiceUploadFileToAltinn"}, histogram = true, percentiles = {0.5, 0.95})
     public ReceiptTo uploadFileToAltinn(String fileReference, String fileName, DataHandler dataHandler) {
         List<Header> headerList = new ArrayList<>();
         Header reportee = null;
@@ -105,6 +107,7 @@ public class BrokerServiceExternalStreamedService {
         return DownloadedMessageFromAltinn.builder().filreferanse(filreferanse).inputStream(inputStream).build();
     }
 
+    @Monitor(value = "dok_metric", extraTags = {"process", "brokerServiceExternalStreamedServiceDownloadFile"}, histogram = true, percentiles = {0.5, 0.95})
     private DataHandler downloadFile(String filreferanse) {
         log.info("Laster ned fil med referansenummer: " + filreferanse);
         try {
