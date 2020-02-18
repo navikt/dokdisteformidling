@@ -95,15 +95,15 @@ class AltinnEformidling implements Eformidling {
     public List<DownloadResponse> hent() {
         log.info("Henter filreferanser til meldinger fra Trygderetten som kan lastes ned gjennom Altinns formidlingstjeneste");
         List<String> filreferanser = brokerServiceExternalService.getAvailableFiles(getSearchCriteria(), getServiceCode());
-        log.info("Hentet {} filreferanser fra Altinn med referanse={}", filreferanser.size(), filreferanser);
+        log.info("Hentet {} filreferanser fra Altinn, referanser={}", filreferanser.size(), filreferanser);
 
         log.info("Henter meldinger fra Altinn");
         List<DownloadedMessageFromAltinn> messagesFromAltinn = brokerServiceExternalStreamedService.downloadFilesFromAltinn(filreferanser);
-        log.info("Hentet {} meldinger fra Altinn med referanse={}", messagesFromAltinn.size(), messagesFromAltinn.stream().map(DownloadedMessageFromAltinn::getFilreferanse).collect(toList()).toString());
+        log.info("Hentet {} meldinger fra Altinn, referanser={}", messagesFromAltinn.size(), messagesFromAltinn.stream().map(DownloadedMessageFromAltinn::getFilreferanse).collect(toList()).toString());
 
         log.info("Pakker ut meldinger fra Altinn");
         List<AltinnDokument> altinnDokuments = eformidlingMessageUnpackager.unpackageMessages(messagesFromAltinn);
-        log.info("Pakket ut {} meldinger fra Altinn med referanse={}", altinnDokuments.size(), altinnDokuments.stream().map(AltinnDokument::getFileReference).collect(toList()).toString());
+        log.info("Pakket ut {} meldinger fra Altinn, referanser={}", altinnDokuments.size(), altinnDokuments.stream().map(AltinnDokument::getFileReference).collect(toList()).toString());
         return getDownloadResponses(altinnDokuments);
     }
 
