@@ -29,9 +29,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static no.nav.dokdisteformidling.utils.DateConverterUtil.convertLocalDateTimeToXmlGregorianCalendar;
 import static no.nav.dokdisteformidling.consumer.eformidling.EformidlingConstants.NAV_ORGNUMMER;
 import static no.nav.dokdisteformidling.consumer.eformidling.EformidlingConstants.TRYGDERETTEN_ORGNUMMER;
-import static no.nav.dokdisteformidling.utils.FunctionalUtils.convertLocalDateTimeToXmlGregorianCalendar;
 
 @Slf4j
 @Component
@@ -72,7 +72,9 @@ public class BrokerServiceExternalService {
     public void confirmDownloaded(String fileReference) {
         try {
             brokerServiceExternal.confirmDownloaded(fileReference, NAV_ORGNUMMER);
+            log.info("Sender nedlasting bekreftelse for fileReference:{} til Altinn", fileReference);
         } catch (IBrokerServiceExternalConfirmDownloadedAltinnFaultFaultFaultMessage e) {
+            log.error(CONFIRM_DOWNLOADED_FEILET + "med fileReference: {}",fileReference);
             throw new AltinnBrokerServiceWsException(CONFIRM_DOWNLOADED_FEILET, AltinnReasonFactory.from(e), e);
         }
     }

@@ -1,5 +1,12 @@
 package no.nav.dokdisteformidling;
 
+import static no.nav.dokdisteformidling.utils.DateConverterUtil.getNow;
+import static no.nav.dokdisteformidling.testUtils.makePreferertKanalSet;
+import static no.nav.dokdisteformidling.testUtils.makeUgyldigDate;
+import static no.nav.dokdisteformidling.testUtils.varslingsTekster;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 import no.nav.dokdisteformidling.consumer.dki.HentSikkerDigitalPostadresseResponseTo;
 import no.nav.dokdisteformidling.consumer.dokkat.tkat021.VarselInfoTo;
 import no.nav.dokdisteformidling.exception.functional.AbstractDokdisteformidlingFunctionalException;
@@ -9,13 +16,6 @@ import org.junit.jupiter.api.Test;
 import javax.xml.datatype.XMLGregorianCalendar;
 import java.util.Arrays;
 import java.util.List;
-
-import static no.nav.dokdisteformidling.testUtils.makePreferertKanalSet;
-import static no.nav.dokdisteformidling.testUtils.makeUgyldigDate;
-import static no.nav.dokdisteformidling.testUtils.varslingsTekster;
-import static no.nav.dokdisteformidling.utils.FunctionalUtils.getNow;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class DigitalKontaktInformasjonValidatorTest {
 

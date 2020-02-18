@@ -40,4 +40,10 @@ public class ForsendelseStatusEndringer {
 
 		return sb.toString();
 	}
+
+	public void clear() {
+		getBekreftet().clear();
+		getFeilet().clear();
+		getEkspedert().clear();
+	}
 }

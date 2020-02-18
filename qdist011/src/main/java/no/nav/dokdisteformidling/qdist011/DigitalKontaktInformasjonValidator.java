@@ -1,5 +1,9 @@
 package no.nav.dokdisteformidling.qdist011;
 
+import static no.nav.dokdisteformidling.utils.DateConverterUtil.getNow;
+import static no.nav.dokdisteformidling.qdist011.constants.BridgeMotSDPMapperConstants.DATE_VALID_MONTHS;
+import static no.nav.dokdisteformidling.qdist011.constants.BridgeMotSDPMapperConstants.RESERVASJON;
+
 import no.nav.dokdisteformidling.consumer.dki.HentSikkerDigitalPostadresseResponseTo;
 import no.nav.dokdisteformidling.consumer.dokkat.tkat021.VarselInfoTo;
 import no.nav.dokdisteformidling.exception.functional.IllegalKontaktInformasjonFunctionalException;
@@ -8,10 +12,6 @@ import org.springframework.stereotype.Component;
 
 import javax.xml.datatype.XMLGregorianCalendar;
 import java.util.GregorianCalendar;
-
-import static no.nav.dokdisteformidling.qdist011.constants.BridgeMotSDPMapperConstants.DATE_VALID_MONTHS;
-import static no.nav.dokdisteformidling.qdist011.constants.BridgeMotSDPMapperConstants.RESERVASJON;
-import static no.nav.dokdisteformidling.utils.FunctionalUtils.getNow;
 
 /**
  * @author Heidi Elisabeth Sando, Visma Consulting

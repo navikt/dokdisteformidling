@@ -24,6 +24,7 @@ import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
+import static no.nav.dokdisteformidling.utils.XmlUtils.unmarshalXmlObject;
 import static no.nav.dokdisteformidling.consumer.eformidling.altinn.from.AltinnDokument.MANIFEST_XML;
 import static no.nav.dokdisteformidling.consumer.eformidling.altinn.from.AltinnDokument.SBD_JSON;
 
@@ -77,7 +78,7 @@ public class EformidlingMessageUnpackager {
                 ZipEntry zipEntry = entries.nextElement();
                 final InputStream inputStream = zipFile.getInputStream(zipEntry);
                 if (MANIFEST_XML.equals(zipEntry.getName())) {
-                    manifest = XmlUtils.unmarshalXmlObject(inputStream, BrokerServiceManifest.class);
+                    manifest = unmarshalXmlObject(inputStream, BrokerServiceManifest.class);
                 } else if (SBD_JSON.equals(zipEntry.getName())) {
                     trygderettenMelding = objectMapper.readValue(inputStream, TrygderettenMelding.class);
                 } else {
@@ -88,7 +89,10 @@ public class EformidlingMessageUnpackager {
             log.error(UNMARSHALLING_EXCEPTION + fileReference, e);
             throw new DokumentUnpackingException(UNMARSHALLING_EXCEPTION + fileReference, e);
         }
-        return AltinnDokument.builder().fileReference(fileReference).manifest(manifest).trygderettenMelding(trygderettenMelding).build();
+        return AltinnDokument.builder()
+                .fileReference(fileReference)
+                .manifest(manifest)
+                .trygderettenMelding(trygderettenMelding).build();
 
     }
 

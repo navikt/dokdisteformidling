@@ -35,14 +35,14 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static java.lang.String.format;
+import static no.nav.dokdisteformidling.utils.FunctionalUtils.deserializeS3JsonPayloadToDokdistDokument;
+import static no.nav.dokdisteformidling.utils.FunctionalUtils.generateRandomUUID;
+import static no.nav.dokdisteformidling.utils.FunctionalUtils.validateThatForsendelseStatusIsKlarForDist;
 import static no.nav.dokdisteformidling.constants.RouteConstants.PROPERTY_ANTALL_DOK;
 import static no.nav.dokdisteformidling.constants.RouteConstants.PROPERTY_BESTILLINGS_ID;
 import static no.nav.dokdisteformidling.constants.RouteConstants.PROPERTY_CONVERSATION_ID;
 import static no.nav.dokdisteformidling.consumer.eformidling.NavDokument.fromArkivmelding;
 import static no.nav.dokdisteformidling.consumer.eformidling.NavDokument.fromVedlegg;
-import static no.nav.dokdisteformidling.utils.FunctionalUtils.deserializeS3JsonPayloadToDokdistDokument;
-import static no.nav.dokdisteformidling.utils.FunctionalUtils.generateRandomUUID;
-import static no.nav.dokdisteformidling.utils.FunctionalUtils.validateThatForsendelseStatusIsKlarForDist;
 
 /**
  * @author Sigurd Midttun, Visma Consulting.
