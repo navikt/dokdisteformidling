@@ -13,5 +13,5 @@ public interface Eformidling {
 
     List<DownloadResponse> hent();
 
-    void bekreft(List<String> filreferanse);
+    void bekreft(String filreferanse);
 }

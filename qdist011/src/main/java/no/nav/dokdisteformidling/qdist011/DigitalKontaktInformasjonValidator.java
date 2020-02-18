@@ -1,6 +1,6 @@
 package no.nav.dokdisteformidling.qdist011;
 
-import static no.nav.dokdisteformidling.common.FunctionalUtils.getNow;
+import static no.nav.dokdisteformidling.utils.DateConverterUtil.getNow;
 import static no.nav.dokdisteformidling.qdist011.constants.BridgeMotSDPMapperConstants.DATE_VALID_MONTHS;
 import static no.nav.dokdisteformidling.qdist011.constants.BridgeMotSDPMapperConstants.RESERVASJON;
 

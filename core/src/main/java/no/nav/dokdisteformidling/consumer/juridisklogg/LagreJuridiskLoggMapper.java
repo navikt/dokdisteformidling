@@ -8,7 +8,6 @@ import org.springframework.stereotype.Component;
 /**
  * @author Sigurd Midttun, Visma Consulting.
  */
-
 @Component
 public class LagreJuridiskLoggMapper {
 

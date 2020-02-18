@@ -1,4 +1,4 @@
-package no.nav.dokdisteformidling.common;
+package no.nav.dokdisteformidling.utils;
 
 import org.springframework.util.Assert;
 
