@@ -108,7 +108,7 @@ public class BrokerServiceExternalStreamedService {
     }
 
     @Monitor(value = "dok_metric", extraTags = {"process", "brokerServiceExternalStreamedServiceDownloadFile"}, histogram = true, percentiles = {0.5, 0.95})
-    private DataHandler downloadFile(String filreferanse) {
+    public DataHandler downloadFile(String filreferanse) {
         log.info("Laster ned fil med referansenummer: " + filreferanse);
         try {
             return brokerServiceExternalStreamed.downloadFileStreamed(filreferanse, NAV_ORGNUMMER);// reportee = NAV_ORGNUMMER
