@@ -100,11 +100,10 @@ class AltinnEformidling implements Eformidling {
 
     @Override
     @Monitor(value = "dok_metric", extraTags = {"process", "altinnEformidlingHent"}, histogram = true, percentiles = {0.5, 0.95})
-    @Retryable(include = AltinnEformidlingRequestTechnicalException.class, backoff = @Backoff(delay = DELAY_SHORT))
     public List<DownloadResponse> hent() {
-        log.info("Henter filreferanse til meldinger fra Trygderetten som kan lastes ned gjennom Altinns formidlingstjeneste");
+        log.info("Henter filreferanser til meldinger fra Trygderetten som kan lastes ned gjennom Altinns formidlingstjeneste");
         List<String> filreferanser = brokerServiceExternalService.getAvailableFiles(getSearchCriteria(), getServiceCode());
-        log.info("Hentet {} filreferenser fra Altinn med referanse={}", filreferanser.size(), filreferanser);
+        log.info("Hentet {} filreferanser fra Altinn med referanse={}", filreferanser.size(), filreferanser);
 
         log.info("Henter meldinger fra Altinn");
         List<DownloadedMessageFromAltinn> messagesFromAltinn = brokerServiceExternalStreamedService.downloadFilesFromAltinn(filreferanser);
