@@ -52,7 +52,7 @@ public class EformidlingMessageUnpackager {
     }
 
     private AltinnDokument unpack(DownloadedMessageFromAltinn melding) {
-        log.info("Pakker ut zipfil med referansenummer: {}", melding.getFilreferanse());
+        log.info("Pakker ut zipfil med referanse={}", melding.getFilreferanse());
 
         // Trenger tempFile for å lagre inputStream fra Altinn som fil. Får feilmelding hvis vi unmarshaller direkte fra Altinn meldingens inputStream.
         try (AutoCloseableTempFile tempFile = new AutoCloseableTempFile("altinn", "test")) {
@@ -62,6 +62,8 @@ public class EformidlingMessageUnpackager {
         } catch (IOException e) {
             log.error(TEMPFILE_EXCEPTION, e);
             throw new DokumentUnpackingException(TEMPFILE_EXCEPTION, e);
+        } finally {
+            log.info("Pakket ut zipfil med referanse={}", melding.getFilreferanse());
         }
     }
 

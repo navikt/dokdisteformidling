@@ -95,7 +95,6 @@ public class BrokerServiceExternalStreamedService {
     }
 
     private DownloadedMessageFromAltinn mapReferenceToDownloadedFile(String filreferanse, DataHandler dataHandler) {
-        log.info("Lastet ned fil med referansenummer: " + filreferanse);
         InputStream inputStream;
         try {
             inputStream = dataHandler.getInputStream();
@@ -106,13 +105,15 @@ public class BrokerServiceExternalStreamedService {
         return DownloadedMessageFromAltinn.builder().filreferanse(filreferanse).inputStream(inputStream).build();
     }
 
-    public DataHandler downloadFile(String filreferanse) {
+    private DataHandler downloadFile(String filreferanse) {
         log.info("Laster ned fil med referansenummer: " + filreferanse);
         try {
             return brokerServiceExternalStreamed.downloadFileStreamed(filreferanse, NAV_ORGNUMMER);// reportee = NAV_ORGNUMMER
         } catch (IBrokerServiceExternalStreamedDownloadFileStreamedAltinnFaultFaultFaultMessage e) {
             log.error(ALTINN_NEDLASTING_FEILET, from(e));
             throw new AltinnBrokerServiceWsException(ALTINN_NEDLASTING_FEILET, AltinnReasonFactory.from(e), e);
+        } finally {
+            log.info("Lastet ned fil med referansenummer: " + filreferanse);
         }
     }
 }
