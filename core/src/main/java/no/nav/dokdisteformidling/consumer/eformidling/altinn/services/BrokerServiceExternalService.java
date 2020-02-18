@@ -75,7 +75,6 @@ public class BrokerServiceExternalService {
     }
 
     public List<String> getAvailableFiles(SearchCriteria criteria, ServiceCode serviceCode) {
-        //TODO: Metrics and logging, number of files available for download, files + filerefence?
         return getFileReferences(criteria, serviceCode)
                 .map(BrokerServiceAvailableFileList::getBrokerServiceAvailableFile)
                 .orElse(Collections.emptyList())

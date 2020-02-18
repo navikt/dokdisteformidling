@@ -30,8 +30,8 @@ import javax.activation.DataHandler;
 import javax.inject.Inject;
 import java.io.InputStream;
 import java.util.List;
-import java.util.stream.Collectors;
 
+import static java.util.stream.Collectors.toList;
 import static no.nav.dokdisteformidling.constants.RetryConstants.DELAY_SHORT;
 import static no.nav.dokdisteformidling.consumer.eformidling.EformidlingConstants.NAV_ORGNUMMER;
 
@@ -102,11 +102,17 @@ class AltinnEformidling implements Eformidling {
     @Monitor(value = "dok_metric", extraTags = {"process", "altinnEformidlingHent"}, histogram = true, percentiles = {0.5, 0.95})
     @Retryable(include = AltinnEformidlingRequestTechnicalException.class, backoff = @Backoff(delay = DELAY_SHORT))
     public List<DownloadResponse> hent() {
-        log.info("Henter tilgjengelige filer til NAV fra Trygderetten gjennom formidlingstjenesten");
+        log.info("Henter filreferanse til meldinger fra Trygderetten som kan lastes ned gjennom Altinns formidlingstjeneste");
         List<String> filreferanser = brokerServiceExternalService.getAvailableFiles(getSearchCriteria(), getServiceCode());
+        log.info("Hentet {} filreferenser fra Altinn med referanse={}", filreferanser.size(), filreferanser);
 
+        log.info("Henter meldinger fra Altinn");
         List<DownloadedMessageFromAltinn> messagesFromAltinn = brokerServiceExternalStreamedService.downloadFilesFromAltinn(filreferanser);
+        log.info("Hentet {} meldinger fra Altinn med referanse={}", messagesFromAltinn.size(), messagesFromAltinn.stream().map(DownloadedMessageFromAltinn::getFilreferanse).collect(toList()).toString());
+
+        log.info("Pakker ut meldinger fra Altinn");
         List<AltinnDokument> altinnDokuments = eformidlingMessageUnpackager.unpackageMessages(messagesFromAltinn);
+        log.info("Pakket ut {} meldinger fra Altinn med referanse={}", altinnDokuments.size(), altinnDokuments.stream().map(AltinnDokument::getFileReference).collect(toList()).toString());
         return getDownloadResponses(altinnDokuments);
     }
 
@@ -125,7 +131,7 @@ class AltinnEformidling implements Eformidling {
     }
 
     private List<DownloadResponse> getDownloadResponses(List<AltinnDokument> altinnDokuments) {
-        return altinnDokuments.stream().map(altinnDokument -> new DownloadResponseBuilder().withAltinnDokument(altinnDokument).build()).collect(Collectors.toList());
+        return altinnDokuments.stream().map(altinnDokument -> new DownloadResponseBuilder().withAltinnDokument(altinnDokument).build()).collect(toList());
     }
 
     @Override
