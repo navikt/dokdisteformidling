@@ -10,7 +10,6 @@ import no.altinn.brokerserviceexternalstreamed.ReceiptExternalStreamedBE;
 import no.altinn.brokerserviceexternalstreamed.StreamedPayloadExternalBE;
 import no.nav.dokdisteformidling.consumer.eformidling.altinn.from.DownloadedMessageFromAltinn;
 import no.nav.dokdisteformidling.consumer.eformidling.altinn.to.AltinnReasonFactory;
-import no.nav.dokdisteformidling.consumer.eformidling.altinn.to.FileReference;
 import no.nav.dokdisteformidling.consumer.eformidling.altinn.to.ReceiptTo;
 import no.nav.dokdisteformidling.consumer.eformidling.dokumentpakker.exceptions.DokumentpakkingException;
 import no.nav.dokdisteformidling.exception.technical.AltinnBrokerServiceWsException;
@@ -89,28 +88,28 @@ public class BrokerServiceExternalStreamedService {
                 .build();
     }
 
-    public List<DownloadedMessageFromAltinn> downloadFilesFromAltinn(List<FileReference> availableFiles) {
-        return availableFiles.stream()
-                .map(fileReference -> mapReferenceToDownloadedFile(fileReference, downloadFile(fileReference.getFileReference())))
+    public List<DownloadedMessageFromAltinn> downloadFilesFromAltinn(List<String> filreferanser) {
+        return filreferanser.stream()
+                .map(filreferanse -> mapReferenceToDownloadedFile(filreferanse, downloadFile(filreferanse)))
                 .collect(toList());
     }
 
-    private DownloadedMessageFromAltinn mapReferenceToDownloadedFile(FileReference fileReference, DataHandler dataHandler) {
-        log.info("Lastet ned fil med referansenummer: " + fileReference);
-        InputStream inputStream = null;
+    private DownloadedMessageFromAltinn mapReferenceToDownloadedFile(String filreferanse, DataHandler dataHandler) {
+        log.info("Lastet ned fil med referansenummer: " + filreferanse);
+        InputStream inputStream;
         try {
             inputStream = dataHandler.getInputStream();
         } catch (IOException e) {
             log.error(ALTINN_AVLESING_AV_MELDING_FEILET, e);
             throw new DokumentpakkingException(ALTINN_AVLESING_AV_MELDING_FEILET, e);
         }
-        return DownloadedMessageFromAltinn.builder().fileReference(fileReference).inputStream(inputStream).build();
+        return DownloadedMessageFromAltinn.builder().filreferanse(filreferanse).inputStream(inputStream).build();
     }
 
-    public DataHandler downloadFile(String fileReference) {
-        log.info("Laster ned fil med referansenummer: " + fileReference);
+    public DataHandler downloadFile(String filreferanse) {
+        log.info("Laster ned fil med referansenummer: " + filreferanse);
         try {
-            return brokerServiceExternalStreamed.downloadFileStreamed(fileReference, NAV_ORGNUMMER);// reportee = NAV_ORGNUMMER
+            return brokerServiceExternalStreamed.downloadFileStreamed(filreferanse, NAV_ORGNUMMER);// reportee = NAV_ORGNUMMER
         } catch (IBrokerServiceExternalStreamedDownloadFileStreamedAltinnFaultFaultFaultMessage e) {
             log.error(ALTINN_NEDLASTING_FEILET, from(e));
             throw new AltinnBrokerServiceWsException(ALTINN_NEDLASTING_FEILET, AltinnReasonFactory.from(e), e);

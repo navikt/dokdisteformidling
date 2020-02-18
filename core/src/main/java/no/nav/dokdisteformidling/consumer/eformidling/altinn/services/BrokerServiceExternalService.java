@@ -2,6 +2,7 @@ package no.nav.dokdisteformidling.consumer.eformidling.altinn.services;
 
 import lombok.extern.slf4j.Slf4j;
 import no.altinn.brokerserviceexternal.ArrayOfRecipient;
+import no.altinn.brokerserviceexternal.BrokerServiceAvailableFile;
 import no.altinn.brokerserviceexternal.BrokerServiceAvailableFileList;
 import no.altinn.brokerserviceexternal.BrokerServiceInitiation;
 import no.altinn.brokerserviceexternal.BrokerServiceSearch;
@@ -15,7 +16,6 @@ import no.altinn.brokerserviceexternal.ObjectFactory;
 import no.altinn.brokerserviceexternal.Recipient;
 import no.nav.dokdisteformidling.consumer.eformidling.altinn.mapper.ManifestBuilder;
 import no.nav.dokdisteformidling.consumer.eformidling.altinn.to.AltinnReasonFactory;
-import no.nav.dokdisteformidling.consumer.eformidling.altinn.to.FileReference;
 import no.nav.dokdisteformidling.consumer.eformidling.altinn.to.SearchCriteria;
 import no.nav.dokdisteformidling.consumer.eformidling.altinn.to.ServiceCode;
 import no.nav.dokdisteformidling.consumer.eformidling.altinn.to.UploadManifest;
@@ -74,13 +74,13 @@ public class BrokerServiceExternalService {
         }
     }
 
-    public List<FileReference> getAvailableFiles(SearchCriteria criteria, ServiceCode serviceCode) {
+    public List<String> getAvailableFiles(SearchCriteria criteria, ServiceCode serviceCode) {
         //TODO: Metrics and logging, number of files available for download, files + filerefence?
         return getFileReferences(criteria, serviceCode)
                 .map(BrokerServiceAvailableFileList::getBrokerServiceAvailableFile)
                 .orElse(Collections.emptyList())
                 .stream()
-                .map(file -> new FileReference(file.getFileReference(), file.getReceiptID()))
+                .map(BrokerServiceAvailableFile::getFileReference)
                 .collect(Collectors.toList());
     }
 

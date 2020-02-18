@@ -11,7 +11,6 @@ import no.nav.dokdisteformidling.consumer.eformidling.altinn.mapper.DownloadResp
 import no.nav.dokdisteformidling.consumer.eformidling.altinn.mapper.InputStreamDataSource;
 import no.nav.dokdisteformidling.consumer.eformidling.altinn.services.BrokerServiceExternalService;
 import no.nav.dokdisteformidling.consumer.eformidling.altinn.services.BrokerServiceExternalStreamedService;
-import no.nav.dokdisteformidling.consumer.eformidling.altinn.to.FileReference;
 import no.nav.dokdisteformidling.consumer.eformidling.altinn.to.ReceiptTo;
 import no.nav.dokdisteformidling.consumer.eformidling.altinn.to.SearchCriteria;
 import no.nav.dokdisteformidling.consumer.eformidling.altinn.to.ServiceCode;
@@ -104,9 +103,9 @@ class AltinnEformidling implements Eformidling {
     @Retryable(include = AltinnEformidlingRequestTechnicalException.class, backoff = @Backoff(delay = DELAY_SHORT))
     public List<DownloadResponse> hent() {
         log.info("Henter tilgjengelige filer til NAV fra Trygderetten gjennom formidlingstjenesten");
-        List<FileReference> availableFiles = brokerServiceExternalService.getAvailableFiles(getSearchCriteria(), getServiceCode());
+        List<String> filreferanser = brokerServiceExternalService.getAvailableFiles(getSearchCriteria(), getServiceCode());
 
-        List<DownloadedMessageFromAltinn> messagesFromAltinn = brokerServiceExternalStreamedService.downloadFilesFromAltinn(availableFiles);
+        List<DownloadedMessageFromAltinn> messagesFromAltinn = brokerServiceExternalStreamedService.downloadFilesFromAltinn(filreferanser);
         List<AltinnDokument> altinnDokuments = eformidlingMessageUnpackager.unpackageMessages(messagesFromAltinn);
         return getDownloadResponses(altinnDokuments);
     }

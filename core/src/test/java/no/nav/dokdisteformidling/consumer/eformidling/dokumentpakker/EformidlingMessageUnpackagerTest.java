@@ -2,7 +2,6 @@ package no.nav.dokdisteformidling.consumer.eformidling.dokumentpakker;
 
 import no.nav.dokdisteformidling.consumer.eformidling.altinn.from.AltinnDokument;
 import no.nav.dokdisteformidling.consumer.eformidling.altinn.from.DownloadedMessageFromAltinn;
-import no.nav.dokdisteformidling.consumer.eformidling.altinn.to.FileReference;
 import no.nav.dokdisteformidling.consumer.eformidling.dokumentpakker.trygderetten.json.KvitteringStatus;
 import no.nav.dokdisteformidling.consumer.eformidling.dokumentpakker.trygderetten.json.TrygderettenMelding;
 import no.nav.dokdisteformidling.consumer.eformidling.dokumentpakker.trygderetten.xml.BrokerServiceManifest;
@@ -35,7 +34,7 @@ public class EformidlingMessageUnpackagerTest {
         AltinnDokument altinnDokument;
 
         messageFromAltinns.add(DownloadedMessageFromAltinn.builder()
-                .fileReference(new FileReference("fileReference", 1))
+                .filreferanse("fileReference")
                 .inputStream(inputStream)
                 .build());
         altinnDokument = eformidlingMessageUnpackager.unpackageMessages(messageFromAltinns).get(0);
