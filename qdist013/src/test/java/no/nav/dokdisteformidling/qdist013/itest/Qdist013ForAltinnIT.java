@@ -6,7 +6,6 @@ import com.github.tomakehurst.wiremock.client.WireMock;
 import com.github.tomakehurst.wiremock.verification.LoggedRequest;
 import no.altinn.brokerserviceexternal.InitiateBrokerService;
 import no.altinn.brokerserviceexternal.Manifest;
-import no.altinn.brokerserviceexternalstreamed.StreamedPayloadExternalBE;
 import no.nav.dokdisteformidling.consumer.eformidling.EformidlingConstants;
 import no.nav.dokdisteformidling.consumer.eformidling.serviceregistry.EformidlingMottakerInfoService;
 import no.nav.dokdisteformidling.consumer.eformidling.serviceregistry.MottakerInfo;
@@ -17,7 +16,6 @@ import org.apache.activemq.command.ActiveMQTextMessage;
 import org.apache.http.HttpHeaders;
 import org.apache.http.entity.ContentType;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
@@ -46,7 +44,6 @@ import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
-import static com.github.tomakehurst.wiremock.client.WireMock.binaryEqualTo;
 import static com.github.tomakehurst.wiremock.client.WireMock.containing;
 import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
 import static com.github.tomakehurst.wiremock.client.WireMock.equalToJson;
@@ -76,7 +73,6 @@ import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
-import static org.springframework.http.HttpHeaders.CONTENT_DISPOSITION;
 import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE;
 import static org.springframework.http.MediaType.APPLICATION_XML_VALUE;
 import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
@@ -812,7 +808,7 @@ public class Qdist013ForAltinnIT {
     }
 
     @Test
-    public void serviceRegisteryShouldThrowTechnicalException() {
+    public void serviceRegistryShouldThrowTechnicalExceptionAndRetry() {
         stubGetForsendelse("__files/rjoark001/getForsendelse-happy.json");
         stubGetSecurityToken();
         stubPostSafJournalpost("queryJournalpostId\":\"123\"", "saf/safQdist013GraphQlResponse-orgnr.json");
@@ -821,11 +817,12 @@ public class Qdist013ForAltinnIT {
         stubPostMaskinporten();
         stubFor(get(urlMatching("/serviceregistry/identifier/" + TRYGDERETTEN_ORGNUMMER + "/process/" + EformidlingConstants.ARKIVMELDING_PROCESS))
                 .willReturn(aResponse().withStatus(HttpStatus.INTERNAL_SERVER_ERROR.value())
-                        .withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_XML_VALUE)));
+                        .withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE)));
 
         sendStringMessage(qdist013, classpathToString("qdist013/qdist013-happy.xml"));
 
-        await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
+        // Retry 3x5s i serviceregistryconsumer
+        await().atMost(20, TimeUnit.SECONDS).untilAsserted(() -> {
             assertMessageOnQueue(backoutQueue);
         });
 
@@ -834,9 +831,8 @@ public class Qdist013ForAltinnIT {
         verifyPostSafJournalpost();
         verifyPostSafJournalpostLightweight();
         verifyGetEregHentOrgNavn("123456789");
-        verifyPostMaskinporten();
-        verifyGetServiceRegistry();
-
+        verifyPostMaskinporten(3);
+        verifyGetServiceRegistry(3);
     }
 
     @Test
@@ -1149,6 +1145,10 @@ public class Qdist013ForAltinnIT {
         verify(1, postRequestedFor(urlEqualTo("/maskinporten")));
     }
 
+    private void verifyPostMaskinporten(int expectedCount) {
+        verify(expectedCount, postRequestedFor(urlEqualTo("/maskinporten")));
+    }
+
     private void verifyPostIntiateBrokerService() {
         verify(1, postRequestedFor(urlEqualTo("/brokerserviceexternal")));
     }
@@ -1159,6 +1159,10 @@ public class Qdist013ForAltinnIT {
 
     private void verifyGetServiceRegistry() {
         verify(1, getRequestedFor(urlEqualTo("/serviceregistry/identifier/" + TRYGDERETTEN_ORGNUMMER + "/process/" + EformidlingConstants.ARKIVMELDING_PROCESS)));
+    }
+
+    private void verifyGetServiceRegistry(int expectedCount) {
+        verify(expectedCount, getRequestedFor(urlEqualTo("/serviceregistry/identifier/" + TRYGDERETTEN_ORGNUMMER + "/process/" + EformidlingConstants.ARKIVMELDING_PROCESS)));
     }
 
     private void assertMessageOnQueue(javax.jms.Queue queue) {
