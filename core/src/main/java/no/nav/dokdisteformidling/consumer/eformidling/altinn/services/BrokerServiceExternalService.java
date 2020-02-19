@@ -2,6 +2,7 @@ package no.nav.dokdisteformidling.consumer.eformidling.altinn.services;
 
 import lombok.extern.slf4j.Slf4j;
 import no.altinn.brokerserviceexternal.ArrayOfRecipient;
+import no.altinn.brokerserviceexternal.BrokerServiceAvailableFile;
 import no.altinn.brokerserviceexternal.BrokerServiceAvailableFileList;
 import no.altinn.brokerserviceexternal.BrokerServiceInitiation;
 import no.altinn.brokerserviceexternal.BrokerServiceSearch;
@@ -15,11 +16,11 @@ import no.altinn.brokerserviceexternal.ObjectFactory;
 import no.altinn.brokerserviceexternal.Recipient;
 import no.nav.dokdisteformidling.consumer.eformidling.altinn.mapper.ManifestBuilder;
 import no.nav.dokdisteformidling.consumer.eformidling.altinn.to.AltinnReasonFactory;
-import no.nav.dokdisteformidling.consumer.eformidling.altinn.to.FileReference;
 import no.nav.dokdisteformidling.consumer.eformidling.altinn.to.SearchCriteria;
 import no.nav.dokdisteformidling.consumer.eformidling.altinn.to.ServiceCode;
 import no.nav.dokdisteformidling.consumer.eformidling.altinn.to.UploadManifest;
 import no.nav.dokdisteformidling.exception.technical.AltinnBrokerServiceWsException;
+import no.nav.dokdisteformidling.metrics.Monitor;
 import org.springframework.stereotype.Component;
 
 import javax.inject.Inject;
@@ -49,6 +50,7 @@ public class BrokerServiceExternalService {
         this.objectFactory = new ObjectFactory();
     }
 
+    @Monitor(value = "dok_metric", extraTags = {"process", "brokerServiceExternalServiceInitiateBrokerService"}, histogram = true, percentiles = {0.5, 0.95})
     public String intiateBrokerService(UploadManifest uploadManifest) {
         try {
             return brokerServiceExternal.initiateBrokerService(getBrokerServiceInitiation(uploadManifest));
@@ -57,8 +59,8 @@ public class BrokerServiceExternalService {
         }
     }
 
-
-    protected Optional<BrokerServiceAvailableFileList> getFileReferences(SearchCriteria criteria, ServiceCode serviceCode) {
+    @Monitor(value = "dok_metric", extraTags = {"process", "brokerServiceExternalServiceGetFileReferences"}, histogram = true, percentiles = {0.5, 0.95})
+    public Optional<BrokerServiceAvailableFileList> getFileReferences(SearchCriteria criteria, ServiceCode serviceCode) {
         try {
             return Optional.of(brokerServiceExternal.getAvailableFiles(getBrokerServiceSearch(NAV_ORGNUMMER, serviceCode, criteria)));
         } catch (IBrokerServiceExternalGetAvailableFilesAltinnFaultFaultFaultMessage e) {
@@ -66,6 +68,7 @@ public class BrokerServiceExternalService {
         }
     }
 
+    @Monitor(value = "dok_metric", extraTags = {"process", "brokerServiceExternalServiceConfirmDownloaded"}, histogram = true, percentiles = {0.5, 0.95})
     public void confirmDownloaded(String fileReference) {
         try {
             brokerServiceExternal.confirmDownloaded(fileReference, NAV_ORGNUMMER);
@@ -76,13 +79,12 @@ public class BrokerServiceExternalService {
         }
     }
 
-    public List<FileReference> getAvailableFiles(SearchCriteria criteria, ServiceCode serviceCode) {
-        //TODO: Metrics and logging, number of files available for download, files + filerefence?
+    public List<String> getAvailableFiles(SearchCriteria criteria, ServiceCode serviceCode) {
         return getFileReferences(criteria, serviceCode)
                 .map(BrokerServiceAvailableFileList::getBrokerServiceAvailableFile)
                 .orElse(Collections.emptyList())
                 .stream()
-                .map(file -> new FileReference(file.getFileReference(), file.getReceiptID()))
+                .map(BrokerServiceAvailableFile::getFileReference)
                 .collect(Collectors.toList());
     }
 
@@ -124,7 +126,6 @@ public class BrokerServiceExternalService {
         BrokerServiceSearch brokerServiceSearch = new BrokerServiceSearch();
         brokerServiceSearch.setFileStatus(criteria.getAvailableFileStatus());
         brokerServiceSearch.setReportee(orgnr);
-        ObjectFactory objectFactory = new ObjectFactory();
         brokerServiceSearch.setExternalServiceCode(objectFactory.createBrokerServiceSearchExternalServiceCode(serviceCode.getServiceCode()));
         brokerServiceSearch.setExternalServiceEditionCode(serviceCode.getServiceEditionCode());
         brokerServiceSearch.setMinSentDateTime(criteria.getMinSentDate() == null ? null : convertLocalDateTimeToXmlGregorianCalendar(criteria.getMinSentDate()));

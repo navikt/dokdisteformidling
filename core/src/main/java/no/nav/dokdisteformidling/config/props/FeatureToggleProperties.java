@@ -5,8 +5,6 @@ import lombok.ToString;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.validation.annotation.Validated;
 
-import javax.validation.constraints.NotNull;
-
 /**
  * @author Joakim Bjørnstad, Jbit AS
  */
@@ -15,5 +13,5 @@ import javax.validation.constraints.NotNull;
 @ConfigurationProperties("feature")
 @Validated
 public class FeatureToggleProperties {
-	private boolean usealtinnformidlingstjenesten;
+    private boolean usealtinnformidlingstjenesten;
 }
