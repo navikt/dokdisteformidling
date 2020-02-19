@@ -56,7 +56,8 @@ public class Sdist001Service {
     @Monitor(value = "dok_metric", extraTags = {"process", "oppdatertDokDistEformidlingStatus"}, histogram = true)
     public void oppdatereDokDistEformidlingStatus() {
         forsendelseStatusEndringer.clear();
-        List<HentEformidlingforsendelserResponseTo.ForsendelseTo> forsendelserTo = hentEformidlingforsendelserResponse();
+        List<HentEformidlingforsendelserResponseTo.ForsendelseTo> forsendelserTo = administrerForsendelse.hentEformidlingForsendelser().getForsendelser();
+        log.info("Hentet eformidlingforsendelser fra rdist001 {} ",forsendelserTo);
         eformidling.hent().stream()
                 .forEach(downloadResponse -> {
                     log.info(String.format("Hentet trygderetten kvittering melding fra Altinn med konversasjonId=%s, SendersReference=%s,KvitteringStatus=%s",
@@ -141,26 +142,6 @@ public class Sdist001Service {
 
         administrerForsendelse.oppdaterForsendelseStatus(forsendelseId, EKSPEDERT.name());
 
-    }
-
-
-    private List<HentEformidlingforsendelserResponseTo.ForsendelseTo> hentEformidlingforsendelserResponse() {
-
-        log.info("Rdist001 mottatt kall til å hente Eformidlingforsendelser fra dokdist database ");
-        HentEformidlingforsendelserResponseTo hentEformidlingforsendelserResponseTo = administrerForsendelse.hentEformidlingForsendelser();
-
-        if (hentEformidlingforsendelserResponseTo == null) {
-            log.warn("Kall mot rdist001 - fant ikke Eformidlingforsendelser fra dokdist database");
-            throw new FantIkkeEformidlingforsendelserException("Kall mot rdist001 - fant ikke Eformidlingforsendelser fra dokdist database.");
-        }
-
-        return hentEformidlingforsendelserResponseTo.getForsendelser().stream()
-                .filter(forsendelse -> !EKSPEDERT.name().equals(forsendelse.getForsendelseStatus()))
-                .map(forsendelse -> {
-
-                    log.info("Kall mot rdist001 - Fant Eformidlingforsendelser fra dokdist database: {}", forsendelse.toString());
-                    return forsendelse;
-                }).collect(Collectors.toList());
     }
 
 }
