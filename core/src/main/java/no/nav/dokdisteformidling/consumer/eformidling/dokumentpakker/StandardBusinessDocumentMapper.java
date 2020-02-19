@@ -37,7 +37,7 @@ public class StandardBusinessDocumentMapper {
 	static final String ARKIVMELDING_FORRETNINGSMELDING = "arkivmelding";
 	public static final String ARKIVMELDING_XML = "arkivmelding.xml";
 	public static final int SIKKERHETSNIVAA = 4;
-	public static final Duration EXPECTED_RESPONSE_WITHIN_HOURS = ofHours(24);
+	public static final Duration EXPECTED_RESPONSE_WITHIN_HOURS = ofHours(1);
 
 	private final Clock clock;
 
