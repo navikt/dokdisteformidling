@@ -1,8 +1,6 @@
 package no.nav.dokdisteformidling.consumer.eformidling.maskinporten;
 
 
-import static no.nav.dokdisteformidling.constants.DomainConstants.DEFAULT_ZONE_ID;
-
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.JWSAlgorithm;
 import com.nimbusds.jose.JWSHeader;
@@ -22,12 +20,11 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.FormHttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
-import org.springframework.retry.annotation.Backoff;
-import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Component;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import java.net.URI;
@@ -40,11 +37,15 @@ import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
+import static no.nav.dokdisteformidling.constants.DomainConstants.DEFAULT_ZONE_ID;
+
 @Slf4j
 @Component
 public class MaskinportenTokenConsumer {
 	// TODO nytt scope når virksomhetssertifikat er klart.
 	private static final String SCOPE_DPO = "move/dpo.read";
+	public static final String FUNKSJONELL_FEIL_ERROR_MESSAGE = "Klarte ikke hente AccessToken fra maskinporten. Funksjonell feil.";
+	public static final String TEKNISK_FEIL_ERROR_MESSAGE = "Klarte ikke hente AccessToken fra maskinporten. Teknisk feil.";
 
 	private final AppCertificate appCertificate;
 	private final MaskinportenProperties maskinportenProperties;
@@ -63,7 +64,6 @@ public class MaskinportenTokenConsumer {
 				.build();
 	}
 
-	@Retryable(value = HttpClientErrorException.class, maxAttempts = 3, backoff = @Backoff(delay = 5000, multiplier = 3))
 	@Monitor(value = "dok_consumer", extraTags = {"process", "maskinporten_fetchtoken"}, percentiles = {0.5, 0.95}, histogram = true)
 	public OidcTokenResponse fetchToken() {
 		LinkedMultiValueMap<String, String> attrMap = new LinkedMultiValueMap<>();
@@ -82,11 +82,20 @@ public class MaskinportenTokenConsumer {
 			throw new RuntimeException(e);
 		}
 
-		log.info("Henter accessToken fra maskinporten på url={}", maskinportenProperties.getUrl().toString());
-		ResponseEntity<OidcTokenResponse> response = restTemplate.exchange(accessTokenUri, HttpMethod.POST,
-				httpEntity, OidcTokenResponse.class);
-		log.info("AccessToken hentet OK fra maskinporten på url={}", maskinportenProperties.getUrl().toString());
-		return response.getBody();
+		final String maskinportenUrl = maskinportenProperties.getUrl().toString();
+		try {
+			log.info("Henter accessToken fra maskinporten på url={}", maskinportenUrl);
+			ResponseEntity<OidcTokenResponse> response = restTemplate.exchange(accessTokenUri, HttpMethod.POST,
+					httpEntity, OidcTokenResponse.class);
+			log.info("AccessToken hentet OK fra maskinporten på url={}", maskinportenUrl);
+			return response.getBody();
+		} catch(HttpClientErrorException e) {
+			log.warn(FUNKSJONELL_FEIL_ERROR_MESSAGE, e);
+			throw new MaskinportenFunctionalException(FUNKSJONELL_FEIL_ERROR_MESSAGE, e);
+		} catch(HttpServerErrorException e) {
+			log.error(TEKNISK_FEIL_ERROR_MESSAGE, e);
+			throw new MaskinportenTechnicalException(TEKNISK_FEIL_ERROR_MESSAGE, e);
+		}
 	}
 
 	private String generateJWT() {
