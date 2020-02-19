@@ -11,7 +11,6 @@ import no.nav.dokdisteformidling.consumer.eformidling.altinn.mapper.DownloadResp
 import no.nav.dokdisteformidling.consumer.eformidling.altinn.mapper.InputStreamDataSource;
 import no.nav.dokdisteformidling.consumer.eformidling.altinn.services.BrokerServiceExternalService;
 import no.nav.dokdisteformidling.consumer.eformidling.altinn.services.BrokerServiceExternalStreamedService;
-import no.nav.dokdisteformidling.consumer.eformidling.altinn.to.FileReference;
 import no.nav.dokdisteformidling.consumer.eformidling.altinn.to.ReceiptTo;
 import no.nav.dokdisteformidling.consumer.eformidling.altinn.to.SearchCriteria;
 import no.nav.dokdisteformidling.consumer.eformidling.altinn.to.ServiceCode;
@@ -27,8 +26,8 @@ import javax.activation.DataHandler;
 import javax.inject.Inject;
 import java.io.InputStream;
 import java.util.List;
-import java.util.stream.Collectors;
 
+import static java.util.stream.Collectors.toList;
 import static no.nav.dokdisteformidling.consumer.eformidling.EformidlingConstants.NAV_ORGNUMMER;
 
 /**
@@ -94,15 +93,22 @@ public class AltinnEformidling implements Eformidling {
 
     @Override
     public List<DownloadResponse> hent() {
-        log.info("Henter tilgjengelige filer til NAV fra Trygderetten gjennom formidlingstjenesten");
-        List<FileReference> availableFiles = brokerServiceExternalService.getAvailableFiles(getSearchCriteria(), getServiceCode());
+        log.info("Henter filreferanser til meldinger fra Trygderetten som kan lastes ned gjennom Altinns formidlingstjeneste");
+        List<String> filreferanser = brokerServiceExternalService.getAvailableFiles(getSearchCriteria(), getServiceCode());
+        log.info("Hentet {} filreferanser fra Altinn, referanser={}", filreferanser.size(), filreferanser);
 
-        List<DownloadedMessageFromAltinn> messagesFromAltinn = brokerServiceExternalStreamedService.downloadFilesFromAltinn(availableFiles);
+        log.info("Henter meldinger fra Altinn");
+        List<DownloadedMessageFromAltinn> messagesFromAltinn = brokerServiceExternalStreamedService.downloadFilesFromAltinn(filreferanser);
+        log.info("Hentet {} meldinger fra Altinn, referanser={}", messagesFromAltinn.size(), messagesFromAltinn.stream().map(DownloadedMessageFromAltinn::getFilreferanse).collect(toList()).toString());
+
+        log.info("Pakker ut meldinger fra Altinn");
         List<AltinnDokument> altinnDokuments = eformidlingMessageUnpackager.unpackageMessages(messagesFromAltinn);
+        log.info("Pakket ut {} meldinger fra Altinn, referanser={}", altinnDokuments.size(), altinnDokuments.stream().map(AltinnDokument::getFileReference).collect(toList()).toString());
         List<DownloadResponse> downloadResponses = getDownloadResponses(altinnDokuments);
         log.info("Meldinger fra Altinn={}", downloadResponses);
 
         return downloadResponses;
+
     }
 
     private SearchCriteria getSearchCriteria() {
@@ -120,9 +126,10 @@ public class AltinnEformidling implements Eformidling {
     }
 
     private List<DownloadResponse> getDownloadResponses(List<AltinnDokument> altinnDokuments) {
-        return altinnDokuments.stream().map(altinnDokument -> new DownloadResponseBuilder().withAltinnDokument(altinnDokument).build()).collect(Collectors.toList());
+        return altinnDokuments.stream().map(altinnDokument -> new DownloadResponseBuilder().withAltinnDokument(altinnDokument).build()).collect(toList());
     }
 
+    @Override
     public void bekreft(String filreferanse) {
        brokerServiceExternalService.confirmDownloaded(filreferanse);
     }
