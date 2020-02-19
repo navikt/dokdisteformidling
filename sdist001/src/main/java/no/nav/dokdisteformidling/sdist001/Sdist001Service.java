@@ -72,7 +72,6 @@ public class Sdist001Service {
                             });
                 });
         log.info("sdist001 har oppdatert status for eFormidlingforsendelser: {}", forsendelseStatusEndringer.toString());
-
     }
 
     public void kontrollerEformidlingStatus(String kvitteringStatus, HentEformidlingforsendelserResponseTo.ForsendelseTo forsendelseTo) {
@@ -121,15 +120,12 @@ public class Sdist001Service {
                         altinnKvitteringStatus, forsendelseId, forsendelseStatus);
                 break;
         }
-
     }
-
 
     private void oppdaterTilEkspedert(String trygderettenKvitteringStatus, String forsendelseId, String konversasjonId) {
         HentForsendelseResponseTo hentForsendelseResponseTo = administrerForsendelse.hentForsendelse(forsendelseId);
         EformidlingStatusOppdatering eformidlingStatusOppdatering =
                 eformidlingStatusOppdateringMapper.map(konversasjonId, trygderettenKvitteringStatus);
-
         try {
             byte[] meldingsInnhold = new ObjectMapper().writeValueAsBytes(eformidlingStatusOppdatering);
             LoggMeldingRequest loggMeldingRequest = lagreJuridiskLoggMapper.map(hentForsendelseResponseTo, meldingsInnhold);
@@ -138,11 +134,8 @@ public class Sdist001Service {
             throw new KunneIkkeSerialisereEformidlingstatusoppdateringTilJson(
                     "Kunne ikke serialisere eformidlingstatusoppdatering til JSON.", e);
         }
-
         administrerForsendelse.oppdaterForsendelseStatus(forsendelseId, EKSPEDERT.name());
-
     }
-
 
     private List<HentEformidlingforsendelserResponseTo.ForsendelseTo> hentEformidlingforsendelserResponse() {
 
@@ -154,13 +147,12 @@ public class Sdist001Service {
             throw new FantIkkeEformidlingforsendelserException("Kall mot rdist001 - fant ikke Eformidlingforsendelser  fra dokdist database.");
         }
 
-       return forsendelseTos.stream()
+        return forsendelseTos.stream()
                 .filter(forsendelse -> !EKSPEDERT.name().equals(forsendelse.getForsendelseStatus()))
                 .map(forsendelse -> {
-
-                            log.info("Kall mot rdist001 - Fant Eformidlingforsendelser fra dokdist database: {}", forsendelse);
-                            return forsendelse;
-                        }).collect(Collectors.toList());
+                    log.info("Kall mot rdist001 - Fant Eformidlingforsendelser fra dokdist database: {}", forsendelse);
+                    return forsendelse;
+                }).collect(Collectors.toList());
     }
 
 }
