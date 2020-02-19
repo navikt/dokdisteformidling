@@ -1,17 +1,13 @@
 package no.nav.dokdisteformidling.consumer.dokkat.tkat021;
 
-import static java.lang.String.format;
-
 import no.nav.dokdisteformidling.config.alias.ServiceuserAlias;
 import no.nav.dokdisteformidling.config.cache.LokalCacheConfig;
-import no.nav.dokdisteformidling.constants.DomainConstants;
 import no.nav.dokdisteformidling.constants.RetryConstants;
 import no.nav.dokdisteformidling.exception.functional.Tkat021FunctionalException;
 import no.nav.dokdisteformidling.exception.technical.AbstractDokdisteformidlingTechnicalException;
 import no.nav.dokdisteformidling.exception.technical.Tkat021TechnicalException;
 import no.nav.dokdisteformidling.metrics.Monitor;
 import no.nav.dokkat.schemas.tkat021.VarselInfoRestTo;
-import no.nav.dokkat.schemas.tkat021.VarselMalRestTo;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.cache.annotation.Cacheable;
@@ -28,6 +24,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import static java.lang.String.format;
 
 /**
  * @author Olav Røstvold Thorsen, Visma Consulting.
@@ -86,8 +84,8 @@ public class VarselInfoConsumer implements VarselInfo {
 	}
 
 	private List<Integer> toDagerListe(VarselInfoRestTo varselInfoRestTo) {
-		List<Integer> antallDagerListe = new ArrayList<Integer>();
-		for(int i = 0; i < varselInfoRestTo.getAntallRevarslinger(); i++){
+		List<Integer> antallDagerListe = new ArrayList<>();
+		for (int i = 0; i < varselInfoRestTo.getAntallRevarslinger(); i++) {
 			antallDagerListe.add(varselInfoRestTo.getRevarslingIntervall() * (i + 1));
 		}
 		return antallDagerListe;
