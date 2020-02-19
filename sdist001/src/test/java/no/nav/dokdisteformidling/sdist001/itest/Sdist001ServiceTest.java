@@ -15,6 +15,7 @@ import no.nav.dokdisteformidling.consumer.rdist001.AdministrerForsendelse;
 import no.nav.dokdisteformidling.consumer.rdist001.AdministrerForsendelseConsumer;
 import no.nav.dokdisteformidling.consumer.rdist001.HentEformidlingforsendelserResponseTo;
 import no.nav.dokdisteformidling.consumer.rdist001.HentForsendelseResponseTo;
+import no.nav.dokdisteformidling.exception.technical.FantIkkeEformidlingforsendelserException;
 import no.nav.dokdisteformidling.sdist001.Sdist001Service;
 import no.nav.dokdisteformidling.sdist001.domain.ForsendelseStatusEndringer;
 import org.junit.jupiter.api.BeforeEach;
@@ -35,9 +36,12 @@ import static no.nav.dokdisteformidling.sdist001.domain.to.AltinnKvitteringStatu
 import static no.nav.dokdisteformidling.sdist001.domain.to.ForsendelseStatus.BEKREFTET;
 import static no.nav.dokdisteformidling.sdist001.domain.to.ForsendelseStatus.EKSPEDERT;
 import static no.nav.dokdisteformidling.sdist001.domain.to.ForsendelseStatus.OVERSENDT;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -110,6 +114,23 @@ public class Sdist001ServiceTest {
 
     }
 
+    @Test
+    public void shouldThrowExceptionIfRdist001EformidlingForsendelserResponseErNull() throws IOException, ClassNotFoundException {
+        when(administrerForsendelse.hentEformidlingForsendelser()).thenReturn(null);
+        when(eformidling.hent()).thenReturn(getDownloadResponse());
+
+        FantIkkeEformidlingforsendelserException exception = assertThrows(FantIkkeEformidlingforsendelserException.class,
+                () -> sdist001Service.oppdatereDokDistEformidlingStatus());
+
+        assertTrue(exception.getMessage().contains("Kall mot rdist001 - fant ikke Eformidlingforsendelser fra dokdist database"));
+
+        verify(administrerForsendelse, times(1)).hentEformidlingForsendelser();
+        verify(administrerForsendelse, never()).hentForsendelse(anyString());
+        verify(eformidling, never()).hent();
+        verify(juridiskLogg, never()).lagreJuridiskLogg(getLoggMeldingRequest());
+
+
+    }
 
     public <T> T deserializeToObject(InputStream inputStream, Class<T> tClass) throws IOException, ClassNotFoundException {
         ObjectMapper objectMapper = new ObjectMapper();
@@ -117,7 +138,6 @@ public class Sdist001ServiceTest {
 
 
     }
-
 
     private List<DownloadResponse> getDownloadResponse() {
         return Arrays.asList(DownloadResponse.builder()

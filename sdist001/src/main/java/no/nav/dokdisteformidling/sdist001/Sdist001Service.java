@@ -147,20 +147,20 @@ public class Sdist001Service {
     private List<HentEformidlingforsendelserResponseTo.ForsendelseTo> hentEformidlingforsendelserResponse() {
 
         log.info("Rdist001 mottatt kall til å hente Eformidlingforsendelser fra dokdist database ");
-        List<HentEformidlingforsendelserResponseTo.ForsendelseTo> forsendelseTos = administrerForsendelse.hentEformidlingForsendelser().getForsendelser();
+        HentEformidlingforsendelserResponseTo hentEformidlingforsendelserResponseTo = administrerForsendelse.hentEformidlingForsendelser();
 
-        if (forsendelseTos == null) {
-            log.warn("Kall mot rdist001 - fant ikke Eformidlingforsendelser  fra dokdist database");
-            throw new FantIkkeEformidlingforsendelserException("Kall mot rdist001 - fant ikke Eformidlingforsendelser  fra dokdist database.");
+        if (hentEformidlingforsendelserResponseTo == null) {
+            log.warn("Kall mot rdist001 - fant ikke Eformidlingforsendelser fra dokdist database");
+            throw new FantIkkeEformidlingforsendelserException("Kall mot rdist001 - fant ikke Eformidlingforsendelser fra dokdist database.");
         }
 
-       return forsendelseTos.stream()
+        return hentEformidlingforsendelserResponseTo.getForsendelser().stream()
                 .filter(forsendelse -> !EKSPEDERT.name().equals(forsendelse.getForsendelseStatus()))
                 .map(forsendelse -> {
 
-                            log.info("Kall mot rdist001 - Fant Eformidlingforsendelser fra dokdist database: {}", forsendelse);
-                            return forsendelse;
-                        }).collect(Collectors.toList());
+                    log.info("Kall mot rdist001 - Fant Eformidlingforsendelser fra dokdist database: {}", forsendelse.toString());
+                    return forsendelse;
+                }).collect(Collectors.toList());
     }
 
 }
