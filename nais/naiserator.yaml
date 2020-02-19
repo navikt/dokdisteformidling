@@ -55,8 +55,6 @@ spec:
       value: {{ AKTOERREGISTER_API_V1_URL }}
     - name: EREG_API_URL
       value: {{ EREG_API_URL }}
-    - name: INTEGRASJONSPUNKT_API_URL
-      value: {{ INTEGRASJONSPUNKT_API_URL }}
     - name: LAGREJURIDISKLOGG_REST_URL
       value: {{ LAGREJURIDISKLOGG_REST_URL }}
     - name: TPSPROXY_API_URL
