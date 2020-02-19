@@ -16,7 +16,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 
 import javax.inject.Inject;
-import java.io.IOException;
 
 @Configuration
 @Profile("nais")
@@ -29,7 +28,7 @@ public class BrokerServiceExternalStreamedConfig extends AbstractCxfEndpointConf
     @SuppressWarnings("unchecked")
     @Bean
     public IBrokerServiceExternalStreamed iBrokerServiceExternalStreamed(BrokerServiceExternalStreamedProperties brokerServiceExternalStreamedProperties,
-                                                                         DpoUserProperties dpoUserProperties) throws IOException {
+                                                                         DpoUserProperties dpoUserProperties) {
         setWsdlUrl("wsdl/BrokerServiceExternalStreamed.wsdl");
         setServiceName(BrokerServiceExternalStreamedSF.SERVICE);
         setEndpointName(BrokerServiceExternalStreamedSF.CustomBindingIBrokerServiceExternalStreamed);
@@ -47,7 +46,6 @@ public class BrokerServiceExternalStreamedConfig extends AbstractCxfEndpointConf
         return iBrokerServiceExternalStreamed;
     }
 
-    // TODO: Vurdere gjennbruk av konfiguerering
     private void setRequestContext(final Client client, DpoUserProperties dpoUserProperties) {
         client.getRequestContext().put("ws-security.must-understand", Boolean.TRUE);
         client.getRequestContext().put("ws-security.username", dpoUserProperties.getUsername());

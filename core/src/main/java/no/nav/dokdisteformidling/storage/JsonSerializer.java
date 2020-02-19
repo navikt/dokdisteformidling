@@ -7,6 +7,9 @@ import com.amazonaws.util.json.Jackson;
  */
 public class JsonSerializer {
 
+	private JsonSerializer() {
+	}
+
 	public static String serialize(Object object) {
 		return Jackson.toJsonString(object);
 	}
