@@ -2,11 +2,13 @@ package no.nav.dokdisteformidling.consumer.eformidling.serviceregistry;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Builder;
 import lombok.Data;
 
 import java.util.List;
 
 @Data
+@Builder
 public class ServiceRecord {
 	private String organisationNumber;
 	private String pemCertificate;

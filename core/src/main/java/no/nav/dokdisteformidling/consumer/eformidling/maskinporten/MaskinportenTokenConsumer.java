@@ -27,6 +27,7 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestTemplate;
 
+import javax.inject.Inject;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.security.cert.CertificateEncodingException;
@@ -44,14 +45,16 @@ import static no.nav.dokdisteformidling.constants.DomainConstants.DEFAULT_ZONE_I
 public class MaskinportenTokenConsumer {
 	// TODO nytt scope når virksomhetssertifikat er klart.
 	private static final String SCOPE_DPO = "move/dpo.read";
-	public static final String FUNKSJONELL_FEIL_ERROR_MESSAGE = "Klarte ikke hente AccessToken fra maskinporten. Funksjonell feil.";
-	public static final String TEKNISK_FEIL_ERROR_MESSAGE = "Klarte ikke hente AccessToken fra maskinporten. Teknisk feil.";
+	public static final String FUNKSJONELL_FEIL_ERROR_MESSAGE = "Klarte ikke hente AccessToken fra maskinporten. Funksjonell feil: ";
+	public static final String TEKNISK_FEIL_ERROR_MESSAGE = "Klarte ikke hente AccessToken fra maskinporten. Teknisk feil: ";
 
 	private final AppCertificate appCertificate;
 	private final MaskinportenProperties maskinportenProperties;
 	private final RestTemplate restTemplate;
 
-	public MaskinportenTokenConsumer(AppCertificate appCertificate, MaskinportenProperties maskinportenProperties,
+	@Inject
+	public MaskinportenTokenConsumer(AppCertificate appCertificate,
+									 MaskinportenProperties maskinportenProperties,
 									 RestTemplateBuilder restTemplateBuilder) {
 		this.appCertificate = appCertificate;
 		this.maskinportenProperties = maskinportenProperties;
@@ -90,11 +93,13 @@ public class MaskinportenTokenConsumer {
 			log.info("AccessToken hentet OK fra maskinporten på url={}", maskinportenUrl);
 			return response.getBody();
 		} catch(HttpClientErrorException e) {
-			log.warn(FUNKSJONELL_FEIL_ERROR_MESSAGE, e);
-			throw new MaskinportenFunctionalException(FUNKSJONELL_FEIL_ERROR_MESSAGE, e);
+			final String errorMessage = FUNKSJONELL_FEIL_ERROR_MESSAGE + e.getResponseBodyAsString();
+			log.warn(errorMessage, e);
+			throw new MaskinportenFunctionalException(errorMessage, e);
 		} catch(HttpServerErrorException e) {
-			log.error(TEKNISK_FEIL_ERROR_MESSAGE, e);
-			throw new MaskinportenTechnicalException(TEKNISK_FEIL_ERROR_MESSAGE, e);
+			final String errorMessage = TEKNISK_FEIL_ERROR_MESSAGE + e.getResponseBodyAsString();
+			log.error(errorMessage, e);
+			throw new MaskinportenTechnicalException(errorMessage, e);
 		}
 	}
 

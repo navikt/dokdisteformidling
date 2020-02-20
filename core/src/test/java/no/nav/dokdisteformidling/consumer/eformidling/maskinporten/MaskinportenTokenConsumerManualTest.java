@@ -14,36 +14,40 @@ import java.net.URL;
 
 @Disabled("Manuell test")
 public class MaskinportenTokenConsumerManualTest {
-	private KeyStoreProperties keyStoreProperties = new KeyStoreProperties();
-	private MaskinportenProperties maskinportenProperties = new MaskinportenProperties();
+    private KeyStoreProperties keyStoreProperties = new KeyStoreProperties();
+    private MaskinportenProperties maskinportenProperties = new MaskinportenProperties();
 
-	@BeforeEach
-	public void setup() throws MalformedURLException {
-		// Sett system properties VM options for testen. Ikke putt det i koden.
-		//
-		// javax.net.ssl.trustStore
-		// javax.net.ssl.trustStorePassword
-		// virksomhetssertifikat.type
-		// virksomhetssertifikat.alias
-		// virksomhetssertifikat.password
-		// virksomhetssertifikat.path
-		System.setProperty("https.proxyHost", "webproxy-utvikler.nav.no");
-		System.setProperty("https.proxyPort", "8088");
-		System.setProperty("https.nonProxyHosts", "*.155.55.|*.192.168.|*.10.|*.local|*.rtv.gov|*.adeo.no|*.nav.no|*.aetat.no|*.devillo.no|*.oera.no");
-		maskinportenProperties.setAudience("https://oidc-ver1.difi.no/idporten-oidc-provider/");
-		maskinportenProperties.setClientid("MOVE_IP_889640782");
-		maskinportenProperties.setUrl(new URL("https://oidc-ver1.difi.no/idporten-oidc-provider/token"));
-		keyStoreProperties.setType(System.getProperty("virksomhetssertifikat.type"));
-		keyStoreProperties.setAlias(System.getProperty("virksomhetssertifikat.alias"));
-		keyStoreProperties.setPassword(System.getProperty("virksomhetssertifikat.password"));
-		keyStoreProperties.setPath(new FileSystemResource(System.getProperty("virksomhetssertifikat.path")));
-	}
+    @BeforeEach
+    public void setup() throws MalformedURLException {
+        // Sett system properties VM options for testen. Ikke putt det i koden.
+        //
+        // javax.net.ssl.trustStore
+        // javax.net.ssl.trustStorePassword
+        // virksomhetssertifikat.type
+        // virksomhetssertifikat.alias
+        // virksomhetssertifikat.password
+        // virksomhetssertifikat.path
+        System.setProperty("https.proxyHost", "webproxy-utvikler.nav.no");
+        System.setProperty("https.proxyPort", "8088");
+        System.setProperty("https.nonProxyHosts", "*.155.55.|*.192.168.|*.10.|*.local|*.rtv.gov|*.adeo.no|*.nav.no|*.aetat.no|*.devillo.no|*.oera.no");
+        maskinportenProperties.setClientid("MOVE_IP_889640782");
+        // test
+//        maskinportenProperties.setAudience("https://oidc-ver1.difi.no/idporten-oidc-provider/");
+//        maskinportenProperties.setUrl(new URL("https://oidc-ver1.difi.no/idporten-oidc-provider/token"));
+        // prod
+        maskinportenProperties.setAudience("https://oidc.difi.no/idporten-oidc-provider/");
+        maskinportenProperties.setUrl(new URL("https://oidc.difi.no/idporten-oidc-provider/token"));
+        keyStoreProperties.setType(System.getProperty("virksomhetssertifikat.type"));
+        keyStoreProperties.setAlias(System.getProperty("virksomhetssertifikat.alias"));
+        keyStoreProperties.setPassword(System.getProperty("virksomhetssertifikat.password"));
+        keyStoreProperties.setPath(new FileSystemResource(System.getProperty("virksomhetssertifikat.path")));
+    }
 
-	@Test
-	public void shouldFetchTokenWhenSystemPropertiesSet() {
-		MaskinportenTokenConsumer oidcTokenClient = new MaskinportenTokenConsumer(new AppCertificate(keyStoreProperties), maskinportenProperties, new RestTemplateBuilder());
+    @Test
+    public void shouldFetchTokenWhenSystemPropertiesSet() {
+        MaskinportenTokenConsumer oidcTokenClient = new MaskinportenTokenConsumer(new AppCertificate(keyStoreProperties), maskinportenProperties, new RestTemplateBuilder());
 
-		final OidcTokenResponse oidcTokenResponse = oidcTokenClient.fetchToken();
-		System.out.println(oidcTokenResponse.getAccessToken());
-	}
+        final OidcTokenResponse oidcTokenResponse = oidcTokenClient.fetchToken();
+        System.out.println(oidcTokenResponse.getAccessToken());
+    }
 }

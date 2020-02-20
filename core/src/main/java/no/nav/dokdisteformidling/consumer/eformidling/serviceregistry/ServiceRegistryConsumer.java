@@ -32,8 +32,8 @@ import java.util.Collections;
 @Component
 public class ServiceRegistryConsumer {
     public static final String OIDC_AUTHORIZATION_PREFIX = "Bearer ";
-    public static final String TEKNISK_FEIL_ERROR_MESSAGE = "Klarte ikke hente mottakerInfo fra service registry. Teknisk feil.";
-    public static final String FUNKSJONELL_FEIL_ERROR_MESSAGE = "Klarte ikke hente mottakerInfo fra service registry. Funksjonell feil.";
+    public static final String TEKNISK_FEIL_ERROR_MESSAGE = "Klarte ikke hente mottakerInfo fra service registry. Teknisk feil: ";
+    public static final String FUNKSJONELL_FEIL_ERROR_MESSAGE = "Klarte ikke hente mottakerInfo fra service registry. Funksjonell feil: ";
     private final MaskinportenTokenConsumer maskinportenTokenConsumer;
     private final RestTemplate restTemplate;
     private final String baseUrl;
@@ -66,11 +66,12 @@ public class ServiceRegistryConsumer {
             final ResponseEntity<IdentifierResource> exchange = restTemplate.exchange(uri, HttpMethod.GET, httpEntity, IdentifierResource.class);
             return exchange.getBody();
         } catch (HttpClientErrorException e) {
-            log.warn(FUNKSJONELL_FEIL_ERROR_MESSAGE, e);
+            log.warn(FUNKSJONELL_FEIL_ERROR_MESSAGE + e.getResponseBodyAsString(), e);
             return IdentifierResource.empty();
         } catch (HttpServerErrorException e) {
-            log.error(TEKNISK_FEIL_ERROR_MESSAGE, e);
-            throw new ServiceRegistryTechnicalException(TEKNISK_FEIL_ERROR_MESSAGE, e);
+            final String errorMessage = TEKNISK_FEIL_ERROR_MESSAGE + e.getResponseBodyAsString();
+            log.error(errorMessage, e);
+            throw new ServiceRegistryTechnicalException(errorMessage, e);
         }
     }
 }
