@@ -4,11 +4,8 @@ import lombok.extern.slf4j.Slf4j;
 import no.arkivverket.standarder.noark5.arkivmelding.Arkivmelding;
 import no.arkivverket.standarder.noark5.arkivmelding.Dokumentbeskrivelse;
 import no.arkivverket.standarder.noark5.arkivmelding.Journalpost;
-import no.nav.dokdisteformidling.config.props.FeatureToggleProperties;
 import no.nav.dokdisteformidling.consumer.eformidling.Eformidling;
 import no.nav.dokdisteformidling.consumer.eformidling.NavDokumentpakke;
-import no.nav.dokdisteformidling.consumer.integrasjonspunkt.CreateMessageRequest;
-import no.nav.dokdisteformidling.consumer.integrasjonspunkt.Integrasjonspunkt;
 import no.nav.dokdisteformidling.consumer.juridisklogg.JuridiskLogg;
 import no.nav.dokdisteformidling.consumer.juridisklogg.LagreJuridiskLoggMapper;
 import no.nav.dokdisteformidling.consumer.rdist001.AdministrerForsendelse;
@@ -52,39 +49,29 @@ import static no.nav.dokdisteformidling.consumer.eformidling.NavDokument.fromVed
 public class Qdist013Service {
 
 	public static final String ARKIVMELDING = "arkivmelding";
-	public static final String ARKIVMELDING_XML = ARKIVMELDING + ".xml";
 
 	private final Storage s3Storage;
 	private final AdministrerForsendelse administrerForsendelse;
 	private final SafJournalpostQueryService<JournalpostQdist013> safJournalpostQueryService;
 	private final JuridiskLogg juridiskLogg;
-	private final Integrasjonspunkt integrasjonspunkt;
-	private final LagreJuridiskLoggMapper lagreJuridiskLoggMapper;
+    private final LagreJuridiskLoggMapper lagreJuridiskLoggMapper;
 	private final ArkivmeldingMapper arkivmeldingMapper;
-	private final CreateMessageRequestMapper createMessageRequestMapper;
-	private final FeatureToggleProperties featureToggleProperties;
-	private final Eformidling eformidling;
+    private final Eformidling eformidling;
 
 	public Qdist013Service(Storage s3Storage,
-						   AdministrerForsendelse administrerForsendelse,
-						   @Named("SafJournalpostQueryServiceQdist013") SafJournalpostQueryService<JournalpostQdist013> safJournalpostQueryService,
-						   JuridiskLogg juridiskLogg,
-						   Integrasjonspunkt integrasjonspunkt,
-						   LagreJuridiskLoggMapper lagreJuridiskLoggMapper,
-						   ArkivmeldingMapper arkivmeldingMapper,
-						   CreateMessageRequestMapper createMessageRequestMapper,
-						   FeatureToggleProperties featureToggleProperties,
-						   Eformidling eformidling) {
+                           AdministrerForsendelse administrerForsendelse,
+                           @Named("SafJournalpostQueryServiceQdist013") SafJournalpostQueryService<JournalpostQdist013> safJournalpostQueryService,
+                           JuridiskLogg juridiskLogg,
+                           LagreJuridiskLoggMapper lagreJuridiskLoggMapper,
+                           ArkivmeldingMapper arkivmeldingMapper,
+                           Eformidling eformidling) {
 		this.s3Storage = s3Storage;
 		this.administrerForsendelse = administrerForsendelse;
 		this.safJournalpostQueryService = safJournalpostQueryService;
 		this.juridiskLogg = juridiskLogg;
-		this.integrasjonspunkt = integrasjonspunkt;
-		this.lagreJuridiskLoggMapper = lagreJuridiskLoggMapper;
+        this.lagreJuridiskLoggMapper = lagreJuridiskLoggMapper;
 		this.arkivmeldingMapper = arkivmeldingMapper;
-		this.createMessageRequestMapper = createMessageRequestMapper;
-		this.featureToggleProperties = featureToggleProperties;
-		this.eformidling = eformidling;
+        this.eformidling = eformidling;
 	}
 
 	@Handler
@@ -103,30 +90,20 @@ public class Qdist013Service {
 				.getArkivId());
 		final JAXBElement<Arkivmelding> arkivmeldingJAXBElement = arkivmeldingMapper.createArkivMelding(journalpostQdist013, bestillingsId);
 		final String arkivmeldingXmlString = marshalArkivmeldingToXmlString(arkivmeldingJAXBElement);
-		final CreateMessageRequest createMessageRequest = createMessageRequestMapper.map(conversationId, hentForsendelseResponseTo);
 
-		if (featureToggleProperties.isUsealtinnformidlingstjenesten()) {
-			log.info("Sender eformidling forsendelse direkte til Altinn formidlingstjenesten. forsendelseId={}, konversasjonsId={}, bestillingsId={}",
-					forsendelseId, conversationId, bestillingsId);
-			eformidling.send(NavDokumentpakke.builder()
-					.conversationId(conversationId)
-					.bestillingsId(bestillingsId)
-					.arkivmelding(fromArkivmelding(new ByteArrayInputStream(arkivmeldingXmlString.getBytes(StandardCharsets.UTF_8))))
-					.navDokumenter(dokdistDokumentList.stream()
-							.map(d -> fromVedlegg(getDocumentFilename(arkivmeldingJAXBElement.getValue(), journalpostQdist013.getJournalpostId(), d.getDokumentInfoId()),
-									new ByteArrayInputStream(d.getPdf())))
-							.collect(Collectors.toList()))
-					.build());
-			juridiskLogg.lagreJuridiskLogg(lagreJuridiskLoggMapper.map(hentForsendelseResponseTo, arkivmeldingXmlString.getBytes()));
-		} else {
-			log.info("Sender eformidling forsendelse til integrasjonspunktet til NAV. forsendelseId={}, konversasjonsId={}, bestillingsId={}",
-					forsendelseId, conversationId, bestillingsId);
-			integrasjonspunkt.opprettMelding(createMessageRequest, conversationId);
-			uploadDocuments(dokdistDokumentList, arkivmeldingJAXBElement.getValue(), journalpostQdist013.getJournalpostId(), bestillingsId);
-			uploadArkivmelding(arkivmeldingXmlString, bestillingsId);
-			integrasjonspunkt.sendMelding(bestillingsId);
-			juridiskLogg.lagreJuridiskLogg(lagreJuridiskLoggMapper.map(hentForsendelseResponseTo, arkivmeldingXmlString.getBytes()));
-		}
+        log.info("Sender eformidling forsendelse direkte til Altinn formidlingstjenesten. forsendelseId={}, konversasjonsId={}, bestillingsId={}",
+                forsendelseId, conversationId, bestillingsId);
+        eformidling.send(NavDokumentpakke.builder()
+                .conversationId(conversationId)
+                .bestillingsId(bestillingsId)
+                .arkivmelding(fromArkivmelding(new ByteArrayInputStream(arkivmeldingXmlString.getBytes(StandardCharsets.UTF_8))))
+                .navDokumenter(dokdistDokumentList.stream()
+                        .map(d -> fromVedlegg(getDocumentFilename(arkivmeldingJAXBElement.getValue(), journalpostQdist013.getJournalpostId(), d.getDokumentInfoId()),
+                                new ByteArrayInputStream(d.getPdf())))
+                        .collect(Collectors.toList()))
+                .build());
+        juridiskLogg.lagreJuridiskLogg(lagreJuridiskLoggMapper.map(hentForsendelseResponseTo, arkivmeldingXmlString.getBytes()));
+
 	}
 
 	private List<DokdistDokument> getDocumentsFromS3(HentForsendelseResponseTo hentForsendelseResponseTo) {
@@ -138,20 +115,6 @@ public class Qdist013Service {
 					return dokdistDokument;
 				})
 				.collect(Collectors.toList());
-	}
-
-	private void uploadDocuments(List<DokdistDokument> dokdistDokumentList, Arkivmelding arkivmelding, String journalpostId, String bestillingsId) {
-		dokdistDokumentList.forEach(dokdistDokument -> {
-			final String title = getDocumentTitle(arkivmelding, journalpostId, dokdistDokument.getDokumentInfoId());
-			final String filename = getDocumentFilename(arkivmelding, journalpostId, dokdistDokument.getDokumentInfoId());
-			integrasjonspunkt.lastOppFil(dokdistDokument, title, filename, bestillingsId);
-		});
-	}
-
-	private void uploadArkivmelding(String arkivmeldingXmlString, String bestillingsId) {
-		integrasjonspunkt.lastOppFil(DokdistDokument.builder()
-				.pdf(arkivmeldingXmlString.getBytes())
-				.build(), ARKIVMELDING, ARKIVMELDING_XML, bestillingsId);
 	}
 
 	private String marshalArkivmeldingToXmlString(JAXBElement<Arkivmelding> arkivmeldingJAXBElement) {

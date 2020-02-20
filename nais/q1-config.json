@@ -22,7 +22,6 @@
   "VIRKSOMHET_DIGITALKONTAKINFORMASJON_V1_ENDPOINTURL": "https://dkif.nais.preprod.local/ws/DigitalKontaktinformasjon/v1",
   "AKTOERREGISTER_API_V1_URL": "https://app-q1.adeo.no/aktoerregister/api/v1",
   "EREG_API_URL": "https://modapp-q1.adeo.no/ereg/api",
-  "INTEGRASJONSPUNKT_API_URL": "https://integrasjonspunkt.nais.preprod.local/api",
   "LAGREJURIDISKLOGG_REST_URL": "https://app-q1.adeo.no/juridisklogg/api/rest/logg",
   "TPSPROXY_API_URL": "https://tps-proxy-q1.nais.preprod.local/api",
   "SAF_GRAPHQL_URL": "https://saf-q1.nais.preprod.local/graphql",
