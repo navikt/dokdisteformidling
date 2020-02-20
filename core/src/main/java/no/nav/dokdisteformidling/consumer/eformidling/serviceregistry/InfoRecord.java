@@ -2,9 +2,11 @@ package no.nav.dokdisteformidling.consumer.eformidling.serviceregistry;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Builder;
 import lombok.Data;
 
 @Data
+@Builder
 public class InfoRecord {
 	private String identifier;
 	private String organizationName;
