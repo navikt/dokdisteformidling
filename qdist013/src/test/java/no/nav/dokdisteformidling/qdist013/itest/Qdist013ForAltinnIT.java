@@ -395,7 +395,7 @@ public class Qdist013ForAltinnIT {
 
         sendStringMessage(qdist013, classpathToString("qdist013/qdist013-happy.xml"));
 
-        await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
+        await().atMost(20, TimeUnit.SECONDS).untilAsserted(() -> {
             assertMessageOnQueue(backoutQueue);
         });
 

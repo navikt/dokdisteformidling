@@ -14,6 +14,8 @@ import java.io.Reader;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 
+import static org.apache.commons.lang3.StringUtils.isBlank;
+
 /**
  * @author Joakim Bjørnstad, Jbit AS
  */
@@ -35,6 +37,9 @@ public class MottakerInfo {
 	}
 
 	private X509Certificate convertToX509(final String pemCertificate) {
+		if(isBlank(pemCertificate)) {
+			throw new MottakerInfoIkkeFunnetException("Fant ikke PEM sertifikat.");
+		}
 		PEMParser pemParser = openPEMResource(pemCertificate);
 		try {
 			final Object certificate = pemParser.readObject();
@@ -44,9 +49,9 @@ public class MottakerInfo {
 				return new JcaX509CertificateConverter().setProvider("BC").getCertificate((X509CertificateHolder) certificate);
 			}
 		} catch (CertificateException e) {
-			throw new MottakerInfoIkkeFunnetException("Klarte ikke konvertere PEM data til X.509 sertifikat.");
+			throw new MottakerInfoIkkeFunnetException("Klarte ikke konvertere PEM data til X.509 sertifikat.", e);
 		} catch (IOException e) {
-			throw new MottakerInfoIkkeFunnetException("Klarte ikke lese PEM data.");
+			throw new MottakerInfoIkkeFunnetException("Klarte ikke lese PEM data.", e);
 		}
 	}
 
