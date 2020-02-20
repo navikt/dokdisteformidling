@@ -8,12 +8,9 @@ import no.nav.dokdisteformidling.config.alias.DigitalKontaktinformasjonV1Alias;
 import no.nav.dokdisteformidling.config.alias.MqGatewayAlias;
 import no.nav.dokdisteformidling.config.alias.ServiceuserAlias;
 import no.nav.dokdisteformidling.config.cache.LokalCacheConfig;
-import no.nav.dokdisteformidling.config.cxf.BrokerServiceExternalConfig;
-import no.nav.dokdisteformidling.config.cxf.BrokerServiceExternalStreamedConfig;
 import no.nav.dokdisteformidling.config.props.BrokerServiceExternalProperties;
 import no.nav.dokdisteformidling.config.props.BrokerServiceExternalStreamedProperties;
 import no.nav.dokdisteformidling.config.props.DpoUserProperties;
-import no.nav.dokdisteformidling.config.props.FeatureToggleProperties;
 import no.nav.dokdisteformidling.config.props.MaskinportenProperties;
 import no.nav.dokdisteformidling.config.props.ServiceRegistryProperties;
 import no.nav.dokdisteformidling.config.props.SrvAppserverProperties;
@@ -42,8 +39,7 @@ import org.springframework.retry.annotation.EnableRetry;
 		SrvAppserverProperties.class,
 		DigitalKontaktinformasjonV1Alias.class,
 		MaskinportenProperties.class,
-		ServiceRegistryProperties.class,
-		FeatureToggleProperties.class})
+		ServiceRegistryProperties.class})
 @Import({JmsItestConfig.class,
 		LokalCacheConfig.class,
 		STSTestConfig.class,

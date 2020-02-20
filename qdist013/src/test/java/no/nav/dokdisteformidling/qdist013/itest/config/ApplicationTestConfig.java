@@ -3,32 +3,17 @@ package no.nav.dokdisteformidling.qdist013.itest.config;
 import static org.mockito.Mockito.mock;
 
 import com.amazonaws.services.s3.AmazonS3;
-import no.nav.dokdisteformidling.CoreConfig;
-import no.nav.dokdisteformidling.certificate.AppCertificate;
 import no.nav.dokdisteformidling.certificate.KeyStoreProperties;
 import no.nav.dokdisteformidling.config.alias.DigitalKontaktinformasjonV1Alias;
 import no.nav.dokdisteformidling.config.alias.MqGatewayAlias;
 import no.nav.dokdisteformidling.config.alias.ServiceuserAlias;
 import no.nav.dokdisteformidling.config.cache.LokalCacheConfig;
-import no.nav.dokdisteformidling.config.cxf.BrokerServiceExternalConfig;
-import no.nav.dokdisteformidling.config.cxf.BrokerServiceExternalStreamedConfig;
 import no.nav.dokdisteformidling.config.props.BrokerServiceExternalProperties;
 import no.nav.dokdisteformidling.config.props.BrokerServiceExternalStreamedProperties;
 import no.nav.dokdisteformidling.config.props.DpoUserProperties;
-import no.nav.dokdisteformidling.config.props.FeatureToggleProperties;
 import no.nav.dokdisteformidling.config.props.MaskinportenProperties;
 import no.nav.dokdisteformidling.config.props.ServiceRegistryProperties;
 import no.nav.dokdisteformidling.config.props.SrvAppserverProperties;
-import no.nav.dokdisteformidling.consumer.eformidling.altinn.services.BrokerServiceExternalService;
-import no.nav.dokdisteformidling.consumer.eformidling.altinn.services.BrokerServiceExternalStreamedService;
-import no.nav.dokdisteformidling.consumer.eformidling.maskinporten.MaskinportenTokenConsumer;
-import no.nav.dokdisteformidling.consumer.eformidling.serviceregistry.EformidlingMottakerInfoService;
-import no.nav.dokdisteformidling.consumer.eformidling.serviceregistry.ServiceRegistryConsumer;
-import no.nav.dokdisteformidling.consumer.rdist001.AdministrerForsendelse;
-import no.nav.dokdisteformidling.consumer.rdist001.AdministrerForsendelseConsumer;
-import no.nav.dokdisteformidling.consumer.saf.SafJournalpostQueryService;
-import no.nav.dokdisteformidling.qdist013.Qdist013Service;
-import no.nav.dokdisteformidling.qdist013.saf.main.SafJournalpostQueryServiceImplQdist013;
 import no.nav.dokdisteformidling.storage.S3Storage;
 import no.nav.dokdisteformidling.storage.Storage;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -54,8 +39,7 @@ import org.springframework.retry.annotation.EnableRetry;
 		SrvAppserverProperties.class,
 		DigitalKontaktinformasjonV1Alias.class,
 		MaskinportenProperties.class,
-		ServiceRegistryProperties.class,
-		FeatureToggleProperties.class})
+		ServiceRegistryProperties.class})
 @Import({JmsItestConfig.class,
 		LokalCacheConfig.class,
 		STSTestConfig.class,
