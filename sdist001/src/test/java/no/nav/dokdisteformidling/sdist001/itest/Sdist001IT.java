@@ -21,7 +21,6 @@ import javax.inject.Inject;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.UUID;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.get;
@@ -50,10 +49,6 @@ import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
 @ActiveProfiles("itest")
 public class Sdist001IT {
 
-    private static String CALL_ID;
-    private static String HENT_EFORMIDLINGSFORSENDELSER_URL = "/administrerforsendelse/henteformidlingforsendelser";
-    private static final String ADMINISTRERFORSENDELSE_URL = "/administrerforsendelse";
-    private static final String FILE_REFERENCE = "16d2f5aa-7bea-48f9-ac70-27b2634bad13";
     private static final Integer FORSENDELSE_ID = 1;
 
     @Inject
@@ -61,8 +56,6 @@ public class Sdist001IT {
 
     @BeforeEach
     public void setupBefore() {
-        CALL_ID = UUID.randomUUID().toString();
-
         WireMock.reset();
         WireMock.resetAllRequests();
         WireMock.removeAllMappings();
@@ -125,7 +118,7 @@ public class Sdist001IT {
     }
 
     private void stubPostBrokerServiceExternalStreamedDownloadFileStreamed() throws IOException {
-        String boundary = UUID.randomUUID().toString();
+        String boundary = "uuid:c678c2f3-c620-4d19-9884-fc1c36c1d29a+id=174513";
 
         stubFor(post(urlMatching("/brokerserviceexternalstreamed"))
                 .willReturn(aResponse().withStatus(HttpStatus.OK.value())
@@ -143,10 +136,10 @@ public class Sdist001IT {
             pw.println("Content-Transfer-Encoding: 8bit");
             pw.println("Content-Type: application/xop+xml;charset=utf-8;type=\"text/xml\"");
             pw.println();
-            pw.println("<s:Envelope xmlns:s=\"http://schemas.xmlsoap.org/soap/envelope/\"><s:Body><DownloadFileStreamedResponse xmlns=\"http://www.altinn.no/services/ServiceEngine/Broker/2015/06\"><DownloadFileStreamedResult><xop:Include href=\"cid:http://tempuri.org/1/***gammelt_fnr***2615129\" xmlns:xop=\"http://www.w3.org/2004/08/xop/include\"/></DownloadFileStreamedResult></DownloadFileStreamedResponse></s:Body></s:Envelope>");
+            pw.println("<s:Envelope xmlns:s=\"http://schemas.xmlsoap.org/soap/envelope/\"><s:Body><DownloadFileStreamedResponse xmlns=\"http://www.altinn.no/services/ServiceEngine/Broker/2015/06\"><DownloadFileStreamedResult><xop:Include href=\"cid:http://tempuri.org/1/***gammelt_fnr***7559832\" xmlns:xop=\"http://www.w3.org/2004/08/xop/include\"/></DownloadFileStreamedResult></DownloadFileStreamedResponse></s:Body></s:Envelope>");
             pw.println();
             pw.println("--" + boundary);
-            pw.println("Content-ID: <http://tempuri.org/1/***gammelt_fnr***2615129>");
+            pw.println("Content-ID: <http://tempuri.org/1/***gammelt_fnr***7559832>");
             pw.println("Content-Transfer-Encoding: binary");
             pw.println("Content-Type: application/octet-stream");
             pw.println();
