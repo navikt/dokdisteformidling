@@ -90,7 +90,7 @@ public class Sdist001ServiceTest {
 
 
     @Test
-    public void navFrosendelserShouldSetToExpedertWhenKvitteringStatusFraTrygdErMottatt() throws IOException, ClassNotFoundException {
+    public void navForsendelserShouldSetToExpedertWhenKvitteringStatusFraTrygdErMottatt() throws IOException {
         InputStream inputStream = new ClassPathResource("__files/rdist001/getForsendelse_forAltinnTest.json").getInputStream();
 
         HentForsendelseResponseTo forsendelseResponseTo = deserializeToObject(inputStream, HentForsendelseResponseTo.class);
@@ -106,16 +106,12 @@ public class Sdist001ServiceTest {
         verify(administrerForsendelse, times(2)).hentForsendelse(anyString());
         verify(eformidling, times(1)).hent();
         verify(juridiskLogg, times(2)).lagreJuridiskLogg(getLoggMeldingRequest());
-
-
     }
 
 
-    public <T> T deserializeToObject(InputStream inputStream, Class<T> tClass) throws IOException, ClassNotFoundException {
+    public <T> T deserializeToObject(InputStream inputStream, Class<T> tClass) throws IOException {
         ObjectMapper objectMapper = new ObjectMapper();
-        return (T) objectMapper.readValue(inputStream, tClass);
-
-
+        return objectMapper.readValue(inputStream, tClass);
     }
 
 
