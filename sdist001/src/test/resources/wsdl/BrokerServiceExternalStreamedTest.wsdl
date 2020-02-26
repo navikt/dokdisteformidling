@@ -1,8 +1,16 @@
-<wsdl:definitions xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:wsam="http://www.w3.org/2007/05/addressing/metadata" xmlns:wsx="http://schemas.xmlsoap.org/ws/2004/09/mex" xmlns:wsap="http://schemas.xmlsoap.org/ws/2004/08/addressing/policy" xmlns:msc="http://schemas.microsoft.com/ws/2005/12/wsdl/contract" xmlns:wsp="http://schemas.xmlsoap.org/ws/2004/09/policy" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:tns="http://www.altinn.no/services/ServiceEngine/Broker/2015/06" xmlns:wsa10="http://www.w3.org/2005/08/addressing" xmlns:wsaw="http://www.w3.org/2006/05/addressing/wsdl" xmlns:wsa="http://schemas.xmlsoap.org/ws/2004/08/addressing" xmlns:xmime="http://www.w3.org/2005/05/xmlmime" name="BrokerServiceExternalStreamedSF" targetNamespace="http://www.altinn.no/services/ServiceEngine/Broker/2015/06">
+<wsdl:definitions xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:wsp="http://schemas.xmlsoap.org/ws/2004/09/policy"
+                  xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd"
+                  xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/"
+                  xmlns:tns="http://www.altinn.no/services/ServiceEngine/Broker/2015/06"
+                  xmlns:wsa10="http://www.w3.org/2005/08/addressing"
+                  xmlns:wsaw="http://www.w3.org/2006/05/addressing/wsdl"
+                  xmlns:xmime="http://www.w3.org/2005/05/xmlmime" name="BrokerServiceExternalStreamedSF"
+                  targetNamespace="http://www.altinn.no/services/ServiceEngine/Broker/2015/06">
     <wsp:Policy wsu:Id="CustomBinding_IBrokerServiceExternalStreamed_policy">
     </wsp:Policy>
     <wsdl:types>
-        <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://www.altinn.no/services/2009/10" elementFormDefault="qualified" targetNamespace="http://www.altinn.no/services/2009/10">
+        <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://www.altinn.no/services/2009/10"
+                   elementFormDefault="qualified" targetNamespace="http://www.altinn.no/services/2009/10">
             <xs:element name="Test">
                 <xs:complexType>
                     <xs:sequence/>
@@ -165,7 +173,9 @@
             <xs:element name="DownloadFileStreamedResponse">
                 <xs:complexType>
                     <xs:sequence>
-                        <xs:element xmlns:q2="http://schemas.microsoft.com/Message" name="DownloadFileStreamedResult" type="q2:StreamBody" xmime:expectedContentTypes="application/octet-stream"/>
+                        <!--                        <xs:element xmlns:q2="http://schemas.microsoft.com/Message" name="DownloadFileStreamedResult" type="q2:StreamBody" xmime:expectedContentTypes="application/octet-stream"/>-->
+                        <xs:element xmlns:xs="http://www.w3.org/2001/XMLSchema" name="DownloadFileStreamedResult"
+                                    type="xs:base64Binary"/>
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
