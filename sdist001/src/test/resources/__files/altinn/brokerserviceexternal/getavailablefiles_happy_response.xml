@@ -1,0 +1,35 @@
+<s:Envelope xmlns:s="http://www.w3.org/2003/05/soap-envelope" xmlns:a="http://www.w3.org/2005/08/addressing"
+            xmlns:u="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd">
+    <s:Header>
+        <a:Action s:mustUnderstand="1">
+            http://www.altinn.no/services/ServiceEngine/Broker/2015/06/IBrokerServiceExternal/GetAvailableFilesResponse
+        </a:Action>
+        <a:RelatesTo>urn:uuid:529bbcbd-0ca3-4833-9f28-5550b83ae27e</a:RelatesTo>
+        <o:Security s:mustUnderstand="1"
+                    xmlns:o="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd">
+            <u:Timestamp u:Id="_0">
+                <u:Created>2020-02-10T14:02:42.166Z</u:Created>
+                <u:Expires>2020-02-10T14:07:42.166Z</u:Expires>
+            </u:Timestamp>
+        </o:Security>
+    </s:Header>
+    <s:Body>
+        <GetAvailableFilesResponse xmlns="http://www.altinn.no/services/ServiceEngine/Broker/2015/06">
+            <GetAvailableFilesResult xmlns:b="http://schemas.altinn.no/services/ServiceEngine/Broker/2015/06">
+                <b:BrokerServiceAvailableFile>
+                    <b:ExternalServiceCode>4192</b:ExternalServiceCode>
+                    <b:ExternalServiceEditionCode>270815</b:ExternalServiceEditionCode>
+                    <b:FileName>sbd.zip</b:FileName>
+                    <b:FileReference>16d2f5aa-7bea-48f9-ac70-27b2634bad13</b:FileReference>
+                    <b:FileSize>1256</b:FileSize>
+                    <b:FileStatus>Uploaded</b:FileStatus>
+                    <b:IsSftpDownloadOnly>false</b:IsSftpDownloadOnly>
+                    <b:ReceiptID>314988974</b:ReceiptID>
+                    <b:Reportee>974761084</b:Reportee>
+                    <b:SendersReference>33259df3-18ae-45e6-9861-47f42e119a14</b:SendersReference>
+                    <b:SentDate>2020-02-10T14:57:33.697</b:SentDate>
+                </b:BrokerServiceAvailableFile>
+            </GetAvailableFilesResult>
+        </GetAvailableFilesResponse>
+    </s:Body>
+</s:Envelope>

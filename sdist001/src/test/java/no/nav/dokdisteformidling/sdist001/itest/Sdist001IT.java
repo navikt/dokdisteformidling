@@ -1,22 +1,28 @@
 package no.nav.dokdisteformidling.sdist001.itest;
 
 import com.github.tomakehurst.wiremock.client.WireMock;
+import com.github.tomakehurst.wiremock.stubbing.Scenario;
+import no.nav.dokdisteformidling.consumer.eformidling.EformidlingConstants;
 import no.nav.dokdisteformidling.sdist001.Sdist001Service;
 import no.nav.dokdisteformidling.sdist001.itest.config.ApplicationTestConfig;
+import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpHeaders;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.cloud.contract.wiremock.AutoConfigureWireMock;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import javax.inject.Inject;
-import java.util.UUID;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.get;
@@ -27,7 +33,10 @@ import static com.github.tomakehurst.wiremock.client.WireMock.put;
 import static com.github.tomakehurst.wiremock.client.WireMock.putRequestedFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
+import static com.github.tomakehurst.wiremock.client.WireMock.urlMatching;
 import static com.github.tomakehurst.wiremock.client.WireMock.verify;
+import static no.nav.dokdisteformidling.consumer.eformidling.EformidlingConstants.TRYGDERETTEN_ORGNUMMER;
+import static no.nav.dokdisteformidling.testUtils.classpathToByteArray;
 import static no.nav.dokdisteformidling.testUtils.classpathToString;
 import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
 
@@ -40,218 +49,131 @@ import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
         webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureWireMock(port = 0)
 @ActiveProfiles("itest")
-@Disabled("Skal endres testen til å bruke AltinnBrokerService")
 public class Sdist001IT {
 
-    private static String CALL_ID;
-    private static String HENT_EFORMIDLINGSFORSENDELSER_URL = "/administrerforsendelse/henteformidlingforsendelser";
+    private static final Integer FORSENDELSE_ID = 1;
+    public static final String SCENARIO_BROKERSERVICEEXTERNAL = "brokerserviceexternal";
+    public static final String SCENARIO_STATE_GET_AVAILABLE_FILES_DONE = "GetAvailableFilesDone";
 
     @Inject
     private Sdist001Service sdist001Service;
 
     @BeforeEach
     public void setupBefore() {
-        CALL_ID = UUID.randomUUID().toString();
-
         WireMock.reset();
         WireMock.resetAllRequests();
         WireMock.removeAllMappings();
     }
 
     @Test
-    public void shouldHenteTomListeOk() throws Exception {
-        stubFor(get(HENT_EFORMIDLINGSFORSENDELSER_URL).willReturn(aResponse().withStatus(HttpStatus.OK.value())
-                .withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE)
-                .withBody(classpathToString("__files/rdist001/henteformidlingforsendelser-empty.json"))));
+    public void shouldOppdatereTilEkspedert() throws IOException {
+        stubPostMaskinporten();
+        stubGetServiceRegistry();
+        stubGetHentEformidlingForsendelserBEKREFTETStatus();
+        stubPostBrokerserviceExternalGetAvailableFiles();
+        stubPostBrokerServiceExternalStreamedDownloadFileStreamed();
+        stubGetAdministrerforsendleseHentForsendelse();
+        stubPostLagreJuridiskLogg();
+        stubPutAdministrerForsendelseOppdaterForsendelseTilEKSPEDERT();
+        stubPostBrokerserviceExternalConfirmDownloaded();
 
         sdist001Service.oppdatereDokDistEformidlingStatus();
-
-        verify(1, getRequestedFor(urlEqualTo(HENT_EFORMIDLINGSFORSENDELSER_URL)));
-    }
-
-    @Test
-    public void shouldNotContactIntegrationPointWhenIllegalForsendelseStatus() throws Exception {
-        stubFor(get(HENT_EFORMIDLINGSFORSENDELSER_URL).willReturn(aResponse().withStatus(HttpStatus.OK.value())
-                .withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE)
-                .withBody(classpathToString("__files/rdist001/henteformidlingforsendelser-illegalStatus.json"))));
-
-        sdist001Service.oppdatereDokDistEformidlingStatus();
-
-
-        verify(1, getRequestedFor(urlEqualTo(HENT_EFORMIDLINGSFORSENDELSER_URL)));
-    }
-
-    @Test
-    public void shouldSetForsendelseStatusOversendtToFeilet() throws Exception {
-        stubFor(get(HENT_EFORMIDLINGSFORSENDELSER_URL).willReturn(aResponse().withStatus(HttpStatus.OK.value())
-                .withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE)
-                .withBody(classpathToString("__files/rdist001/henteformidlingforsendelser-oversendtStatus.json"))));
-        stubFor(put("/administrerforsendelse?forsendelseId=1&forsendelseStatus=FEILET")
-                .willReturn(aResponse().withStatus(HttpStatus.OK.value())));
-
-        sdist001Service.oppdatereDokDistEformidlingStatus();
-
-
-        verify(1, getRequestedFor(urlEqualTo(HENT_EFORMIDLINGSFORSENDELSER_URL)));
-        verify(1, putRequestedFor(urlEqualTo("/administrerforsendelse?forsendelseId=1&forsendelseStatus=FEILET")));
-    }
-
-    @Test
-    public void shouldSetForsendelseStatusOversendtToBekreftet() throws Exception {
-        stubFor(get(HENT_EFORMIDLINGSFORSENDELSER_URL).willReturn(aResponse().withStatus(HttpStatus.OK.value())
-                .withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE)
-                .withBody(classpathToString("__files/rdist001/henteformidlingforsendelser-oversendtStatus.json"))));
-        stubFor(put("/administrerforsendelse?forsendelseId=1&forsendelseStatus=BEKREFTET")
-                .willReturn(aResponse().withStatus(HttpStatus.OK.value())));
-
-        sdist001Service.oppdatereDokDistEformidlingStatus();
-
-        verify(1, getRequestedFor(urlEqualTo(HENT_EFORMIDLINGSFORSENDELSER_URL)));
-        verify(1, putRequestedFor(urlEqualTo("/administrerforsendelse?forsendelseId=1&forsendelseStatus=BEKREFTET")));
-    }
-
-    @Test
-    public void shouldSetForsendelseStatusOversendtToEkspedert() throws Exception {
-        stubFor(get(HENT_EFORMIDLINGSFORSENDELSER_URL).willReturn(aResponse().withStatus(HttpStatus.OK.value())
-                .withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE)
-                .withBody(classpathToString("__files/rdist001/henteformidlingforsendelser-oversendtStatus.json"))));
-        stubFor(get("/administrerforsendelse/1").willReturn(aResponse().withStatus(HttpStatus.OK.value())
-                .withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE)
-                .withBody(classpathToString("__files/rdist001/getForsendelse-BEKREFTET.json")
-                        .replace("insertCallIdHere", CALL_ID))));
-        stubFor(post("/juridiskLogg").willReturn(aResponse().withStatus(HttpStatus.OK.value())
-                .withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE)
-                .withBody("{\"id\": \"123\"}")));
-        stubFor(put("/administrerforsendelse?forsendelseId=1&forsendelseStatus=EKSPEDERT")
-                .willReturn(aResponse().withStatus(HttpStatus.OK.value())));
-
-        sdist001Service.oppdatereDokDistEformidlingStatus();
-
-
-        verify(1, getRequestedFor(urlEqualTo(HENT_EFORMIDLINGSFORSENDELSER_URL)));
+        verify(1, postRequestedFor(urlEqualTo("/maskinporten")));
+        verify(1, getRequestedFor(urlEqualTo("/serviceregistry/identifier/" + TRYGDERETTEN_ORGNUMMER + "/process/" + EformidlingConstants.ARKIVMELDING_PROCESS)));
+        verify(1, getRequestedFor(urlEqualTo("/administrerforsendelse/henteformidlingforsendelser")));
+        verify(2, postRequestedFor(urlEqualTo("/brokerserviceexternal")));
+        verify(1, postRequestedFor(urlEqualTo("/brokerserviceexternalstreamed")));
         verify(1, getRequestedFor(urlEqualTo("/administrerforsendelse/1")));
         verify(1, postRequestedFor(urlEqualTo("/juridiskLogg")));
         verify(1, putRequestedFor(urlEqualTo("/administrerforsendelse?forsendelseId=1&forsendelseStatus=EKSPEDERT")));
     }
 
-    @Test
-    public void shouldSetForsendelseStatusBekreftetToFeilet() throws Exception {
-        stubFor(get(HENT_EFORMIDLINGSFORSENDELSER_URL).willReturn(aResponse().withStatus(HttpStatus.OK.value())
-                .withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE)
-                .withBody(classpathToString("__files/rdist001/henteformidlingforsendelser-bekreftetStatus.json"))));
-        stubFor(put("/administrerforsendelse?forsendelseId=1&forsendelseStatus=FEILET")
-                .willReturn(aResponse().withStatus(HttpStatus.OK.value())));
 
-        sdist001Service.oppdatereDokDistEformidlingStatus();
-
-
-        verify(1, getRequestedFor(urlEqualTo(HENT_EFORMIDLINGSFORSENDELSER_URL)));
-        verify(1, putRequestedFor(urlEqualTo("/administrerforsendelse?forsendelseId=1&forsendelseStatus=FEILET")));
+    private void stubPostMaskinporten() {
+        stubFor(post(urlMatching("/maskinporten"))
+                .willReturn(aResponse().withStatus(HttpStatus.OK.value())
+                        .withHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                        .withBodyFile("maskinporten/maskinporten_happy_response.json")));
     }
 
-    @Test
-    public void shouldSetForsendelseStatusBekreftetToEkspedert() throws Exception {
-        stubFor(get(HENT_EFORMIDLINGSFORSENDELSER_URL).willReturn(aResponse().withStatus(HttpStatus.OK.value())
-                .withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE)
-                .withBody(classpathToString("__files/rdist001/henteformidlingforsendelser-bekreftetStatus3.json"))));
-        stubFor(get("/administrerforsendelse/1").willReturn(aResponse().withStatus(HttpStatus.OK.value())
-                .withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE)
-                .withBody(classpathToString("__files/rdist001/getForsendelse-BEKREFTET.json")
-                        .replace("insertCallIdHere", CALL_ID))));
-        stubFor(put("/administrerforsendelse?forsendelseId=1&forsendelseStatus=EKSPEDERT")
-                .willReturn(aResponse().withStatus(HttpStatus.OK.value())));
-        stubFor(get("/administrerforsendelse/2").willReturn(aResponse().withStatus(HttpStatus.OK.value())
-                .withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE)
-                .withBody(classpathToString("__files/rdist001/getForsendelse-BEKREFTET.json")
-                        .replace("insertCallIdHere", CALL_ID))));
-        stubFor(put("/administrerforsendelse?forsendelseId=2&forsendelseStatus=EKSPEDERT")
-                .willReturn(aResponse().withStatus(HttpStatus.OK.value())));
-        stubFor(get("/administrerforsendelse/3").willReturn(aResponse().withStatus(HttpStatus.OK.value())
-                .withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE)
-                .withBody(classpathToString("__files/rdist001/getForsendelse-BEKREFTET.json")
-                        .replace("insertCallIdHere", CALL_ID))));
-        stubFor(put("/administrerforsendelse?forsendelseId=3&forsendelseStatus=EKSPEDERT")
-                .willReturn(aResponse().withStatus(HttpStatus.OK.value())));
-        stubFor(post("/juridiskLogg").willReturn(aResponse().withStatus(HttpStatus.OK.value())
-                .withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE)
-                .withBody("{\"id\": \"123\"}")));
-
-        sdist001Service.oppdatereDokDistEformidlingStatus();
-
-
-        verify(1, getRequestedFor(urlEqualTo(HENT_EFORMIDLINGSFORSENDELSER_URL)));
-        verify(1, getRequestedFor(urlEqualTo("/administrerforsendelse/1")));
-        verify(1, getRequestedFor(urlEqualTo("/administrerforsendelse/2")));
-        verify(1, getRequestedFor(urlEqualTo("/administrerforsendelse/3")));
-        verify(3, postRequestedFor(urlEqualTo("/juridiskLogg")));
-        verify(1, putRequestedFor(urlEqualTo("/administrerforsendelse?forsendelseId=1&forsendelseStatus=EKSPEDERT")));
-        verify(1, putRequestedFor(urlEqualTo("/administrerforsendelse?forsendelseId=2&forsendelseStatus=EKSPEDERT")));
-        verify(1, putRequestedFor(urlEqualTo("/administrerforsendelse?forsendelseId=3&forsendelseStatus=EKSPEDERT")));
+    private void stubGetServiceRegistry() {
+        stubFor(get(urlMatching("/serviceregistry/identifier/" + EformidlingConstants.TRYGDERETTEN_ORGNUMMER + "/process/" + EformidlingConstants.ARKIVMELDING_PROCESS))
+                .willReturn(aResponse().withStatus(HttpStatus.OK.value())
+                        .withHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                        .withBodyFile("serviceregistry/serviceregistry_happy_response.json")));
     }
 
-    @Test
-    public void shouldProcessAllForsendelserWhenFunctionalException() throws Exception {
-        stubFor(get(HENT_EFORMIDLINGSFORSENDELSER_URL).willReturn(aResponse().withStatus(HttpStatus.OK.value())
-                .withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE)
-                .withBody(classpathToString("__files/rdist001/henteformidlingforsendelser-bekreftetStatus2.json"))));
-        stubFor(get("/administrerforsendelse/2").willReturn(aResponse().withStatus(HttpStatus.OK.value())
-                .withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE)
-                .withBody(classpathToString("__files/rdist001/getForsendelse-BEKREFTET.json")
-                        .replace("insertCallIdHere", CALL_ID))));
-        stubFor(put("/administrerforsendelse?forsendelseId=2&forsendelseStatus=EKSPEDERT")
-                .willReturn(aResponse().withStatus(HttpStatus.OK.value())));
-        stubFor(post("/juridiskLogg").willReturn(aResponse().withStatus(HttpStatus.OK.value())
-                .withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE)
-                .withBody("{\"id\": \"123\"}")));
-
-        sdist001Service.oppdatereDokDistEformidlingStatus();
-
-
-        verify(1, getRequestedFor(urlEqualTo(HENT_EFORMIDLINGSFORSENDELSER_URL)));
-        verify(0, getRequestedFor(urlEqualTo("/administrerforsendelse/1")));
-        verify(1, getRequestedFor(urlEqualTo("/administrerforsendelse/2")));
-        verify(1, postRequestedFor(urlEqualTo("/juridiskLogg")));
-        verify(0, putRequestedFor(urlEqualTo("/administrerforsendelse?forsendelseId=1&forsendelseStatus=EKSPEDERT")));
-        verify(1, putRequestedFor(urlEqualTo("/administrerforsendelse?forsendelseId=2&forsendelseStatus=EKSPEDERT")));
+    private void stubGetHentEformidlingForsendelserBEKREFTETStatus() {
+        stubFor(get("/administrerforsendelse/henteformidlingforsendelser")
+                .willReturn(aResponse().withStatus(HttpStatus.OK.value())
+                        .withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE)
+                        .withBodyFile("rdist001/henteformidlingforsendelser-bekreftetStatus.json")));
     }
 
-    @Test
-    public void shouldStopProcessingWhenTechnicalException() throws Exception {
-        stubFor(get(HENT_EFORMIDLINGSFORSENDELSER_URL).willReturn(aResponse().withStatus(HttpStatus.OK.value())
-                .withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE)
-                .withBody(classpathToString("__files/rdist001/henteformidlingforsendelser-bekreftetStatus2.json"))));
-
-        sdist001Service.oppdatereDokDistEformidlingStatus();
-
-        verify(1, getRequestedFor(urlEqualTo(HENT_EFORMIDLINGSFORSENDELSER_URL)));
-        verify(0, getRequestedFor(urlEqualTo("/administrerforsendelse/1")));
-        verify(0, getRequestedFor(urlEqualTo("/administrerforsendelse/2")));
-        verify(0, postRequestedFor(urlEqualTo("/juridiskLogg")));
-        verify(0, putRequestedFor(urlEqualTo("/administrerforsendelse?forsendelseId=1&forsendelseStatus=EKSPEDERT")));
-        verify(0, putRequestedFor(urlEqualTo("/administrerforsendelse?forsendelseId=2&forsendelseStatus=EKSPEDERT")));
+    private void stubPostBrokerserviceExternalGetAvailableFiles() {
+        stubFor(post(urlEqualTo("/brokerserviceexternal"))
+                .inScenario(SCENARIO_BROKERSERVICEEXTERNAL)
+                .whenScenarioStateIs(Scenario.STARTED)
+                .willSetStateTo(SCENARIO_STATE_GET_AVAILABLE_FILES_DONE)
+                .willReturn(aResponse().withStatus(HttpStatus.OK.value())
+                        .withHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_XML_VALUE)
+                        .withBodyFile("altinn/brokerserviceexternal/getavailablefiles_happy_response.xml")));
     }
 
-    @Test
-    public void shouldUseLatestIntegrasjonspunktStatus() throws Exception {
-        stubFor(get(HENT_EFORMIDLINGSFORSENDELSER_URL).willReturn(aResponse().withStatus(HttpStatus.OK.value())
+    private void stubPostBrokerServiceExternalStreamedDownloadFileStreamed() throws IOException {
+        String boundary = "uuid:c678c2f3-c620-4d19-9884-fc1c36c1d29a+id=174513";
+
+        stubFor(post(urlMatching("/brokerserviceexternalstreamed"))
+                .willReturn(aResponse().withStatus(HttpStatus.OK.value())
+                        .withHeader(HttpHeaders.CONTENT_TYPE, String.format("multipart/related; type=\"application/xop+xml\"; start=\"<http://tempuri.org/1>\"; boundary=\"%s\"; start-info=\"text/xml\"", boundary))
+                        .withHeader(HttpHeaders.TRANSFER_ENCODING, "chunked")
+                        .withHeader("MIME-Version", "1.0")
+                        .withBody(getDownloadBody(boundary))));
+    }
+
+    private byte[] getDownloadBody(String boundary) throws IOException {
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        final Charset utf8 = StandardCharsets.UTF_8;
+        IOUtils.write("--" + boundary + "\r\n", bos, utf8);
+        IOUtils.write("Content-ID: <http://tempuri.org/1>\r\n", bos, utf8);
+        IOUtils.write("Content-Transfer-Encoding: 8bit\r\n", bos, utf8);
+        IOUtils.write("Content-Type: application/xop+xml; charset=UTF-8; type=\"text/xml\"\r\n", bos, utf8);
+        IOUtils.write("\r\n", bos, utf8);
+        IOUtils.write(classpathToString("__files/altinn/brokerserviceexternalstreamed/downloadfilestreamed_happy_response.xml"), bos, utf8);
+        IOUtils.write("\r\n", bos, utf8);
+        IOUtils.write("--" + boundary + "\r\n", bos, utf8);
+        IOUtils.write("Content-ID: <http://tempuri.org/1/***gammelt_fnr***7559832>\r\n", bos, utf8);
+        IOUtils.write("Content-Transfer-Encoding: binary\r\n", bos, utf8);
+        IOUtils.write("Content-Type: application/octet-stream\r\n", bos, utf8);
+        IOUtils.write("\r\n", bos, utf8);
+        IOUtils.write(classpathToByteArray("__files/zip/altinn_sbd_kvittering_LEST.zip"), bos);
+        IOUtils.write("\r\n", bos, utf8);
+        IOUtils.write("--" + boundary, bos, utf8);
+        return bos.toByteArray();
+    }
+
+    private void stubGetAdministrerforsendleseHentForsendelse() {
+        stubFor(get("/administrerforsendelse/" + FORSENDELSE_ID).willReturn(aResponse().withStatus(HttpStatus.OK.value())
                 .withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE)
-                .withBody(classpathToString("__files/rdist001/henteformidlingforsendelser-bekreftetStatus.json"))));
-        stubFor(get("/administrerforsendelse/1").willReturn(aResponse().withStatus(HttpStatus.OK.value())
-                .withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE)
-                .withBody(classpathToString("__files/rdist001/getForsendelse-BEKREFTET.json")
-                        .replace("insertCallIdHere", CALL_ID))));
-        stubFor(put("/administrerforsendelse?forsendelseId=1&forsendelseStatus=EKSPEDERT")
+                .withBodyFile("rdist001/getForsendelse-BEKREFTET.json")));
+    }
+
+    private void stubPostLagreJuridiskLogg() {
+        stubFor(post(urlMatching("/juridiskLogg")).willReturn(aResponse().withStatus(HttpStatus.OK.value())));
+    }
+
+    private void stubPutAdministrerForsendelseOppdaterForsendelseTilEKSPEDERT() {
+        stubFor(put("/administrerforsendelse?forsendelseId=" + FORSENDELSE_ID + "&forsendelseStatus=EKSPEDERT")
                 .willReturn(aResponse().withStatus(HttpStatus.OK.value())));
-        stubFor(post("/juridiskLogg").willReturn(aResponse().withStatus(HttpStatus.OK.value())
-                .withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE)
-                .withBody("{\"id\": \"123\"}")));
+    }
 
-        sdist001Service.oppdatereDokDistEformidlingStatus();
-
-
-        verify(1, getRequestedFor(urlEqualTo(HENT_EFORMIDLINGSFORSENDELSER_URL)));
-        verify(1, getRequestedFor(urlEqualTo("/administrerforsendelse/1")));
-        verify(1, postRequestedFor(urlEqualTo("/juridiskLogg")));
-        verify(1, putRequestedFor(urlEqualTo("/administrerforsendelse?forsendelseId=1&forsendelseStatus=EKSPEDERT")));
+    private void stubPostBrokerserviceExternalConfirmDownloaded() {
+        stubFor(post(urlEqualTo("/brokerserviceexternal"))
+                .inScenario(SCENARIO_BROKERSERVICEEXTERNAL)
+                .whenScenarioStateIs(SCENARIO_STATE_GET_AVAILABLE_FILES_DONE)
+                .willReturn(aResponse()
+                        .withStatus(HttpStatus.OK.value())
+                        .withHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_XML_VALUE)
+                        .withBodyFile("altinn/brokerserviceexternal/confirmdownloaded_happy_response.xml")));
     }
 }

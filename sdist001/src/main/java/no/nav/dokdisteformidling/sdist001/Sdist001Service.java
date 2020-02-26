@@ -11,7 +11,6 @@ import no.nav.dokdisteformidling.consumer.rdist001.AdministrerForsendelse;
 import no.nav.dokdisteformidling.consumer.rdist001.HentEformidlingforsendelserResponseTo;
 import no.nav.dokdisteformidling.consumer.rdist001.HentForsendelseResponseTo;
 import no.nav.dokdisteformidling.exception.functional.KunneIkkeSerialisereEformidlingstatusoppdateringTilJson;
-import no.nav.dokdisteformidling.exception.technical.FantIkkeEformidlingforsendelserException;
 import no.nav.dokdisteformidling.metrics.Monitor;
 import no.nav.dokdisteformidling.sdist001.domain.EformidlingStatusOppdatering;
 import no.nav.dokdisteformidling.sdist001.domain.ForsendelseStatusEndringer;
@@ -19,7 +18,6 @@ import no.nav.dokdisteformidling.sdist001.domain.to.AltinnKvitteringStatus;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static no.nav.dokdisteformidling.sdist001.domain.to.ForsendelseStatus.BEKREFTET;
 import static no.nav.dokdisteformidling.sdist001.domain.to.ForsendelseStatus.EKSPEDERT;
@@ -38,7 +36,6 @@ public class Sdist001Service {
     private final JuridiskLogg juridiskLogg;
     private final LagreJuridiskLoggMapper lagreJuridiskLoggMapper;
     private final EformidlingStatusOppdateringMapper eformidlingStatusOppdateringMapper;
-    private AltinnKvitteringStatus altinnKvitteringStatus;
     private final ForsendelseStatusEndringer forsendelseStatusEndringer;
 
     public Sdist001Service(AdministrerForsendelse administrerForsendelse,
@@ -57,10 +54,10 @@ public class Sdist001Service {
     public void oppdatereDokDistEformidlingStatus() {
         forsendelseStatusEndringer.clear();
         List<HentEformidlingforsendelserResponseTo.ForsendelseTo> forsendelserTo = administrerForsendelse.hentEformidlingForsendelser().getForsendelser();
-        log.info("Hentet eformidlingforsendelser fra rdist001 {} ",forsendelserTo);
-        eformidling.hent().stream()
+        log.info("Hentet eformidlingforsendelser fra rdist001 {} ", forsendelserTo);
+        eformidling.hent()
                 .forEach(downloadResponse -> {
-                    log.info(String.format("Hentet trygderetten kvittering melding fra Altinn med konversasjonId=%s, SendersReference=%s,KvitteringStatus=%s",
+                    log.info(String.format("Hentet trygderetten kvittering melding fra Altinn med konversasjonId=%s, SendersReference=%s, KvitteringStatus=%s",
                             downloadResponse.getConversationId(), downloadResponse.getSendersReference(), downloadResponse.getKvitteringStatus()));
                     forsendelserTo.stream()
                             .filter(forsendelseTo -> downloadResponse.getConversationId().equals(forsendelseTo.getKonversasjonId()))
@@ -97,8 +94,7 @@ public class Sdist001Service {
     }
 
     private void oppdaterEformidlingStatus(String kvitteringStatus, String konversasjonId, String forsendelseId, String forsendelseStatus) {
-
-        altinnKvitteringStatus = AltinnKvitteringStatus.valueOf(kvitteringStatus);
+        AltinnKvitteringStatus altinnKvitteringStatus = AltinnKvitteringStatus.valueOf(kvitteringStatus);
         switch (altinnKvitteringStatus) {
             case SENDT:
                 administrerForsendelse.oppdaterForsendelseStatus(forsendelseId, BEKREFTET.name());
@@ -113,7 +109,7 @@ public class Sdist001Service {
             case FAIL:
                 break;
             case LEVETID_UTLOPT:
-                log.error("Avvik har oppstått for forsendelseId={},konversasjonId={}. Forsendelsen settes til FEILET.", forsendelseId, konversasjonId);
+                log.error("Avvik har oppstått for forsendelseId={}, konversasjonId={}. Forsendelsen settes til FEILET.", forsendelseId, konversasjonId);
                 administrerForsendelse.oppdaterForsendelseStatus(forsendelseId, FEIL.name());
                 forsendelseStatusEndringer.getFeilet().add(forsendelseId);
                 break;
