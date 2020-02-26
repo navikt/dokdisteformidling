@@ -50,6 +50,8 @@ import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
 public class Sdist001IT {
 
     private static final Integer FORSENDELSE_ID = 1;
+    public static final String SCENARIO_BROKERSERVICEEXTERNAL = "brokerserviceexternal";
+    public static final String SCENARIO_STATE_GET_AVAILABLE_FILES_DONE = "GetAvailableFilesDone";
 
     @Inject
     private Sdist001Service sdist001Service;
@@ -73,7 +75,6 @@ public class Sdist001IT {
         stubPutAdministrerForsendelseOppdaterForsendelseTilEKSPEDERT();
         stubPostBrokerserviceExternalConfirmDownloaded();
 
-
         sdist001Service.oppdatereDokDistEformidlingStatus();
         verify(1, postRequestedFor(urlEqualTo("/maskinporten")));
         verify(1, getRequestedFor(urlEqualTo("/serviceregistry/identifier/" + TRYGDERETTEN_ORGNUMMER + "/process/" + EformidlingConstants.ARKIVMELDING_PROCESS)));
@@ -90,31 +91,31 @@ public class Sdist001IT {
         stubFor(post(urlMatching("/maskinporten"))
                 .willReturn(aResponse().withStatus(HttpStatus.OK.value())
                         .withHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-                        .withBody(classpathToString("__files/maskinporten/maskinporten_happy_response.json"))));
+                        .withBodyFile("maskinporten/maskinporten_happy_response.json")));
     }
 
     private void stubGetServiceRegistry() {
         stubFor(get(urlMatching("/serviceregistry/identifier/" + EformidlingConstants.TRYGDERETTEN_ORGNUMMER + "/process/" + EformidlingConstants.ARKIVMELDING_PROCESS))
                 .willReturn(aResponse().withStatus(HttpStatus.OK.value())
                         .withHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-                        .withBody(classpathToString("__files/serviceregistry/serviceregistry_happy_response.json"))));
+                        .withBodyFile("serviceregistry/serviceregistry_happy_response.json")));
     }
 
     private void stubGetHentEformidlingForsendelserBEKREFTETStatus() {
         stubFor(get("/administrerforsendelse/henteformidlingforsendelser")
                 .willReturn(aResponse().withStatus(HttpStatus.OK.value())
                         .withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE)
-                        .withBody(classpathToString("__files/rdist001/henteformidlingforsendelser-bekreftetStatus.json"))));
+                        .withBodyFile("rdist001/henteformidlingforsendelser-bekreftetStatus.json")));
     }
 
     private void stubPostBrokerserviceExternalGetAvailableFiles() {
         stubFor(post(urlEqualTo("/brokerserviceexternal"))
-                .inScenario("brokerserviceexternal")
+                .inScenario(SCENARIO_BROKERSERVICEEXTERNAL)
                 .whenScenarioStateIs(Scenario.STARTED)
+                .willSetStateTo(SCENARIO_STATE_GET_AVAILABLE_FILES_DONE)
                 .willReturn(aResponse().withStatus(HttpStatus.OK.value())
                         .withHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_XML_VALUE)
-                        .withBody(classpathToString("__files/altinn/brokerserviceexternal/getavailablefiles_happy_response.xml")))
-                .willSetStateTo("GetAvailableFilesDone"));
+                        .withBodyFile("altinn/brokerserviceexternal/getavailablefiles_happy_response.xml")));
     }
 
     private void stubPostBrokerServiceExternalStreamedDownloadFileStreamed() throws IOException {
@@ -136,7 +137,7 @@ public class Sdist001IT {
             pw.println("Content-Transfer-Encoding: 8bit");
             pw.println("Content-Type: application/xop+xml;charset=utf-8;type=\"text/xml\"");
             pw.println();
-            pw.println("<s:Envelope xmlns:s=\"http://schemas.xmlsoap.org/soap/envelope/\"><s:Body><DownloadFileStreamedResponse xmlns=\"http://www.altinn.no/services/ServiceEngine/Broker/2015/06\"><DownloadFileStreamedResult><xop:Include href=\"cid:http://tempuri.org/1/***gammelt_fnr***7559832\" xmlns:xop=\"http://www.w3.org/2004/08/xop/include\"/></DownloadFileStreamedResult></DownloadFileStreamedResponse></s:Body></s:Envelope>");
+            pw.println(classpathToString("__files/altinn/brokerserviceexternalstreamed/downloadfilestreamed_happy_response.xml"));
             pw.println();
             pw.println("--" + boundary);
             pw.println("Content-ID: <http://tempuri.org/1/***gammelt_fnr***7559832>");
@@ -158,7 +159,7 @@ public class Sdist001IT {
     private void stubGetAdministrerforsendleseHentForsendelse() {
         stubFor(get("/administrerforsendelse/" + FORSENDELSE_ID).willReturn(aResponse().withStatus(HttpStatus.OK.value())
                 .withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE)
-                .withBody(classpathToString("__files/rdist001/getForsendelse-BEKREFTET.json"))));
+                .withBodyFile("rdist001/getForsendelse-BEKREFTET.json")));
     }
 
     private void stubPostLagreJuridiskLogg() {
@@ -172,11 +173,11 @@ public class Sdist001IT {
 
     private void stubPostBrokerserviceExternalConfirmDownloaded() {
         stubFor(post(urlEqualTo("/brokerserviceexternal"))
-                .inScenario("brokerserviceexternal")
-                .whenScenarioStateIs("GetAvailableFilesDone")
+                .inScenario(SCENARIO_BROKERSERVICEEXTERNAL)
+                .whenScenarioStateIs(SCENARIO_STATE_GET_AVAILABLE_FILES_DONE)
                 .willReturn(aResponse()
                         .withStatus(HttpStatus.OK.value())
                         .withHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_XML_VALUE)
-                        .withBody(classpathToString("__files/altinn/brokerserviceexternal/confirmdownloaded_happy_response.xml"))));
+                        .withBodyFile("altinn/brokerserviceexternal/confirmdownloaded_happy_response.xml")));
     }
 }
