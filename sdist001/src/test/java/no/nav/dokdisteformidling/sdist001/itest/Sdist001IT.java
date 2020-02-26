@@ -5,6 +5,7 @@ import com.github.tomakehurst.wiremock.stubbing.Scenario;
 import no.nav.dokdisteformidling.consumer.eformidling.EformidlingConstants;
 import no.nav.dokdisteformidling.sdist001.Sdist001Service;
 import no.nav.dokdisteformidling.sdist001.itest.config.ApplicationTestConfig;
+import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpHeaders;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -20,7 +21,8 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import javax.inject.Inject;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.PrintWriter;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.get;
@@ -123,7 +125,7 @@ public class Sdist001IT {
 
         stubFor(post(urlMatching("/brokerserviceexternalstreamed"))
                 .willReturn(aResponse().withStatus(HttpStatus.OK.value())
-                        .withHeader(HttpHeaders.CONTENT_TYPE, String.format("multipart/related; type=\"application/xop+xml\";start=\"<http://tempuri.org/1>\";boundary=\"%s\";start-info=\"text/xml\"", boundary))
+                        .withHeader(HttpHeaders.CONTENT_TYPE, String.format("multipart/related; type=\"application/xop+xml\"; start=\"<http://tempuri.org/1>\"; boundary=\"%s\"; start-info=\"text/xml\"", boundary))
                         .withHeader(HttpHeaders.TRANSFER_ENCODING, "chunked")
                         .withHeader("MIME-Version", "1.0")
                         .withBody(getDownloadBody(boundary))));
@@ -131,29 +133,23 @@ public class Sdist001IT {
 
     private byte[] getDownloadBody(String boundary) throws IOException {
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
-        try (PrintWriter pw = new PrintWriter(bos)) {
-            pw.println("--" + boundary);
-            pw.println("Content-ID: <http://tempuri.org/1>");
-            pw.println("Content-Transfer-Encoding: 8bit");
-            pw.println("Content-Type: application/xop+xml;charset=utf-8;type=\"text/xml\"");
-            pw.println();
-            pw.println(classpathToString("__files/altinn/brokerserviceexternalstreamed/downloadfilestreamed_happy_response.xml"));
-            pw.println();
-            pw.println("--" + boundary);
-            pw.println("Content-ID: <http://tempuri.org/1/***gammelt_fnr***7559832>");
-            pw.println("Content-Transfer-Encoding: binary");
-            pw.println("Content-Type: application/octet-stream");
-            pw.println();
-            pw.flush();
-            bos.write(classpathToByteArray("__files/zip/altinn_sbd_kvittering_LEST.zip"));
-            bos.flush();
-            pw.println();
-            pw.println("--" + boundary);
-            pw.flush();
-        }
-
+        final Charset utf8 = StandardCharsets.UTF_8;
+        IOUtils.write("--" + boundary + "\r\n", bos, utf8);
+        IOUtils.write("Content-ID: <http://tempuri.org/1>\r\n", bos, utf8);
+        IOUtils.write("Content-Transfer-Encoding: 8bit\r\n", bos, utf8);
+        IOUtils.write("Content-Type: application/xop+xml; charset=UTF-8; type=\"text/xml\"\r\n", bos, utf8);
+        IOUtils.write("\r\n", bos, utf8);
+        IOUtils.write(classpathToString("__files/altinn/brokerserviceexternalstreamed/downloadfilestreamed_happy_response.xml"), bos, utf8);
+        IOUtils.write("\r\n", bos, utf8);
+        IOUtils.write("--" + boundary + "\r\n", bos, utf8);
+        IOUtils.write("Content-ID: <http://tempuri.org/1/***gammelt_fnr***7559832>\r\n", bos, utf8);
+        IOUtils.write("Content-Transfer-Encoding: binary\r\n", bos, utf8);
+        IOUtils.write("Content-Type: application/octet-stream\r\n", bos, utf8);
+        IOUtils.write("\r\n", bos, utf8);
+        IOUtils.write(classpathToByteArray("__files/zip/altinn_sbd_kvittering_LEST.zip"), bos);
+        IOUtils.write("\r\n", bos, utf8);
+        IOUtils.write("--" + boundary, bos, utf8);
         return bos.toByteArray();
-
     }
 
     private void stubGetAdministrerforsendleseHentForsendelse() {
