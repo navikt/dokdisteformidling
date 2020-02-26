@@ -122,7 +122,7 @@ public class Sdist001IT {
 
         stubFor(post(urlMatching("/brokerserviceexternalstreamed"))
                 .willReturn(aResponse().withStatus(HttpStatus.OK.value())
-                        .withHeader(HttpHeaders.CONTENT_TYPE, String.format("multipart/related; type=\"application/xop+xml\";start=\"<http://tempuri.org/0>\";boundary=\"%s\";start-info=\"text/xml\"", boundary))
+                        .withHeader(HttpHeaders.CONTENT_TYPE, String.format("multipart/related; type=\"application/xop+xml\";start=\"<http://tempuri.org/1>\";boundary=\"%s\";start-info=\"text/xml\"", boundary))
                         .withHeader(HttpHeaders.TRANSFER_ENCODING, "chunked")
                         .withHeader("MIME-Version", "1.0")
                         .withBody(getDownloadBody(boundary))));
@@ -132,7 +132,7 @@ public class Sdist001IT {
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
         try (PrintWriter pw = new PrintWriter(bos)) {
             pw.println("--" + boundary);
-            pw.println("Content-ID: <http://tempuri.org/0>");
+            pw.println("Content-ID: <http://tempuri.org/1>");
             pw.println("Content-Transfer-Encoding: 8bit");
             pw.println("Content-Type: application/xop+xml;charset=utf-8;type=\"text/xml\"");
             pw.println();
