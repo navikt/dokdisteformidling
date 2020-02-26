@@ -100,7 +100,7 @@ public class BrokerServiceExternalStreamedService {
         InputStream inputStream;
         try {
             inputStream = dataHandler.getInputStream();
-        } catch (IOException e) {
+        } catch (IOException | IllegalStateException e) {
             log.error(ALTINN_AVLESING_AV_MELDING_FEILET, e);
             throw new DokumentpakkingException(ALTINN_AVLESING_AV_MELDING_FEILET, e);
         }
@@ -109,14 +109,14 @@ public class BrokerServiceExternalStreamedService {
 
     @Monitor(value = "dok_metric", extraTags = {"process", "brokerServiceExternalStreamedServiceDownloadFile"}, histogram = true, percentiles = {0.5, 0.95})
     public DataHandler downloadFile(String filreferanse) {
-        log.info("Laster ned fil med referansenummer: " + filreferanse);
+        log.info("Laster ned fil fra Altinn med filreferanse=" + filreferanse);
         try {
-            return brokerServiceExternalStreamed.downloadFileStreamed(filreferanse, NAV_ORGNUMMER);// reportee = NAV_ORGNUMMER
+            final DataHandler dataHandler = brokerServiceExternalStreamed.downloadFileStreamed(filreferanse, NAV_ORGNUMMER);
+            log.info("Lastet ned fil fra Altinn med filreferanse=" + filreferanse);
+            return dataHandler;
         } catch (IBrokerServiceExternalStreamedDownloadFileStreamedAltinnFaultFaultFaultMessage e) {
             log.error(ALTINN_NEDLASTING_FEILET, from(e));
             throw new AltinnBrokerServiceWsException(ALTINN_NEDLASTING_FEILET, AltinnReasonFactory.from(e), e);
-        } finally {
-            log.info("Lastet ned fil med referansenummer: " + filreferanse);
         }
     }
 }

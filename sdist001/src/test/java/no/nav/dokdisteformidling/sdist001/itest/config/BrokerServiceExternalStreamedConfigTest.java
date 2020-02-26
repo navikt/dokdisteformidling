@@ -12,8 +12,6 @@ import no.nav.dokdisteformidling.config.props.DpoUserProperties;
 import org.apache.cxf.Bus;
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.frontend.ClientProxy;
-import org.apache.cxf.interceptor.LoggingInInterceptor;
-import org.apache.cxf.interceptor.LoggingOutInterceptor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
@@ -40,9 +38,6 @@ public class BrokerServiceExternalStreamedConfigTest extends AbstractCxfEndpoint
         addInInterceptor(new CookiesInInterceptor());
         addOutInterceptor(new HeaderOutInterceptor());
         addOutInterceptor(new CookiesOutInterceptor());
-        // TODO remove
-        addInInterceptor(new LoggingInInterceptor());
-        addOutInterceptor(new LoggingOutInterceptor());
 
         IBrokerServiceExternalStreamed iBrokerServiceExternalStreamed = createPort(IBrokerServiceExternalStreamed.class);
         final Client client = ClientProxy.getClient(iBrokerServiceExternalStreamed);
