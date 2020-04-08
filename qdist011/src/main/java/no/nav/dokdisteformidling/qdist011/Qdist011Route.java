@@ -22,6 +22,7 @@ import org.springframework.stereotype.Component;
 import javax.inject.Inject;
 import javax.jms.Queue;
 import javax.xml.bind.JAXBContext;
+import java.nio.charset.UnmappableCharacterException;
 
 
 /**
@@ -71,7 +72,23 @@ public class Qdist011Route extends SpringRouteBuilder {
 				.handled(true)
 				.useOriginalMessage()
 				.log(LoggingLevel.WARN, log, "${exception}; " + getIdsForLogging())
+				.process(exchange -> {
+					exchange.getIn().getBody();
+				})
 				.to("jms:" + qdist011FunksjonellFeil.getQueueName());
+
+		//Egen håndtering av denne type feil for å unngå logging av hele brev
+		onException(UnmappableCharacterException.class)
+				.log(LoggingLevel.WARN, log, "UnmappableCharachterException oppstått i qdist011 for " + getIdsForLogging() + ". Melding sendes til funksjonell feilkø.")
+				.useOriginalMessage()
+				.logExhaustedMessageBody(false)
+				.logExhaustedMessageHistory(false)
+				.logStackTrace(false)
+				.process(exchange -> {
+					exchange.getIn().getBody();
+				})
+				.to("jms:" + qdist011FunksjonellFeil.getQueueName())
+				.handled(true);
 
 		from("jms:" + qdist011.getQueueName() + "?transacted=true&concurrentConsumers=1")
 				.routeId(QDIST011_SERVICE_ID)
