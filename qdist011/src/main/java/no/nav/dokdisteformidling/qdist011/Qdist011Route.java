@@ -72,23 +72,17 @@ public class Qdist011Route extends SpringRouteBuilder {
 				.handled(true)
 				.useOriginalMessage()
 				.log(LoggingLevel.WARN, log, "${exception}; " + getIdsForLogging())
-				.process(exchange -> {
-					exchange.getIn().getBody();
-				})
 				.to("jms:" + qdist011FunksjonellFeil.getQueueName());
 
 		//Egen håndtering av denne type feil for å unngå logging av hele brev
 		onException(UnmappableCharacterException.class)
-				.log(LoggingLevel.WARN, log, "UnmappableCharachterException oppstått i qdist011 for " + getIdsForLogging() + ". Melding sendes til funksjonell feilkø.")
+				.log(LoggingLevel.WARN, log, "UnmappableCharachterException oppstått i qdist011 for forsendelse med " + getIdsForLogging() + ". Melding sendt til funksjonell feilkø.")
 				.useOriginalMessage()
 				.logExhaustedMessageBody(false)
 				.logExhaustedMessageHistory(false)
 				.logStackTrace(false)
-				.process(exchange -> {
-					exchange.getIn().getBody();
-				})
-				.to("jms:" + qdist011FunksjonellFeil.getQueueName())
-				.handled(true);
+				.handled(true)
+				.to("jms:" + qdist011FunksjonellFeil.getQueueName());
 
 		from("jms:" + qdist011.getQueueName() + "?transacted=true&concurrentConsumers=1")
 				.routeId(QDIST011_SERVICE_ID)
