@@ -71,6 +71,7 @@ public class Qdist011Route extends SpringRouteBuilder {
 		onException(AbstractDokdisteformidlingFunctionalException.class, ValidationException.class)
 				.handled(true)
 				.useOriginalMessage()
+				.logExhaustedMessageBody(false)
 				.log(LoggingLevel.WARN, log, "${exception}; " + getIdsForLogging())
 				.to("jms:" + qdist011FunksjonellFeil.getQueueName());
 
