@@ -7,6 +7,7 @@ import static no.nav.dokdisteformidling.constants.RouteConstants.QDIST011_SERVIC
 import static org.apache.camel.LoggingLevel.ERROR;
 
 import com.google.common.base.Charsets;
+import com.ibm.msg.client.jms.DetailedJMSException;
 import no.nav.dokdisteformidling.common.DokdistAdministrerForsendelseUpdater;
 import no.nav.dokdisteformidling.common.IdsProcessor;
 import no.nav.dokdisteformidling.exception.functional.AbstractDokdisteformidlingFunctionalException;
@@ -22,7 +23,6 @@ import org.springframework.stereotype.Component;
 import javax.inject.Inject;
 import javax.jms.Queue;
 import javax.xml.bind.JAXBContext;
-import java.nio.charset.UnmappableCharacterException;
 
 
 /**
@@ -75,8 +75,8 @@ public class Qdist011Route extends SpringRouteBuilder {
 				.to("jms:" + qdist011FunksjonellFeil.getQueueName());
 
 		//Egen håndtering av denne type feil for å unngå logging av hele brev
-		onException(UnmappableCharacterException.class)
-				.log(LoggingLevel.WARN, log, "UnmappableCharachterException oppstått i qdist011 for forsendelse med " + getIdsForLogging() + ". Melding sendt til funksjonell feilkø.")
+		onException(DetailedJMSException.class)
+				.log(LoggingLevel.WARN, log, "DetailedJMSException oppstått i qdist011 for forsendelse med " + getIdsForLogging() + ". Melding sendt til funksjonell feilkø.")
 				.useOriginalMessage()
 				.logExhaustedMessageBody(false)
 				.logExhaustedMessageHistory(false)
