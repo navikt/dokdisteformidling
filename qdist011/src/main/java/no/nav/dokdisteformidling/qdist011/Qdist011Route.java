@@ -7,6 +7,7 @@ import static no.nav.dokdisteformidling.constants.RouteConstants.QDIST011_SERVIC
 import static org.apache.camel.LoggingLevel.ERROR;
 
 import com.google.common.base.Charsets;
+import com.ibm.msg.client.jms.DetailedJMSException;
 import no.nav.dokdisteformidling.common.DokdistAdministrerForsendelseUpdater;
 import no.nav.dokdisteformidling.common.IdsProcessor;
 import no.nav.dokdisteformidling.exception.functional.AbstractDokdisteformidlingFunctionalException;
@@ -70,7 +71,18 @@ public class Qdist011Route extends SpringRouteBuilder {
 		onException(AbstractDokdisteformidlingFunctionalException.class, ValidationException.class)
 				.handled(true)
 				.useOriginalMessage()
+				.logExhaustedMessageBody(false)
 				.log(LoggingLevel.WARN, log, "${exception}; " + getIdsForLogging())
+				.to("jms:" + qdist011FunksjonellFeil.getQueueName());
+
+		//Egen håndtering av denne type feil for å unngå logging av hele brev i prod
+		onException(DetailedJMSException.class)
+				.log(LoggingLevel.WARN, "DetailedJMSException oppstått i qdist011 for forsendelse med " + getIdsForLogging() + ". Melding sendt til funksjonell feilkø.")
+				.useOriginalMessage()
+				.logExhaustedMessageBody(false)
+				.logExhaustedMessageHistory(false)
+				.logStackTrace(false)
+				.handled(true)
 				.to("jms:" + qdist011FunksjonellFeil.getQueueName());
 
 		from("jms:" + qdist011.getQueueName() + "?transacted=true&concurrentConsumers=1")
