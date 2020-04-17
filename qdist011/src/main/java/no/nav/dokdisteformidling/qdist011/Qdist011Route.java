@@ -11,7 +11,6 @@ import com.ibm.msg.client.jms.DetailedJMSException;
 import no.nav.dokdisteformidling.common.DokdistAdministrerForsendelseUpdater;
 import no.nav.dokdisteformidling.common.IdsProcessor;
 import no.nav.dokdisteformidling.exception.functional.AbstractDokdisteformidlingFunctionalException;
-import no.nav.dokdisteformidling.exception.technical.Qdist011DetailedJMSException;
 import no.nav.meldinger.virksomhet.dokdistfordeling.qdist008.out.DistribuerTilKanal;
 import org.apache.camel.ExchangePattern;
 import org.apache.camel.LoggingLevel;
@@ -76,6 +75,16 @@ public class Qdist011Route extends SpringRouteBuilder {
 				.log(LoggingLevel.WARN, log, "${exception}; " + getIdsForLogging())
 				.to("jms:" + qdist011FunksjonellFeil.getQueueName());
 
+		//Egen håndtering av denne type feil for å unngå logging av hele brev i prod
+		onException(DetailedJMSException.class)
+				.log(LoggingLevel.WARN, "DetailedJMSException oppstått i qdist011 for forsendelse med " + getIdsForLogging() + ". Melding sendt til funksjonell feilkø.")
+				.useOriginalMessage()
+				.logExhaustedMessageBody(false)
+				.logExhaustedMessageHistory(false)
+				.logStackTrace(false)
+				.handled(true)
+				.to("jms:" + qdist011FunksjonellFeil.getQueueName());
+
 		from("jms:" + qdist011.getQueueName() + "?transacted=true&concurrentConsumers=1")
 				.routeId(QDIST011_SERVICE_ID)
 				.routePolicy(qdist0011MetricsRoutePolicy)
@@ -86,11 +95,7 @@ public class Qdist011Route extends SpringRouteBuilder {
 				.unmarshal(new JaxbDataFormat(JAXBContext.newInstance(DistribuerTilKanal.class)))
 				.bean(distribuerForsendelseTilDpiMapper)
 				.bean(qdist011Service)
-				.doTry()
 				.marshal(digitalpostFormat).convertBodyTo(String.class, Charsets.UTF_8.toString())
-				.doCatch(DetailedJMSException.class)    //Egen håndtering av denne type feil for å unngå logging av hele brev i prod
-				.throwException(new Qdist011DetailedJMSException("DetailedJMSException oppstått i qdist011 for forsendelse med " + getIdsForLogging()))
-				.end()
 				.to("jms:" + tdist005.getQueueName())
 				.log(LoggingLevel.INFO, log, "qdist011 har lagt forsendelse med " + getIdsForLogging() + " på kø til tdist005 for distribusjon via DPI")
 				.bean(dokdistAdministrerForsendelseUpdater, "updateStatusAndConversationId")
