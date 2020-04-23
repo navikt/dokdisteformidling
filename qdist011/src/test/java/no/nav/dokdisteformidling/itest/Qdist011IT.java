@@ -11,7 +11,6 @@ import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlMatching;
 import static com.github.tomakehurst.wiremock.client.WireMock.verify;
-import static no.nav.dokdisteformidling.utils.DateConverterUtil.getNow;
 import static no.nav.dokdisteformidling.config.cache.LokalCacheConfig.TKAT020_CACHE;
 import static no.nav.dokdisteformidling.config.cache.LokalCacheConfig.TKAT021_CACHE;
 import static no.nav.dokdisteformidling.constants.RetryConstants.MAX_ATTEMPTS_SHORT;
@@ -19,6 +18,7 @@ import static no.nav.dokdisteformidling.itest.config.SftpConfig.startSshServer;
 import static no.nav.dokdisteformidling.storage.S3Configuration.BUCKET_NAME;
 import static no.nav.dokdisteformidling.testUtils.classpathToString;
 import static no.nav.dokdisteformidling.testUtils.fileToString;
+import static no.nav.dokdisteformidling.utils.DateConverterUtil.getNow;
 import static org.awaitility.Awaitility.await;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -195,32 +195,58 @@ public class Qdist011IT {
 
 	@Test
 	@Order(Integer.MIN_VALUE)
-	public void shouldThrowForsendelseManglerPaakrevdHeaderFunctionalExceptionManglerCallId() throws Exception {
+	public void shouldProcessForsendelseWithoutCallId() throws Exception {
+
+		stubGetForsendelse("__files/rdist001/getForsendelse-happy.json");
+		stubPostDigitalKontaktInformasjon();
+		stubGetDokumentTypeInfo("dokumentinfov4/tkat020-happy.json");
+		stubGetVarselInfo();
+		stubPostSafJournalpost("saf/safGraphQlResponse-happy.json");
+		stubGetSecurityToken();
+		stubPutForsendelseStatusAndkonversasjonsId();
 
 		sendStringMessage(qdist011, classpathToString("qdist011/qdist011-happy.xml"), null);
 
+		String uploadFilePath = tempDir.toString() + REMOTE_FILE_PATH;
 		await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
-			String resultOnQdist011FunksjonellFeilQueue = receive(qdist011FunksjonellFeil);
-			assertNotNull(resultOnQdist011FunksjonellFeilQueue);
-			assertEquals(resultOnQdist011FunksjonellFeilQueue, classpathToString("qdist011/qdist011-happy.xml"));
+			assertTrue(new File(uploadFilePath + DOKUMENT_OBJEKT_REFERANSE_HOVEDDOK + ".pdf").exists());
+			assertTrue(new File(uploadFilePath + DOKUMENT_OBJEKT_REFERANSE_VEDLEGG1 + ".pdf").exists());
+			assertTrue(new File(uploadFilePath + DOKUMENT_OBJEKT_REFERANSE_VEDLEGG2 + ".pdf").exists());
+
+			String response = receive(tdist005);
+			String expected = classpathToString("tdist005/tdist005_happy.xml").replace("insertBestillingsIdHere", BESTILLINGS_ID);
+			assertEquals(comparableMessage(expected), comparableMessage(response));
 		});
 
-		verifyAllStubs(0);
+		verifyAllStubs(1);
 	}
 
 	@Test
 	@Order(Integer.MIN_VALUE)
-	public void shouldThrowForsendelseManglerPaakrevdHeaderFunctionalExceptionTomCallId() throws Exception {
+	public void shouldProcessForsendelseWithEmptyCallId() throws Exception {
+
+		stubGetForsendelse("__files/rdist001/getForsendelse-happy.json");
+		stubPostDigitalKontaktInformasjon();
+		stubGetDokumentTypeInfo("dokumentinfov4/tkat020-happy.json");
+		stubGetVarselInfo();
+		stubPostSafJournalpost("saf/safGraphQlResponse-happy.json");
+		stubGetSecurityToken();
+		stubPutForsendelseStatusAndkonversasjonsId();
 
 		sendStringMessage(qdist011, classpathToString("qdist011/qdist011-happy.xml"), "");
 
+		String uploadFilePath = tempDir.toString() + REMOTE_FILE_PATH;
 		await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
-			String resultOnQdist011FunksjonellFeilQueue = receive(qdist011FunksjonellFeil);
-			assertNotNull(resultOnQdist011FunksjonellFeilQueue);
-			assertEquals(resultOnQdist011FunksjonellFeilQueue, classpathToString("qdist011/qdist011-happy.xml"));
+			assertTrue(new File(uploadFilePath + DOKUMENT_OBJEKT_REFERANSE_HOVEDDOK + ".pdf").exists());
+			assertTrue(new File(uploadFilePath + DOKUMENT_OBJEKT_REFERANSE_VEDLEGG1 + ".pdf").exists());
+			assertTrue(new File(uploadFilePath + DOKUMENT_OBJEKT_REFERANSE_VEDLEGG2 + ".pdf").exists());
+
+			String response = receive(tdist005);
+			String expected = classpathToString("tdist005/tdist005_happy.xml").replace("insertBestillingsIdHere", BESTILLINGS_ID);
+			assertEquals(comparableMessage(expected), comparableMessage(response));
 		});
 
-		verifyAllStubs(0);
+		verifyAllStubs(1);
 	}
 
 	@Test
