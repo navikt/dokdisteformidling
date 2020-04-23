@@ -2,6 +2,7 @@ package no.nav.dokdisteformidling.common;
 
 import static no.nav.dokdisteformidling.constants.MdcConstants.CALL_ID;
 import static no.nav.dokdisteformidling.constants.RouteConstants.PROPERTY_FORSENDELSE_ID;
+import static org.apache.commons.lang3.StringUtils.isBlank;
 
 import no.nav.dokdisteformidling.exception.functional.ForsendelseManglerForsendelseIdFunctionalException;
 import org.apache.camel.Exchange;
@@ -23,12 +24,14 @@ public class IdsProcessor implements Processor {
 	}
 
 	private void setOrGenerateCallIdToMdc(Exchange exchange) {
-		String callId = exchange.getIn().getHeader(CALL_ID, String.class);
-		if (callId == null || callId.trim().isEmpty()) {
-			callId = UUID.randomUUID().toString();
-			exchange.getIn().setHeader(CALL_ID, callId);
+		final String callId = exchange.getIn().getHeader(CALL_ID, String.class);
+		if (callId == null || isBlank(callId)) {
+			String newCallId = UUID.randomUUID().toString();
+			exchange.getIn().setHeader(CALL_ID, newCallId);
+			MDC.put(CALL_ID, newCallId);
+		} else {
+			MDC.put(CALL_ID, callId);
 		}
-		MDC.put(CALL_ID, callId);
 	}
 
 	private void setForsendelseIdAsProperty(Exchange exchange) {
