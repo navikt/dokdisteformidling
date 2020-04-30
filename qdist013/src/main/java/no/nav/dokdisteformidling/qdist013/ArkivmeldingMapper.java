@@ -164,8 +164,8 @@ public class ArkivmeldingMapper {
         dokumentbeskrivelse.setDokumenttype(DOKUMENTTYPE_DOKUMENTASJON);
         dokumentbeskrivelse.setDokumentstatus(Dokumentstatus.DOKUMENTET_ER_FERDIGSTILT);
         dokumentbeskrivelse.setTittel(getDokumentbeskrivelseTittel(journalpostQdist013, dokumentInfo, isHoveddokument(rekkefolge)));
-        dokumentbeskrivelse.setOpprettetDato(getDokumentOpprettetDato(isHoveddokument(rekkefolge), journalpostQdist013, dokumentInfo));
-        dokumentbeskrivelse.setOpprettetAv(getDokumentOpprettetAv(isHoveddokument(rekkefolge), journalpostQdist013, dokumentInfo));
+        dokumentbeskrivelse.setOpprettetDato(getDokumentDatoJournalfoert(isHoveddokument(rekkefolge), journalpostQdist013, dokumentInfo));
+        dokumentbeskrivelse.setOpprettetAv(getDokumentJournalfortAvNavn(isHoveddokument(rekkefolge), journalpostQdist013, dokumentInfo));
         dokumentbeskrivelse.setTilknyttetRegistreringSom(isHoveddokument(rekkefolge) ? TilknyttetRegistreringSom.HOVEDDOKUMENT : TilknyttetRegistreringSom.VEDLEGG);
         dokumentbeskrivelse.setDokumentnummer(BigInteger.valueOf(rekkefolge));
         dokumentbeskrivelse.setTilknyttetDato(datoArkivmeldingOpprettet);
@@ -203,7 +203,7 @@ public class ArkivmeldingMapper {
         return isBlank(journalpostId) ? null : safJournalpostQueryService.hentJournalpost(journalpostId);
     }
 
-    private XMLGregorianCalendar getDokumentOpprettetDato(boolean isHoveddok, JournalpostQdist013 journalpostQdist013, JournalpostQdist013.DokumentInfo dokumentInfo) {
+    private XMLGregorianCalendar getDokumentDatoJournalfoert(boolean isHoveddok, JournalpostQdist013 journalpostQdist013, JournalpostQdist013.DokumentInfo dokumentInfo) {
         if ((!isHoveddok && !isBlank(dokumentInfo.getOriginalJournalpostId())) && !isJournalDatoNull(dokumentInfo.getOriginalJournalpostId())) {
             LightweightSafJournalpostQdist013 lightweightSafJournalpostQdist013 = safJournalpostQueryService.hentJournalpost(dokumentInfo
                     .getOriginalJournalpostId());
@@ -214,10 +214,10 @@ public class ArkivmeldingMapper {
     }
 
     private boolean isJournalDatoNull(String journalpostId) {
-        return getLightweightSafJournalpostQdist013(journalpostId)==null ? Objects.isNull(getLightweightSafJournalpostQdist013(journalpostId)):  getLightweightSafJournalpostQdist013(journalpostId).getDatoJournalfoert() == null;
+        return getLightweightSafJournalpostQdist013(journalpostId) == null ? Objects.isNull(getLightweightSafJournalpostQdist013(journalpostId)) : getLightweightSafJournalpostQdist013(journalpostId).getDatoJournalfoert() == null;
     }
 
-    private String getDokumentOpprettetAv(boolean isHoveddok, JournalpostQdist013 journalpostQdist013, JournalpostQdist013.DokumentInfo dokumentInfo) {
+    private String getDokumentJournalfortAvNavn(boolean isHoveddok, JournalpostQdist013 journalpostQdist013, JournalpostQdist013.DokumentInfo dokumentInfo) {
         if (!isHoveddok && !isBlank(dokumentInfo.getOriginalJournalpostId())) {
             LightweightSafJournalpostQdist013 lightweightSafJournalpostQdist013 = getLightweightSafJournalpostQdist013(dokumentInfo.getOriginalJournalpostId());
             if (!isJournalfortAvNavnNull(dokumentInfo.getOriginalJournalpostId())) {
@@ -232,7 +232,7 @@ public class ArkivmeldingMapper {
 
 
     private boolean isJournalfortAvNavnNull(String journalpostId) {
-        return getLightweightSafJournalpostQdist013(journalpostId)==null ? Objects.isNull(getLightweightSafJournalpostQdist013(journalpostId)):isBlank(getLightweightSafJournalpostQdist013(journalpostId).getJournalfortAvNavn());
+        return getLightweightSafJournalpostQdist013(journalpostId) == null ? Objects.isNull(getLightweightSafJournalpostQdist013(journalpostId)) : isBlank(getLightweightSafJournalpostQdist013(journalpostId).getJournalfortAvNavn());
     }
 
 
@@ -243,8 +243,8 @@ public class ArkivmeldingMapper {
         Dokumentobjekt dokumentobjekt = objectFactory.createDokumentobjekt();
         dokumentobjekt.setVersjonsnummer(BigInteger.ONE);
         dokumentobjekt.setVariantformat(mapVariantformatSafValueToNoark5VariantFormat(getDokumentVariant(dokumentInfo)));
-        dokumentobjekt.setOpprettetDato(getDokumentOpprettetDato(isHoveddokument, journalpostQdist013, dokumentInfo));
-        dokumentobjekt.setOpprettetAv(getDokumentOpprettetAv(isHoveddokument, journalpostQdist013, dokumentInfo));
+        dokumentobjekt.setOpprettetDato(getDokumentDatoJournalfoert(isHoveddokument, journalpostQdist013, dokumentInfo));
+        dokumentobjekt.setOpprettetAv(getDokumentJournalfortAvNavn(isHoveddokument, journalpostQdist013, dokumentInfo));
         dokumentobjekt.setReferanseDokumentfil(getReferanseDokumentFil(journalpostQdist013.getJournalpostId(), dokumentInfo));
         return dokumentobjekt;
     }
