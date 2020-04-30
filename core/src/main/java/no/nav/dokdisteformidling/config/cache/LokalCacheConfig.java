@@ -24,6 +24,7 @@ public class LokalCacheConfig {
 	public static final String TKAT021_CACHE = "tkat021Cache";
 	public static final String STS_CACHE = "stsCache";
 	public static final String LIGHTWEIGHT_SAF_JOURNALPOST_QDIST013_CACHE = "LightweightSafJournalpostQdist013Cache";
+	public static final String SAF_JOURNALPOST_QDIST013_CACHE = "SafJournalpostQueryServiceImplQdist013Cache";
 
 	@Bean
 	@Primary
@@ -39,11 +40,12 @@ public class LokalCacheConfig {
 						.build()),
 				new CaffeineCache(STS_CACHE, Caffeine.newBuilder()
 						.expireAfterWrite(55, TimeUnit.MINUTES)
-						.maximumSize(500)
 						.build()),
 				new CaffeineCache(LIGHTWEIGHT_SAF_JOURNALPOST_QDIST013_CACHE, Caffeine.newBuilder()
 						.expireAfterWrite(30, TimeUnit.SECONDS)
-						.maximumSize(500)
+						.build()),
+				new CaffeineCache(SAF_JOURNALPOST_QDIST013_CACHE, Caffeine.newBuilder()
+						.expireAfterWrite(30, TimeUnit.SECONDS)
 						.build())
 		));
 		return manager;
