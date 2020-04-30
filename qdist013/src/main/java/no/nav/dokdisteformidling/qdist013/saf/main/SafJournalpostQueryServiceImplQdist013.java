@@ -4,9 +4,12 @@ import no.nav.dokdisteformidling.consumer.saf.SafJournalpostQueryService;
 import no.nav.dokdisteformidling.consumer.saf.graphql.GraphQLRequest;
 import no.nav.dokdisteformidling.consumer.saf.graphql.SafGraphqlConsumer;
 import no.nav.dokdisteformidling.consumer.saf.journalpost.SafJournalpost;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Component;
 
 import java.util.Collections;
+
+import static no.nav.dokdisteformidling.config.cache.LokalCacheConfig.SAF_JOURNALPOST_QDIST013_CACHE;
 
 /**
  * @author Sigurd Midttun, Visma Consulting.
@@ -63,6 +66,7 @@ public class SafJournalpostQueryServiceImplQdist013 implements SafJournalpostQue
 		this.journalpostQdist013Mapper = journalpostQdist013Mapper;
 	}
 
+	@Cacheable(SAF_JOURNALPOST_QDIST013_CACHE)
 	public JournalpostQdist013 hentJournalpost(String journalpostid) {
 		SafJournalpost safJournalpost = safGraphqlConsumer.performQuery(GraphQLRequest.builder()
 				.query(JOURNALPOST_QUERY)
