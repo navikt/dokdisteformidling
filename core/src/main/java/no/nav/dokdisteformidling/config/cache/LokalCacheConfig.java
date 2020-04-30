@@ -39,9 +39,11 @@ public class LokalCacheConfig {
 						.build()),
 				new CaffeineCache(STS_CACHE, Caffeine.newBuilder()
 						.expireAfterWrite(55, TimeUnit.MINUTES)
+						.maximumSize(500)
 						.build()),
 				new CaffeineCache(LIGHTWEIGHT_SAF_JOURNALPOST_QDIST013_CACHE, Caffeine.newBuilder()
 						.expireAfterWrite(30, TimeUnit.SECONDS)
+						.maximumSize(500)
 						.build())
 		));
 		return manager;
