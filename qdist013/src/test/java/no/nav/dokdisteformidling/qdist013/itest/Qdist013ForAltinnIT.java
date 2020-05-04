@@ -178,6 +178,28 @@ public class Qdist013ForAltinnIT {
     }
 
     @Test
+    public void shouldIntiateBrokerServiceWhenDataJournalfoertErNull() {
+        stubGetForsendelse("__files/rjoark001/getForsendelse-happy.json");
+        stubGetSecurityToken();
+        stubPostSafJournalpost("queryJournalpostId\":\"123\"", "saf/safQdist013GraphQlResponse-aktoerId.json");
+        stubPostSafJournalpost("queryJournalpostId\":\"448212366\"", "saf/safLightweightGraphQlResponse-datojournalfoert-null.jsonn");
+        stubGetTpsHentPersonNavn("***gammelt_fnr***");
+        stubGetAktoerregisterHentIdentForAktoerId("***gammelt_fnr***09");
+        stubPostMaskinporten();
+        stubGetServiceRegistry();
+        stubPostIntiateBrokerService();
+        sendStringMessage(qdist013, classpathToString("qdist013/qdist013-happy.xml"));
+
+        await().atMost(10, SECONDS).untilAsserted(() -> {
+            verifyGetForsendelse();
+            verifyGetSecurityToken(4);
+            verifyPostSafJournalpost();
+            verify(1, postRequestedFor(urlEqualTo("/safgraphql")));
+
+        });
+    }
+
+    @Test
     public void brokerserviceStreamedShouldUploadFileToAltinn() {
 
         stubGetForsendelse("__files/rjoark001/getForsendelse-happy.json");
@@ -450,45 +472,6 @@ public class Qdist013ForAltinnIT {
                 .withRequestBody(equalToJson(classpathToString("__files/saf/safLightweightGraphQlRequest.json"))));
     }
 
-    @Test
-    public void shouldThrowSafJournalpostValidationExceptionLightweightWhenTomJournalfoertAvNavn() {
-        stubGetForsendelse("__files/rjoark001/getForsendelse-happy.json");
-        stubGetSecurityToken();
-        stubPostSafJournalpost("queryJournalpostId\":\"123\"", "saf/safQdist013GraphQlResponse-aktoerId.json");
-        stubPostSafJournalpost("queryJournalpostId\":\"448212366\"", "saf/safLightweightGraphQlResponse-tomJournalfoertAvNavn.json");
-
-        sendStringMessage(qdist013, classpathToString("qdist013/qdist013-happy.xml"));
-
-        await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
-            assertMessageOnQueue(qdist013FunksjonellFeil);
-        });
-
-        verifyGetForsendelse();
-        verifyGetSecurityToken(2);
-        verifyPostSafJournalpost();
-        verify(1, postRequestedFor(urlEqualTo("/safgraphql"))
-                .withRequestBody(equalToJson(classpathToString("__files/saf/safLightweightGraphQlRequest.json"))));
-    }
-
-    @Test
-    public void shouldThrowSafJournalpostValidationExceptionLightweightWhenUtenDatoJournalfoert() {
-        stubGetForsendelse("__files/rjoark001/getForsendelse-happy.json");
-        stubGetSecurityToken();
-        stubPostSafJournalpost("queryJournalpostId\":\"123\"", "saf/safQdist013GraphQlResponse-aktoerId.json");
-        stubPostSafJournalpost("queryJournalpostId\":\"448212366\"", "saf/safLightweightGraphQlResponse-utenDatoJournalfoert.json");
-
-        sendStringMessage(qdist013, classpathToString("qdist013/qdist013-happy.xml"));
-
-        await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
-            assertMessageOnQueue(qdist013FunksjonellFeil);
-        });
-
-        verifyGetForsendelse();
-        verifyGetSecurityToken(2);
-        verifyPostSafJournalpost();
-        verify(1, postRequestedFor(urlEqualTo("/safgraphql"))
-                .withRequestBody(equalToJson(classpathToString("__files/saf/safLightweightGraphQlRequest.json"))));
-    }
 
     @Test
     public void shouldThrowAktoerHentIdentForAktoerIdFunctionalException() {
