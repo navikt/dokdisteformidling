@@ -1,0 +1,81 @@
+{
+  "data": {
+    "journalpost": {
+      "journalpostId": "448212366",
+      "sak": {
+        "datoOpprettet": "2018-12-12T06:45:06"
+      },
+      "opprettetAvNavn": "qmot002",
+      "journalposttype": "I",
+      "bruker": {
+        "id": "***gammelt_fnr***09",
+        "type": "AKTOERID"
+      },
+      "datoOpprettet": "2019-04-01T08:44:21",
+      "tittel": "MASKERT_FELT",
+      "journalfortAvNavn": "qmot002",
+      "temanavn": "Foreldre- og svangerskapspenger",
+      "journalfoerendeEnhet": "4806",
+      "relevanteDatoer": [
+        {
+          "dato": "2019-04-01T08:44:19",
+          "datotype": "DATO_DOKUMENT"
+        },
+        {
+          "dato": "2019-04-01T08:44:21",
+          "datotype": "DATO_REGISTRERT"
+        }
+      ],
+      "dokumenter": [
+        {
+          "dokumentInfoId": "463791441",
+          "dokumentstatus": "FERDIGSTILT",
+          "tittel": "Tittel",
+          "originalJournalpostId": null,
+          "dokumentvarianter": [
+            {
+              "variantformat": "ARKIV",
+              "filtype": "PDF"
+            },
+            {
+              "variantformat": "ORIGINAL",
+              "filtype": "XML"
+            }
+          ]
+        },
+        {
+          "dokumentInfoId": "463791442",
+          "dokumentstatus": "FERDIGSTILT",
+          "tittel": "Tittel Vedlegg 1",
+          "originalJournalpostId": null,
+          "dokumentvarianter": [
+            {
+              "variantformat": "SLADDET",
+              "filtype": "PDF"
+            },
+            {
+              "variantformat": "ORIGINAL",
+              "filtype": "XML"
+            }
+          ]
+        },
+        {
+          "dokumentInfoId": "463791443",
+          "dokumentstatus": "FERDIGSTILT",
+          "tittel": "Tittel Vedlegg 2",
+          "originalJournalpostId": "448212366",
+          "dokumentvarianter": [
+            {
+              "variantformat": "ARKIV",
+              "filtype": "PNG"
+            },
+            {
+              "variantformat": "ORIGINAL",
+              "filtype": "XML"
+            }
+          ]
+        }
+      ]
+    }
+  }
+}
