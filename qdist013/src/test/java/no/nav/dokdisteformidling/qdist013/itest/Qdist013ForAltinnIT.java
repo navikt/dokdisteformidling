@@ -16,6 +16,7 @@ import org.apache.activemq.command.ActiveMQTextMessage;
 import org.apache.http.HttpHeaders;
 import org.apache.http.entity.ContentType;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -179,7 +180,7 @@ public class Qdist013ForAltinnIT {
     }
 
     @Test
-    @Order(1)
+    @Disabled
     public void whenLightweightSafDataJournalfoertErNull() {
         stubGetForsendelse("__files/rjoark001/getForsendelse-happy.json");
         stubGetSecurityToken();
@@ -198,7 +199,7 @@ public class Qdist013ForAltinnIT {
     }
 
     @Test
-    @Order(2)
+    @Disabled
     public void shouldThrowExceptionWhenDatoJournalfoertErNullInJpQdist013() {
         stubGetForsendelse("__files/rjoark001/getForsendelse-happy.json");
         stubGetSecurityToken();
