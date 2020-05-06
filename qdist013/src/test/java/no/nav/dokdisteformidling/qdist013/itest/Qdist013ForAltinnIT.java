@@ -16,6 +16,7 @@ import org.apache.activemq.command.ActiveMQTextMessage;
 import org.apache.http.HttpHeaders;
 import org.apache.http.entity.ContentType;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
@@ -175,6 +176,44 @@ public class Qdist013ForAltinnIT {
         });
 
 
+    }
+
+    @Test
+    @Order(1)
+    public void whenLightweightSafDataJournalfoertErNull() {
+        stubGetForsendelse("__files/rjoark001/getForsendelse-happy.json");
+        stubGetSecurityToken();
+        stubPostSafJournalpost("queryJournalpostId\":\"123\"", "saf/safQdist013GraphQlResponse-aktoerId.json");
+        stubPostSafJournalpost("queryJournalpostId\":\"448212366\"", "saf/safLightweightGraphQlResponse-datojournalfoert-null.json");
+        stubGetTpsHentPersonNavn("***gammelt_fnr***");
+        stubGetAktoerregisterHentIdentForAktoerId("***gammelt_fnr***09");
+        stubPostMaskinporten();
+        stubGetServiceRegistry();
+        stubPostIntiateBrokerService();
+        sendStringMessage(qdist013, classpathToString("qdist013/qdist013-happy.xml"));
+
+        await().atMost(10, SECONDS).untilAsserted(() -> {
+            verifyAllStubsSaf("", "***gammelt_fnr***", "***gammelt_fnr***09", 17);
+        });
+    }
+
+    @Test
+    @Order(2)
+    public void shouldThrowExceptionWhenDatoJournalfoertErNullInJpQdist013() {
+        stubGetForsendelse("__files/rjoark001/getForsendelse-happy.json");
+        stubGetSecurityToken();
+        stubPostSafJournalpost("queryJournalpostId\":\"123\"", "saf/safQdist013GraphQlResponse-relevantdato-null.json");
+        stubPostSafJournalpost("queryJournalpostId\":\"448212366\"", "saf/safLightweightGraphQlResponse-datojournalfoert-null.json");
+
+        sendStringMessage(qdist013, classpathToString("qdist013/qdist013-happy.xml"));
+
+        await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
+            assertMessageOnQueue(qdist013FunksjonellFeil);
+        });
+
+        verifyGetForsendelse();
+        verifyGetSecurityToken(1);
+        verifyPostSafJournalpost();
     }
 
     @Test
@@ -450,45 +489,6 @@ public class Qdist013ForAltinnIT {
                 .withRequestBody(equalToJson(classpathToString("__files/saf/safLightweightGraphQlRequest.json"))));
     }
 
-    @Test
-    public void shouldThrowSafJournalpostValidationExceptionLightweightWhenTomJournalfoertAvNavn() {
-        stubGetForsendelse("__files/rjoark001/getForsendelse-happy.json");
-        stubGetSecurityToken();
-        stubPostSafJournalpost("queryJournalpostId\":\"123\"", "saf/safQdist013GraphQlResponse-aktoerId.json");
-        stubPostSafJournalpost("queryJournalpostId\":\"448212366\"", "saf/safLightweightGraphQlResponse-tomJournalfoertAvNavn.json");
-
-        sendStringMessage(qdist013, classpathToString("qdist013/qdist013-happy.xml"));
-
-        await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
-            assertMessageOnQueue(qdist013FunksjonellFeil);
-        });
-
-        verifyGetForsendelse();
-        verifyGetSecurityToken(2);
-        verifyPostSafJournalpost();
-        verify(1, postRequestedFor(urlEqualTo("/safgraphql"))
-                .withRequestBody(equalToJson(classpathToString("__files/saf/safLightweightGraphQlRequest.json"))));
-    }
-
-    @Test
-    public void shouldThrowSafJournalpostValidationExceptionLightweightWhenUtenDatoJournalfoert() {
-        stubGetForsendelse("__files/rjoark001/getForsendelse-happy.json");
-        stubGetSecurityToken();
-        stubPostSafJournalpost("queryJournalpostId\":\"123\"", "saf/safQdist013GraphQlResponse-aktoerId.json");
-        stubPostSafJournalpost("queryJournalpostId\":\"448212366\"", "saf/safLightweightGraphQlResponse-utenDatoJournalfoert.json");
-
-        sendStringMessage(qdist013, classpathToString("qdist013/qdist013-happy.xml"));
-
-        await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
-            assertMessageOnQueue(qdist013FunksjonellFeil);
-        });
-
-        verifyGetForsendelse();
-        verifyGetSecurityToken(2);
-        verifyPostSafJournalpost();
-        verify(1, postRequestedFor(urlEqualTo("/safgraphql"))
-                .withRequestBody(equalToJson(classpathToString("__files/saf/safLightweightGraphQlRequest.json"))));
-    }
 
     @Test
     public void shouldThrowAktoerHentIdentForAktoerIdFunctionalException() {
@@ -1045,6 +1045,29 @@ public class Qdist013ForAltinnIT {
         });
 
         verify(1, getRequestedFor(urlEqualTo("/administrerforsendelse/" + FORSENDELSE_ID)));
+    }
+
+
+    private void verifyAllStubsSaf(String orgnr, String fnr, String aktoerId, int stsCount) {
+        verifyGetForsendelse();
+        verifyGetSecurityToken(stsCount);
+        verifyPostSafJournalpost();
+        verify(14, postRequestedFor(urlEqualTo("/safgraphql"))
+                .withRequestBody(equalToJson(classpathToString("__files/saf/safLightweightGraphQlRequest.json"))));
+
+        if (!isNullOrEmpty(orgnr)) {
+            verifyGetEregHentOrgNavn(orgnr);
+        } else {
+            verifyGetTpsHentPersonNavn(fnr);
+        }
+        if (!isNullOrEmpty(aktoerId)) {
+            verifyGetAktoerregisterHentIdentForAktoerId(aktoerId);
+        }
+
+        verifyPostMaskinporten();
+        verifyGetServiceRegistry();
+        verifyPostIntiateBrokerService();
+
     }
 
 

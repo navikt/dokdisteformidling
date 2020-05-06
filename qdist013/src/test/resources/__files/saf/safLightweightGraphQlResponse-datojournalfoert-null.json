@@ -1,0 +1,11 @@
+{
+  "data": {
+    "journalpost": {
+      "journalfortAvNavn": "qmot002",
+      "avsenderMottaker": {
+        "navn": "FORNAVN ETTERNAVN"
+      },
+      "relevanteDatoer": []
+    }
+  }
+}
