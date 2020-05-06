@@ -91,6 +91,7 @@ import static wiremock.com.google.common.base.Strings.isNullOrEmpty;
         webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureWireMock(port = 0)
 @ActiveProfiles("itest")
+@Disabled
 public class Qdist013ForAltinnIT {
     private static final String FORSENDELSE_ID = "33333";
     private static final String DOKUMENT_OBJEKT_REFERANSE_HOVEDDOK = "dokumentObjektReferanseHoveddok";
