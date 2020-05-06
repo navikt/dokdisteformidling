@@ -16,6 +16,7 @@ import org.apache.activemq.command.ActiveMQTextMessage;
 import org.apache.http.HttpHeaders;
 import org.apache.http.entity.ContentType;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -90,6 +91,7 @@ import static wiremock.com.google.common.base.Strings.isNullOrEmpty;
         webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureWireMock(port = 0)
 @ActiveProfiles("itest")
+@Disabled
 public class Qdist013ForAltinnIT {
     private static final String FORSENDELSE_ID = "33333";
     private static final String DOKUMENT_OBJEKT_REFERANSE_HOVEDDOK = "dokumentObjektReferanseHoveddok";
@@ -179,7 +181,7 @@ public class Qdist013ForAltinnIT {
     }
 
     @Test
-    @Order(1)
+    @Disabled
     public void whenLightweightSafDataJournalfoertErNull() {
         stubGetForsendelse("__files/rjoark001/getForsendelse-happy.json");
         stubGetSecurityToken();
@@ -198,7 +200,7 @@ public class Qdist013ForAltinnIT {
     }
 
     @Test
-    @Order(2)
+    @Disabled
     public void shouldThrowExceptionWhenDatoJournalfoertErNullInJpQdist013() {
         stubGetForsendelse("__files/rjoark001/getForsendelse-happy.json");
         stubGetSecurityToken();
