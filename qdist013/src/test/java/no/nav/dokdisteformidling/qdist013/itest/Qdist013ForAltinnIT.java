@@ -17,7 +17,6 @@ import org.apache.http.HttpHeaders;
 import org.apache.http.entity.ContentType;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
@@ -155,7 +154,7 @@ public class Qdist013ForAltinnIT {
         assertThat(mottakerInfo.getOrgnummer(), is(TRYGDERETTEN_ORGNUMMER));
         assertThat(mottakerInfo.getServiceCode(), is("4192"));
         assertThat(mottakerInfo.getServiceEditionCode(), is("270815"));
-        verify(1, getRequestedFor(urlEqualTo("/serviceregistry/identifier/" + TRYGDERETTEN_ORGNUMMER + "/process/" + EformidlingConstants.ARKIVMELDING_PROCESS)));
+        verify(1, getRequestedFor(urlEqualTo("/serviceregistry/identifier/" + TRYGDERETTEN_ORGNUMMER + "/process/" + EformidlingConstants.AVTALEMELDING_PROCESS)));
         verify(1, postRequestedFor(urlEqualTo("/maskinporten")));
 
     }
@@ -817,7 +816,7 @@ public class Qdist013ForAltinnIT {
         stubPostSafJournalpost("queryJournalpostId\":\"448212366\"", "saf/safLightweightGraphQlResponse-happy.json");
         stubGetEregHentOrgNavn("123456789");
         stubPostMaskinporten();
-        stubFor(get(urlMatching("/serviceregistry/identifier/" + TRYGDERETTEN_ORGNUMMER + "/process/" + EformidlingConstants.ARKIVMELDING_PROCESS))
+        stubFor(get(urlMatching("/serviceregistry/identifier/" + TRYGDERETTEN_ORGNUMMER + "/process/" + EformidlingConstants.AVTALEMELDING_PROCESS))
                 .willReturn(aResponse().withStatus(HttpStatus.INTERNAL_SERVER_ERROR.value())
                         .withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE)));
 
@@ -1183,11 +1182,11 @@ public class Qdist013ForAltinnIT {
     }
 
     private void verifyGetServiceRegistry() {
-        verify(1, getRequestedFor(urlEqualTo("/serviceregistry/identifier/" + TRYGDERETTEN_ORGNUMMER + "/process/" + EformidlingConstants.ARKIVMELDING_PROCESS)));
+        verify(1, getRequestedFor(urlEqualTo("/serviceregistry/identifier/" + TRYGDERETTEN_ORGNUMMER + "/process/" + EformidlingConstants.AVTALEMELDING_PROCESS)));
     }
 
     private void verifyGetServiceRegistry(int expectedCount) {
-        verify(expectedCount, getRequestedFor(urlEqualTo("/serviceregistry/identifier/" + TRYGDERETTEN_ORGNUMMER + "/process/" + EformidlingConstants.ARKIVMELDING_PROCESS)));
+        verify(expectedCount, getRequestedFor(urlEqualTo("/serviceregistry/identifier/" + TRYGDERETTEN_ORGNUMMER + "/process/" + EformidlingConstants.AVTALEMELDING_PROCESS)));
     }
 
     private void assertMessageOnQueue(javax.jms.Queue queue) {
@@ -1255,7 +1254,7 @@ public class Qdist013ForAltinnIT {
     }
 
     public static void stubGetServiceRegistry() {
-        stubFor(get(urlMatching("/serviceregistry/identifier/" + TRYGDERETTEN_ORGNUMMER + "/process/" + EformidlingConstants.ARKIVMELDING_PROCESS))
+        stubFor(get(urlMatching("/serviceregistry/identifier/" + TRYGDERETTEN_ORGNUMMER + "/process/" + EformidlingConstants.AVTALEMELDING_PROCESS))
                 .willReturn(aResponse().withStatus(HttpStatus.OK.value())
                         .withHeader(org.springframework.http.HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                         .withBody(classpathToString("__files/serviceregistry/serviceregistry_happy_response.json"))));
