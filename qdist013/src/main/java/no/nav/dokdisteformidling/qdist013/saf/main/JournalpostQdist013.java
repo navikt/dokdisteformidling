@@ -33,6 +33,7 @@ public class JournalpostQdist013 implements Journalpost {
 	@Value
 	@Builder
 	public static class Sak {
+		private final String arkivsaksnummer;
 		private final LocalDateTime datoOpprettet;
 	}
 
