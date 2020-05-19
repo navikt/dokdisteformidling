@@ -62,7 +62,7 @@ public class StandardBusinessDocument {
 	private StandardBusinessDocumentHeader standardBusinessDocumentHeader;
 
 	@XmlAnyElement(lax = true)
-	@JsonAlias({"arkivmelding", "arkivmelding_kvittering","status"})
+	@JsonAlias({"arkivmelding", "arkivmelding_kvittering", "avtalt", "status"})
 	@NotNull
 	private Object any;
 

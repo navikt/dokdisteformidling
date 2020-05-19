@@ -54,7 +54,7 @@ public class EformidlingMessagePackager {
     public InputStream packageMessage(NavDokumentpakke navDokumentpakke,
                                       AppCertificate appCertificate,
                                       X509Certificate mottakerCertificate) {
-        final StandardBusinessDocument envelope = standardBusinessDocumentMapper.mapArkivmeldingEnvelope(navDokumentpakke.getConversationId(),
+        final StandardBusinessDocument envelope = standardBusinessDocumentMapper.mapAvtaltmeldingEnvelope(navDokumentpakke.getConversationId(),
                 navDokumentpakke.getBestillingsId());
         final InputStream content = eformidlingContentPackager.packageContent(navDokumentpakke, appCertificate, mottakerCertificate);
         final ByteArrayOutputStream zipfile = new ByteArrayOutputStream();
@@ -67,7 +67,7 @@ public class EformidlingMessagePackager {
 
     private void writeZip(StandardBusinessDocument konvolutt, InputStream innhold, OutputStream outputStream) {
         try (ZipOutputStream zipOutputStream = new ZipOutputStream(outputStream)) {
-            if (konvolutt.getAny() instanceof ArkivmeldingMessage) {
+            if (konvolutt.getAny() instanceof AvtaltMessage) {
                 zipOutputStream.putNextEntry(new ZipEntry(EFORMIDLING_SBD));
                 objectMapper.writeValue(zipOutputStream, konvolutt);
                 zipOutputStream.closeEntry();

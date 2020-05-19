@@ -10,7 +10,6 @@ import no.arkivverket.standarder.noark5.arkivmelding.Korrespondansepart;
 import no.arkivverket.standarder.noark5.arkivmelding.ObjectFactory;
 import no.arkivverket.standarder.noark5.arkivmelding.Part;
 import no.arkivverket.standarder.noark5.arkivmelding.Saksmappe;
-import no.nav.dokdisteformidling.constants.DomainConstants;
 import no.nav.dokdisteformidling.consumer.aktoerregister.Aktoerregister;
 import no.nav.dokdisteformidling.consumer.ereg.Ereg;
 import no.nav.dokdisteformidling.consumer.saf.SafJournalpostQueryService;
@@ -30,7 +29,6 @@ import java.util.Objects;
 import static java.lang.String.format;
 import static no.nav.dokdisteformidling.constants.DomainConstants.APP_NAME;
 import static no.nav.dokdisteformidling.constants.DomainConstants.VARIANTFORMAT_ARKIV;
-import static no.nav.dokdisteformidling.constants.DomainConstants.VARIANTFORMAT_PRODUKSJON;
 import static no.nav.dokdisteformidling.constants.DomainConstants.VARIANTFORMAT_SLADDET;
 import static no.nav.dokdisteformidling.consumer.eformidling.EformidlingConstants.NAV_ORGNUMMER;
 import static no.nav.dokdisteformidling.consumer.eformidling.EformidlingConstants.TRYGDERETTEN_ORGNUMMER;
@@ -38,11 +36,18 @@ import static no.nav.dokdisteformidling.qdist013.util.ArkivMapperUtil.brukerType
 import static no.nav.dokdisteformidling.qdist013.util.ArkivMapperUtil.brukerTypeIsOrgnr;
 import static no.nav.dokdisteformidling.qdist013.util.ArkivMapperUtil.isBrukerTypeFnr;
 import static no.nav.dokdisteformidling.qdist013.util.ArkivMapperUtil.isHoveddokument;
-import static no.nav.dokdisteformidling.qdist013.util.AvtaletmeldingConstant.DOKUMENTASJON;
-import static no.nav.dokdisteformidling.qdist013.util.AvtaletmeldingConstant.DOKUMENTET_ER_FERDIGSTILT;
-import static no.nav.dokdisteformidling.qdist013.util.AvtaletmeldingConstant.EKSPEDERT;
-import static no.nav.dokdisteformidling.qdist013.util.AvtaletmeldingConstant.UNDER_BEHANDLING;
-import static no.nav.dokdisteformidling.qdist013.util.AvtaletmeldingConstant.UTGAAENDE_DOKUMENT;
+import static no.nav.dokdisteformidling.qdist013.util.AvtaltmeldingConstant.ARKIVFORMAT;
+import static no.nav.dokdisteformidling.qdist013.util.AvtaltmeldingConstant.AVSENDER;
+import static no.nav.dokdisteformidling.qdist013.util.AvtaltmeldingConstant.DOKUMENTASJON;
+import static no.nav.dokdisteformidling.qdist013.util.AvtaltmeldingConstant.DOKUMENTET_ER_FERDIGSTILT;
+import static no.nav.dokdisteformidling.qdist013.util.AvtaltmeldingConstant.DOKUMENT_HVOR_DELER_AV_INNHOLDET_ER_SKJERMET;
+import static no.nav.dokdisteformidling.qdist013.util.AvtaltmeldingConstant.EKSPEDERT;
+import static no.nav.dokdisteformidling.qdist013.util.AvtaltmeldingConstant.HOVEDDOKUMENT;
+import static no.nav.dokdisteformidling.qdist013.util.AvtaltmeldingConstant.MOTTAKER;
+import static no.nav.dokdisteformidling.qdist013.util.AvtaltmeldingConstant.PRODUKSJONSFORMAT;
+import static no.nav.dokdisteformidling.qdist013.util.AvtaltmeldingConstant.UNDER_BEHANDLING;
+import static no.nav.dokdisteformidling.qdist013.util.AvtaltmeldingConstant.UTGAAENDE_DOKUMENT;
+import static no.nav.dokdisteformidling.qdist013.util.AvtaltmeldingConstant.VEDLEGG;
 import static no.nav.dokdisteformidling.utils.DateConverterUtil.convertLocalDateTimeToXmlGregorianCalendar;
 import static no.nav.dokdisteformidling.utils.DateConverterUtil.getNow;
 import static org.apache.commons.lang3.StringUtils.isBlank;
@@ -51,12 +56,10 @@ import static org.apache.commons.lang3.StringUtils.isBlank;
  * @author Sigurd Midttun, Visma Consulting.
  */
 @Component
-public class ArkivmeldingMapper {
+public class AvtaltmeldingMapper {
 
     public static final String NAV_KLAGEINSTANS = "NAV Klageinstans";
     public static final String TRYGDERETTEN = "TRYGDERETTEN";
-    private static final String MOTTAKER = "Mottaker";
-    private static final String AVSENDER = "Avsender";
     public static final String SAKSPART_ROLLE_DAP = "DAP";
     public static final String SAKSPART_ROLLE_AMP = "AMP";
     public static final String INNGAAENDE = "I";
@@ -72,10 +75,10 @@ public class ArkivmeldingMapper {
     private final Tps tps;
     private final SafJournalpostQueryService<LightweightSafJournalpostQdist013> safJournalpostQueryService;
 
-    public ArkivmeldingMapper(@Named("LightweightSafJournalpostQueryServiceQdist013") SafJournalpostQueryService<LightweightSafJournalpostQdist013> safJournalpostQueryService,
-                              Aktoerregister aktoerregister,
-                              Ereg ereg,
-                              Tps tps) {
+    public AvtaltmeldingMapper(@Named("LightweightSafJournalpostQueryServiceQdist013") SafJournalpostQueryService<LightweightSafJournalpostQdist013> safJournalpostQueryService,
+                               Aktoerregister aktoerregister,
+                               Ereg ereg,
+                               Tps tps) {
         this.safJournalpostQueryService = safJournalpostQueryService;
         this.aktoerregister = aktoerregister;
         this.ereg = ereg;
@@ -120,7 +123,8 @@ public class ArkivmeldingMapper {
                 .add(createAndPopulateJournalpost(journalpostQdist013, datoArkivmeldingOpprettet, objectFactory));
         saksmappe.setSaksdato(convertLocalDateTimeToXmlGregorianCalendar(journalpostQdist013.getSak().getDatoOpprettet()));
         saksmappe.setAdministrativEnhet(NAV_KLAGEINSTANS);
-        saksmappe.setSaksansvarlig(journalpostQdist013.getJournalfoerendeEnhet());
+        saksmappe.setSaksansvarlig(journalpostQdist013.getOpprettetAvNavn());
+        saksmappe.setJournalenhet(journalpostQdist013.getJournalfoerendeEnhet());
         saksmappe.setSaksstatus(UNDER_BEHANDLING);
 
         return saksmappe;
@@ -156,6 +160,8 @@ public class ArkivmeldingMapper {
                 });
     }
 
+
+
     private Dokumentbeskrivelse createAndPopulateDokumentBeskrivelse(JournalpostQdist013 journalpostQdist013,
                                                                      JournalpostQdist013.DokumentInfo dokumentInfo,
                                                                      int rekkefolge,
@@ -167,7 +173,7 @@ public class ArkivmeldingMapper {
         dokumentbeskrivelse.setTittel(getDokumentbeskrivelseTittel(journalpostQdist013, dokumentInfo, isHoveddokument(rekkefolge)));
         dokumentbeskrivelse.setOpprettetDato(getDokumentDatoJournalfoert(isHoveddokument(rekkefolge), journalpostQdist013, dokumentInfo));
         dokumentbeskrivelse.setOpprettetAv(getDokumentJournalfortAvNavn(isHoveddokument(rekkefolge), journalpostQdist013, dokumentInfo));
-        dokumentbeskrivelse.setTilknyttetRegistreringSom(isHoveddokument(rekkefolge) ? DomainConstants.HOVEDDOKUMENT : DomainConstants.VEDLEGG);
+        dokumentbeskrivelse.setTilknyttetRegistreringSom(isHoveddokument(rekkefolge) ? HOVEDDOKUMENT : VEDLEGG);
         dokumentbeskrivelse.setDokumentnummer(BigInteger.valueOf(rekkefolge));
         dokumentbeskrivelse.setTilknyttetDato(datoArkivmeldingOpprettet);
         dokumentbeskrivelse.setTilknyttetAv(journalpostQdist013.getJournalfortAvNavn());
@@ -237,7 +243,6 @@ public class ArkivmeldingMapper {
         Dokumentobjekt dokumentobjekt = objectFactory.createDokumentobjekt();
         dokumentobjekt.setVersjonsnummer(BigInteger.ONE);
         dokumentobjekt.setVariantformat(getDokumentVariant(dokumentInfo));
-        dokumentobjekt.setVariantformat(getDokumentVariant(dokumentInfo));
         dokumentobjekt.setOpprettetDato(getDokumentDatoJournalfoert(isHoveddokument, journalpostQdist013, dokumentInfo));
         dokumentobjekt.setOpprettetAv(getDokumentJournalfortAvNavn(isHoveddokument, journalpostQdist013, dokumentInfo));
         dokumentobjekt.setReferanseDokumentfil(getReferanseDokumentFil(journalpostQdist013.getJournalpostId(), dokumentInfo));
@@ -251,7 +256,7 @@ public class ArkivmeldingMapper {
 
     private String getDokumentVariant(JournalpostQdist013.DokumentInfo dokumentInfo) {
         if (dokumentInfoContainsSladdetDokumentvariant(dokumentInfo)) {
-            return VARIANTFORMAT_SLADDET;
+            return DOKUMENT_HVOR_DELER_AV_INNHOLDET_ER_SKJERMET;
         } else {
             JournalpostQdist013.DokumentInfo.Dokumentvariant dokumentvariantArkiv = dokumentInfo.getDokumentvarianter()
                     .stream()
@@ -259,7 +264,7 @@ public class ArkivmeldingMapper {
                     .findAny()
                     .get(); //Ok, already validated in SafJournalpostValidatorQdist013.
 
-            return isFiltypePNGorJPEG(dokumentvariantArkiv) ? VARIANTFORMAT_ARKIV : VARIANTFORMAT_PRODUKSJON;
+            return isFiltypePNGorJPEG(dokumentvariantArkiv) ? ARKIVFORMAT : PRODUKSJONSFORMAT;
         }
     }
 
@@ -348,14 +353,6 @@ public class ArkivmeldingMapper {
 
     private String hentOrgNummerDAP(JournalpostQdist013 journalpostQdist013) {
         return brukerTypeIsOrgnr(journalpostQdist013) ? journalpostQdist013.getBruker().getId() : null;
-    }
-
-    private String getSakspartIdDAP(JournalpostQdist013 journalpostQdist013, String fnrObtainedFromAktoerId) {
-        if (brukerTypeIsAktoerId(journalpostQdist013)) {
-            return fnrObtainedFromAktoerId;
-        } else {
-            return journalpostQdist013.getBruker().getId();
-        }
     }
 
     private String getSakspartNavnDAP(JournalpostQdist013 journalpostQdist013, String fnrObtainedFromAktoerId) {

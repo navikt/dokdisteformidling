@@ -14,7 +14,7 @@ import org.springframework.core.io.FileSystemResource;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-import static no.nav.dokdisteformidling.consumer.eformidling.EformidlingConstants.ARKIVMELDING_PROCESS;
+import static no.nav.dokdisteformidling.consumer.eformidling.EformidlingConstants.AVTALEMELDING_PROCESS;
 import static no.nav.dokdisteformidling.consumer.eformidling.EformidlingConstants.TRYGDERETTEN_ORGNUMMER;
 
 /**
@@ -61,7 +61,7 @@ class ServiceRegistryConsumerManualTest {
 		MaskinportenTokenConsumer maskinportenTokenConsumer = new MaskinportenTokenConsumer(new AppCertificate(keyStoreProperties), maskinportenProperties, new RestTemplateBuilder());
 		ServiceRegistryConsumer serviceRegistryConsumer = new ServiceRegistryConsumer(serviceRegistryProperties, maskinportenTokenConsumer, new RestTemplateBuilder());
 
-		final IdentifierResource identifierResource = serviceRegistryConsumer.getIdentifierResource(TRYGDERETTEN_ORGNUMMER, ARKIVMELDING_PROCESS);
+		final IdentifierResource identifierResource = serviceRegistryConsumer.getIdentifierResource(TRYGDERETTEN_ORGNUMMER, AVTALEMELDING_PROCESS);
 		System.out.println(identifierResource);
 	}
 }

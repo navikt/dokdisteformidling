@@ -40,7 +40,7 @@ class EformidlingMessagePackagerTest {
 		final NavDokumentpakke navDokumentpakke = NavDokumentpakke.builder()
 				.conversationId("1")
 				.bestillingsId("2")
-				.arkivmelding(NavDokument.fromArkivmelding(new ByteArrayInputStream("arkivmelding".getBytes())))
+				.arkivmelding(NavDokument.fromAvtaltmelding(new ByteArrayInputStream("avtalt".getBytes())))
 				.navDokumenter(Collections.singletonList(NavDokument.fromVedlegg("test1.pdf", new ByteArrayInputStream("test1pdf".getBytes()))))
 				.build();
 
@@ -59,7 +59,7 @@ class EformidlingMessagePackagerTest {
 		final NavDokumentpakke navDokumentpakke = NavDokumentpakke.builder()
 				.conversationId("1")
 				.bestillingsId("2")
-				.arkivmelding(NavDokument.fromArkivmelding(null))
+				.arkivmelding(NavDokument.fromAvtaltmelding(null))
 				.navDokumenter(Collections.singletonList(NavDokument.fromVedlegg("test1.pdf", new ByteArrayInputStream("test1pdf".getBytes()))))
 				.build();
 

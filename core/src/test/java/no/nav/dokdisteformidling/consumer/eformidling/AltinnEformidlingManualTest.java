@@ -70,15 +70,13 @@ class AltinnEformidlingManualTest {
 				new JacksonConfig().eformidlingObjectMapper(SYSTEM_CLOCK),
 				new StandardBusinessDocumentMapper(SYSTEM_CLOCK),
 				new EformidlingContentPackager());
-//		final Eformidling eformidling = new AltinnEformidling(appCertificate, eformidlingMottakerInfoService, eformidlingMessagePackager, null, null);
 
 		final NavDokumentpakke navDokumentpakke = NavDokumentpakke.builder()
 				.conversationId("1")
 				.bestillingsId("2")
-				.arkivmelding(NavDokument.fromArkivmelding(new ByteArrayInputStream("arkivmelding".getBytes())))
+				.arkivmelding(NavDokument.fromAvtaltmelding(new ByteArrayInputStream("arkivmelding".getBytes())))
 				.navDokumenter(Collections.singletonList(NavDokument.fromVedlegg("test1.pdf", new ByteArrayInputStream("test1pdf".getBytes()))))
 				.build();
 
-//		eformidling.send(navDokumentpakke);
 	}
 }
