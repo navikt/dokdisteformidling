@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.stream.Stream;
 
 import static no.nav.dokdisteformidling.AppTestUtils.zipEntries;
-import static no.nav.dokdisteformidling.consumer.eformidling.NavDokument.fromArkivmelding;
+import static no.nav.dokdisteformidling.consumer.eformidling.NavDokument.fromAvtaltmelding;
 import static no.nav.dokdisteformidling.consumer.eformidling.NavDokument.fromVedlegg;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -22,8 +22,9 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @author Joakim Bjørnstad, Jbit AS
  */
 class AsiceCreatorTest {
-	private static final String ARKIVMELDING_NAME = "arkivmelding.xml";
+	private static final String ARKIVMELDING_NAME = "test.txt";
 	private static final String ARKIVMELDING_CONTENTS = "arkivmelding";
+	private static final String AVTALTMELDING_CONTENTS = "avtalt";
 	private static final String DOKUMENT_1_NAME = "test1.pdf";
 	private static final String DOKUMENT_1_CONTENTS = "test1pdf";
 	private static final String DOKUMENT_2_NAME = "test2.pdf";
@@ -33,7 +34,7 @@ class AsiceCreatorTest {
 
 	@Test
 	void shouldCreateAndSignAsice() throws Exception {
-		final OutputStream asiceStreamed = asiceCreator.createAsiceStreamed(fromArkivmelding(new ByteArrayInputStream(ARKIVMELDING_CONTENTS.getBytes())),
+		final OutputStream asiceStreamed = asiceCreator.createAsiceStreamed(fromAvtaltmelding(new ByteArrayInputStream(AVTALTMELDING_CONTENTS.getBytes())),
 				Stream.of(fromVedlegg(DOKUMENT_1_NAME, new ByteArrayInputStream(DOKUMENT_1_CONTENTS.getBytes())),
 						fromVedlegg(DOKUMENT_2_NAME, new ByteArrayInputStream(DOKUMENT_2_CONTENTS.getBytes()))),
 				new AppCertificate(CertTestUtils.itestVirksomhetssertifikatProperties()));
@@ -45,11 +46,11 @@ class AsiceCreatorTest {
 		assertThat(zipEntries).extracting(AppTestUtils.ZipFile::getName).containsAll(
 				Arrays.asList("mimetype",
 						"manifest.xml",
-						"arkivmelding.xml",
+						"test.txt",
 						"test1.pdf",
 						"META-INF/asicmanifest.xml",
 						"META-INF/manifest.xml"));
-		assertFileContents(zipEntries, ARKIVMELDING_NAME, ARKIVMELDING_CONTENTS);
+		assertFileContents(zipEntries, ARKIVMELDING_NAME, AVTALTMELDING_CONTENTS);
 		assertFileContents(zipEntries, DOKUMENT_1_NAME, DOKUMENT_1_CONTENTS);
 		assertFileContents(zipEntries, DOKUMENT_2_NAME, DOKUMENT_2_CONTENTS);
 	}

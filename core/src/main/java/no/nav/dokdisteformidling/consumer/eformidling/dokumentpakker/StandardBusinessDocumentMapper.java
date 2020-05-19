@@ -31,10 +31,10 @@ public class StandardBusinessDocumentMapper {
 	static final String HEADER_VERSION = "1.0";
 	static final String TYPE_VERSION = "1.0";
 	static final String IDENTIFIER_AUTHORITY = "iso6523-actorid-upis";
-	static final String DOCUMENT_IDENTIFICATOR_STANDARD = "urn:no:difi:arkivmelding:xsd::arkivmelding";
+	static final String DOCUMENT_IDENTIFICATOR_STANDARD = "urn:no:difi:avtalt:xsd::avtalt";
 	static final String SCOPE_CONVERSATION_ID = "ConversationId";
-	static final String SCOPE_CONVERSATION_ID_IDENTIFIER = "urn:no:difi:profile:arkivmelding:administrasjon:ver1.0";
-	static final String ARKIVMELDING_FORRETNINGSMELDING = "arkivmelding";
+	static final String SCOPE_CONVERSATION_ID_IDENTIFIER = "urn:no:difi:profile:avtalt:avtalt:ver1.0";
+	static final String AVTALTMELDING_FORRETNINGSMELDING = "avtalt";
 	public static final String ARKIVMELDING_XML = "arkivmelding.xml";
 	public static final int SIKKERHETSNIVAA = 4;
 	public static final Duration EXPECTED_RESPONSE_WITHIN_HOURS = ofHours(24);
@@ -46,7 +46,7 @@ public class StandardBusinessDocumentMapper {
 		this.clock = clock;
 	}
 
-	StandardBusinessDocument mapArkivmeldingEnvelope(final String conversationId, final String bestillingsId) {
+	StandardBusinessDocument mapAvtaltmeldingEnvelope(final String conversationId, final String bestillingsId) {
 		StandardBusinessDocumentHeader standardBusinessDocumentHeader = new StandardBusinessDocumentHeader();
 		standardBusinessDocumentHeader.setHeaderVersion(HEADER_VERSION);
 		standardBusinessDocumentHeader.addSender(createSender());
@@ -57,7 +57,7 @@ public class StandardBusinessDocumentMapper {
 		standardBusinessDocumentHeader.setBusinessScope(businessScope);
 		StandardBusinessDocument standardBusinessDocument = new StandardBusinessDocument();
 		standardBusinessDocument.setStandardBusinessDocumentHeader(standardBusinessDocumentHeader);
-		standardBusinessDocument.setAny(createArkivmeldingMessage());
+		standardBusinessDocument.setAny(createAvtaltMessage());
 		return standardBusinessDocument;
 	}
 
@@ -66,7 +66,7 @@ public class StandardBusinessDocumentMapper {
 		documentIdentification.setStandard(DOCUMENT_IDENTIFICATOR_STANDARD);
 		documentIdentification.setTypeVersion(TYPE_VERSION);
 		documentIdentification.setInstanceIdentifier(instanceIdentifier);
-		documentIdentification.setType(ARKIVMELDING_FORRETNINGSMELDING);
+		documentIdentification.setType(AVTALTMELDING_FORRETNINGSMELDING);
 		documentIdentification.setMultipleType(true);
 		documentIdentification.setCreationDateAndTime(OffsetDateTime.now(clock).minus(10, ChronoUnit.SECONDS));
 		return documentIdentification;
@@ -101,10 +101,12 @@ public class StandardBusinessDocumentMapper {
 		return conversationIdScope;
 	}
 
-	private ArkivmeldingMessage createArkivmeldingMessage() {
-		final ArkivmeldingMessage forretningsmelding = new ArkivmeldingMessage();
-		forretningsmelding.setHoveddokument(ARKIVMELDING_XML);
+	private AvtaltMessage createAvtaltMessage(){
+		final AvtaltMessage forretningsmelding = new AvtaltMessage();
+		forretningsmelding.setIdentifier(SCOPE_CONVERSATION_ID_IDENTIFIER);
+		forretningsmelding.setContent(null);
 		forretningsmelding.setSikkerhetsnivaa(SIKKERHETSNIVAA);
+		forretningsmelding.setHoveddokument(ARKIVMELDING_XML);
 		return forretningsmelding;
 	}
 }

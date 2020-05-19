@@ -16,10 +16,10 @@
       "contactInformation" : [ ]
     } ],
     "documentIdentification" : {
-      "standard" : "urn:no:difi:arkivmelding:xsd::arkivmelding",
+      "standard" : "urn:no:difi:avtalt:xsd::avtalt",
       "typeVersion" : "1.0",
       "instanceIdentifier" : "2",
-      "type" : "arkivmelding",
+      "type" : "avtalt",
       "multipleType" : true,
       "creationDateAndTime" : "2020-01-01T12:59:50+01:00"
     },
@@ -27,15 +27,15 @@
       "scope" : [ {
         "type" : "ConversationId",
         "instanceIdentifier" : "1",
-        "identifier" : "urn:no:difi:profile:arkivmelding:administrasjon:ver1.0",
+        "identifier" : "urn:no:difi:profile:avtalt:avtalt:ver1.0",
         "scopeInformation" : [ {
           "expectedResponseDateTime" : "2020-01-02T13:00:00+01:00"
         } ]
       } ]
     }
   },
-  "arkivmelding" : {
+  "avtalt" : {
     "sikkerhetsnivaa" : 4,
-    "hoveddokument" : "arkivmelding.xml"
+    "identifier" : "urn:no:difi:profile:avtalt:avtalt:ver1.0"
   }
 }

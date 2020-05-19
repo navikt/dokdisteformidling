@@ -15,7 +15,7 @@ import static no.nav.dokdisteformidling.AppTestUtils.zipEntries;
 import static no.nav.dokdisteformidling.CertTestUtils.itestPemCertificate;
 import static no.nav.dokdisteformidling.CertTestUtils.itestPrivateKey;
 import static no.nav.dokdisteformidling.CertTestUtils.itestVirksomhetssertifikatProperties;
-import static no.nav.dokdisteformidling.consumer.eformidling.NavDokument.fromArkivmelding;
+import static no.nav.dokdisteformidling.consumer.eformidling.NavDokument.fromAvtaltmelding;
 import static no.nav.dokdisteformidling.consumer.eformidling.NavDokument.fromVedlegg;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -36,7 +36,7 @@ class EformidlingContentPackagerTest {
 		final NavDokumentpakke navDokumentpakke = NavDokumentpakke.builder()
 				.conversationId("1")
 				.bestillingsId("2")
-				.arkivmelding(fromArkivmelding(new ByteArrayInputStream(ARKIVMELDING_CONTENTS.getBytes())))
+				.arkivmelding(fromAvtaltmelding(new ByteArrayInputStream(ARKIVMELDING_CONTENTS.getBytes())))
 				.navDokumenter(Arrays.asList(fromVedlegg(DOKUMENT_1_NAME, new ByteArrayInputStream(DOKUMENT_1_CONTENTS.getBytes())),
 						fromVedlegg(DOKUMENT_2_NAME, new ByteArrayInputStream(DOKUMENT_2_CONTENTS.getBytes()))))
 				.build();
