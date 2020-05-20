@@ -14,7 +14,7 @@
 		<module>qdist011</module>
 		<module>qdist013</module>
 		<module>sdist001</module>
-		<module>schemas-avtalemelding</module>
+		<module>schemas-avtaltmelding</module>
 		<module>schemas-altinn</module>
 	</modules>
 	<parent>
@@ -80,7 +80,7 @@
 			</dependency>
 			<dependency>
 				<groupId>no.nav.dokdisteformidling</groupId>
-				<artifactId>schemas-avtalemelding</artifactId>
+				<artifactId>schemas-avtaltmelding</artifactId>
 				<version>${project.version}</version>
 			</dependency>
 			<dependency>

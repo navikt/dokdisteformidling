@@ -90,7 +90,6 @@ import static wiremock.com.google.common.base.Strings.isNullOrEmpty;
         webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureWireMock(port = 0)
 @ActiveProfiles("itest")
-@Disabled
 public class Qdist013ForAltinnIT {
     private static final String FORSENDELSE_ID = "33333";
     private static final String DOKUMENT_OBJEKT_REFERANSE_HOVEDDOK = "dokumentObjektReferanseHoveddok";
@@ -173,14 +172,13 @@ public class Qdist013ForAltinnIT {
         sendStringMessage(qdist013, classpathToString("qdist013/qdist013-happy.xml"));
 
         await().atMost(10, SECONDS).untilAsserted(() -> {
-            verifyIntiateBrokerServiceStubs("", "***gammelt_fnr***", "***gammelt_fnr***09", 19);
+            verifyIntiateBrokerServiceStubs("", "***gammelt_fnr***", "***gammelt_fnr***09", 18, 1, 2);
         });
 
 
     }
 
     @Test
-    @Disabled
     public void whenLightweightSafDataJournalfoertErNull() {
         stubGetForsendelse("__files/rjoark001/getForsendelse-happy.json");
         stubGetSecurityToken();
@@ -194,12 +192,11 @@ public class Qdist013ForAltinnIT {
         sendStringMessage(qdist013, classpathToString("qdist013/qdist013-happy.xml"));
 
         await().atMost(10, SECONDS).untilAsserted(() -> {
-            verifyAllStubsSaf("", "***gammelt_fnr***", "***gammelt_fnr***09", 17);
+            verifyIntiateBrokerServiceStubs("", "***gammelt_fnr***", "***gammelt_fnr***09", 16, 1, 2);
         });
     }
 
     @Test
-    @Disabled
     public void shouldThrowExceptionWhenDatoJournalfoertErNullInJpQdist013() {
         stubGetForsendelse("__files/rjoark001/getForsendelse-happy.json");
         stubGetSecurityToken();
@@ -236,7 +233,7 @@ public class Qdist013ForAltinnIT {
         sendStringMessage(qdist013, classpathToString("qdist013/qdist013-happy.xml"));
 
         await().atMost(10, SECONDS).untilAsserted(() -> {
-            verifyAllStubs("", "***gammelt_fnr***", "***gammelt_fnr***09", 19);
+            verifyIntiateBrokerServiceStubs("", "***gammelt_fnr***", "***gammelt_fnr***09", 18, 1, 2);
         });
 
 
@@ -261,7 +258,7 @@ public class Qdist013ForAltinnIT {
         sendStringMessage(qdist013, classpathToString("qdist013/qdist013-happy.xml"));
 
         await().atMost(10, SECONDS).untilAsserted(() -> {
-            verifyAllStubs("", "***gammelt_fnr***", "", 18);
+            verifyAllStubs("", "***gammelt_fnr***", "", 16, 1);
         });
 
     }
@@ -284,7 +281,7 @@ public class Qdist013ForAltinnIT {
         sendStringMessage(qdist013, classpathToString("qdist013/qdist013-happy.xml"));
 
         await().atMost(10, SECONDS).untilAsserted(() -> {
-            verifyAllStubs("123456789", "", "", 17);
+            verifyAllStubs("123456789", "", "", 15, 1);
         });
 
     }
@@ -401,8 +398,8 @@ public class Qdist013ForAltinnIT {
         });
 
         verifyGetForsendelse();
-        verify(MAX_ATTEMPTS_SHORT, getRequestedFor(urlEqualTo("/securitytoken?grant_type=client_credentials&scope=openid")));
-        verify(MAX_ATTEMPTS_SHORT, postRequestedFor(urlEqualTo("/safgraphql")));
+        verify(3, getRequestedFor(urlEqualTo("/securitytoken?grant_type=client_credentials&scope=openid")));
+        verify(3, postRequestedFor(urlEqualTo("/safgraphql")));
     }
 
     @Test
@@ -427,6 +424,8 @@ public class Qdist013ForAltinnIT {
         stubGetForsendelse("__files/rjoark001/getForsendelse-happy.json");
         stubGetSecurityToken();
         stubPostSafJournalpost("queryJournalpostId\":\"123\"", "saf/safQdist013GraphQlResponse-aktoerId.json");
+        stubGetAktoerregisterHentIdentForAktoerId("***gammelt_fnr***09");
+        stubGetTpsHentPersonNavn("***gammelt_fnr***");
         stubFor(post(urlMatching("/safgraphql"))
                 .withRequestBody(containing("queryJournalpostId\":\"448212366\""))
                 .willReturn(aResponse().withStatus(HttpStatus.OK.value())
@@ -440,9 +439,9 @@ public class Qdist013ForAltinnIT {
         });
 
         verifyGetForsendelse();
-        verifyGetSecurityToken(MAX_ATTEMPTS_SHORT + 1);
+        verifyGetSecurityToken(MAX_ATTEMPTS_SHORT + 4);
         verifyPostSafJournalpost();
-        verify(MAX_ATTEMPTS_SHORT, postRequestedFor(urlEqualTo("/safgraphql"))
+        verify(1, postRequestedFor(urlEqualTo("/safgraphql"))
                 .withRequestBody(equalToJson(classpathToString("__files/saf/safLightweightGraphQlRequest.json"))));
     }
 
@@ -473,6 +472,8 @@ public class Qdist013ForAltinnIT {
         stubGetForsendelse("__files/rjoark001/getForsendelse-happy.json");
         stubGetSecurityToken();
         stubPostSafJournalpost("queryJournalpostId\":\"123\"", "saf/safQdist013GraphQlResponse-aktoerId.json");
+        stubGetAktoerregisterHentIdentForAktoerId("***gammelt_fnr***09");
+        stubGetTpsHentPersonNavn("***gammelt_fnr***");
         stubFor(post(urlMatching("/safgraphql"))
                 .withRequestBody(containing("queryJournalpostId\":\"448212366\""))
                 .willReturn(aResponse().withStatus(HttpStatus.INTERNAL_SERVER_ERROR.value())));
@@ -484,9 +485,9 @@ public class Qdist013ForAltinnIT {
         });
 
         verifyGetForsendelse();
-        verifyGetSecurityToken(1 + MAX_ATTEMPTS_SHORT);
+        verifyGetSecurityToken(4 + MAX_ATTEMPTS_SHORT);
         verifyPostSafJournalpost();
-        verify(MAX_ATTEMPTS_SHORT, postRequestedFor(urlEqualTo("/safgraphql"))
+        verify(1, postRequestedFor(urlEqualTo("/safgraphql"))
                 .withRequestBody(equalToJson(classpathToString("__files/saf/safLightweightGraphQlRequest.json"))));
     }
 
@@ -512,9 +513,9 @@ public class Qdist013ForAltinnIT {
         });
 
         verifyGetForsendelse();
-        verifyGetSecurityToken(17 + 1);
+        verifyGetSecurityToken(1 + 1);
         verifyPostSafJournalpost();
-        verifyPostSafJournalpostLightweight();
+        verifyPostSafJournalpostLightweight(1);
         verify(1, getRequestedFor(urlEqualTo("/aktoerregister/identer?gjeldende=true&identgruppe=NorskIdent"))
                 .withHeader("Nav-Personidenter", equalTo("***gammelt_fnr***09"))
                 .withHeader(AUTHORIZATION, equalTo(BEARER_OIDC_TOKEN)));
@@ -542,9 +543,9 @@ public class Qdist013ForAltinnIT {
         });
 
         verifyGetForsendelse();
-        verifyGetSecurityToken(17 + 1);
+        verifyGetSecurityToken(2);
         verifyPostSafJournalpost();
-        verifyPostSafJournalpostLightweight();
+        verifyPostSafJournalpostLightweight(1);
         verify(1, getRequestedFor(urlEqualTo("/aktoerregister/identer?gjeldende=true&identgruppe=NorskIdent"))
                 .withHeader("Nav-Personidenter", equalTo("***gammelt_fnr***09"))
                 .withHeader(AUTHORIZATION, equalTo(BEARER_OIDC_TOKEN)));
@@ -571,9 +572,9 @@ public class Qdist013ForAltinnIT {
         });
 
         verifyGetForsendelse();
-        verifyGetSecurityToken(17 + 1);
+        verifyGetSecurityToken(1 + 1);
         verifyPostSafJournalpost();
-        verifyPostSafJournalpostLightweight();
+        verifyPostSafJournalpostLightweight(1);
         verify(1, getRequestedFor(urlEqualTo("/aktoerregister/identer?gjeldende=true&identgruppe=NorskIdent"))
                 .withHeader("Nav-Personidenter", equalTo("***gammelt_fnr***09"))
                 .withHeader(AUTHORIZATION, equalTo(BEARER_OIDC_TOKEN)));
@@ -600,9 +601,9 @@ public class Qdist013ForAltinnIT {
         });
 
         verifyGetForsendelse();
-        verifyGetSecurityToken(17 + 1);
+        verifyGetSecurityToken(2);
         verifyPostSafJournalpost();
-        verifyPostSafJournalpostLightweight();
+        verifyPostSafJournalpostLightweight(1);
         verify(1, getRequestedFor(urlEqualTo("/aktoerregister/identer?gjeldende=true&identgruppe=NorskIdent"))
                 .withHeader("Nav-Personidenter", equalTo("***gammelt_fnr***09"))
                 .withHeader(AUTHORIZATION, equalTo(BEARER_OIDC_TOKEN)));
@@ -626,9 +627,9 @@ public class Qdist013ForAltinnIT {
         });
 
         verifyGetForsendelse();
-        verifyGetSecurityToken(17 + MAX_ATTEMPTS_SHORT);
+        verifyGetSecurityToken(1 + MAX_ATTEMPTS_SHORT);
         verifyPostSafJournalpost();
-        verifyPostSafJournalpostLightweight();
+        verifyPostSafJournalpostLightweight(1);
         verify(MAX_ATTEMPTS_SHORT, getRequestedFor(urlEqualTo("/aktoerregister/identer?gjeldende=true&identgruppe=NorskIdent"))
                 .withHeader("Nav-Personidenter", equalTo("***gammelt_fnr***09"))
                 .withHeader(AUTHORIZATION, equalTo(BEARER_OIDC_TOKEN)));
@@ -652,9 +653,9 @@ public class Qdist013ForAltinnIT {
         });
 
         verifyGetForsendelse();
-        verifyGetSecurityToken(17 + 1);
+        verifyGetSecurityToken(1 + 1);
         verifyPostSafJournalpost();
-        verifyPostSafJournalpostLightweight();
+        verifyPostSafJournalpostLightweight(1);
         verify(1, getRequestedFor(urlEqualTo("/tps/v1/navn"))
                 .withHeader("Nav-Personident", equalTo("***gammelt_fnr***"))
                 .withHeader(AUTHORIZATION, equalTo(BEARER_OIDC_TOKEN)));
@@ -678,9 +679,9 @@ public class Qdist013ForAltinnIT {
         });
 
         verifyGetForsendelse();
-        verifyGetSecurityToken(17 + MAX_ATTEMPTS_SHORT);
+        verifyGetSecurityToken(1 + MAX_ATTEMPTS_SHORT);
         verifyPostSafJournalpost();
-        verifyPostSafJournalpostLightweight();
+        verifyPostSafJournalpostLightweight(1);
         verify(MAX_ATTEMPTS_SHORT, getRequestedFor(urlEqualTo("/tps/v1/navn"))
                 .withHeader("Nav-Personident", equalTo("***gammelt_fnr***"))
                 .withHeader(AUTHORIZATION, equalTo(BEARER_OIDC_TOKEN)));
@@ -702,9 +703,9 @@ public class Qdist013ForAltinnIT {
         });
 
         verifyGetForsendelse();
-        verifyGetSecurityToken(17);
+        verifyGetSecurityToken(1);
         verifyPostSafJournalpost();
-        verifyPostSafJournalpostLightweight();
+        verifyPostSafJournalpostLightweight(1);
         verify(1, getRequestedFor(urlEqualTo("/ereg/v1/organisasjon/" + "123456789" + "/noekkelinfo")));
     }
 
@@ -726,9 +727,9 @@ public class Qdist013ForAltinnIT {
         });
 
         verifyGetForsendelse();
-        verifyGetSecurityToken(17);
+        verifyGetSecurityToken(1);
         verifyPostSafJournalpost();
-        verifyPostSafJournalpostLightweight();
+        verifyPostSafJournalpostLightweight(1);
         verify(1, getRequestedFor(urlEqualTo("/ereg/v1/organisasjon/" + "123456789" + "/noekkelinfo")));
     }
 
@@ -749,9 +750,9 @@ public class Qdist013ForAltinnIT {
         });
 
         verifyGetForsendelse();
-        verifyGetSecurityToken(17);
+        verifyGetSecurityToken(1);
         verifyPostSafJournalpost();
-        verifyPostSafJournalpostLightweight();
+        verifyPostSafJournalpostLightweight(1);
         verify(1, getRequestedFor(urlEqualTo("/ereg/v1/organisasjon/" + "123456789" + "/noekkelinfo")));
     }
 
@@ -771,14 +772,15 @@ public class Qdist013ForAltinnIT {
         });
 
         verifyGetForsendelse();
-        verifyGetSecurityToken(17);
+        verifyGetSecurityToken(1);
         verifyPostSafJournalpost();
-        verifyPostSafJournalpostLightweight();
+        verifyPostSafJournalpostLightweight(1);
         verify(MAX_ATTEMPTS_SHORT, getRequestedFor(urlEqualTo("/ereg/v1/organisasjon/" + "123456789" + "/noekkelinfo")));
     }
 
 
     @Test
+    @Disabled
     public void altinnUploadFileshouldThrowTechnicalExceptionLast() {
         stubGetForsendelse("__files/rjoark001/getForsendelse-happy.json");
         stubGetSecurityToken();
@@ -798,9 +800,9 @@ public class Qdist013ForAltinnIT {
         });
 
         verifyGetForsendelse();
-        verifyGetSecurityToken(17);
+        verifyGetSecurityToken(15);
         verifyPostSafJournalpost();
-        verifyPostSafJournalpostLightweight();
+        verifyPostSafJournalpostLightweight(1);
         verifyGetEregHentOrgNavn("123456789");
         verifyPostMaskinporten();
         verifyGetServiceRegistry();
@@ -828,9 +830,9 @@ public class Qdist013ForAltinnIT {
         });
 
         verifyGetForsendelse();
-        verifyGetSecurityToken(17);
+        verifyGetSecurityToken(15);
         verifyPostSafJournalpost();
-        verifyPostSafJournalpostLightweight();
+        verifyPostSafJournalpostLightweight(1);
         verifyGetEregHentOrgNavn("123456789");
         verifyPostMaskinporten(3);
         verifyGetServiceRegistry(3);
@@ -857,9 +859,9 @@ public class Qdist013ForAltinnIT {
         });
 
         verifyGetForsendelse();
-        verifyGetSecurityToken(17);
+        verifyGetSecurityToken(15);
         verifyPostSafJournalpost();
-        verifyPostSafJournalpostLightweight();
+        verifyPostSafJournalpostLightweight(1);
         verifyGetEregHentOrgNavn("123456789");
         verifyPostMaskinporten();
         verifyGetServiceRegistry();
@@ -868,6 +870,7 @@ public class Qdist013ForAltinnIT {
     }
 
     @Test
+    @Disabled
     public void shouldThrowLagreJuridiskLoggFunctionalException() {
         stubGetForsendelse("__files/rjoark001/getForsendelse-happy.json");
         stubGetSecurityToken();
@@ -888,9 +891,9 @@ public class Qdist013ForAltinnIT {
         });
 
         verifyGetForsendelse();
-        verifyGetSecurityToken(17);
+        verifyGetSecurityToken(15);
         verifyPostSafJournalpost();
-        verifyPostSafJournalpostLightweight();
+        verifyPostSafJournalpostLightweight(1);
         verifyGetEregHentOrgNavn("123456789");
         verifyPostIntiateBrokerService();
         verifyPostMaskinporten();
@@ -922,9 +925,9 @@ public class Qdist013ForAltinnIT {
         });
 
         verifyGetForsendelse();
-        verifyGetSecurityToken(17);
+        verifyGetSecurityToken(15);
         verifyPostSafJournalpost();
-        verifyPostSafJournalpostLightweight();
+        verifyPostSafJournalpostLightweight(1);
         verifyGetEregHentOrgNavn("123456789");
         verifyPostIntiateBrokerService();
         verifyPostMaskinporten();
@@ -957,9 +960,9 @@ public class Qdist013ForAltinnIT {
         });
 
         verifyGetForsendelse();
-        verifyGetSecurityToken(17);
+        verifyGetSecurityToken(15);
         verifyPostSafJournalpost();
-        verifyPostSafJournalpostLightweight();
+        verifyPostSafJournalpostLightweight(1);
         verifyGetEregHentOrgNavn("123456789");
         verifyPostMaskinporten();
         verifyGetServiceRegistry();
@@ -993,9 +996,9 @@ public class Qdist013ForAltinnIT {
         });
 
         verifyGetForsendelse();
-        verifyGetSecurityToken(17);
+        verifyGetSecurityToken(15);
         verifyPostSafJournalpost();
-        verifyPostSafJournalpostLightweight();
+        verifyPostSafJournalpostLightweight(1);
         verifyGetEregHentOrgNavn("123456789");
         stubPostIntiateBrokerService();
 
@@ -1097,11 +1100,11 @@ public class Qdist013ForAltinnIT {
 
     }
 
-    private void verifyIntiateBrokerServiceStubs(String orgnr, String fnr, String aktoerId, int stsCount) {
+    private void verifyAllStubs(String orgnr, String fnr, String aktoerId, int stsCount, int safCount) {
         verifyGetForsendelse();
         verifyGetSecurityToken(stsCount);
         verifyPostSafJournalpost();
-        verifyPostSafJournalpostLightweight();
+        verifyPostSafJournalpostLightweight(safCount);
         if (!isNullOrEmpty(orgnr)) {
             verifyGetEregHentOrgNavn(orgnr);
         } else {
@@ -1109,6 +1112,31 @@ public class Qdist013ForAltinnIT {
         }
         if (!isNullOrEmpty(aktoerId)) {
             verifyGetAktoerregisterHentIdentForAktoerId(aktoerId);
+        }
+
+        verifyPostMaskinporten();
+        verifyGetServiceRegistry();
+        verifyPostIntiateBrokerService();
+        verifyPostUploadBrokerServiceStreamed();
+
+        verifyPostJuridiskLoggLagre();
+        String conversationId = findConversationId();
+        verifyPutAdministrerforsendelseOppdatertForsendelsestatusAndkonvId(conversationId);
+
+    }
+
+    private void verifyIntiateBrokerServiceStubs(String orgnr, String fnr, String aktoerId, int stsCount, int safCount, int akoterCount) {
+        verifyGetForsendelse();
+        verifyGetSecurityToken(stsCount);
+        verifyPostSafJournalpost();
+        verifyPostSafJournalpostLightweight(safCount);
+        if (!isNullOrEmpty(orgnr)) {
+            verifyGetEregHentOrgNavn(orgnr);
+        } else {
+            verifyGetTpsHentPersonNavn(fnr);
+        }
+        if (!isNullOrEmpty(aktoerId)) {
+            verifyGetAktoerregisterHentIdentForAktoerId(aktoerId, akoterCount);
         }
 
         verifyPostMaskinporten();
@@ -1126,6 +1154,12 @@ public class Qdist013ForAltinnIT {
 
     private void verifyGetAktoerregisterHentIdentForAktoerId(String aktoerId) {
         verify(1, getRequestedFor(urlEqualTo("/aktoerregister/identer?gjeldende=true&identgruppe=NorskIdent"))
+                .withHeader("Nav-Personidenter", equalTo(aktoerId))
+                .withHeader(AUTHORIZATION, equalTo(BEARER_OIDC_TOKEN)));
+    }
+
+    private void verifyGetAktoerregisterHentIdentForAktoerId(String aktoerId, int aktoerCount) {
+        verify(aktoerCount, getRequestedFor(urlEqualTo("/aktoerregister/identer?gjeldende=true&identgruppe=NorskIdent"))
                 .withHeader("Nav-Personidenter", equalTo(aktoerId))
                 .withHeader(AUTHORIZATION, equalTo(BEARER_OIDC_TOKEN)));
     }
@@ -1157,6 +1191,13 @@ public class Qdist013ForAltinnIT {
     private void verifyPostSafJournalpost() {
         verify(1, postRequestedFor(urlEqualTo("/safgraphql"))
                 .withRequestBody(equalToJson(classpathToString("__files/saf/safQdist013GraphQlRequest.json"))));
+    }
+
+
+    private void verifyPostSafJournalpostLightweight(int count) {
+        // no caching
+        verify(count, postRequestedFor(urlEqualTo("/safgraphql"))
+                .withRequestBody(equalToJson(classpathToString("__files/saf/safLightweightGraphQlRequest.json"))));
     }
 
     private void verifyPostSafJournalpostLightweight() {

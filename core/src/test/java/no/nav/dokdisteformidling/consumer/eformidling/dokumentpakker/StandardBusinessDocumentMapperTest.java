@@ -1,5 +1,6 @@
 package no.nav.dokdisteformidling.consumer.eformidling.dokumentpakker;
 
+import no.nav.dokdisteformidling.AppTestUtils;
 import no.nav.dokdisteformidling.consumer.eformidling.Organisasjonsnummer;
 import no.nav.dokdisteformidling.consumer.eformidling.dokumentpakker.sbdh.CorrelationInformation;
 import no.nav.dokdisteformidling.consumer.eformidling.dokumentpakker.sbdh.PartnerIdentification;
@@ -35,10 +36,10 @@ class StandardBusinessDocumentMapperTest {
 	private static final String TEN_SECONDS_BEFORE = "2020-01-01T12:59:50+01:00";
 	private static final String TWENTY_FOUR_HOURS_LATER = "2020-01-02T13:00:00+01:00";
 	private final StandardBusinessDocumentMapper mapper = new StandardBusinessDocumentMapper(Clock.fixed(Instant.parse(FIXED_TIME), DEFAULT_ZONE_ID));
-
+	private static final String ARKIVEMELDING_XML = AppTestUtils.classpathToString("avtaltmelding/arkivemelding.xml");
 	@Test
 	void shouldMapArkivmeldingKonvolutt() {
-		final StandardBusinessDocument sbd = mapper.mapAvtaltmeldingEnvelope(KONVERSASJON_ID, BESTILLINGS_ID);
+		final StandardBusinessDocument sbd = mapper.mapAvtaltmeldingEnvelope(KONVERSASJON_ID, BESTILLINGS_ID,ARKIVEMELDING_XML);
 
 		assertThat(sbd.getStandardBusinessDocumentHeader().getHeaderVersion()).isEqualTo(HEADER_VERSION);
 		assertThat(sbd.getStandardBusinessDocumentHeader().getSender())

@@ -101,7 +101,7 @@ public class Qdist013Service {
                         .map(d -> fromVedlegg(getDocumentFilename(arkivmeldingJAXBElement.getValue(), journalpostQdist013.getJournalpostId(), d.getDokumentInfoId()),
                                 new ByteArrayInputStream(d.getPdf())))
                         .collect(Collectors.toList()))
-                .build());
+                .build(), arkivmeldingXmlString);
         juridiskLogg.lagreJuridiskLogg(lagreJuridiskLoggMapper.map(hentForsendelseResponseTo, arkivmeldingXmlString.getBytes()));
 
     }

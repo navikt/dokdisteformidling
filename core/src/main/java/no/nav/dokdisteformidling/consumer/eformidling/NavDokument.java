@@ -11,11 +11,9 @@ import java.io.InputStream;
 @Builder
 @Value
 public class NavDokument {
-	private static final String AVTALTMELDING_TEXT_FILENAME = "test.txt";
 	private static final String ARKIVMELDING_XML_FILENAME = "arkivmelding.xml";
 	public static final String MIMETYPE_XML = "application/xml";
 	public static final String MIMETYPE_PDF = "application/pdf";
-	public static final String MIMETYPE_PLAIN = "text/plain";
 
 	private final String filnavn;
 	private final String mimeType;
@@ -23,8 +21,8 @@ public class NavDokument {
 
 	public static NavDokument fromAvtaltmelding(final InputStream contents) {
 		return NavDokument.builder()
-				.filnavn(AVTALTMELDING_TEXT_FILENAME)
-				.mimeType(MIMETYPE_PLAIN)
+				.filnavn(ARKIVMELDING_XML_FILENAME)
+				.mimeType(MIMETYPE_XML)
 				.innhold(contents)
 				.build();
 	}

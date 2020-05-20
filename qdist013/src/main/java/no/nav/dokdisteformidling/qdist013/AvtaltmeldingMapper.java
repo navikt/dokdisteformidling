@@ -16,7 +16,6 @@ import no.nav.dokdisteformidling.consumer.saf.SafJournalpostQueryService;
 import no.nav.dokdisteformidling.consumer.tps.Tps;
 import no.nav.dokdisteformidling.qdist013.saf.lightweight.LightweightSafJournalpostQdist013;
 import no.nav.dokdisteformidling.qdist013.saf.main.JournalpostQdist013;
-import no.nav.dokdisteformidling.qdist013.util.VirksomhetsspesifikkeMetadata;
 import org.springframework.stereotype.Component;
 
 import javax.inject.Named;
@@ -114,7 +113,7 @@ public class AvtaltmeldingMapper {
         saksmappe.setTittel(journalpostQdist013.getTemanavn());
         saksmappe.setOpprettetDato(convertLocalDateTimeToXmlGregorianCalendar(journalpostQdist013.getSak().getDatoOpprettet()));
         saksmappe.setOpprettetAv(journalpostQdist013.getOpprettetAvNavn());
-        saksmappe.setVirksomhetsspesifikkeMetadata(oppretteVirksomhetsspesifikkeMetadata(journalpostQdist013));
+        saksmappe.setVirksomhetsspesifikkeMetadata(journalpostQdist013.getSak().getArkivsaksnummer());
         saksmappe.getPart()
                 .add(createAndPopulatePartAMP(journalpostQdist013, objectFactory));
         saksmappe.getPart()
@@ -159,7 +158,6 @@ public class AvtaltmeldingMapper {
 
                 });
     }
-
 
 
     private Dokumentbeskrivelse createAndPopulateDokumentBeskrivelse(JournalpostQdist013 journalpostQdist013,
@@ -207,13 +205,17 @@ public class AvtaltmeldingMapper {
     }
 
     private XMLGregorianCalendar getDokumentDatoJournalfoert(boolean isHoveddok, JournalpostQdist013 journalpostQdist013, JournalpostQdist013.DokumentInfo dokumentInfo) {
-        if (!isHoveddok && !isBlank(dokumentInfo.getOriginalJournalpostId())) {
+        if (!isHoveddok && !isBlank(dokumentInfo.getOriginalJournalpostId()) && !isJournalDatoNull(dokumentInfo.getOriginalJournalpostId())) {
             LightweightSafJournalpostQdist013 lightweightSafJournalpostQdist013 = safJournalpostQueryService.hentJournalpost(dokumentInfo
                     .getOriginalJournalpostId());
             return convertLocalDateTimeToXmlGregorianCalendar(lightweightSafJournalpostQdist013.getDatoJournalfoert());
         } else {
             return convertLocalDateTimeToXmlGregorianCalendar(journalpostQdist013.getDatoJournalfoert());
         }
+    }
+
+    private boolean isJournalDatoNull(String journalpostId) {
+        return getLightweightSafJournalpostQdist013(journalpostId) == null ? Objects.isNull(getLightweightSafJournalpostQdist013(journalpostId)) : getLightweightSafJournalpostQdist013(journalpostId).getDatoJournalfoert() == null;
     }
 
 
@@ -365,11 +367,5 @@ public class AvtaltmeldingMapper {
         }
     }
 
-    private VirksomhetsspesifikkeMetadata oppretteVirksomhetsspesifikkeMetadata(JournalpostQdist013 journalpostQdist013) {
-        return VirksomhetsspesifikkeMetadata.builder()
-                .saksnummerNAV(journalpostQdist013.getSak().getArkivsaksnummer())
-                .build();
-
-    }
 
 }

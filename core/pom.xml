@@ -17,7 +17,7 @@
         </dependency>
         <dependency>
             <groupId>no.nav.dokdisteformidling</groupId>
-            <artifactId>schemas-avtalemelding</artifactId>
+            <artifactId>schemas-avtaltmelding</artifactId>
         </dependency>
         <dependency>
             <groupId>no.nav.dokdisteformidling</groupId>

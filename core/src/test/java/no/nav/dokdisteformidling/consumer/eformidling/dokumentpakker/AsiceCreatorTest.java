@@ -22,8 +22,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @author Joakim Bjørnstad, Jbit AS
  */
 class AsiceCreatorTest {
-	private static final String ARKIVMELDING_NAME = "test.txt";
-	private static final String ARKIVMELDING_CONTENTS = "arkivmelding";
+	private static final String ARKIVMELDING_NAME = "arkivmelding.xml";
 	private static final String AVTALTMELDING_CONTENTS = "avtalt";
 	private static final String DOKUMENT_1_NAME = "test1.pdf";
 	private static final String DOKUMENT_1_CONTENTS = "test1pdf";
@@ -46,7 +45,7 @@ class AsiceCreatorTest {
 		assertThat(zipEntries).extracting(AppTestUtils.ZipFile::getName).containsAll(
 				Arrays.asList("mimetype",
 						"manifest.xml",
-						"test.txt",
+						"arkivmelding.xml",
 						"test1.pdf",
 						"META-INF/asicmanifest.xml",
 						"META-INF/manifest.xml"));

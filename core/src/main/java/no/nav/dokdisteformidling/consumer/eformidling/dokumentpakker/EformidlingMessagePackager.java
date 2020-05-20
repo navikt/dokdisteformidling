@@ -51,11 +51,11 @@ public class EformidlingMessagePackager {
         this.eformidlingContentPackager = eformidlingContentPackager;
     }
 
-    public InputStream packageMessage(NavDokumentpakke navDokumentpakke,
+    public InputStream packageMessage(NavDokumentpakke navDokumentpakke, String arkivmelding,
                                       AppCertificate appCertificate,
                                       X509Certificate mottakerCertificate) {
         final StandardBusinessDocument envelope = standardBusinessDocumentMapper.mapAvtaltmeldingEnvelope(navDokumentpakke.getConversationId(),
-                navDokumentpakke.getBestillingsId());
+                navDokumentpakke.getBestillingsId(), arkivmelding);
         final InputStream content = eformidlingContentPackager.packageContent(navDokumentpakke, appCertificate, mottakerCertificate);
         final ByteArrayOutputStream zipfile = new ByteArrayOutputStream();
         writeZip(envelope, content, zipfile);
