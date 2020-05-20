@@ -1,5 +1,6 @@
 package no.nav.dokdisteformidling.consumer.eformidling.dokumentpakker;
 
+import no.arkivverket.standarder.noark5.arkivmelding.Arkivmelding;
 import no.nav.dokdisteformidling.consumer.eformidling.EformidlingConstants;
 import no.nav.dokdisteformidling.consumer.eformidling.dokumentpakker.sbdh.BusinessScope;
 import no.nav.dokdisteformidling.consumer.eformidling.dokumentpakker.sbdh.CorrelationInformation;
@@ -46,7 +47,7 @@ public class StandardBusinessDocumentMapper {
 		this.clock = clock;
 	}
 
-	StandardBusinessDocument mapAvtaltmeldingEnvelope(final String conversationId, final String bestillingsId) {
+	StandardBusinessDocument mapAvtaltmeldingEnvelope(final String conversationId, final String bestillingsId, String arkivmelding) {
 		StandardBusinessDocumentHeader standardBusinessDocumentHeader = new StandardBusinessDocumentHeader();
 		standardBusinessDocumentHeader.setHeaderVersion(HEADER_VERSION);
 		standardBusinessDocumentHeader.addSender(createSender());
@@ -57,7 +58,7 @@ public class StandardBusinessDocumentMapper {
 		standardBusinessDocumentHeader.setBusinessScope(businessScope);
 		StandardBusinessDocument standardBusinessDocument = new StandardBusinessDocument();
 		standardBusinessDocument.setStandardBusinessDocumentHeader(standardBusinessDocumentHeader);
-		standardBusinessDocument.setAny(createAvtaltMessage());
+		standardBusinessDocument.setAny(createAvtaltMessage(arkivmelding));
 		return standardBusinessDocument;
 	}
 
@@ -101,12 +102,12 @@ public class StandardBusinessDocumentMapper {
 		return conversationIdScope;
 	}
 
-	private AvtaltMessage createAvtaltMessage(){
+	private AvtaltMessage createAvtaltMessage(String arkivmelding){
 		final AvtaltMessage forretningsmelding = new AvtaltMessage();
 		forretningsmelding.setIdentifier(SCOPE_CONVERSATION_ID_IDENTIFIER);
-		forretningsmelding.setContent(null);
 		forretningsmelding.setSikkerhetsnivaa(SIKKERHETSNIVAA);
 		forretningsmelding.setHoveddokument(ARKIVMELDING_XML);
+		forretningsmelding.setContent(arkivmelding);
 		return forretningsmelding;
 	}
 }

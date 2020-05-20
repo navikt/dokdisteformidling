@@ -36,6 +36,8 @@
   },
   "avtalt" : {
     "sikkerhetsnivaa" : 4,
-    "identifier" : "urn:no:difi:profile:avtalt:avtalt:ver1.0"
+    "hoveddokument" : "arkivmelding.xml",
+    "identifier" : "urn:no:difi:profile:avtalt:avtalt:ver1.0",
+    "content" : "arkivemelding"
   }
 }

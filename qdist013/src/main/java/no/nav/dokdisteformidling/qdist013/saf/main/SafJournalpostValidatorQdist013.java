@@ -48,6 +48,7 @@ public class SafJournalpostValidatorQdist013 {
 
 	private void assertSak(SafJournalpost safJournalpost, String journalpostId) {
 		assertObjectOnSafJournalpostBodyNotNull("jounalpost.sak", safJournalpost.getSak(), journalpostId);
+		assertObjectOnSafJournalpostBodyNotNull("journalpost.sak.arkivsaksnummer", safJournalpost.getSak().getArkivsaksnummer(), journalpostId);
 		assertObjectOnSafJournalpostBodyNotNull("journalpost.sak.datoOpprettet", safJournalpost.getSak().getDatoOpprettet(), journalpostId);
 	}
 

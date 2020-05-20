@@ -9,7 +9,7 @@ import java.util.List;
  * @author Joakim Bjørnstad, Jbit AS
  */
 public interface Eformidling {
-    UploadResponse send(NavDokumentpakke navDokumentpakke);
+    UploadResponse send(NavDokumentpakke navDokumentpakke, String arkivmelding);
 
     List<DownloadResponse> hent();
 

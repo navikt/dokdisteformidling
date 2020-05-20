@@ -29,6 +29,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 class EformidlingMessagePackagerTest {
 	private static final String FIXED_TIME = "2020-01-01T12:00:00Z";
 	public static final Clock FIXED_CLOCK = Clock.fixed(Instant.parse(FIXED_TIME), DEFAULT_ZONE_ID);
+	private static final String ARKIVEMELDING = "arkivemelding";
 
 	private final EformidlingMessagePackager eformidlingMessagePackager = new EformidlingMessagePackager(
 			new JacksonConfig().eformidlingObjectMapper(FIXED_CLOCK),
@@ -44,7 +45,7 @@ class EformidlingMessagePackagerTest {
 				.navDokumenter(Collections.singletonList(NavDokument.fromVedlegg("test1.pdf", new ByteArrayInputStream("test1pdf".getBytes()))))
 				.build();
 
-		final InputStream inputStream = eformidlingMessagePackager.packageMessage(navDokumentpakke,
+		final InputStream inputStream = eformidlingMessagePackager.packageMessage(navDokumentpakke,ARKIVEMELDING,
 				new AppCertificate(itestVirksomhetssertifikatProperties()),
 				itestPemCertificate());
 
@@ -64,7 +65,7 @@ class EformidlingMessagePackagerTest {
 				.build();
 
 		final DokumentpakkingException dokumentpakkingException = assertThrows(DokumentpakkingException.class, () -> {
-			eformidlingMessagePackager.packageMessage(navDokumentpakke,
+			eformidlingMessagePackager.packageMessage(navDokumentpakke, ARKIVEMELDING,
 					new AppCertificate(itestVirksomhetssertifikatProperties()),
 					itestPemCertificate());
 		});

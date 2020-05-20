@@ -52,7 +52,7 @@ public abstract class SafJournalpostTest {
 				.journalposttype(JOURNALPOST_TYPE)
 				.opprettetAvNavn(OPPRETTET_AV_NAVN)
 				.relevanteDatoer(Arrays.asList(createRelevantDatoRegistrert(), createRelevantDatoJournalfoert()))
-				.sak(SafJournalpost.Sak.builder().datoOpprettet(DATO_OPPRETTET_SAK).build())
+				.sak(SafJournalpost.Sak.builder().arkivsaksnummer("1234568").datoOpprettet(DATO_OPPRETTET_SAK).build())
 				.temanavn(TEMANAVN)
 				.tittel(TITTEL);
 	}
