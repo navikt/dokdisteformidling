@@ -3,6 +3,7 @@ package no.nav.dokdisteformidling.qdist013;
 import static no.nav.dokdisteformidling.constants.RouteConstants.PROPERTY_BESTILLINGS_ID;
 import static no.nav.dokdisteformidling.constants.RouteConstants.PROPERTY_CONVERSATION_ID;
 import static no.nav.dokdisteformidling.constants.RouteConstants.PROPERTY_FORSENDELSE_ID;
+import static no.nav.dokdisteformidling.constants.RouteConstants.PROPERTY_JOURNALPOST_ID;
 import static no.nav.dokdisteformidling.constants.RouteConstants.QDIST013_SERVICE_ID;
 import static org.apache.camel.LoggingLevel.ERROR;
 
@@ -77,7 +78,7 @@ public class Qdist013Route extends SpringRouteBuilder {
 				.bean(distribuerForsendelseTilTrygderettenMapper)
 				.bean(qdist013Service)
 				.log(LoggingLevel.INFO, log, "qdist013 har videresendt forsendelse med " + getIdsForLogging() + " til DIFI for distribusjon via TRYGDERETTEN. " +
-						"Forsendelsen inneholder ${exchangeProperty.antallDok} dokumenter og arkivmelding.")
+						"Forsendelsen inneholder ${exchangeProperty.antallDok} dokumenter og avtaltmelding.")
 				.bean(dokdistAdministrerforsendelseUpdater, "updateStatusAndConversationId")
 				.log(LoggingLevel.INFO, log, "qdist013 har oppdatert dokdistDb med konversasjonsId=${exchangeProperty.conversationId} og forsendelseStatus=OVERSENDT og avslutter behandling av forsendelse med " + getIdsForLogging())
 				.end();
@@ -86,6 +87,7 @@ public class Qdist013Route extends SpringRouteBuilder {
 	public static String getIdsForLogging() {
 		return "bestillingsId=${exchangeProperty." + PROPERTY_BESTILLINGS_ID + "}, " +
 				"forsendelseId=${exchangeProperty." + PROPERTY_FORSENDELSE_ID + "} og " +
+				"journalpostId=${exchangeProperty." + PROPERTY_JOURNALPOST_ID + "} og " +
 				"conversationId=${exchangeProperty." + PROPERTY_CONVERSATION_ID + "}";
 	}
 }

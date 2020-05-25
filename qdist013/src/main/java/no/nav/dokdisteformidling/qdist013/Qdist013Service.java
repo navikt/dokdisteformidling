@@ -35,6 +35,7 @@ import static java.lang.String.format;
 import static no.nav.dokdisteformidling.constants.RouteConstants.PROPERTY_ANTALL_DOK;
 import static no.nav.dokdisteformidling.constants.RouteConstants.PROPERTY_BESTILLINGS_ID;
 import static no.nav.dokdisteformidling.constants.RouteConstants.PROPERTY_CONVERSATION_ID;
+import static no.nav.dokdisteformidling.constants.RouteConstants.PROPERTY_JOURNALPOST_ID;
 import static no.nav.dokdisteformidling.consumer.eformidling.NavDokument.fromAvtaltmelding;
 import static no.nav.dokdisteformidling.consumer.eformidling.NavDokument.fromVedlegg;
 import static no.nav.dokdisteformidling.utils.FunctionalUtils.deserializeS3JsonPayloadToDokdistDokument;
@@ -48,7 +49,6 @@ import static no.nav.dokdisteformidling.utils.FunctionalUtils.validateThatForsen
 @Service
 public class Qdist013Service {
 
-    public static final String ARKIVMELDING = "arkivmelding";
 
     private final Storage s3Storage;
     private final AdministrerForsendelse administrerForsendelse;
@@ -82,6 +82,9 @@ public class Qdist013Service {
         final HentForsendelseResponseTo hentForsendelseResponseTo = administrerForsendelse.hentForsendelse(forsendelseId);
         final String bestillingsId = hentForsendelseResponseTo.getBestillingsId();
         exchange.setProperty(PROPERTY_BESTILLINGS_ID, bestillingsId);
+        final String journalpostId =  hentForsendelseResponseTo.getArkivInformasjon().getArkivId();
+        exchange.setProperty(PROPERTY_JOURNALPOST_ID, journalpostId);
+        exchange.setProperty(PROPERTY_CONVERSATION_ID, conversationId);
         validateThatForsendelseStatusIsKlarForDist(hentForsendelseResponseTo.getForsendelseStatus());
 
         final List<DokdistDokument> dokdistDokumentList = getDocumentsFromS3(hentForsendelseResponseTo);
