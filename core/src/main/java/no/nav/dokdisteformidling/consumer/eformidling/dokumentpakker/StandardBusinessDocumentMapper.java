@@ -47,7 +47,7 @@ public class StandardBusinessDocumentMapper {
 		this.clock = clock;
 	}
 
-	StandardBusinessDocument mapAvtaltmeldingEnvelope(final String conversationId, final String bestillingsId, String arkivmelding) {
+	StandardBusinessDocument mapAvtaltmeldingEnvelope(final String conversationId, final String bestillingsId, String avtaltmelding) {
 		StandardBusinessDocumentHeader standardBusinessDocumentHeader = new StandardBusinessDocumentHeader();
 		standardBusinessDocumentHeader.setHeaderVersion(HEADER_VERSION);
 		standardBusinessDocumentHeader.addSender(createSender());
@@ -58,7 +58,7 @@ public class StandardBusinessDocumentMapper {
 		standardBusinessDocumentHeader.setBusinessScope(businessScope);
 		StandardBusinessDocument standardBusinessDocument = new StandardBusinessDocument();
 		standardBusinessDocument.setStandardBusinessDocumentHeader(standardBusinessDocumentHeader);
-		standardBusinessDocument.setAny(createAvtaltMessage(arkivmelding));
+		standardBusinessDocument.setAny(createAvtaltMessage(avtaltmelding));
 		return standardBusinessDocument;
 	}
 
@@ -102,12 +102,12 @@ public class StandardBusinessDocumentMapper {
 		return conversationIdScope;
 	}
 
-	private AvtaltMessage createAvtaltMessage(String arkivmelding){
+	private AvtaltMessage createAvtaltMessage(String avtaltmelding){
 		final AvtaltMessage forretningsmelding = new AvtaltMessage();
 		forretningsmelding.setIdentifier(SCOPE_CONVERSATION_ID_IDENTIFIER);
 		forretningsmelding.setSikkerhetsnivaa(SIKKERHETSNIVAA);
 		forretningsmelding.setHoveddokument(ARKIVMELDING_XML);
-		forretningsmelding.setContent(arkivmelding);
+		forretningsmelding.setContent(avtaltmelding);
 		return forretningsmelding;
 	}
 }

@@ -11,7 +11,7 @@ import java.security.Security;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 import static no.nav.dokdisteformidling.AppTestUtils.classpathToString;
-import static no.nav.dokdisteformidling.consumer.eformidling.EformidlingConstants.AVTALEMELDING_PROCESS;
+import static no.nav.dokdisteformidling.consumer.eformidling.EformidlingConstants.AVTALTMELDING_PROCESS;
 import static no.nav.dokdisteformidling.consumer.eformidling.EformidlingConstants.TRYGDERETTEN_ORGNUMMER;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchThrowable;
@@ -34,7 +34,7 @@ class EformidlingMottakerInfoServiceTest {
 
     @Test
     void shouldHentMottakerInfo() throws Exception {
-        when(serviceRegistryConsumerMock.getIdentifierResource(eq(TRYGDERETTEN_ORGNUMMER), eq(AVTALEMELDING_PROCESS)))
+        when(serviceRegistryConsumerMock.getIdentifierResource(eq(TRYGDERETTEN_ORGNUMMER), eq(AVTALTMELDING_PROCESS)))
                 .thenReturn(baseIdentifierResource()
                         .serviceRecords(singletonList(createServiceRecord(createDpoService())))
                         .build());
@@ -50,7 +50,7 @@ class EformidlingMottakerInfoServiceTest {
 
     @Test
     void shouldHentDpoMottakerInfoWhenResponseFromServiceRegistryContainsMultipleServiceRecords() throws Exception {
-        when(serviceRegistryConsumerMock.getIdentifierResource(eq(TRYGDERETTEN_ORGNUMMER), eq(AVTALEMELDING_PROCESS)))
+        when(serviceRegistryConsumerMock.getIdentifierResource(eq(TRYGDERETTEN_ORGNUMMER), eq(AVTALTMELDING_PROCESS)))
                 .thenReturn(baseIdentifierResource()
                         .serviceRecords(asList(createServiceRecord(createDpvService()), createServiceRecord(createDpoService())))
                         .build());
@@ -65,7 +65,7 @@ class EformidlingMottakerInfoServiceTest {
 
     @Test
     void shouldThrowMottakerInfoIkkeFunnetExceptionWhenNoDpoServiceExists() throws Exception {
-        when(serviceRegistryConsumerMock.getIdentifierResource(eq(TRYGDERETTEN_ORGNUMMER), eq(AVTALEMELDING_PROCESS)))
+        when(serviceRegistryConsumerMock.getIdentifierResource(eq(TRYGDERETTEN_ORGNUMMER), eq(AVTALTMELDING_PROCESS)))
                 .thenReturn(baseIdentifierResource()
                         .serviceRecords(singletonList(createServiceRecord(createDpvService())))
                         .build());
@@ -80,7 +80,7 @@ class EformidlingMottakerInfoServiceTest {
     void shouldThrowMottakerInfoIkkeFunnetExceptionWhenNoPemCertificateIsSet() throws Exception {
         final ServiceRecord serviceRecord = createServiceRecord(createDpoService());
         serviceRecord.setPemCertificate(null);
-        when(serviceRegistryConsumerMock.getIdentifierResource(eq(TRYGDERETTEN_ORGNUMMER), eq(AVTALEMELDING_PROCESS)))
+        when(serviceRegistryConsumerMock.getIdentifierResource(eq(TRYGDERETTEN_ORGNUMMER), eq(AVTALTMELDING_PROCESS)))
                 .thenReturn(baseIdentifierResource()
                         .serviceRecords(singletonList(serviceRecord))
                         .build());
@@ -96,7 +96,7 @@ class EformidlingMottakerInfoServiceTest {
                 .organisationNumber(TRYGDERETTEN_ORGNUMMER)
                 .pemCertificate(classpathToString("secrets/itest.pem"))
                 .service(service)
-                .process(AVTALEMELDING_PROCESS)
+                .process(AVTALTMELDING_PROCESS)
                 .documentTypes(singletonList("urn:no:difi:arkivmelding:xsd::arkivmelding"))
                 .build();
     }

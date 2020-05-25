@@ -59,11 +59,11 @@ public class AltinnEformidling implements Eformidling {
     }
 
     @Override
-    public UploadResponse send(NavDokumentpakke navDokumentpakke, String arkivmelding) {
+    public UploadResponse send(NavDokumentpakke navDokumentpakke, String avtaltmelding) {
         log.info("Henter mottakerInfo for Trygderetten. conversationId={}, bestillingsId={}", navDokumentpakke.getConversationId(), navDokumentpakke.getBestillingsId());
         final MottakerInfo mottakerInfo = eformidlingMottakerInfoService.hentMottakerInfoTrygderetten();
         log.info("Hentet mottakerInfo={} for Trygderetten. conversationId={}, bestillingsId={}", mottakerInfo, navDokumentpakke.getConversationId(), navDokumentpakke.getBestillingsId());
-        final InputStream sbdZip = eformidlingMessagePackager.packageMessage(navDokumentpakke, arkivmelding, appCertificate,
+        final InputStream sbdZip = eformidlingMessagePackager.packageMessage(navDokumentpakke, avtaltmelding, appCertificate,
                 mottakerInfo.getX509Certificate());
 
         final UploadManifest uploadManifest = mapUploadManifest(mottakerInfo, navDokumentpakke.getConversationId());
