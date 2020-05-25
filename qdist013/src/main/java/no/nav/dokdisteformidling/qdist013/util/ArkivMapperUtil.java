@@ -9,12 +9,17 @@ public final class ArkivMapperUtil {
 
 	private static final String AKTOERID = "AKTOERID";
 	private static final String ORGNR = "ORGNR";
+	private static final String FNR = "FNR";
 
 	private ArkivMapperUtil() {
 	}
 
 	public static boolean brukerTypeIsAktoerId(JournalpostQdist013 journalpostQdist013) {
 		return AKTOERID.equals(journalpostQdist013.getBruker().getType());
+	}
+
+	public static boolean isBrukerTypeFnr(JournalpostQdist013 journalpostQdist013) {
+		return FNR.equals(journalpostQdist013.getBruker().getType());
 	}
 
 	public static boolean brukerTypeIsOrgnr(JournalpostQdist013 journalpostQdist013) {

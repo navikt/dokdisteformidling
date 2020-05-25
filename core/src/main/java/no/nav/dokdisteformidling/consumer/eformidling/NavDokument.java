@@ -19,7 +19,7 @@ public class NavDokument {
 	private final String mimeType;
 	private final InputStream innhold;
 
-	public static NavDokument fromArkivmelding(final InputStream contents) {
+	public static NavDokument fromAvtaltmelding(final InputStream contents) {
 		return NavDokument.builder()
 				.filnavn(ARKIVMELDING_XML_FILENAME)
 				.mimeType(MIMETYPE_XML)

@@ -79,7 +79,7 @@ public class Sdist001IT {
 
         sdist001Service.oppdatereDokDistEformidlingStatus();
         verify(1, postRequestedFor(urlEqualTo("/maskinporten")));
-        verify(1, getRequestedFor(urlEqualTo("/serviceregistry/identifier/" + TRYGDERETTEN_ORGNUMMER + "/process/" + EformidlingConstants.ARKIVMELDING_PROCESS)));
+        verify(1, getRequestedFor(urlEqualTo("/serviceregistry/identifier/" + TRYGDERETTEN_ORGNUMMER + "/process/" + EformidlingConstants.AVTALTMELDING_PROCESS)));
         verify(1, getRequestedFor(urlEqualTo("/administrerforsendelse/henteformidlingforsendelser")));
         verify(2, postRequestedFor(urlEqualTo("/brokerserviceexternal")));
         verify(1, postRequestedFor(urlEqualTo("/brokerserviceexternalstreamed")));
@@ -97,7 +97,7 @@ public class Sdist001IT {
     }
 
     private void stubGetServiceRegistry() {
-        stubFor(get(urlMatching("/serviceregistry/identifier/" + EformidlingConstants.TRYGDERETTEN_ORGNUMMER + "/process/" + EformidlingConstants.ARKIVMELDING_PROCESS))
+        stubFor(get(urlMatching("/serviceregistry/identifier/" + EformidlingConstants.TRYGDERETTEN_ORGNUMMER + "/process/" + EformidlingConstants.AVTALTMELDING_PROCESS))
                 .willReturn(aResponse().withStatus(HttpStatus.OK.value())
                         .withHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                         .withBodyFile("serviceregistry/serviceregistry_happy_response.json")));

@@ -29,6 +29,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 class EformidlingMessagePackagerTest {
 	private static final String FIXED_TIME = "2020-01-01T12:00:00Z";
 	public static final Clock FIXED_CLOCK = Clock.fixed(Instant.parse(FIXED_TIME), DEFAULT_ZONE_ID);
+	private static final String ARKIVMELDING = AppTestUtils.classpathToString("avtaltmelding/arkivmelding.xml");
 
 	private final EformidlingMessagePackager eformidlingMessagePackager = new EformidlingMessagePackager(
 			new JacksonConfig().eformidlingObjectMapper(FIXED_CLOCK),
@@ -40,11 +41,11 @@ class EformidlingMessagePackagerTest {
 		final NavDokumentpakke navDokumentpakke = NavDokumentpakke.builder()
 				.conversationId("1")
 				.bestillingsId("2")
-				.arkivmelding(NavDokument.fromArkivmelding(new ByteArrayInputStream("arkivmelding".getBytes())))
+				.arkivmelding(NavDokument.fromAvtaltmelding(new ByteArrayInputStream("avtalt".getBytes())))
 				.navDokumenter(Collections.singletonList(NavDokument.fromVedlegg("test1.pdf", new ByteArrayInputStream("test1pdf".getBytes()))))
 				.build();
 
-		final InputStream inputStream = eformidlingMessagePackager.packageMessage(navDokumentpakke,
+		final InputStream inputStream = eformidlingMessagePackager.packageMessage(navDokumentpakke, ARKIVMELDING,
 				new AppCertificate(itestVirksomhetssertifikatProperties()),
 				itestPemCertificate());
 
@@ -59,12 +60,12 @@ class EformidlingMessagePackagerTest {
 		final NavDokumentpakke navDokumentpakke = NavDokumentpakke.builder()
 				.conversationId("1")
 				.bestillingsId("2")
-				.arkivmelding(NavDokument.fromArkivmelding(null))
+				.arkivmelding(NavDokument.fromAvtaltmelding(null))
 				.navDokumenter(Collections.singletonList(NavDokument.fromVedlegg("test1.pdf", new ByteArrayInputStream("test1pdf".getBytes()))))
 				.build();
 
 		final DokumentpakkingException dokumentpakkingException = assertThrows(DokumentpakkingException.class, () -> {
-			eformidlingMessagePackager.packageMessage(navDokumentpakke,
+			eformidlingMessagePackager.packageMessage(navDokumentpakke, ARKIVMELDING,
 					new AppCertificate(itestVirksomhetssertifikatProperties()),
 					itestPemCertificate());
 		});

@@ -9,7 +9,7 @@
 	</parent>
 	<modelVersion>4.0.0</modelVersion>
 
-	<artifactId>schemas</artifactId>
+	<artifactId>schemas-avtaltmelding</artifactId>
 
 	<build>
 		<plugins>
