@@ -3,6 +3,7 @@
     "journalpost": {
       "journalpostId": "448212366",
       "sak": {
+        "arkivsaksnummer": "12345678",
         "datoOpprettet": "2018-12-12T06:45:06"
       },
       "opprettetAvNavn": "qmot002",

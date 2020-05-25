@@ -1,8 +1,10 @@
 package no.nav.dokdisteformidling;
 
+import static java.lang.String.format;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 import lombok.Data;
+import lombok.SneakyThrows;
 import org.apache.commons.io.IOUtils;
 import org.springframework.core.io.ClassPathResource;
 
@@ -26,9 +28,15 @@ public final class AppTestUtils {
 	private AppTestUtils() {
 	}
 
-	public static String classpathToString(String classpathResource) throws IOException {
-		try (InputStream inputStream = new ClassPathResource(classpathResource).getInputStream()) {
-			return IOUtils.toString(inputStream, UTF_8);
+	@SneakyThrows
+	public static String classpathToString(String classpathResource) {
+		try {
+			InputStream inputStream = new ClassPathResource(classpathResource).getInputStream();
+			String message = IOUtils.toString(inputStream, UTF_8);
+			IOUtils.closeQuietly(inputStream);
+			return message;
+		} catch (IOException e) {
+			throw new IOException(format("Kunne ikke åpne classpath-ressurs %s", classpathResource), e);
 		}
 	}
 

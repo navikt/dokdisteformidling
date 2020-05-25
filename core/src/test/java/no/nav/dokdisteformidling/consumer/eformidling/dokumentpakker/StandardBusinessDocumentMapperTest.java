@@ -1,5 +1,6 @@
 package no.nav.dokdisteformidling.consumer.eformidling.dokumentpakker;
 
+import no.nav.dokdisteformidling.AppTestUtils;
 import no.nav.dokdisteformidling.consumer.eformidling.Organisasjonsnummer;
 import no.nav.dokdisteformidling.consumer.eformidling.dokumentpakker.sbdh.CorrelationInformation;
 import no.nav.dokdisteformidling.consumer.eformidling.dokumentpakker.sbdh.PartnerIdentification;
@@ -16,7 +17,7 @@ import java.time.OffsetDateTime;
 import static no.nav.dokdisteformidling.constants.DomainConstants.DEFAULT_ZONE_ID;
 import static no.nav.dokdisteformidling.consumer.eformidling.EformidlingConstants.NAV_ORGNUMMER;
 import static no.nav.dokdisteformidling.consumer.eformidling.EformidlingConstants.TRYGDERETTEN_ORGNUMMER;
-import static no.nav.dokdisteformidling.consumer.eformidling.dokumentpakker.StandardBusinessDocumentMapper.ARKIVMELDING_FORRETNINGSMELDING;
+import static no.nav.dokdisteformidling.consumer.eformidling.dokumentpakker.StandardBusinessDocumentMapper.AVTALTMELDING_FORRETNINGSMELDING;
 import static no.nav.dokdisteformidling.consumer.eformidling.dokumentpakker.StandardBusinessDocumentMapper.DOCUMENT_IDENTIFICATOR_STANDARD;
 import static no.nav.dokdisteformidling.consumer.eformidling.dokumentpakker.StandardBusinessDocumentMapper.HEADER_VERSION;
 import static no.nav.dokdisteformidling.consumer.eformidling.dokumentpakker.StandardBusinessDocumentMapper.IDENTIFIER_AUTHORITY;
@@ -35,10 +36,10 @@ class StandardBusinessDocumentMapperTest {
 	private static final String TEN_SECONDS_BEFORE = "2020-01-01T12:59:50+01:00";
 	private static final String TWENTY_FOUR_HOURS_LATER = "2020-01-02T13:00:00+01:00";
 	private final StandardBusinessDocumentMapper mapper = new StandardBusinessDocumentMapper(Clock.fixed(Instant.parse(FIXED_TIME), DEFAULT_ZONE_ID));
-
+	private static final String ARKIVEMELDING_XML = AppTestUtils.classpathToString("avtaltmelding/arkivmelding.xml");
 	@Test
 	void shouldMapArkivmeldingKonvolutt() {
-		final StandardBusinessDocument sbd = mapper.mapArkivmeldingEnvelope(KONVERSASJON_ID, BESTILLINGS_ID);
+		final StandardBusinessDocument sbd = mapper.mapAvtaltmeldingEnvelope(KONVERSASJON_ID, BESTILLINGS_ID,ARKIVEMELDING_XML);
 
 		assertThat(sbd.getStandardBusinessDocumentHeader().getHeaderVersion()).isEqualTo(HEADER_VERSION);
 		assertThat(sbd.getStandardBusinessDocumentHeader().getSender())
@@ -56,7 +57,7 @@ class StandardBusinessDocumentMapperTest {
 		assertThat(sbd.getStandardBusinessDocumentHeader().getDocumentIdentification().getStandard()).isEqualTo(DOCUMENT_IDENTIFICATOR_STANDARD);
 		assertThat(sbd.getStandardBusinessDocumentHeader().getDocumentIdentification().getTypeVersion()).isEqualTo(TYPE_VERSION);
 		assertThat(sbd.getStandardBusinessDocumentHeader().getDocumentIdentification().getInstanceIdentifier()).isEqualTo(BESTILLINGS_ID);
-		assertThat(sbd.getStandardBusinessDocumentHeader().getDocumentIdentification().getType()).isEqualTo(ARKIVMELDING_FORRETNINGSMELDING);
+		assertThat(sbd.getStandardBusinessDocumentHeader().getDocumentIdentification().getType()).isEqualTo(AVTALTMELDING_FORRETNINGSMELDING);
 		assertThat(sbd.getStandardBusinessDocumentHeader().getDocumentIdentification().getCreationDateAndTime()).isEqualTo(OffsetDateTime.parse(TEN_SECONDS_BEFORE));
 		assertThat(sbd.getStandardBusinessDocumentHeader().getDocumentIdentification().getMultipleType()).isTrue();
 		assertThat(sbd.getStandardBusinessDocumentHeader().getBusinessScope().getScope()).hasSize(1);
@@ -69,6 +70,6 @@ class StandardBusinessDocumentMapperTest {
 				.flatExtracting(Scope::getScopeInformation)
 				.extracting(CorrelationInformation::getExpectedResponseDateTime)
 				.contains(OffsetDateTime.parse(TWENTY_FOUR_HOURS_LATER));
-		assertThat(sbd.getAny()).isInstanceOf(ArkivmeldingMessage.class);
+		assertThat(sbd.getAny()).isInstanceOf(AvtaltMessage.class);
 	}
 }

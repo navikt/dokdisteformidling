@@ -38,6 +38,7 @@ public class SafJournalpost {
 	@Value
 	@Builder
 	public static class Sak {
+		private final String arkivsaksnummer;
 		private final LocalDateTime datoOpprettet;
 	}
 

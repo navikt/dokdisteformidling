@@ -24,6 +24,7 @@ public class SafJournalpostQueryServiceImplQdist013 implements SafJournalpostQue
 					"journalpost(journalpostId: $queryJournalpostId) {\n" +
 						"journalpostId\n" +
 						"sak {\n" +
+							"arkivsaksnummer\n" +
 							"datoOpprettet\n" +
 						"}\n" +
 						"opprettetAvNavn\n" +
