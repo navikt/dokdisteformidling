@@ -11,6 +11,7 @@ import java.time.LocalDateTime;
 public class LightweightSafJournalpostQdist013 implements Journalpost {
 
 	private final String journalfortAvNavn;
+	private final String journalposttype;
 	private final String avsenderMottakerNavn;
 	private final LocalDateTime datoJournalfoert;
 

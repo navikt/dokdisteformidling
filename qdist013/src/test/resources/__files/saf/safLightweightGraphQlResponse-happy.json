@@ -2,6 +2,7 @@
   "data": {
     "journalpost": {
       "journalfortAvNavn": "qmot002",
+      "journalposttype" : "U",
       "avsenderMottaker": {
         "navn": "FORNAVN ETTERNAVN"
       },
