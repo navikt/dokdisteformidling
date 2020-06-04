@@ -32,6 +32,7 @@ public class LightweightSafJournalpostQueryServiceImplQdist013 implements SafJou
                     "    avsenderMottaker{\n" +
                     "		navn\n" +
                     "	 }\n" +
+                    "    journalposttype\n" +
                     "	 relevanteDatoer {\n" +
                     "		dato\n" +
                     "		datotype\n" +
@@ -60,6 +61,7 @@ public class LightweightSafJournalpostQueryServiceImplQdist013 implements SafJou
 
         return LightweightSafJournalpostQdist013.builder()
                 .journalfortAvNavn(safJournalpost.getJournalfortAvNavn())
+                .journalposttype(safJournalpost.getJournalposttype())
                 .avsenderMottakerNavn(getAvsenderMottakerNavn(safJournalpost.getAvsenderMottaker()))
                 .datoJournalfoert(getDatoJournalfoert(safJournalpost.getRelevanteDatoer(), journalpostId))
                 .build();

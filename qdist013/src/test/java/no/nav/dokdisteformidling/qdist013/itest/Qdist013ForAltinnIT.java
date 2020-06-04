@@ -172,7 +172,7 @@ public class Qdist013ForAltinnIT {
         sendStringMessage(qdist013, classpathToString("qdist013/qdist013-happy.xml"));
 
         await().atMost(10, SECONDS).untilAsserted(() -> {
-            verifyIntiateBrokerServiceStubs("", "***gammelt_fnr***", "***gammelt_fnr***09", 18, 1, 2);
+            verifyIntiateBrokerServiceStubs("", "***gammelt_fnr***", "***gammelt_fnr***09", 22, 1, 2);
         });
 
 
@@ -192,7 +192,7 @@ public class Qdist013ForAltinnIT {
         sendStringMessage(qdist013, classpathToString("qdist013/qdist013-happy.xml"));
 
         await().atMost(10, SECONDS).untilAsserted(() -> {
-            verifyIntiateBrokerServiceStubs("", "***gammelt_fnr***", "***gammelt_fnr***09", 16, 1, 2);
+            verifyIntiateBrokerServiceStubs("", "***gammelt_fnr***", "***gammelt_fnr***09", 18, 1, 2);
         });
     }
 
@@ -233,7 +233,7 @@ public class Qdist013ForAltinnIT {
         sendStringMessage(qdist013, classpathToString("qdist013/qdist013-happy.xml"));
 
         await().atMost(10, SECONDS).untilAsserted(() -> {
-            verifyIntiateBrokerServiceStubs("", "***gammelt_fnr***", "***gammelt_fnr***09", 18, 1, 2);
+            verifyIntiateBrokerServiceStubs("", "***gammelt_fnr***", "***gammelt_fnr***09", 22, 1, 2);
         });
 
 
@@ -258,7 +258,7 @@ public class Qdist013ForAltinnIT {
         sendStringMessage(qdist013, classpathToString("qdist013/qdist013-happy.xml"));
 
         await().atMost(10, SECONDS).untilAsserted(() -> {
-            verifyAllStubs("", "***gammelt_fnr***", "", 16, 1);
+            verifyAllStubs("", "***gammelt_fnr***", "", 20, 1);
         });
 
     }
@@ -281,7 +281,7 @@ public class Qdist013ForAltinnIT {
         sendStringMessage(qdist013, classpathToString("qdist013/qdist013-happy.xml"));
 
         await().atMost(10, SECONDS).untilAsserted(() -> {
-            verifyAllStubs("123456789", "", "", 15, 1);
+            verifyAllStubs("123456789", "", "", 19, 1);
         });
 
     }
@@ -830,7 +830,7 @@ public class Qdist013ForAltinnIT {
         });
 
         verifyGetForsendelse();
-        verifyGetSecurityToken(15);
+        verifyGetSecurityToken(19);
         verifyPostSafJournalpost();
         verifyPostSafJournalpostLightweight(1);
         verifyGetEregHentOrgNavn("123456789");
@@ -859,7 +859,7 @@ public class Qdist013ForAltinnIT {
         });
 
         verifyGetForsendelse();
-        verifyGetSecurityToken(15);
+        verifyGetSecurityToken(19);
         verifyPostSafJournalpost();
         verifyPostSafJournalpostLightweight(1);
         verifyGetEregHentOrgNavn("123456789");
@@ -925,7 +925,7 @@ public class Qdist013ForAltinnIT {
         });
 
         verifyGetForsendelse();
-        verifyGetSecurityToken(15);
+        verifyGetSecurityToken(19);
         verifyPostSafJournalpost();
         verifyPostSafJournalpostLightweight(1);
         verifyGetEregHentOrgNavn("123456789");
@@ -960,7 +960,7 @@ public class Qdist013ForAltinnIT {
         });
 
         verifyGetForsendelse();
-        verifyGetSecurityToken(15);
+        verifyGetSecurityToken(19);
         verifyPostSafJournalpost();
         verifyPostSafJournalpostLightweight(1);
         verifyGetEregHentOrgNavn("123456789");
@@ -996,7 +996,7 @@ public class Qdist013ForAltinnIT {
         });
 
         verifyGetForsendelse();
-        verifyGetSecurityToken(15);
+        verifyGetSecurityToken(19);
         verifyPostSafJournalpost();
         verifyPostSafJournalpostLightweight(1);
         verifyGetEregHentOrgNavn("123456789");
