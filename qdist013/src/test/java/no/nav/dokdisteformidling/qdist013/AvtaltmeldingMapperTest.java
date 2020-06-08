@@ -240,9 +240,9 @@ class AvtaltmeldingMapperTest {
         Dokumentbeskrivelse dokumentbeskrivelse = (Dokumentbeskrivelse) registreringJp.getDokumentbeskrivelse()
                 .get(1);
 
-        assertEquals(dokumentbeskrivelse.getTittel(), TITTEL_VEDLEGG + ", Fra " + AVSENDER_MOTTAKER_NAVN_ORIG_JP);
+        assertEquals(dokumentbeskrivelse.getTittel(), TITTEL_VEDLEGG + ", Til " + AVSENDER_MOTTAKER_NAVN_ORIG_JP);
 
-        verify(safJournalpostQueryServiceMock, times(14)).hentJournalpost(ORIGINAL_JPID_VEDLEGG);
+        verify(safJournalpostQueryServiceMock, times(18)).hentJournalpost(ORIGINAL_JPID_VEDLEGG);
     }
 
     @Test
@@ -266,7 +266,7 @@ class AvtaltmeldingMapperTest {
 
         assertEquals(dokumentbeskrivelse.getTittel(), TITTEL_VEDLEGG + ", Til " + AVSENDER_MOTTAKER_NAVN_ORIG_JP);
 
-        verify(safJournalpostQueryServiceMock, times(14)).hentJournalpost(ORIGINAL_JPID_VEDLEGG);
+        verify(safJournalpostQueryServiceMock, times(18)).hentJournalpost(ORIGINAL_JPID_VEDLEGG);
     }
 
     @Test
@@ -288,9 +288,9 @@ class AvtaltmeldingMapperTest {
         Dokumentbeskrivelse dokumentbeskrivelse = (Dokumentbeskrivelse) registreringJp.getDokumentbeskrivelse()
                 .get(1);
 
-        assertEquals(dokumentbeskrivelse.getTittel(), TITTEL_VEDLEGG);
+        assertEquals(dokumentbeskrivelse.getTittel(), TITTEL_VEDLEGG + ", Til " + AVSENDER_MOTTAKER_NAVN_ORIG_JP);
 
-        verify(safJournalpostQueryServiceMock, times(12)).hentJournalpost(ORIGINAL_JPID_VEDLEGG);
+        verify(safJournalpostQueryServiceMock, times(18)).hentJournalpost(ORIGINAL_JPID_VEDLEGG);
     }
 
     @Test
@@ -321,7 +321,7 @@ class AvtaltmeldingMapperTest {
         assertEquals(convertFromXmlGregorianCalendarToLocalDateTime(dokumentbeskrivelseVedlegg.getOpprettetDato()), DATO_JOURNALFOERT_ORIG_JP);
         assertEquals(convertFromXmlGregorianCalendarToLocalDateTime(dokumentobjektVedlegg.getOpprettetDato()), DATO_JOURNALFOERT_ORIG_JP);
 
-        verify(safJournalpostQueryServiceMock, times(14)).hentJournalpost(ORIGINAL_JPID_VEDLEGG);
+        verify(safJournalpostQueryServiceMock, times(18)).hentJournalpost(ORIGINAL_JPID_VEDLEGG);
     }
 
     @Test
@@ -352,7 +352,7 @@ class AvtaltmeldingMapperTest {
         assertEquals(dokumentbeskrivelseVedlegg.getOpprettetAv(), JOURNALFOERT_AV_NAVN_ORIG_JP);
         assertEquals(dokumentobjektVedlegg.getOpprettetAv(), JOURNALFOERT_AV_NAVN_ORIG_JP);
 
-        verify(safJournalpostQueryServiceMock, times(14)).hentJournalpost(ORIGINAL_JPID_VEDLEGG);
+        verify(safJournalpostQueryServiceMock, times(18)).hentJournalpost(ORIGINAL_JPID_VEDLEGG);
     }
 
     @Test
@@ -779,6 +779,7 @@ class AvtaltmeldingMapperTest {
     private LightweightSafJournalpostQdist013 createLightweightSafJournalpostQdist013() {
         return LightweightSafJournalpostQdist013.builder()
                 .avsenderMottakerNavn(AVSENDER_MOTTAKER_NAVN_ORIG_JP)
+                .journalposttype(UTGAAENDE)
                 .journalfortAvNavn(JOURNALFOERT_AV_NAVN_ORIG_JP)
                 .datoJournalfoert(DATO_JOURNALFOERT_ORIG_JP)
                 .build();

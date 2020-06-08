@@ -168,7 +168,7 @@ public class AvtaltmeldingMapper {
         Dokumentbeskrivelse dokumentbeskrivelse = objectFactory.createDokumentbeskrivelse();
         dokumentbeskrivelse.setDokumenttype(DOKUMENTASJON);
         dokumentbeskrivelse.setDokumentstatus(DOKUMENTET_ER_FERDIGSTILT);
-        dokumentbeskrivelse.setTittel(getDokumentbeskrivelseTittel(journalpostQdist013, dokumentInfo, isHoveddokument(rekkefolge)));
+        dokumentbeskrivelse.setTittel(getDokumentbeskrivelseTittel(dokumentInfo, isHoveddokument(rekkefolge)));
         dokumentbeskrivelse.setOpprettetDato(getDokumentDatoJournalfoert(isHoveddokument(rekkefolge), journalpostQdist013, dokumentInfo));
         dokumentbeskrivelse.setOpprettetAv(getDokumentJournalfortAvNavn(isHoveddokument(rekkefolge), journalpostQdist013, dokumentInfo));
         dokumentbeskrivelse.setTilknyttetRegistreringSom(isHoveddokument(rekkefolge) ? HOVEDDOKUMENT : VEDLEGG);
@@ -180,11 +180,11 @@ public class AvtaltmeldingMapper {
         return dokumentbeskrivelse;
     }
 
-    private String getDokumentbeskrivelseTittel(JournalpostQdist013 journalpostQdist013, JournalpostQdist013.DokumentInfo dokumentInfo, boolean isHoveddok) {
+    private String getDokumentbeskrivelseTittel(JournalpostQdist013.DokumentInfo dokumentInfo, boolean isHoveddok) {
         if (!isHoveddok && !isBlank(dokumentInfo.getOriginalJournalpostId())) {
-            if (INNGAAENDE.equals(journalpostQdist013.getJournalposttype())) {
+            if (INNGAAENDE.equals(getJournalpostType(dokumentInfo.getOriginalJournalpostId()))) {
                 return format("%s, Fra %s", dokumentInfo.getTittel(), getAvsenderMottakerNavn(dokumentInfo.getOriginalJournalpostId()));
-            } else if (UTGAAENDE.equals(journalpostQdist013.getJournalposttype())) {
+            } else if (UTGAAENDE.equals(getJournalpostType(dokumentInfo.getOriginalJournalpostId()))) {
                 return format("%s, Til %s", dokumentInfo.getTittel(), getAvsenderMottakerNavn(dokumentInfo.getOriginalJournalpostId()));
             } else {
                 return dokumentInfo.getTittel();
@@ -195,12 +195,16 @@ public class AvtaltmeldingMapper {
         }
     }
 
+    private String getJournalpostType(String originalJournalpostId) {
+        return getLightweightSafJournalpost(originalJournalpostId) == null ? null : Objects.requireNonNull(getLightweightSafJournalpost(originalJournalpostId)).getJournalposttype();
+    }
+
     private String getAvsenderMottakerNavn(String journalpostId) {
-        return getLightweightSafJournalpostQdist013(journalpostId) == null ? null : getLightweightSafJournalpostQdist013(journalpostId).getAvsenderMottakerNavn();
+        return getLightweightSafJournalpost(journalpostId) == null ? null : getLightweightSafJournalpost(journalpostId).getAvsenderMottakerNavn();
 
     }
 
-    private LightweightSafJournalpostQdist013 getLightweightSafJournalpostQdist013(String journalpostId) {
+    private LightweightSafJournalpostQdist013 getLightweightSafJournalpost(String journalpostId) {
         return isBlank(journalpostId) ? null : safJournalpostQueryService.hentJournalpost(journalpostId);
     }
 
@@ -215,13 +219,13 @@ public class AvtaltmeldingMapper {
     }
 
     private boolean isJournalDatoNull(String journalpostId) {
-        return getLightweightSafJournalpostQdist013(journalpostId) == null ? Objects.isNull(getLightweightSafJournalpostQdist013(journalpostId)) : getLightweightSafJournalpostQdist013(journalpostId).getDatoJournalfoert() == null;
+        return getLightweightSafJournalpost(journalpostId) == null ? Objects.isNull(getLightweightSafJournalpost(journalpostId)) : getLightweightSafJournalpost(journalpostId).getDatoJournalfoert() == null;
     }
 
 
     private String getDokumentJournalfortAvNavn(boolean isHoveddok, JournalpostQdist013 journalpostQdist013, JournalpostQdist013.DokumentInfo dokumentInfo) {
         if (!isHoveddok && !isBlank(dokumentInfo.getOriginalJournalpostId())) {
-            LightweightSafJournalpostQdist013 lightweightSafJournalpostQdist013 = getLightweightSafJournalpostQdist013(dokumentInfo.getOriginalJournalpostId());
+            LightweightSafJournalpostQdist013 lightweightSafJournalpostQdist013 = getLightweightSafJournalpost(dokumentInfo.getOriginalJournalpostId());
             if (!isJournalfortAvNavnNull(dokumentInfo.getOriginalJournalpostId())) {
                 return lightweightSafJournalpostQdist013.getJournalfortAvNavn();
             }
@@ -234,7 +238,7 @@ public class AvtaltmeldingMapper {
 
 
     private boolean isJournalfortAvNavnNull(String journalpostId) {
-        return getLightweightSafJournalpostQdist013(journalpostId) == null ? Objects.isNull(getLightweightSafJournalpostQdist013(journalpostId)) : isBlank(getLightweightSafJournalpostQdist013(journalpostId).getJournalfortAvNavn());
+        return getLightweightSafJournalpost(journalpostId) == null ? Objects.isNull(getLightweightSafJournalpost(journalpostId)) : isBlank(getLightweightSafJournalpost(journalpostId).getJournalfortAvNavn());
     }
 
 
