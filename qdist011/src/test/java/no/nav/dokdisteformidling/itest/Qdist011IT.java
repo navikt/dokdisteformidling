@@ -7,6 +7,7 @@ import no.nav.dokdisteformidling.itest.config.ApplicationTestConfig;
 import no.nav.dokdisteformidling.storage.DokdistDokument;
 import no.nav.dokdisteformidling.storage.JsonSerializer;
 import org.apache.activemq.command.ActiveMQTextMessage;
+import org.apache.commons.io.FileUtils;
 import org.apache.http.HttpHeaders;
 import org.apache.http.entity.ContentType;
 import org.apache.sshd.server.SshServer;
@@ -28,6 +29,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.xmlunit.assertj.XmlAssert;
 
 import javax.inject.Inject;
 import javax.jms.Queue;
@@ -39,8 +41,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.get;
@@ -61,11 +61,10 @@ import static no.nav.dokdisteformidling.storage.S3Configuration.BUCKET_NAME;
 import static no.nav.dokdisteformidling.testUtils.classpathToString;
 import static no.nav.dokdisteformidling.testUtils.fileToString;
 import static no.nav.dokdisteformidling.utils.DateConverterUtil.getNow;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.when;
@@ -94,8 +93,10 @@ public class Qdist011IT {
     private static final String VEDLEGG1_TEST_CONTENT = "VEDLEGG1_TEST_CONTENT";
     private static final String VEDLEGG2_TEST_CONTENT = "VEDLEGG2_TEST_CONTENT";
     private static final String REMOTE_FILE_PATH = "/dokumentdistribusjon/documentFileshare/";
+    public static final String DOCUMENT_FILESHARE = "dokumentdistribusjon/documentFileshare/";
     private static String CALL_ID;
     private static final String KONVERSASJON_ID = "601a9fcd-8bae-4076-a2d7-37f9dd17e050";
+    private static final String BESTILLINGS_ID = "b8b297e1-46c1-4657-9f2d-7cf6dd089b9d";
 
 	@Inject
     private JmsTemplate jmsTemplate;
@@ -125,7 +126,7 @@ public class Qdist011IT {
 
     @BeforeAll
     public static void setupBeforeAll() throws IOException {
-        final Path documentFileshare = tempDir.resolve("dokumentdistribusjon/documentFileshare/");
+        final Path documentFileshare = tempDir.resolve(DOCUMENT_FILESHARE);
         Files.createDirectories(documentFileshare);
         sshServer = startSshServer(tempDir);
         System.setProperty("sftp.privateKeyFile", new ClassPathResource("ssh/id_rsa").getURL().getPath());
@@ -138,7 +139,8 @@ public class Qdist011IT {
     }
 
     @BeforeEach
-    public void setupBefore() {
+    public void setupBefore() throws IOException {
+        FileUtils.cleanDirectory(tempDir.resolve(DOCUMENT_FILESHARE).toFile());
         CALL_ID = UUID.randomUUID().toString();
 
 		WireMock.reset();
@@ -172,22 +174,16 @@ public class Qdist011IT {
 
         String uploadFilePath = tempDir.toString() + REMOTE_FILE_PATH;
         await().atMost(15, TimeUnit.SECONDS).untilAsserted(() -> {
-            assertTrue(new File(uploadFilePath + DOKUMENT_OBJEKT_REFERANSE_HOVEDDOK + ".pdf").exists());
-            assertTrue(new File(uploadFilePath + DOKUMENT_OBJEKT_REFERANSE_VEDLEGG1 + ".pdf").exists());
-            assertTrue(new File(uploadFilePath + DOKUMENT_OBJEKT_REFERANSE_VEDLEGG2 + ".pdf").exists());
-
             String response = receive(tdist005);
             String expected = classpathToString("tdist005/tdist005_happy.xml");
-            assertEquals(comparableMessage(expected), comparableMessage(response));
+            XmlAssert.assertThat(comparableMessage(response)).and(comparableMessage(expected))
+                    .ignoreWhitespace()
+                    .areSimilar();
         });
 
-        String hoveddokContent = fileToString(new File(uploadFilePath + DOKUMENT_OBJEKT_REFERANSE_HOVEDDOK + ".pdf"));
-        String vedlegg1Content = fileToString(new File(uploadFilePath + DOKUMENT_OBJEKT_REFERANSE_VEDLEGG1 + ".pdf"));
-        String vedlegg2Content = fileToString(new File(uploadFilePath + DOKUMENT_OBJEKT_REFERANSE_VEDLEGG2 + ".pdf"));
-
-        assertEquals(HOVEDDOK_TEST_CONTENT, hoveddokContent);
-        assertEquals(VEDLEGG1_TEST_CONTENT, vedlegg1Content);
-        assertEquals(VEDLEGG2_TEST_CONTENT, vedlegg2Content);
+        assertThat(fileToString(new File(uploadFilePath + DOKUMENT_OBJEKT_REFERANSE_HOVEDDOK + ".pdf"))).isEqualTo(HOVEDDOK_TEST_CONTENT);
+        assertThat(fileToString(new File(uploadFilePath + DOKUMENT_OBJEKT_REFERANSE_VEDLEGG1 + ".pdf"))).isEqualTo(VEDLEGG1_TEST_CONTENT);
+        assertThat(fileToString(new File(uploadFilePath + DOKUMENT_OBJEKT_REFERANSE_VEDLEGG2 + ".pdf"))).isEqualTo(VEDLEGG2_TEST_CONTENT);
 
         verifyAllStubs(1);
     }
@@ -208,13 +204,11 @@ public class Qdist011IT {
 
         String uploadFilePath = tempDir.toString() + REMOTE_FILE_PATH;
         await().atMost(15, TimeUnit.SECONDS).untilAsserted(() -> {
-            assertTrue(new File(uploadFilePath + DOKUMENT_OBJEKT_REFERANSE_HOVEDDOK + ".pdf").exists());
-            assertTrue(new File(uploadFilePath + DOKUMENT_OBJEKT_REFERANSE_VEDLEGG1 + ".pdf").exists());
-            assertTrue(new File(uploadFilePath + DOKUMENT_OBJEKT_REFERANSE_VEDLEGG2 + ".pdf").exists());
-
             String response = receive(tdist005);
             String expected = classpathToString("tdist005/tdist005_happy.xml");
-            assertEquals(comparableMessage(expected), comparableMessage(response));
+            XmlAssert.assertThat(comparableMessage(response)).and(comparableMessage(expected))
+                    .ignoreWhitespace()
+                    .areSimilar();
         });
 
         verifyAllStubs(1);
@@ -234,15 +228,12 @@ public class Qdist011IT {
 
         sendStringMessage(qdist011, classpathToString("qdist011/qdist011-happy.xml"), "");
 
-        String uploadFilePath = tempDir.toString() + REMOTE_FILE_PATH;
         await().atMost(15, TimeUnit.SECONDS).untilAsserted(() -> {
-            assertTrue(new File(uploadFilePath + DOKUMENT_OBJEKT_REFERANSE_HOVEDDOK + ".pdf").exists());
-            assertTrue(new File(uploadFilePath + DOKUMENT_OBJEKT_REFERANSE_VEDLEGG1 + ".pdf").exists());
-            assertTrue(new File(uploadFilePath + DOKUMENT_OBJEKT_REFERANSE_VEDLEGG2 + ".pdf").exists());
-
             String response = receive(tdist005);
             String expected = classpathToString("tdist005/tdist005_happy.xml");
-            assertEquals(comparableMessage(expected), comparableMessage(response));
+            XmlAssert.assertThat(comparableMessage(response)).and(comparableMessage(expected))
+                    .ignoreWhitespace()
+                    .areSimilar();
         });
 
         verifyAllStubs(1);
@@ -1019,25 +1010,10 @@ public class Qdist011IT {
     }
 
     private String comparableMessage(String melding) {
-        Pattern pattern = Pattern.compile("(?<=ns[0-9]:sendDigitalPost).+(?=>)");
-        Matcher matcher = pattern.matcher(melding);
-        if (matcher.find()) {
-            String namespaces = matcher.group();
-            assertTrue(namespaces.contains("http://www.unece.org/cefact/namespaces/StandardBusinessDocumentHeader"));
-            assertTrue(namespaces.contains("http://begrep.difi.no/sdp/schema_v10"));
-            assertTrue(namespaces.contains("http://nav.no/tjeneste/virksomhet/digitalpost/sendDigitalPost/v1"));
-            assertTrue(namespaces.contains("http://www.w3.org/2000/09/xmldsig#"));
-        } else {
-            fail("Melding mangler sendDigitalPost element med namespaces");
-        }
-
-        // tøm CreationDateAndTime, InstanceIdentifier da det er generert
-        // fjern namespaces siden rekkefølgen kan variere
+        // Tøm CreationDateAndTime og putt inn placeholders.
         return melding.replaceFirst("(?<=CreationDateAndTime>).+(?=</)", "")
-                .replaceAll("ns[0-9]:", "")
-                .replaceFirst("(?<=<sendDigitalPost).+(?=>)", "")
-                .replaceAll("[\t\r\n ]", "");
-
+                .replace("${bestillingsId}", BESTILLINGS_ID)
+                .replace("${konversasjonId}", KONVERSASJON_ID);
     }
 }
 
