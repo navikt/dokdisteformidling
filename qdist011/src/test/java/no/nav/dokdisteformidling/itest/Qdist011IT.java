@@ -184,8 +184,6 @@ public class Qdist011IT {
         assertThat(fileToString(new File(uploadFilePath + DOKUMENT_OBJEKT_REFERANSE_HOVEDDOK + ".pdf"))).isEqualTo(HOVEDDOK_TEST_CONTENT);
         assertThat(fileToString(new File(uploadFilePath + DOKUMENT_OBJEKT_REFERANSE_VEDLEGG1 + ".pdf"))).isEqualTo(VEDLEGG1_TEST_CONTENT);
         assertThat(fileToString(new File(uploadFilePath + DOKUMENT_OBJEKT_REFERANSE_VEDLEGG2 + ".pdf"))).isEqualTo(VEDLEGG2_TEST_CONTENT);
-
-        verifyAllStubs(1);
     }
 
     @Test
@@ -202,7 +200,6 @@ public class Qdist011IT {
 
         sendStringMessage(qdist011, classpathToString("qdist011/qdist011-happy.xml"), null);
 
-        String uploadFilePath = tempDir.toString() + REMOTE_FILE_PATH;
         await().atMost(15, TimeUnit.SECONDS).untilAsserted(() -> {
             String response = receive(tdist005);
             String expected = classpathToString("tdist005/tdist005_happy.xml");
@@ -210,8 +207,6 @@ public class Qdist011IT {
                     .ignoreWhitespace()
                     .areSimilar();
         });
-
-        verifyAllStubs(1);
     }
 
     @Test
@@ -235,8 +230,6 @@ public class Qdist011IT {
                     .ignoreWhitespace()
                     .areSimilar();
         });
-
-        verifyAllStubs(1);
     }
 
     @Test
@@ -249,8 +242,6 @@ public class Qdist011IT {
             assertNotNull(resultOnQdist011FunksjonellFeilQueue);
             assertEquals(resultOnQdist011FunksjonellFeilQueue, classpathToString("qdist011/qdist011-feilId.xml"));
         });
-
-        verifyAllStubs(0);
     }
 
     @Test
@@ -263,8 +254,6 @@ public class Qdist011IT {
             assertNotNull(resultOnQdist011FunksjonellFeilQueue);
             assertEquals(resultOnQdist011FunksjonellFeilQueue, classpathToString("qdist011/qdist011-tom-forsendelseId.xml"));
         });
-
-        verifyAllStubs(0);
     }
 
     @Test
@@ -897,8 +886,6 @@ public class Qdist011IT {
             assertNotNull(resultOnQdist011FunksjonellFeilQueue);
             assertEquals(resultOnQdist011FunksjonellFeilQueue, classpathToString("qdist011/qdist011-happy.xml"));
         });
-
-        verifyAllStubs(1);
     }
 
     @Test
@@ -996,17 +983,6 @@ public class Qdist011IT {
             response = ((JAXBElement) response).getValue();
         }
         return (T) response;
-    }
-
-    private void verifyAllStubs(int count) {
-        verify(count, getRequestedFor(urlEqualTo("/administrerforsendelse/" + FORSENDELSE_ID)));
-        verify(count, postRequestedFor(urlEqualTo("/digitalkontaktinformasjonv1")));
-        verify(count, getRequestedFor(urlEqualTo("/dokumenttypeinfo/" + DOKUMENTTYPE_ID_HOVEDDOK)));
-        verify(count, getRequestedFor(urlEqualTo("/varselinfo/" + VARSEL_TYPE_ID)));
-        verify(count, getRequestedFor(urlEqualTo("/securitytoken?grant_type=client_credentials&scope=openid")));
-        verify(count, postRequestedFor(urlEqualTo("/safgraphql")));
-        verify(count, putRequestedFor(
-                urlEqualTo("/administrerforsendelse?forsendelseId=" + FORSENDELSE_ID + "&forsendelseStatus=OVERSENDT&konversasjonsId=" + KONVERSASJON_ID)));
     }
 
     private String comparableMessage(String melding) {
