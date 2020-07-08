@@ -174,7 +174,7 @@ public class Qdist011IT {
 
             XmlAssert.assertThat(comparableMessage(response)).and(comparableMessage(expected))
                     .ignoreWhitespace()
-                    .areIdentical();
+                    .areSimilar();
         });
 
         assertThat(fileToString(new File(uploadFilePath + DOKUMENT_OBJEKT_REFERANSE_HOVEDDOK + ".pdf"))).isEqualTo(HOVEDDOK_TEST_CONTENT);
@@ -201,7 +201,7 @@ public class Qdist011IT {
             String expected = classpathToString("tdist005/tdist005_happy.xml");
             XmlAssert.assertThat(comparableMessage(response)).and(comparableMessage(expected))
                     .ignoreWhitespace()
-                    .areIdentical();
+                    .areSimilar();
         });
     }
 
@@ -224,7 +224,7 @@ public class Qdist011IT {
             String expected = classpathToString("tdist005/tdist005_happy.xml");
             XmlAssert.assertThat(comparableMessage(response)).and(comparableMessage(expected))
                     .ignoreWhitespace()
-                    .areIdentical();
+                    .areSimilar();
         });
     }
 
