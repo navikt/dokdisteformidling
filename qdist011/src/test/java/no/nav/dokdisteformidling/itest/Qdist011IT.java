@@ -44,18 +44,13 @@ import java.util.concurrent.TimeUnit;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.get;
-import static com.github.tomakehurst.wiremock.client.WireMock.getRequestedFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.post;
-import static com.github.tomakehurst.wiremock.client.WireMock.postRequestedFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.put;
-import static com.github.tomakehurst.wiremock.client.WireMock.putRequestedFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlMatching;
-import static com.github.tomakehurst.wiremock.client.WireMock.verify;
 import static no.nav.dokdisteformidling.config.cache.LokalCacheConfig.TKAT020_CACHE;
 import static no.nav.dokdisteformidling.config.cache.LokalCacheConfig.TKAT021_CACHE;
-import static no.nav.dokdisteformidling.constants.RetryConstants.MAX_ATTEMPTS_SHORT;
 import static no.nav.dokdisteformidling.itest.config.SftpConfig.startSshServer;
 import static no.nav.dokdisteformidling.storage.S3Configuration.BUCKET_NAME;
 import static no.nav.dokdisteformidling.testUtils.classpathToString;
@@ -270,15 +265,6 @@ public class Qdist011IT {
             assertNotNull(resultOnQdist011FunksjonellFeilQueue);
             assertEquals(resultOnQdist011FunksjonellFeilQueue, classpathToString("qdist011/qdist011-happy.xml"));
         });
-
-        verify(1, getRequestedFor(urlEqualTo("/administrerforsendelse/" + FORSENDELSE_ID)));
-        verify(0, postRequestedFor(urlEqualTo("/digitalkontaktinformasjonv1")));
-        verify(0, getRequestedFor(urlEqualTo("/dokumenttypeinfo/" + DOKUMENTTYPE_ID_HOVEDDOK)));
-        verify(0, getRequestedFor(urlEqualTo("/varselinfo/" + VARSEL_TYPE_ID)));
-        verify(0, getRequestedFor(urlEqualTo("/securitytoken?grant_type=client_credentials&scope=openid")));
-        verify(0, postRequestedFor(urlEqualTo("/safgraphql")));
-        verify(0, putRequestedFor(
-                urlEqualTo("/administrerforsendelse?forsendelseId=" + FORSENDELSE_ID + "&forsendelseStatus=OVERSENDT&konversasjonsId=" + KONVERSASJON_ID)));
     }
 
     @Test
@@ -294,15 +280,6 @@ public class Qdist011IT {
             assertNotNull(resultOnQdist011BackoutQueue);
             assertEquals(resultOnQdist011BackoutQueue, classpathToString("qdist011/qdist011-happy.xml"));
         });
-
-        verify(MAX_ATTEMPTS_SHORT, getRequestedFor(urlEqualTo("/administrerforsendelse/" + FORSENDELSE_ID)));
-        verify(0, postRequestedFor(urlEqualTo("/digitalkontaktinformasjonv1")));
-        verify(0, getRequestedFor(urlEqualTo("/dokumenttypeinfo/" + DOKUMENTTYPE_ID_HOVEDDOK)));
-        verify(0, getRequestedFor(urlEqualTo("/varselinfo/" + VARSEL_TYPE_ID)));
-        verify(0, getRequestedFor(urlEqualTo("/securitytoken?grant_type=client_credentials&scope=openid")));
-        verify(0, postRequestedFor(urlEqualTo("/safgraphql")));
-        verify(0, putRequestedFor(
-                urlEqualTo("/administrerforsendelse?forsendelseId=" + FORSENDELSE_ID + "&forsendelseStatus=OVERSENDT&konversasjonsId=" + KONVERSASJON_ID)));
     }
 
     @Test
@@ -317,15 +294,6 @@ public class Qdist011IT {
             assertNotNull(resultOnQdist011FunksjonellFeilQueue);
             assertEquals(resultOnQdist011FunksjonellFeilQueue, classpathToString("qdist011/qdist011-happy.xml"));
         });
-
-        verify(1, getRequestedFor(urlEqualTo("/administrerforsendelse/" + FORSENDELSE_ID)));
-        verify(0, postRequestedFor(urlEqualTo("/digitalkontaktinformasjonv1")));
-        verify(0, getRequestedFor(urlEqualTo("/dokumenttypeinfo/" + DOKUMENTTYPE_ID_HOVEDDOK)));
-        verify(0, getRequestedFor(urlEqualTo("/varselinfo/" + VARSEL_TYPE_ID)));
-        verify(0, getRequestedFor(urlEqualTo("/securitytoken?grant_type=client_credentials&scope=openid")));
-        verify(0, postRequestedFor(urlEqualTo("/safgraphql")));
-        verify(0, putRequestedFor(
-                urlEqualTo("/administrerforsendelse?forsendelseId=" + FORSENDELSE_ID + "&forsendelseStatus=OVERSENDT&konversasjonsId=" + KONVERSASJON_ID)));
     }
 
     @Test
@@ -342,15 +310,6 @@ public class Qdist011IT {
             assertNotNull(resultOnQdist011FunksjonellFeilQueue);
             assertEquals(resultOnQdist011FunksjonellFeilQueue, classpathToString("qdist011/qdist011-happy.xml"));
         });
-
-        verify(1, getRequestedFor(urlEqualTo("/administrerforsendelse/" + FORSENDELSE_ID)));
-        verify(1, postRequestedFor(urlEqualTo("/digitalkontaktinformasjonv1")));
-        verify(0, getRequestedFor(urlEqualTo("/dokumenttypeinfo/" + DOKUMENTTYPE_ID_HOVEDDOK)));
-        verify(0, getRequestedFor(urlEqualTo("/varselinfo/" + VARSEL_TYPE_ID)));
-        verify(0, getRequestedFor(urlEqualTo("/securitytoken?grant_type=client_credentials&scope=openid")));
-        verify(0, postRequestedFor(urlEqualTo("/safgraphql")));
-        verify(0, putRequestedFor(
-                urlEqualTo("/administrerforsendelse?forsendelseId=" + FORSENDELSE_ID + "&forsendelseStatus=OVERSENDT&konversasjonsId=" + KONVERSASJON_ID)));
     }
 
     @Test
@@ -367,15 +326,6 @@ public class Qdist011IT {
             assertNotNull(resultOnQdist011FunksjonellFeilQueue);
             assertEquals(resultOnQdist011FunksjonellFeilQueue, classpathToString("qdist011/qdist011-happy.xml"));
         });
-
-        verify(1, getRequestedFor(urlEqualTo("/administrerforsendelse/" + FORSENDELSE_ID)));
-        verify(1, postRequestedFor(urlEqualTo("/digitalkontaktinformasjonv1")));
-        verify(0, getRequestedFor(urlEqualTo("/dokumenttypeinfo/" + DOKUMENTTYPE_ID_HOVEDDOK)));
-        verify(0, getRequestedFor(urlEqualTo("/varselinfo/" + VARSEL_TYPE_ID)));
-        verify(0, getRequestedFor(urlEqualTo("/securitytoken?grant_type=client_credentials&scope=openid")));
-        verify(0, postRequestedFor(urlEqualTo("/safgraphql")));
-        verify(0, putRequestedFor(
-                urlEqualTo("/administrerforsendelse?forsendelseId=" + FORSENDELSE_ID + "&forsendelseStatus=OVERSENDT")));
     }
 
     @Test
@@ -392,15 +342,6 @@ public class Qdist011IT {
             assertNotNull(resultOnQdist011FunksjonellFeilQueue);
             assertEquals(resultOnQdist011FunksjonellFeilQueue, classpathToString("qdist011/qdist011-happy.xml"));
         });
-
-        verify(1, getRequestedFor(urlEqualTo("/administrerforsendelse/" + FORSENDELSE_ID)));
-        verify(1, postRequestedFor(urlEqualTo("/digitalkontaktinformasjonv1")));
-        verify(0, getRequestedFor(urlEqualTo("/dokumenttypeinfo/" + DOKUMENTTYPE_ID_HOVEDDOK)));
-        verify(0, getRequestedFor(urlEqualTo("/varselinfo/" + VARSEL_TYPE_ID)));
-        verify(0, getRequestedFor(urlEqualTo("/securitytoken?grant_type=client_credentials&scope=openid")));
-        verify(0, postRequestedFor(urlEqualTo("/safgraphql")));
-        verify(0, putRequestedFor(
-                urlEqualTo("/administrerforsendelse?forsendelseId=" + FORSENDELSE_ID + "&forsendelseStatus=OVERSENDT")));
     }
 
     @Test
@@ -417,15 +358,6 @@ public class Qdist011IT {
             assertNotNull(resultOnQdist011BackoutQueue);
             assertEquals(resultOnQdist011BackoutQueue, classpathToString("qdist011/qdist011-happy.xml"));
         });
-
-        verify(1, getRequestedFor(urlEqualTo("/administrerforsendelse/" + FORSENDELSE_ID)));
-        verify(MAX_ATTEMPTS_SHORT, postRequestedFor(urlEqualTo("/digitalkontaktinformasjonv1")));
-        verify(0, getRequestedFor(urlEqualTo("/dokumenttypeinfo/" + DOKUMENTTYPE_ID_HOVEDDOK)));
-        verify(0, getRequestedFor(urlEqualTo("/varselinfo/" + VARSEL_TYPE_ID)));
-        verify(0, getRequestedFor(urlEqualTo("/securitytoken?grant_type=client_credentials&scope=openid")));
-        verify(0, postRequestedFor(urlEqualTo("/safgraphql")));
-        verify(0, putRequestedFor(
-                urlEqualTo("/administrerforsendelse?forsendelseId=" + FORSENDELSE_ID + "&forsendelseStatus=OVERSENDT&konversasjonsId=" + KONVERSASJON_ID)));
     }
 
     @Test
@@ -443,15 +375,6 @@ public class Qdist011IT {
             assertNotNull(resultOnQdist011FunksjonellFeilQueue);
             assertEquals(resultOnQdist011FunksjonellFeilQueue, classpathToString("qdist011/qdist011-happy.xml"));
         });
-
-        verify(1, getRequestedFor(urlEqualTo("/administrerforsendelse/" + FORSENDELSE_ID)));
-        verify(1, postRequestedFor(urlEqualTo("/digitalkontaktinformasjonv1")));
-        verify(1, getRequestedFor(urlEqualTo("/dokumenttypeinfo/" + DOKUMENTTYPE_ID_HOVEDDOK)));
-        verify(0, getRequestedFor(urlEqualTo("/varselinfo/" + VARSEL_TYPE_ID)));
-        verify(0, getRequestedFor(urlEqualTo("/securitytoken?grant_type=client_credentials&scope=openid")));
-        verify(0, postRequestedFor(urlEqualTo("/safgraphql")));
-        verify(0, putRequestedFor(
-                urlEqualTo("/administrerforsendelse?forsendelseId=" + FORSENDELSE_ID + "&forsendelseStatus=OVERSENDT&konversasjonsId=" + KONVERSASJON_ID)));
     }
 
     @Test
@@ -468,15 +391,6 @@ public class Qdist011IT {
             assertNotNull(resultOnQdist011FunksjonellFeilQueue);
             assertEquals(resultOnQdist011FunksjonellFeilQueue, classpathToString("qdist011/qdist011-happy.xml"));
         });
-
-        verify(1, getRequestedFor(urlEqualTo("/administrerforsendelse/" + FORSENDELSE_ID)));
-        verify(1, postRequestedFor(urlEqualTo("/digitalkontaktinformasjonv1")));
-        verify(1, getRequestedFor(urlEqualTo("/dokumenttypeinfo/" + DOKUMENTTYPE_ID_HOVEDDOK)));
-        verify(0, getRequestedFor(urlEqualTo("/varselinfo/" + VARSEL_TYPE_ID)));
-        verify(0, getRequestedFor(urlEqualTo("/securitytoken?grant_type=client_credentials&scope=openid")));
-        verify(0, postRequestedFor(urlEqualTo("/safgraphql")));
-        verify(0, putRequestedFor(
-                urlEqualTo("/administrerforsendelse?forsendelseId=" + FORSENDELSE_ID + "&forsendelseStatus=OVERSENDT&konversasjonsId=" + KONVERSASJON_ID)));
     }
 
     @Test
@@ -493,15 +407,6 @@ public class Qdist011IT {
             assertNotNull(resultOnQdist011FunksjonellFeilQueue);
             assertEquals(resultOnQdist011FunksjonellFeilQueue, classpathToString("qdist011/qdist011-happy.xml"));
         });
-
-        verify(1, getRequestedFor(urlEqualTo("/administrerforsendelse/" + FORSENDELSE_ID)));
-        verify(1, postRequestedFor(urlEqualTo("/digitalkontaktinformasjonv1")));
-        verify(1, getRequestedFor(urlEqualTo("/dokumenttypeinfo/" + DOKUMENTTYPE_ID_HOVEDDOK)));
-        verify(0, getRequestedFor(urlEqualTo("/varselinfo/" + VARSEL_TYPE_ID)));
-        verify(0, getRequestedFor(urlEqualTo("/securitytoken?grant_type=client_credentials&scope=openid")));
-        verify(0, postRequestedFor(urlEqualTo("/safgraphql")));
-        verify(0, putRequestedFor(
-                urlEqualTo("/administrerforsendelse?forsendelseId=" + FORSENDELSE_ID + "&forsendelseStatus=OVERSENDT&konversasjonsId=" + KONVERSASJON_ID)));
     }
 
     @Test
@@ -518,15 +423,6 @@ public class Qdist011IT {
             assertNotNull(resultOnQdist011FunksjonellFeilQueue);
             assertEquals(resultOnQdist011FunksjonellFeilQueue, classpathToString("qdist011/qdist011-happy.xml"));
         });
-
-        verify(1, getRequestedFor(urlEqualTo("/administrerforsendelse/" + FORSENDELSE_ID)));
-        verify(1, postRequestedFor(urlEqualTo("/digitalkontaktinformasjonv1")));
-        verify(1, getRequestedFor(urlEqualTo("/dokumenttypeinfo/" + DOKUMENTTYPE_ID_HOVEDDOK)));
-        verify(0, getRequestedFor(urlEqualTo("/varselinfo/" + VARSEL_TYPE_ID)));
-        verify(0, getRequestedFor(urlEqualTo("/securitytoken?grant_type=client_credentials&scope=openid")));
-        verify(0, postRequestedFor(urlEqualTo("/safgraphql")));
-        verify(0, putRequestedFor(
-                urlEqualTo("/administrerforsendelse?forsendelseId=" + FORSENDELSE_ID + "&forsendelseStatus=OVERSENDT&konversasjonsId=" + KONVERSASJON_ID)));
     }
 
     @Test
@@ -544,15 +440,6 @@ public class Qdist011IT {
             assertNotNull(resultOnQdist011BackoutQueue);
             assertEquals(resultOnQdist011BackoutQueue, classpathToString("qdist011/qdist011-happy.xml"));
         });
-
-        verify(1, getRequestedFor(urlEqualTo("/administrerforsendelse/" + FORSENDELSE_ID)));
-        verify(1, postRequestedFor(urlEqualTo("/digitalkontaktinformasjonv1")));
-        verify(MAX_ATTEMPTS_SHORT, getRequestedFor(urlEqualTo("/dokumenttypeinfo/" + DOKUMENTTYPE_ID_HOVEDDOK)));
-        verify(0, getRequestedFor(urlEqualTo("/varselinfo/" + VARSEL_TYPE_ID)));
-        verify(0, getRequestedFor(urlEqualTo("/securitytoken?grant_type=client_credentials&scope=openid")));
-        verify(0, postRequestedFor(urlEqualTo("/safgraphql")));
-        verify(0, putRequestedFor(
-                urlEqualTo("/administrerforsendelse?forsendelseId=" + FORSENDELSE_ID + "&forsendelseStatus=OVERSENDT&konversasjonsId=" + KONVERSASJON_ID)));
     }
 
     @Test
@@ -571,15 +458,6 @@ public class Qdist011IT {
             assertNotNull(resultOnQdist011FunksjonellFeilQueue);
             assertEquals(resultOnQdist011FunksjonellFeilQueue, classpathToString("qdist011/qdist011-happy.xml"));
         });
-
-        verify(1, getRequestedFor(urlEqualTo("/administrerforsendelse/" + FORSENDELSE_ID)));
-        verify(1, postRequestedFor(urlEqualTo("/digitalkontaktinformasjonv1")));
-        verify(1, getRequestedFor(urlEqualTo("/dokumenttypeinfo/" + DOKUMENTTYPE_ID_HOVEDDOK)));
-        verify(1, getRequestedFor(urlEqualTo("/varselinfo/" + VARSEL_TYPE_ID)));
-        verify(0, getRequestedFor(urlEqualTo("/securitytoken?grant_type=client_credentials&scope=openid")));
-        verify(0, postRequestedFor(urlEqualTo("/safgraphql")));
-        verify(0, putRequestedFor(
-                urlEqualTo("/administrerforsendelse?forsendelseId=" + FORSENDELSE_ID + "&forsendelseStatus=OVERSENDT&konversasjonsId=" + KONVERSASJON_ID)));
     }
 
     @Test
@@ -598,15 +476,6 @@ public class Qdist011IT {
             assertNotNull(resultOnQdist011BackoutQueue);
             assertEquals(resultOnQdist011BackoutQueue, classpathToString("qdist011/qdist011-happy.xml"));
         });
-
-        verify(1, getRequestedFor(urlEqualTo("/administrerforsendelse/" + FORSENDELSE_ID)));
-        verify(1, postRequestedFor(urlEqualTo("/digitalkontaktinformasjonv1")));
-        verify(1, getRequestedFor(urlEqualTo("/dokumenttypeinfo/" + DOKUMENTTYPE_ID_HOVEDDOK)));
-        verify(MAX_ATTEMPTS_SHORT, getRequestedFor(urlEqualTo("/varselinfo/" + VARSEL_TYPE_ID)));
-        verify(0, getRequestedFor(urlEqualTo("/securitytoken?grant_type=client_credentials&scope=openid")));
-        verify(0, postRequestedFor(urlEqualTo("/safgraphql")));
-        verify(0, putRequestedFor(
-                urlEqualTo("/administrerforsendelse?forsendelseId=" + FORSENDELSE_ID + "&forsendelseStatus=OVERSENDT&konversasjonsId=" + KONVERSASJON_ID)));
     }
 
     @Test
@@ -626,15 +495,6 @@ public class Qdist011IT {
             assertNotNull(resultOnQdist011FunksjonellFeilQueue);
             assertEquals(resultOnQdist011FunksjonellFeilQueue, classpathToString("qdist011/qdist011-happy.xml"));
         });
-
-        verify(1, getRequestedFor(urlEqualTo("/administrerforsendelse/" + FORSENDELSE_ID)));
-        verify(1, postRequestedFor(urlEqualTo("/digitalkontaktinformasjonv1")));
-        verify(1, getRequestedFor(urlEqualTo("/dokumenttypeinfo/" + DOKUMENTTYPE_ID_HOVEDDOK)));
-        verify(1, getRequestedFor(urlEqualTo("/varselinfo/" + VARSEL_TYPE_ID)));
-        verify(0, getRequestedFor(urlEqualTo("/securitytoken?grant_type=client_credentials&scope=openid")));
-        verify(0, postRequestedFor(urlEqualTo("/safgraphql")));
-        verify(0, putRequestedFor(
-                urlEqualTo("/administrerforsendelse?forsendelseId=" + FORSENDELSE_ID + "&forsendelseStatus=OVERSENDT&konversasjonsId=" + KONVERSASJON_ID)));
     }
 
     @Test
@@ -654,15 +514,6 @@ public class Qdist011IT {
             assertNotNull(resultOnQdist011BackoutQueue);
             assertEquals(resultOnQdist011BackoutQueue, classpathToString("qdist011/qdist011-happy.xml"));
         });
-
-        verify(1, getRequestedFor(urlEqualTo("/administrerforsendelse/" + FORSENDELSE_ID)));
-        verify(1, postRequestedFor(urlEqualTo("/digitalkontaktinformasjonv1")));
-        verify(1, getRequestedFor(urlEqualTo("/dokumenttypeinfo/" + DOKUMENTTYPE_ID_HOVEDDOK)));
-        verify(1, getRequestedFor(urlEqualTo("/varselinfo/" + VARSEL_TYPE_ID)));
-        verify(0, getRequestedFor(urlEqualTo("/securitytoken?grant_type=client_credentials&scope=openid")));
-        verify(0, postRequestedFor(urlEqualTo("/safgraphql")));
-        verify(0, putRequestedFor(
-                urlEqualTo("/administrerforsendelse?forsendelseId=" + FORSENDELSE_ID + "&forsendelseStatus=OVERSENDT&konversasjonsId=" + KONVERSASJON_ID)));
     }
 
     @Test
@@ -682,15 +533,6 @@ public class Qdist011IT {
             assertNotNull(resultOnQdist011BackoutQueue);
             assertEquals(resultOnQdist011BackoutQueue, classpathToString("qdist011/qdist011-happy.xml"));
         });
-
-        verify(1, getRequestedFor(urlEqualTo("/administrerforsendelse/" + FORSENDELSE_ID)));
-        verify(1, postRequestedFor(urlEqualTo("/digitalkontaktinformasjonv1")));
-        verify(1, getRequestedFor(urlEqualTo("/dokumenttypeinfo/" + DOKUMENTTYPE_ID_HOVEDDOK)));
-        verify(1, getRequestedFor(urlEqualTo("/varselinfo/" + VARSEL_TYPE_ID)));
-        verify(0, getRequestedFor(urlEqualTo("/securitytoken?grant_type=client_credentials&scope=openid")));
-        verify(0, postRequestedFor(urlEqualTo("/safgraphql")));
-        verify(0, putRequestedFor(
-                urlEqualTo("/administrerforsendelse?forsendelseId=" + FORSENDELSE_ID + "&forsendelseStatus=OVERSENDT&konversasjonsId=" + KONVERSASJON_ID)));
     }
 
     // Kjøres sist pga den stopper sftp serveren
@@ -711,15 +553,6 @@ public class Qdist011IT {
             assertNotNull(resultOnQdist011BackoutQueue);
             assertEquals(resultOnQdist011BackoutQueue, classpathToString("qdist011/qdist011-happy.xml"));
         });
-
-        verify(1, getRequestedFor(urlEqualTo("/administrerforsendelse/" + FORSENDELSE_ID)));
-        verify(1, postRequestedFor(urlEqualTo("/digitalkontaktinformasjonv1")));
-        verify(1, getRequestedFor(urlEqualTo("/dokumenttypeinfo/" + DOKUMENTTYPE_ID_HOVEDDOK)));
-        verify(1, getRequestedFor(urlEqualTo("/varselinfo/" + VARSEL_TYPE_ID)));
-        verify(0, getRequestedFor(urlEqualTo("/securitytoken?grant_type=client_credentials&scope=openid")));
-        verify(0, postRequestedFor(urlEqualTo("/safgraphql")));
-        verify(0, putRequestedFor(
-                urlEqualTo("/administrerforsendelse?forsendelseId=" + FORSENDELSE_ID + "&forsendelseStatus=OVERSENDT&konversasjonsId=" + KONVERSASJON_ID)));
     }
 
     @Test
@@ -740,15 +573,6 @@ public class Qdist011IT {
             assertNotNull(resultOnQdist011FunksjonellFeilQueue);
             assertEquals(resultOnQdist011FunksjonellFeilQueue, classpathToString("qdist011/qdist011-happy.xml"));
         });
-
-        verify(1, getRequestedFor(urlEqualTo("/administrerforsendelse/" + FORSENDELSE_ID)));
-        verify(1, postRequestedFor(urlEqualTo("/digitalkontaktinformasjonv1")));
-        verify(1, getRequestedFor(urlEqualTo("/dokumenttypeinfo/" + DOKUMENTTYPE_ID_HOVEDDOK)));
-        verify(1, getRequestedFor(urlEqualTo("/varselinfo/" + VARSEL_TYPE_ID)));
-        verify(1, getRequestedFor(urlEqualTo("/securitytoken?grant_type=client_credentials&scope=openid")));
-        verify(1, postRequestedFor(urlEqualTo("/safgraphql")));
-        verify(0, putRequestedFor(
-                urlEqualTo("/administrerforsendelse?forsendelseId=" + FORSENDELSE_ID + "&forsendelseStatus=OVERSENDT&konversasjonsId=" + KONVERSASJON_ID)));
     }
 
     @Test
@@ -770,15 +594,6 @@ public class Qdist011IT {
             assertNotNull(resultOnQdist011BackoutQueue);
             assertEquals(resultOnQdist011BackoutQueue, classpathToString("qdist011/qdist011-happy.xml"));
         });
-
-        verify(1, getRequestedFor(urlEqualTo("/administrerforsendelse/" + FORSENDELSE_ID)));
-        verify(1, postRequestedFor(urlEqualTo("/digitalkontaktinformasjonv1")));
-        verify(1, getRequestedFor(urlEqualTo("/dokumenttypeinfo/" + DOKUMENTTYPE_ID_HOVEDDOK)));
-        verify(1, getRequestedFor(urlEqualTo("/varselinfo/" + VARSEL_TYPE_ID)));
-        verify(MAX_ATTEMPTS_SHORT, getRequestedFor(urlEqualTo("/securitytoken?grant_type=client_credentials&scope=openid")));
-        verify(MAX_ATTEMPTS_SHORT, postRequestedFor(urlEqualTo("/safgraphql")));
-        verify(0, putRequestedFor(
-                urlEqualTo("/administrerforsendelse?forsendelseId=" + FORSENDELSE_ID + "&forsendelseStatus=OVERSENDT&konversasjonsId=" + KONVERSASJON_ID)));
     }
 
     @Test
@@ -798,15 +613,6 @@ public class Qdist011IT {
             assertNotNull(resultOnQdist011FunksjonellFeilQueue);
             assertEquals(resultOnQdist011FunksjonellFeilQueue, classpathToString("qdist011/qdist011-happy.xml"));
         });
-
-        verify(1, getRequestedFor(urlEqualTo("/administrerforsendelse/" + FORSENDELSE_ID)));
-        verify(1, postRequestedFor(urlEqualTo("/digitalkontaktinformasjonv1")));
-        verify(1, getRequestedFor(urlEqualTo("/dokumenttypeinfo/" + DOKUMENTTYPE_ID_HOVEDDOK)));
-        verify(1, getRequestedFor(urlEqualTo("/varselinfo/" + VARSEL_TYPE_ID)));
-        verify(1, getRequestedFor(urlEqualTo("/securitytoken?grant_type=client_credentials&scope=openid")));
-        verify(1, postRequestedFor(urlEqualTo("/safgraphql")));
-        verify(0, putRequestedFor(
-                urlEqualTo("/administrerforsendelse?forsendelseId=" + FORSENDELSE_ID + "&forsendelseStatus=OVERSENDT&konversasjonsId=" + KONVERSASJON_ID)));
     }
 
     @Test
@@ -827,15 +633,6 @@ public class Qdist011IT {
             assertNotNull(resultOnQdist011BackoutQueue);
             assertEquals(resultOnQdist011BackoutQueue, classpathToString("qdist011/qdist011-happy.xml"));
         });
-
-        verify(1, getRequestedFor(urlEqualTo("/administrerforsendelse/" + FORSENDELSE_ID)));
-        verify(1, postRequestedFor(urlEqualTo("/digitalkontaktinformasjonv1")));
-        verify(1, getRequestedFor(urlEqualTo("/dokumenttypeinfo/" + DOKUMENTTYPE_ID_HOVEDDOK)));
-        verify(1, getRequestedFor(urlEqualTo("/varselinfo/" + VARSEL_TYPE_ID)));
-        verify(MAX_ATTEMPTS_SHORT, getRequestedFor(urlEqualTo("/securitytoken?grant_type=client_credentials&scope=openid")));
-        verify(MAX_ATTEMPTS_SHORT, postRequestedFor(urlEqualTo("/safgraphql")));
-        verify(0, putRequestedFor(
-                urlEqualTo("/administrerforsendelse?forsendelseId=" + FORSENDELSE_ID + "&forsendelseStatus=OVERSENDT&konversasjonsId=" + KONVERSASJON_ID)));
     }
 
     @Test
@@ -856,15 +653,6 @@ public class Qdist011IT {
             assertNotNull(resultOnQdist011BackoutQueue);
             assertEquals(resultOnQdist011BackoutQueue, classpathToString("qdist011/qdist011-happy.xml"));
         });
-
-        verify(1, getRequestedFor(urlEqualTo("/administrerforsendelse/" + FORSENDELSE_ID)));
-        verify(1, postRequestedFor(urlEqualTo("/digitalkontaktinformasjonv1")));
-        verify(1, getRequestedFor(urlEqualTo("/dokumenttypeinfo/" + DOKUMENTTYPE_ID_HOVEDDOK)));
-        verify(1, getRequestedFor(urlEqualTo("/varselinfo/" + VARSEL_TYPE_ID)));
-        verify(MAX_ATTEMPTS_SHORT, getRequestedFor(urlEqualTo("/securitytoken?grant_type=client_credentials&scope=openid")));
-        verify(0, postRequestedFor(urlEqualTo("/safgraphql")));
-        verify(0, putRequestedFor(
-                urlEqualTo("/administrerforsendelse?forsendelseId=" + FORSENDELSE_ID + "&forsendelseStatus=OVERSENDT&konversasjonsId=" + KONVERSASJON_ID)));
     }
 
     @Test
@@ -907,15 +695,6 @@ public class Qdist011IT {
             assertNotNull(resultOnQdist011BackoutQueue);
             assertEquals(resultOnQdist011BackoutQueue, classpathToString("qdist011/qdist011-happy.xml"));
         });
-
-        verify(1, getRequestedFor(urlEqualTo("/administrerforsendelse/" + FORSENDELSE_ID)));
-        verify(1, postRequestedFor(urlEqualTo("/digitalkontaktinformasjonv1")));
-        verify(1, getRequestedFor(urlEqualTo("/dokumenttypeinfo/" + DOKUMENTTYPE_ID_HOVEDDOK)));
-        verify(1, getRequestedFor(urlEqualTo("/varselinfo/" + VARSEL_TYPE_ID)));
-        verify(1, getRequestedFor(urlEqualTo("/securitytoken?grant_type=client_credentials&scope=openid")));
-        verify(1, postRequestedFor(urlEqualTo("/safgraphql")));
-        verify(MAX_ATTEMPTS_SHORT, putRequestedFor(
-                urlEqualTo("/administrerforsendelse?forsendelseId=" + FORSENDELSE_ID + "&forsendelseStatus=OVERSENDT&konversasjonsId=" + KONVERSASJON_ID)));
     }
 
     private void stubPutForsendelseStatusAndkonversasjonsId() {
