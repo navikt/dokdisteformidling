@@ -1,11 +1,5 @@
 package no.nav.dokdisteformidling.qdist011;
 
-import static no.nav.dokdisteformidling.constants.RouteConstants.PROPERTY_BESTILLINGS_ID;
-import static no.nav.dokdisteformidling.constants.RouteConstants.PROPERTY_CONVERSATION_ID;
-import static no.nav.dokdisteformidling.constants.RouteConstants.PROPERTY_FORSENDELSE_ID;
-import static no.nav.dokdisteformidling.constants.RouteConstants.QDIST011_SERVICE_ID;
-import static org.apache.camel.LoggingLevel.ERROR;
-
 import com.google.common.base.Charsets;
 import com.ibm.msg.client.jms.DetailedJMSException;
 import no.nav.dokdisteformidling.common.DokdistAdministrerForsendelseUpdater;
@@ -23,6 +17,12 @@ import org.springframework.stereotype.Component;
 import javax.inject.Inject;
 import javax.jms.Queue;
 import javax.xml.bind.JAXBContext;
+
+import static no.nav.dokdisteformidling.constants.RouteConstants.PROPERTY_BESTILLINGS_ID;
+import static no.nav.dokdisteformidling.constants.RouteConstants.PROPERTY_CONVERSATION_ID;
+import static no.nav.dokdisteformidling.constants.RouteConstants.PROPERTY_FORSENDELSE_ID;
+import static no.nav.dokdisteformidling.constants.RouteConstants.QDIST011_SERVICE_ID;
+import static org.apache.camel.LoggingLevel.ERROR;
 
 
 /**
@@ -99,11 +99,11 @@ public class Qdist011Route extends SpringRouteBuilder {
 				.to("jms:" + tdist005.getQueueName())
 				.log(LoggingLevel.INFO, log, "qdist011 har lagt forsendelse med " + getIdsForLogging() + " på kø til tdist005 for distribusjon via DPI")
 				.bean(dokdistAdministrerForsendelseUpdater, "updateStatusAndConversationId")
-				.log(LoggingLevel.INFO, log, "qdist011 har oppdatert dokdistDb med forsendelseStatus=OVERSENDT og konversasjonsId=${exchangeProperty." + PROPERTY_CONVERSATION_ID + "} og avslutter behandling av forsendelse med " + getIdsForLogging());
+				.log(LoggingLevel.INFO, log, "qdist011 har oppdatert dokdistDb med forsendelseStatus=OVERSENDT og konversasjonId=${exchangeProperty." + PROPERTY_CONVERSATION_ID + "} og avslutter behandling av forsendelse med " + getIdsForLogging());
 	}
 
 	public static String getIdsForLogging() {
-		return "bestillingsId=${exchangeProperty." + PROPERTY_BESTILLINGS_ID + "} og " +
+		return "bestillingsId=${exchangeProperty." + PROPERTY_BESTILLINGS_ID + "}, " +
 				"forsendelseId=${exchangeProperty." + PROPERTY_FORSENDELSE_ID + "}";
 	}
 }

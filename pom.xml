@@ -51,9 +51,10 @@
 		<activemq.version>5.15.2</activemq.version>
 		<junit-jupiter.version>5.4.1</junit-jupiter.version>
 		<junit5.mockito.version>2.25.1</junit5.mockito.version>
-		<spring-cloud-contract-wiremock.version>1.2.5.RELEASE</spring-cloud-contract-wiremock.version>
-		<wiremock-standalone.version>2.24.1</wiremock-standalone.version>
 		<sshd-sftp.version>2.0.0</sshd-sftp.version>
+		<spring-cloud-contract-wiremock.version>1.2.7.RELEASE</spring-cloud-contract-wiremock.version>
+		<!-- wiremock compat -->
+		<xmlunit-core.version>2.6.3</xmlunit-core.version>
 	</properties>
 
 	<dependencyManagement>
@@ -279,12 +280,6 @@
 				<scope>test</scope>
 			</dependency>
 			<dependency>
-				<groupId>com.github.tomakehurst</groupId>
-				<artifactId>wiremock-standalone</artifactId>
-				<version>${wiremock-standalone.version}</version>
-				<scope>test</scope>
-			</dependency>
-			<dependency>
 				<groupId>org.apache.sshd</groupId>
 				<artifactId>sshd-sftp</artifactId>
 				<version>${sshd-sftp.version}</version>
@@ -300,6 +295,12 @@
 				<groupId>org.awaitility</groupId>
 				<artifactId>awaitility</artifactId>
 				<version>${awaitility.version}</version>
+				<scope>test</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.xmlunit</groupId>
+				<artifactId>xmlunit-assertj</artifactId>
+				<version>${xmlunit-core.version}</version>
 				<scope>test</scope>
 			</dependency>
 		</dependencies>
