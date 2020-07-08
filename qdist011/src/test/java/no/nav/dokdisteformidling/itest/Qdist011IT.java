@@ -155,7 +155,7 @@ public class Qdist011IT {
     
     @Test
     @Order(Integer.MIN_VALUE)
-    public void shouldProcessForsendelse() throws Exception {
+    public void shouldProcessNewForsendelse() throws Exception {
 
         stubGetForsendelse("__files/rdist001/getForsendelse-happy.json");
         stubPostDigitalKontaktInformasjon();
@@ -171,9 +171,10 @@ public class Qdist011IT {
         await().atMost(15, TimeUnit.SECONDS).untilAsserted(() -> {
             String response = receive(tdist005);
             String expected = classpathToString("tdist005/tdist005_happy.xml");
+
             XmlAssert.assertThat(comparableMessage(response)).and(comparableMessage(expected))
                     .ignoreWhitespace()
-                    .areSimilar();
+                    .areIdentical();
         });
 
         assertThat(fileToString(new File(uploadFilePath + DOKUMENT_OBJEKT_REFERANSE_HOVEDDOK + ".pdf"))).isEqualTo(HOVEDDOK_TEST_CONTENT);
@@ -183,9 +184,9 @@ public class Qdist011IT {
 
     @Test
     @Order(Integer.MIN_VALUE)
-    public void shouldProcessForsendelseWithoutCallId() throws Exception {
+    public void shouldProcessRForsendelseResendingWithoutCallId() throws Exception {
 
-        stubGetForsendelse("__files/rdist001/getForsendelse-happy.json");
+        stubGetForsendelse("__files/rdist001/getForsendelse-resending.json");
         stubPostDigitalKontaktInformasjon();
         stubGetDokumentTypeInfo("dokumentinfov4/tkat020-happy.json");
         stubGetVarselInfo();
@@ -200,15 +201,15 @@ public class Qdist011IT {
             String expected = classpathToString("tdist005/tdist005_happy.xml");
             XmlAssert.assertThat(comparableMessage(response)).and(comparableMessage(expected))
                     .ignoreWhitespace()
-                    .areSimilar();
+                    .areIdentical();
         });
     }
 
     @Test
     @Order(Integer.MIN_VALUE)
-    public void shouldProcessForsendelseWithEmptyCallId() throws Exception {
+    public void shouldProcessForsendelseResendingWithEmptyCallId() throws Exception {
 
-        stubGetForsendelse("__files/rdist001/getForsendelse-happy.json");
+        stubGetForsendelse("__files/rdist001/getForsendelse-resending.json");
         stubPostDigitalKontaktInformasjon();
         stubGetDokumentTypeInfo("dokumentinfov4/tkat020-happy.json");
         stubGetVarselInfo();
@@ -223,7 +224,7 @@ public class Qdist011IT {
             String expected = classpathToString("tdist005/tdist005_happy.xml");
             XmlAssert.assertThat(comparableMessage(response)).and(comparableMessage(expected))
                     .ignoreWhitespace()
-                    .areSimilar();
+                    .areIdentical();
         });
     }
 
@@ -299,7 +300,7 @@ public class Qdist011IT {
     @Test
     @Order(Integer.MIN_VALUE)
     public void shouldThrowDigitalKontaktinformasjonV1KontaktinformasjonIkkeFunnetFunctionalException() throws Exception {
-        stubGetForsendelse("__files/rdist001/getForsendelse-happy.json");
+        stubGetForsendelse("__files/rdist001/getForsendelse-resending.json");
         stubFor(post("/digitalkontaktinformasjonv1").willReturn(aResponse().withStatus(HttpStatus.OK.value())
                 .withBody(classpathToString("__files/digitalkontaktinformasjonv1/ikke-funnet.xml"))));
 
@@ -315,7 +316,7 @@ public class Qdist011IT {
     @Test
     @Order(Integer.MIN_VALUE)
     public void shouldThrowDigitalKontaktinformasjonV1PersonIkkeFunnetFunctionalException() throws Exception {
-        stubGetForsendelse("__files/rdist001/getForsendelse-happy.json");
+        stubGetForsendelse("__files/rdist001/getForsendelse-resending.json");
         stubFor(post("/digitalkontaktinformasjonv1").willReturn(aResponse().withStatus(HttpStatus.OK.value())
                 .withBody(classpathToString("__files/digitalkontaktinformasjonv1/person-ikke-funnet.xml"))));
 
@@ -331,7 +332,7 @@ public class Qdist011IT {
     @Test
     @Order(Integer.MIN_VALUE)
     public void shouldThrowDigitalKontaktinformasjonV1SikkerhetsbegrensingFunctionalException() throws Exception {
-        stubGetForsendelse("__files/rdist001/getForsendelse-happy.json");
+        stubGetForsendelse("__files/rdist001/getForsendelse-resending.json");
         stubFor(post("/digitalkontaktinformasjonv1").willReturn(aResponse().withStatus(HttpStatus.OK.value())
                 .withBody(classpathToString("__files/digitalkontaktinformasjonv1/sikkerhet.xml"))));
 
@@ -347,7 +348,7 @@ public class Qdist011IT {
     @Test
     @Order(Integer.MIN_VALUE)
     public void shouldThrowDigitalKontaktinformasjonV1HentSikkerDigitalPostadresseTechnicalException() throws Exception {
-        stubGetForsendelse("__files/rdist001/getForsendelse-happy.json");
+        stubGetForsendelse("__files/rdist001/getForsendelse-resending.json");
         stubFor(post("/digitalkontaktinformasjonv1").willReturn(aResponse().withStatus(HttpStatus.OK.value())
                 .withBody(classpathToString("__files/digitalkontaktinformasjonv1/securityError.xml"))));
 
@@ -363,7 +364,7 @@ public class Qdist011IT {
     @Test
     @Order(Integer.MIN_VALUE)
     public void shouldThrowTkat020FunctionalException() throws Exception {
-        stubGetForsendelse("__files/rdist001/getForsendelse-happy.json");
+        stubGetForsendelse("__files/rdist001/getForsendelse-resending.json");
         stubPostDigitalKontaktInformasjon();
         stubFor(get(urlMatching("/dokumenttypeinfo/" + DOKUMENTTYPE_ID_HOVEDDOK))
                 .willReturn(aResponse().withStatus(HttpStatus.NOT_FOUND.value())));
@@ -380,7 +381,7 @@ public class Qdist011IT {
     @Test
     @Order(Integer.MIN_VALUE)
     public void shouldThrowTkat020FunctionalExceptionUtenDokumentProduksjonsInfo() throws Exception {
-        stubGetForsendelse("__files/rdist001/getForsendelse-happy.json");
+        stubGetForsendelse("__files/rdist001/getForsendelse-resending.json");
         stubPostDigitalKontaktInformasjon();
         stubGetDokumentTypeInfo("dokumentinfov4/tkat020-utenDokumentProduksjonsInfo.json");
 
@@ -396,7 +397,7 @@ public class Qdist011IT {
     @Test
     @Order(Integer.MIN_VALUE)
     public void shouldThrowTkat020FunctionalExceptionUtenDistribusjonInfo() throws Exception {
-        stubGetForsendelse("__files/rdist001/getForsendelse-happy.json");
+        stubGetForsendelse("__files/rdist001/getForsendelse-resending.json");
         stubPostDigitalKontaktInformasjon();
         stubGetDokumentTypeInfo("dokumentinfov4/tkat020-utenDistribusjonInfo.json");
 
@@ -412,7 +413,7 @@ public class Qdist011IT {
     @Test
     @Order(Integer.MIN_VALUE)
     public void shouldThrowTkat020FunctionalExceptionUtenSDPDistribusjonVarsel() throws Exception {
-        stubGetForsendelse("__files/rdist001/getForsendelse-happy.json");
+        stubGetForsendelse("__files/rdist001/getForsendelse-resending.json");
         stubPostDigitalKontaktInformasjon();
         stubGetDokumentTypeInfo("dokumentinfov4/tkat020-utenSDPDistribusjonVarsel.json");
 
@@ -428,7 +429,7 @@ public class Qdist011IT {
     @Test
     @Order(Integer.MIN_VALUE)
     public void shouldThrowTkat020TechicalException() throws Exception {
-        stubGetForsendelse("__files/rdist001/getForsendelse-happy.json");
+        stubGetForsendelse("__files/rdist001/getForsendelse-resending.json");
         stubPostDigitalKontaktInformasjon();
         stubFor(get(urlMatching("/dokumenttypeinfo/" + DOKUMENTTYPE_ID_HOVEDDOK))
                 .willReturn(aResponse().withStatus(HttpStatus.INTERNAL_SERVER_ERROR.value())));
@@ -445,7 +446,7 @@ public class Qdist011IT {
     @Test
     @Order(Integer.MIN_VALUE)
     public void shouldThrowTkat021FunctionalException() throws Exception {
-        stubGetForsendelse("__files/rdist001/getForsendelse-happy.json");
+        stubGetForsendelse("__files/rdist001/getForsendelse-resending.json");
         stubPostDigitalKontaktInformasjon();
         stubGetDokumentTypeInfo("dokumentinfov4/tkat020-happy.json");
         stubFor(get(urlMatching("/varselinfo/" + VARSEL_TYPE_ID))
@@ -463,7 +464,7 @@ public class Qdist011IT {
     @Test
     @Order(Integer.MIN_VALUE)
     public void shouldThrowTkat021TechnicalException() throws Exception {
-        stubGetForsendelse("__files/rdist001/getForsendelse-happy.json");
+        stubGetForsendelse("__files/rdist001/getForsendelse-resending.json");
         stubPostDigitalKontaktInformasjon();
         stubGetDokumentTypeInfo("dokumentinfov4/tkat020-happy.json");
         stubFor(get(urlMatching("/varselinfo/" + VARSEL_TYPE_ID))
@@ -483,7 +484,7 @@ public class Qdist011IT {
     public void shouldThrowKunneIkkeDeserialisereS3PayloadFunctionalException() throws Exception {
         when(amazonS3.getObjectAsString(eq(BUCKET_NAME), eq(DOKUMENT_OBJEKT_REFERANSE_VEDLEGG2))).thenReturn("notJsonSerializedString");
 
-        stubGetForsendelse("__files/rdist001/getForsendelse-happy.json");
+        stubGetForsendelse("__files/rdist001/getForsendelse-resending.json");
         stubPostDigitalKontaktInformasjon();
         stubGetDokumentTypeInfo("dokumentinfov4/tkat020-happy.json");
         stubGetVarselInfo();
@@ -502,7 +503,7 @@ public class Qdist011IT {
     public void shouldThrowS3FailedToGetDocumentTechnicalExceptionVedSdkClientException() throws Exception {
         when(amazonS3.getObjectAsString(eq(BUCKET_NAME), eq(DOKUMENT_OBJEKT_REFERANSE_HOVEDDOK))).thenThrow(new SdkClientException("SdkClientException"));
 
-        stubGetForsendelse("__files/rdist001/getForsendelse-happy.json");
+        stubGetForsendelse("__files/rdist001/getForsendelse-resending.json");
         stubPostDigitalKontaktInformasjon();
         stubGetDokumentTypeInfo("dokumentinfov4/tkat020-happy.json");
         stubGetVarselInfo();
@@ -521,7 +522,7 @@ public class Qdist011IT {
     public void shouldThrowS3FailedToGetDocumentTechnicalExceptionVedSecurityException() throws Exception {
         when(amazonS3.getObjectAsString(eq(BUCKET_NAME), eq(DOKUMENT_OBJEKT_REFERANSE_HOVEDDOK))).thenThrow(new SecurityException("SecurityException"));
 
-        stubGetForsendelse("__files/rdist001/getForsendelse-happy.json");
+        stubGetForsendelse("__files/rdist001/getForsendelse-resending.json");
         stubPostDigitalKontaktInformasjon();
         stubGetDokumentTypeInfo("dokumentinfov4/tkat020-happy.json");
         stubGetVarselInfo();
@@ -541,7 +542,7 @@ public class Qdist011IT {
     public void shouldGetErrorWhenSFTPNotAvailable() throws Exception {
         stopServer();
 
-        stubGetForsendelse("__files/rdist001/getForsendelse-happy.json");
+        stubGetForsendelse("__files/rdist001/getForsendelse-resending.json");
         stubPostDigitalKontaktInformasjon();
         stubGetDokumentTypeInfo("dokumentinfov4/tkat020-happy.json");
         stubGetVarselInfo();
@@ -558,7 +559,7 @@ public class Qdist011IT {
     @Test
     @Order(Integer.MIN_VALUE)
     public void shouldThrowSafFunctionalException() throws Exception {
-        stubGetForsendelse("__files/rdist001/getForsendelse-happy.json");
+        stubGetForsendelse("__files/rdist001/getForsendelse-resending.json");
         stubPostDigitalKontaktInformasjon();
         stubGetDokumentTypeInfo("dokumentinfov4/tkat020-happy.json");
         stubGetVarselInfo();
@@ -578,7 +579,7 @@ public class Qdist011IT {
     @Test
     @Order(Integer.MIN_VALUE)
     public void shouldPutMessageOnBackoutQueueWhenSafJournalpostIkkeFunnetException() throws Exception {
-        stubGetForsendelse("__files/rdist001/getForsendelse-happy.json");
+        stubGetForsendelse("__files/rdist001/getForsendelse-resending.json");
         stubPostDigitalKontaktInformasjon();
         stubGetDokumentTypeInfo("dokumentinfov4/tkat020-happy.json");
         stubGetVarselInfo();
@@ -599,7 +600,7 @@ public class Qdist011IT {
     @Test
     @Order(Integer.MIN_VALUE)
     public void shouldThrowSafJournalpostValidationException() throws Exception {
-        stubGetForsendelse("__files/rdist001/getForsendelse-happy.json");
+        stubGetForsendelse("__files/rdist001/getForsendelse-resending.json");
         stubPostDigitalKontaktInformasjon();
         stubGetDokumentTypeInfo("dokumentinfov4/tkat020-happy.json");
         stubGetVarselInfo();
@@ -618,7 +619,7 @@ public class Qdist011IT {
     @Test
     @Order(Integer.MIN_VALUE)
     public void shouldThrowSafTechnicalException() throws Exception {
-        stubGetForsendelse("__files/rdist001/getForsendelse-happy.json");
+        stubGetForsendelse("__files/rdist001/getForsendelse-resending.json");
         stubPostDigitalKontaktInformasjon();
         stubGetDokumentTypeInfo("dokumentinfov4/tkat020-happy.json");
         stubGetVarselInfo();
@@ -638,7 +639,7 @@ public class Qdist011IT {
     @Test
     @Order(Integer.MIN_VALUE)
     public void shouldThrowStsTechnicalException() throws Exception {
-        stubGetForsendelse("__files/rdist001/getForsendelse-happy.json");
+        stubGetForsendelse("__files/rdist001/getForsendelse-resending.json");
         stubPostDigitalKontaktInformasjon();
         stubGetDokumentTypeInfo("dokumentinfov4/tkat020-happy.json");
         stubGetVarselInfo();
@@ -658,7 +659,7 @@ public class Qdist011IT {
     @Test
     @Order(Integer.MIN_VALUE)
     public void shouldThrowRdist001OppdaterForsendelseStatusFunctionalException() throws Exception {
-        stubGetForsendelse("__files/rdist001/getForsendelse-happy.json");
+        stubGetForsendelse("__files/rdist001/getForsendelse-resending.json");
         stubPostDigitalKontaktInformasjon();
         stubGetDokumentTypeInfo("dokumentinfov4/tkat020-happy.json");
         stubGetVarselInfo();
@@ -679,7 +680,7 @@ public class Qdist011IT {
     @Test
     @Order(Integer.MIN_VALUE)
     public void shouldThrowRdist001OppdaterForsendelseStatusTechnicalException() throws Exception {
-        stubGetForsendelse("__files/rdist001/getForsendelse-happy.json");
+        stubGetForsendelse("__files/rdist001/getForsendelse-resending.json");
         stubPostDigitalKontaktInformasjon();
         stubGetDokumentTypeInfo("dokumentinfov4/tkat020-happy.json");
         stubGetVarselInfo();
