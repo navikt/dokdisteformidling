@@ -1,9 +1,9 @@
 package no.nav.dokdisteformidling.consumer.juridisklogg;
 
-import static no.nav.dokdisteformidling.constants.DomainConstants.APP_NAME;
-
 import no.nav.dokdisteformidling.consumer.rdist001.HentForsendelseResponseTo;
 import org.springframework.stereotype.Component;
+
+import static no.nav.dokdisteformidling.constants.DomainConstants.APP_NAME;
 
 /**
  * @author Sigurd Midttun, Visma Consulting.
@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class LagreJuridiskLoggMapper {
 
-	private static final Integer ANTALL_AAR_LAGRES = 10; //TODO: Denne må avklares
+	private static final Integer ANTALL_AAR_LAGRES = 10;
 
 	public LoggMeldingRequest map(HentForsendelseResponseTo hentForsendelseResponseTo, byte[] meldingsInnhold) {
 		return LoggMeldingRequest.builder()
