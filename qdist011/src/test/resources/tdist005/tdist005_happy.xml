@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<ns4:sendDigitalPost xmlns:ns2="http://www.unece.org/cefact/namespaces/StandardBusinessDocumentHeader" xmlns:ns3="http://begrep.difi.no/sdp/schema_v10" xmlns:ns4="http://nav.no/tjeneste/virksomhet/digitalpost/sendDigitalPost/v1" xmlns:ns5="http://www.w3.org/2000/09/xmldsig#">
+<ns4:sendDigitalPost xmlns:ns2="http://www.unece.org/cefact/namespaces/StandardBusinessDocumentHeader"
+					 xmlns:ns3="http://begrep.difi.no/sdp/schema_v10"
+					 xmlns:ns4="http://nav.no/tjeneste/virksomhet/digitalpost/sendDigitalPost/v1">
 	<sendDigitalPostRequest>
 		<standardBusinessDocument>
 			<ns2:StandardBusinessDocumentHeader>
@@ -13,14 +15,14 @@
 				<ns2:DocumentIdentification>
 					<ns2:Standard>urn:no:difi:sdp:1.0</ns2:Standard>
 					<ns2:TypeVersion>1.0</ns2:TypeVersion>
-					<ns2:InstanceIdentifier>insertBestillingsIdHere</ns2:InstanceIdentifier>
+					<ns2:InstanceIdentifier>b8b297e1-46c1-4657-9f2d-7cf6dd089b9d</ns2:InstanceIdentifier>
 					<ns2:Type>digitalPost</ns2:Type>
 					<ns2:CreationDateAndTime>2016-11-09T09:42:23.907</ns2:CreationDateAndTime>
 				</ns2:DocumentIdentification>
 				<ns2:BusinessScope>
 					<ns2:Scope>
 						<ns2:Type>ConversationId</ns2:Type>
-						<ns2:InstanceIdentifier>insertBestillingsIdHere</ns2:InstanceIdentifier>
+						<ns2:InstanceIdentifier>601a9fcd-8bae-4076-a2d7-37f9dd17e050</ns2:InstanceIdentifier>
 						<ns2:Identifier>urn:no:difi:sdp:1.0</ns2:Identifier>
 					</ns2:Scope>
 				</ns2:BusinessScope>

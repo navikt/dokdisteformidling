@@ -1,26 +1,5 @@
 package no.nav.dokdisteformidling;
 
-import static no.nav.dokdisteformidling.utils.DateConverterUtil.getNow;
-import static no.nav.dokdisteformidling.qdist011.constants.BridgeMotSDPMapperConstants.AUTHORITY;
-import static no.nav.dokdisteformidling.qdist011.constants.BridgeMotSDPMapperConstants.AUTHORITY_ENUM;
-import static no.nav.dokdisteformidling.qdist011.constants.BridgeMotSDPMapperConstants.BUSINESS_SCOPE_TYPE;
-import static no.nav.dokdisteformidling.qdist011.constants.BridgeMotSDPMapperConstants.DIGITAL_POST;
-import static no.nav.dokdisteformidling.qdist011.constants.BridgeMotSDPMapperConstants.DOKUMENT_MIME;
-import static no.nav.dokdisteformidling.qdist011.constants.BridgeMotSDPMapperConstants.ORGNR_NAV;
-import static no.nav.dokdisteformidling.qdist011.constants.BridgeMotSDPMapperConstants.ORG_PREFIX;
-import static no.nav.dokdisteformidling.qdist011.constants.BridgeMotSDPMapperConstants.SPRAAK_KODE;
-import static no.nav.dokdisteformidling.qdist011.constants.BridgeMotSDPMapperConstants.STANDARD;
-import static no.nav.dokdisteformidling.qdist011.constants.BridgeMotSDPMapperConstants.VERSION;
-import static no.nav.dokdisteformidling.testUtils.getDateOnly;
-import static no.nav.dokdisteformidling.testUtils.makePreferertKanalSet;
-import static no.nav.dokdisteformidling.testUtils.makeUgyldigDate;
-import static no.nav.dokdisteformidling.testUtils.varslingsTekster;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 import no.difi.begrep.sdp.schema_v10.DigitalPost;
 import no.difi.begrep.sdp.schema_v10.DigitalPostInfo;
 import no.difi.begrep.sdp.schema_v10.Manifest;
@@ -45,13 +24,33 @@ import javax.xml.datatype.XMLGregorianCalendar;
 import java.util.Arrays;
 import java.util.List;
 
+import static no.nav.dokdisteformidling.qdist011.constants.BridgeMotSDPMapperConstants.AUTHORITY;
+import static no.nav.dokdisteformidling.qdist011.constants.BridgeMotSDPMapperConstants.AUTHORITY_ENUM;
+import static no.nav.dokdisteformidling.qdist011.constants.BridgeMotSDPMapperConstants.BUSINESS_SCOPE_TYPE;
+import static no.nav.dokdisteformidling.qdist011.constants.BridgeMotSDPMapperConstants.DIGITAL_POST;
+import static no.nav.dokdisteformidling.qdist011.constants.BridgeMotSDPMapperConstants.DOKUMENT_MIME;
+import static no.nav.dokdisteformidling.qdist011.constants.BridgeMotSDPMapperConstants.ORGNR_NAV;
+import static no.nav.dokdisteformidling.qdist011.constants.BridgeMotSDPMapperConstants.ORG_PREFIX;
+import static no.nav.dokdisteformidling.qdist011.constants.BridgeMotSDPMapperConstants.SPRAAK_KODE;
+import static no.nav.dokdisteformidling.qdist011.constants.BridgeMotSDPMapperConstants.STANDARD;
+import static no.nav.dokdisteformidling.qdist011.constants.BridgeMotSDPMapperConstants.VERSION;
+import static no.nav.dokdisteformidling.testUtils.getDateOnly;
+import static no.nav.dokdisteformidling.testUtils.makePreferertKanalSet;
+import static no.nav.dokdisteformidling.testUtils.makeUgyldigDate;
+import static no.nav.dokdisteformidling.testUtils.varslingsTekster;
+import static no.nav.dokdisteformidling.utils.DateConverterUtil.getNow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 /**
  * @author Heidi Elisabeth Sando, Visma Consulting.
  */
 
 
 public class BridgeMotSDPMapperTest {
-
 	private static final String BESTILLINGS_ID = "bestillingsId";
 	private static final String MODUS = "T";
 	private static final String FORSENDELSE_STATUS = "forsendelseStatus";
@@ -100,12 +99,14 @@ public class BridgeMotSDPMapperTest {
 	private static final String TITTEL_VEDLEGG_1 = "tittelVedlegg1";
 	private static final String TITTEL_VEDLEGG_2 = "tittelVedlegg2";
 	private static final boolean ER_PRIORITERT = false;
+	private static final String KONVERSASJON_ID = "konversasjonId";
 
 	private final BridgeMotSDPMapper bridgeMotSDPMapper = new BridgeMotSDPMapper();
 
 	@Test
 	public void shouldMap() {
 		SendDigitalPost sendDigitalPost = bridgeMotSDPMapper.map(createHentForsendelseResponsToBuilder().build(),
+				KONVERSASJON_ID,
 				createHentSikkerDigitalPostadresseResponseToBuilder().build(), createDokumenttypeInfoTo(),
 				createVarselInfoToBuilder().build(), createSafJournalpostTo());
 
@@ -145,6 +146,7 @@ public class BridgeMotSDPMapperTest {
 				.preferertKanal(makePreferertKanalSet(PREFERERT_KANAL_EPOST));
 
 		SendDigitalPost sendDigitalPost = bridgeMotSDPMapper.map(hentForsendelseResponseToBuilder.build(),
+				KONVERSASJON_ID,
 				hentSikkerDigitalPostadresseResponseToBuilder.build(), createDokumenttypeInfoTo(),
 				varselInfoToBuilder.build(), createSafJournalpostTo());
 
@@ -180,6 +182,7 @@ public class BridgeMotSDPMapperTest {
 		varselInfoToBuilder.preferertKanal(makePreferertKanalSet(PREFERERT_KANAL_EPOST));
 
 		SendDigitalPost sendDigitalPost = bridgeMotSDPMapper.map(createHentForsendelseResponsToBuilder().build(),
+				KONVERSASJON_ID,
 				hentSikkerDigitalPostadresseResponseToBuilder.build(), createDokumenttypeInfoTo(),
 				varselInfoToBuilder.build(), createSafJournalpostTo());
 
@@ -209,6 +212,7 @@ public class BridgeMotSDPMapperTest {
 		varselInfoToBuilder.preferertKanal(makePreferertKanalSet(PREFERERT_KANAL_EPOST));
 
 		SendDigitalPost sendDigitalPost = bridgeMotSDPMapper.map(createHentForsendelseResponsToBuilder().build(),
+				KONVERSASJON_ID,
 				hentSikkerDigitalPostadresseResponseToBuilder.build(), createDokumenttypeInfoTo(),
 				varselInfoToBuilder.build(), createSafJournalpostTo());
 
@@ -234,6 +238,7 @@ public class BridgeMotSDPMapperTest {
 		varselInfoToBuilder.preferertKanal(makePreferertKanalSet(PREFERERT_KANAL_SMS));
 
 		SendDigitalPost sendDigitalPost = bridgeMotSDPMapper.map(createHentForsendelseResponsToBuilder().build(),
+				KONVERSASJON_ID,
 				hentSikkerDigitalPostadresseResponseToBuilder.build(), createDokumenttypeInfoTo(),
 				varselInfoToBuilder.build(), createSafJournalpostTo());
 
@@ -259,6 +264,7 @@ public class BridgeMotSDPMapperTest {
 		varselInfoToBuilder.preferertKanal(makePreferertKanalSet(PREFERERT_KANAL_SMS));
 
 		SendDigitalPost sendDigitalPost = bridgeMotSDPMapper.map(createHentForsendelseResponsToBuilder().build(),
+				KONVERSASJON_ID,
 				hentSikkerDigitalPostadresseResponseToBuilder.build(), createDokumenttypeInfoTo(),
 				varselInfoToBuilder.build(), createSafJournalpostTo());
 
@@ -288,6 +294,7 @@ public class BridgeMotSDPMapperTest {
 		varselInfoToBuilder.preferertKanal(makePreferertKanalSet(PREFERERT_KANAL_SMS));
 
 		SendDigitalPost sendDigitalPost = bridgeMotSDPMapper.map(createHentForsendelseResponsToBuilder().build(),
+				KONVERSASJON_ID,
 				hentSikkerDigitalPostadresseResponseToBuilder.build(), createDokumenttypeInfoTo(),
 				varselInfoToBuilder.build(), createSafJournalpostTo());
 
@@ -313,6 +320,7 @@ public class BridgeMotSDPMapperTest {
 		varselInfoToBuilder.preferertKanal(makePreferertKanalSet(PREFERERT_KANAL_EPOST, PREFERERT_KANAL_SMS));
 
 		SendDigitalPost sendDigitalPost = bridgeMotSDPMapper.map(createHentForsendelseResponsToBuilder().build(),
+				KONVERSASJON_ID,
 				hentSikkerDigitalPostadresseResponseToBuilder.build(), createDokumenttypeInfoTo(),
 				varselInfoToBuilder.build(), createSafJournalpostTo());
 
@@ -338,6 +346,7 @@ public class BridgeMotSDPMapperTest {
 		varselInfoToBuilder.preferertKanal(makePreferertKanalSet(PREFERERT_KANAL_EPOST, PREFERERT_KANAL_SMS));
 
 		SendDigitalPost sendDigitalPost = bridgeMotSDPMapper.map(createHentForsendelseResponsToBuilder().build(),
+				KONVERSASJON_ID,
 				hentSikkerDigitalPostadresseResponseToBuilder.build(), createDokumenttypeInfoTo(),
 				varselInfoToBuilder.build(), createSafJournalpostTo());
 
@@ -367,6 +376,7 @@ public class BridgeMotSDPMapperTest {
 		varselInfoToBuilder.preferertKanal(makePreferertKanalSet(PREFERERT_KANAL_EPOST, PREFERERT_KANAL_SMS));
 
 		SendDigitalPost sendDigitalPost = bridgeMotSDPMapper.map(createHentForsendelseResponsToBuilder().build(),
+				KONVERSASJON_ID,
 				hentSikkerDigitalPostadresseResponseToBuilder.build(), createDokumenttypeInfoTo(),
 				varselInfoToBuilder.build(), createSafJournalpostTo());
 
@@ -396,6 +406,7 @@ public class BridgeMotSDPMapperTest {
 		varselInfoToBuilder.preferertKanal(makePreferertKanalSet(PREFERERT_KANAL_EPOST, PREFERERT_KANAL_SMS));
 
 		SendDigitalPost sendDigitalPost = bridgeMotSDPMapper.map(createHentForsendelseResponsToBuilder().build(),
+				KONVERSASJON_ID,
 				hentSikkerDigitalPostadresseResponseToBuilder.build(), createDokumenttypeInfoTo(),
 				varselInfoToBuilder.build(), createSafJournalpostTo());
 
@@ -425,6 +436,7 @@ public class BridgeMotSDPMapperTest {
 		varselInfoToBuilder.preferertKanal(makePreferertKanalSet(PREFERERT_KANAL_EPOST, PREFERERT_KANAL_SMS));
 
 		SendDigitalPost sendDigitalPost = bridgeMotSDPMapper.map(createHentForsendelseResponsToBuilder().build(),
+				KONVERSASJON_ID,
 				hentSikkerDigitalPostadresseResponseToBuilder.build(), createDokumenttypeInfoTo(),
 				varselInfoToBuilder.build(), createSafJournalpostTo());
 
@@ -546,7 +558,7 @@ public class BridgeMotSDPMapperTest {
 		final Scope scope = standardBusinessDocumentHeader.getBusinessScope().getScope().stream().findFirst().get();
 		assertNotNull(scope);
 		assertEquals(scope.getType(), BUSINESS_SCOPE_TYPE);
-		assertEquals(scope.getInstanceIdentifier(), BESTILLINGS_ID);
+		assertEquals(scope.getInstanceIdentifier(), KONVERSASJON_ID);
 		assertEquals(scope.getIdentifier(), STANDARD);
 
 		//Assert DigitalPost
@@ -626,6 +638,7 @@ public class BridgeMotSDPMapperTest {
 	private HentForsendelseResponseTo.HentForsendelseResponseToBuilder createHentForsendelseResponsToBuilder() {
 		return HentForsendelseResponseTo.builder()
 				.bestillingsId(BESTILLINGS_ID)
+				.konversasjonId(KONVERSASJON_ID)
 				.forsendelseStatus(FORSENDELSE_STATUS)
 				.modus(MODUS)
 				.tema(TEMA)
