@@ -4,7 +4,7 @@
 			<response>
 				<sikkerDigitalKontaktinformasjon>
 					<digitalKontaktinformasjon>
-						<personident>***gammelt_fnr***</personident>
+						<personident>22027838743</personident>
 						<reservasjon>NEI</reservasjon>
 						<epostadresse sistVerifisert="insertDateHere"
 									  sistOppdatert="insertDateHere">er@mocked.data</epostadresse>

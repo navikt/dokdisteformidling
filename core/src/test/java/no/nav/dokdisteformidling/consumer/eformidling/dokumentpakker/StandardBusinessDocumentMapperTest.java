@@ -34,7 +34,7 @@ class StandardBusinessDocumentMapperTest {
 	private static final String BESTILLINGS_ID = "bestillingsId1";
 	private static final String FIXED_TIME = "2020-01-01T12:00:00Z";
 	private static final String TEN_SECONDS_BEFORE = "2020-01-01T12:59:50+01:00";
-	private static final String TWENTY_FOUR_HOURS_LATER = "2020-01-02T13:00:00+01:00";
+	private static final String TWENTY_FOUR_HOURS_LATER = "2020-01-06T13:00:00+01:00";
 	private final StandardBusinessDocumentMapper mapper = new StandardBusinessDocumentMapper(Clock.fixed(Instant.parse(FIXED_TIME), DEFAULT_ZONE_ID));
 	private static final String ARKIVEMELDING_XML = AppTestUtils.classpathToString("avtaltmelding/arkivmelding.xml");
 	@Test
