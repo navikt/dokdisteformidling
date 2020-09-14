@@ -47,7 +47,7 @@ public class AppCertificate {
 	 */
 	public PrivateKey loadPrivateKey() {
 		PrivateKey privateKey;
-		char[] ***passord=gammelt_passord***();
+		char[] password = properties.getPassword().toCharArray();
 		try {
 			privateKey = (PrivateKey) keyStore.getKey(properties.getAlias(), password);
 			if (privateKey == null) {

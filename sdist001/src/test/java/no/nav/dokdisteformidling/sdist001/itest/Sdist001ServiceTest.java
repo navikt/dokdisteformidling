@@ -28,6 +28,7 @@ import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 
+import static no.nav.dokdisteformidling.sdist001.domain.to.AltinnKvitteringStatus.LEST;
 import static no.nav.dokdisteformidling.sdist001.domain.to.AltinnKvitteringStatus.LEVERT;
 import static no.nav.dokdisteformidling.sdist001.domain.to.AltinnKvitteringStatus.LEVETID_UTLOPT;
 import static no.nav.dokdisteformidling.sdist001.domain.to.AltinnKvitteringStatus.MOTTATT;
@@ -90,7 +91,7 @@ public class Sdist001ServiceTest {
 
 
     @Test
-    public void navForsendelserShouldSetToExpedertWhenKvitteringStatusFraTrygdErMottatt() throws IOException {
+    public void navForsendelserShouldLoggWhenKvitteringStatusFraTrygdErMottatt() throws IOException {
         InputStream inputStream = new ClassPathResource("__files/rdist001/getForsendelse_forAltinnTest.json").getInputStream();
 
         HentForsendelseResponseTo forsendelseResponseTo = deserializeToObject(inputStream, HentForsendelseResponseTo.class);
@@ -98,6 +99,25 @@ public class Sdist001ServiceTest {
         when(administrerForsendelse.hentEformidlingForsendelser()).thenReturn(hentEformidlingforsendelserResponseTo());
         when(administrerForsendelse.hentForsendelse(anyString())).thenReturn(forsendelseResponseTo);
         when(eformidling.hent()).thenReturn(getDownloadResponse());
+        when(juridiskLogg.lagreJuridiskLogg(getLoggMeldingRequest())).thenReturn(getloggMeldingResponse());
+
+        sdist001Service.oppdatereDokDistEformidlingStatus();
+
+        verify(administrerForsendelse, times(1)).hentEformidlingForsendelser();
+        verify(administrerForsendelse, times(1)).hentForsendelse(anyString());
+        verify(eformidling, times(1)).hent();
+        verify(juridiskLogg, times(1)).lagreJuridiskLogg(getLoggMeldingRequest());
+    }
+
+    @Test
+    public void navForsendelserShouldSetToExpedertWhenKvitteringStatusFraTrygdErLevert() throws IOException {
+        InputStream inputStream = new ClassPathResource("__files/rdist001/getForsendelse_forAltinnTest.json").getInputStream();
+
+        HentForsendelseResponseTo forsendelseResponseTo = deserializeToObject(inputStream, HentForsendelseResponseTo.class);
+
+        when(administrerForsendelse.hentEformidlingForsendelser()).thenReturn(hentEformidlingforsendelserResponseTo());
+        when(administrerForsendelse.hentForsendelse(anyString())).thenReturn(forsendelseResponseTo);
+        when(eformidling.hent()).thenReturn(getDownloadResponseLevert());
         when(juridiskLogg.lagreJuridiskLogg(getLoggMeldingRequest())).thenReturn(getloggMeldingResponse());
 
         sdist001Service.oppdatereDokDistEformidlingStatus();
@@ -153,6 +173,43 @@ public class Sdist001ServiceTest {
         );
     }
 
+    private List<DownloadResponse> getDownloadResponseLevert() {
+        return Arrays.asList(DownloadResponse.builder()
+                        .conversationId(CONVERSATION_ID_1)
+                        .kvitteringStatus(KvitteringStatus.builder()
+                                .status(LEST.name())
+                                .build())
+                        .sendersReference(SENDERS_REFERENCE_1)
+                        .sendtDate(LocalDateTime.now().toString())
+                        .build(),
+                DownloadResponse.builder()
+                        .conversationId(CONVERSATION_ID_2)
+                        .kvitteringStatus(KvitteringStatus.builder()
+                                .status(LEVERT.name())
+                                .build())
+                        .sendersReference(SENDERS_REFERENCE_2)
+                        .sendtDate(LocalDateTime.now().toString())
+                        .build(),
+                DownloadResponse.builder()
+                        .conversationId(CONVERSATION_ID_3)
+                        .kvitteringStatus(KvitteringStatus.builder()
+                                .status(SENDT.name())
+                                .build())
+                        .sendersReference(SENDERS_REFERENCE_3)
+                        .sendtDate(LocalDateTime.now().toString())
+                        .build(),
+                DownloadResponse.builder()
+                        .conversationId(CONVERSATION_ID_4)
+                        .kvitteringStatus(KvitteringStatus.builder()
+                                .status(LEVETID_UTLOPT.name())
+                                .build())
+                        .sendersReference(SENDERS_REFERENCE_4)
+                        .sendtDate(LocalDateTime.now().toString())
+                        .build()
+
+
+        );
+    }
     private HentEformidlingforsendelserResponseTo hentEformidlingforsendelserResponseTo() {
 
         return HentEformidlingforsendelserResponseTo.builder()
@@ -193,7 +250,7 @@ public class Sdist001ServiceTest {
         return LoggMeldingRequest.builder()
                 .antallAarLagres(1234)
                 .avsender("dokdisteformidling")
-                .mottaker("***gammelt_fnr***")
+                .mottaker("01054049486")
                 .joarkRef("429436507")
                 .meldingsId(any())
                 .build();
