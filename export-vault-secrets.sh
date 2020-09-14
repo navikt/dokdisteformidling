@@ -8,7 +8,7 @@ fi
 if test -f /secrets/serviceuser/srvdokdisteformidling/password;
 then
     echo "Setting serviceuser_password"
-    export  serviceuser_***passord=gammelt_passord***)
+    export  serviceuser_password=$(cat /secrets/serviceuser/srvdokdisteformidling/password)
 fi
 if test -f /secrets/privateKey/privateKeyPassphrase;
 then
@@ -20,14 +20,14 @@ then
     echo "Setting dpo_username"
     export dpo_username="$(cat /secrets/dpo/dpo.json | jq -r '.username')"
     echo "Setting dpo_password"
-    export dpo_***passord=gammelt_passord***')"
+    export dpo_password="$(cat /secrets/dpo/dpo.json | jq -r '.password')"
 fi
 if test -f /secrets/virksomhetssertifikat/credentials.json
 then
     echo "Setting virksomhetssertifikat_alias"
     export virksomhetssertifikat_alias="$(cat /secrets/virksomhetssertifikat/credentials.json | jq -r '.alias')"
     echo "Setting virksomhetssertifikat_password"
-    export virksomhetssertifikat_***passord=gammelt_passord***')"
+    export virksomhetssertifikat_password="$(cat /secrets/virksomhetssertifikat/credentials.json | jq -r '.password')"
     echo "Setting virksomhetssertifikat_type"
     export virksomhetssertifikat_type="$(cat /secrets/virksomhetssertifikat/credentials.json | jq -r '.type')"
 fi

@@ -18,7 +18,7 @@ public class ClientCallBackHandler implements CallbackHandler {
 
     @Override
     public void handle(Callback[] callbacks) {
-        WS***passord=gammelt_passord***];
+        WSPasswordCallback wsPasswordCallback = (WSPasswordCallback) callbacks[0];
         wsPasswordCallback.setPassword(dpoUserProperties.getPassword());
     }
 }

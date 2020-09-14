@@ -23,7 +23,7 @@
             <partRolle>DAP</partRolle>
             <organisasjonsnummer/>
             <foedselsnummer>
-                <foedselsnummer>***gammelt_fnr***</foedselsnummer>
+                <foedselsnummer>11111111111</foedselsnummer>
             </foedselsnummer>
         </part>
         <registrering xsi:type="journalpost">

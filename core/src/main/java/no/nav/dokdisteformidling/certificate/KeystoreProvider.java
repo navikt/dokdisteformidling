@@ -28,7 +28,7 @@ public class KeystoreProvider {
 
 	public static KeyStore loadKeyStore(KeyStoreProperties properties) throws KeystoreProviderException {
 		String type = properties.getType();
-		String ***passord=gammelt_passord***();
+		String password = properties.getPassword();
 		Resource path = properties.getPath();
 
 		try {

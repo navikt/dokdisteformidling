@@ -16,7 +16,7 @@
     <s:Body>
         <DownloadFileStreamedResponse xmlns="http://www.altinn.no/services/ServiceEngine/Broker/2015/06">
             <DownloadFileStreamedResult>
-                <xop:Include href="cid:http://tempuri.org/1/***gammelt_fnr***7559832"
+                <xop:Include href="cid:http://tempuri.org/1/637169441367559832"
                              xmlns:xop="http://www.w3.org/2004/08/xop/include"/>
             </DownloadFileStreamedResult>
         </DownloadFileStreamedResponse>
