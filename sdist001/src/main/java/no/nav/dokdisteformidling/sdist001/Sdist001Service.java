@@ -101,6 +101,8 @@ public class Sdist001Service {
                 forsendelseStatusEndringer.getBekreftet().add(forsendelseId);
                 break;
             case MOTTATT:
+                log.info("Hentet eFormidlingforsendelser status fra Altinn med kvitteringStatus={}, konversasjonId={}", kvitteringStatus, konversasjonId);
+                break;
             case LEVERT:
             case LEST:
                 oppdaterTilEkspedert(altinnKvitteringStatus.name(), forsendelseId, konversasjonId);

@@ -142,7 +142,7 @@ public class Sdist001IT {
         IOUtils.write(classpathToString("__files/altinn/brokerserviceexternalstreamed/downloadfilestreamed_happy_response.xml"), bos, utf8);
         IOUtils.write("\r\n", bos, utf8);
         IOUtils.write("--" + boundary + "\r\n", bos, utf8);
-        IOUtils.write("Content-ID: <http://tempuri.org/1/***gammelt_fnr***7559832>\r\n", bos, utf8);
+        IOUtils.write("Content-ID: <http://tempuri.org/1/637169441367559832>\r\n", bos, utf8);
         IOUtils.write("Content-Transfer-Encoding: binary\r\n", bos, utf8);
         IOUtils.write("Content-Type: application/octet-stream\r\n", bos, utf8);
         IOUtils.write("\r\n", bos, utf8);

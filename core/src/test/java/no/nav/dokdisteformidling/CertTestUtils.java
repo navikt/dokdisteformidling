@@ -46,7 +46,7 @@ public final class CertTestUtils {
 	public static final String SELF_SIGNED_PKCS12_BASE64 = "secrets/itest.p12.b64";
 	public static final String PKCS_12 = "PKCS12";
 	public static final String SELF_SIGNED_PKCS12_ALIAS = "1";
-	public static final String SELF_SIGNED_PKCS12_***passord=gammelt_passord***";
+	public static final String SELF_SIGNED_PKCS12_PASSWORD = "bjarne";
 
 	private CertTestUtils() {
 		// noop
