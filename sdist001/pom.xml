@@ -16,7 +16,11 @@
 			<groupId>no.nav.dokdisteformidling</groupId>
 			<artifactId>core</artifactId>
 		</dependency>
-
+		<dependency>
+			<groupId>org.projectlombok</groupId>
+			<artifactId>lombok</artifactId>
+			<scope>provided</scope>
+		</dependency>
 		<!--test-->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -24,8 +28,8 @@
 			<scope>test</scope>
 			<exclusions>
 				<exclusion>
-					<groupId>junit</groupId>
-					<artifactId>junit</artifactId>
+					<groupId>org.junit.vintage</groupId>
+					<artifactId>junit-vintage-engine</artifactId>
 				</exclusion>
 			</exclusions>
 		</dependency>
