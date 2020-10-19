@@ -14,8 +14,8 @@ import no.nav.meldinger.virksomhet.dokdistfordeling.qdist008.out.DistribuerTilKa
 import org.apache.camel.ExchangePattern;
 import org.apache.camel.LoggingLevel;
 import org.apache.camel.ValidationException;
+import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.converter.jaxb.JaxbDataFormat;
-import org.apache.camel.spring.SpringRouteBuilder;
 import org.springframework.stereotype.Component;
 
 import javax.inject.Inject;
@@ -27,7 +27,7 @@ import javax.xml.bind.JAXBContext;
  * @author Sigurd Midttun, Visma Consulting.
  */
 @Component
-public class Qdist013Route extends SpringRouteBuilder {
+public class Qdist013Route extends RouteBuilder {
 
 	private final Qdist013Service qdist013Service;
 	private final Queue qdist013;
