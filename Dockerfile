@@ -1,4 +1,4 @@
-FROM navikt/java:8
+FROM navikt/java:11
 
 # Brukes for å hente config fra json filer
 RUN export "http_proxy=http://webproxy-utvikler.nav.no:8088/" \

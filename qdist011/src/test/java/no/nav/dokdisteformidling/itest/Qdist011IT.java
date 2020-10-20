@@ -153,7 +153,7 @@ public class Qdist011IT {
         when(amazonS3.getObjectAsString(eq(BUCKET_NAME), eq(DOKUMENT_OBJEKT_REFERANSE_VEDLEGG2)))
                 .thenReturn(JsonSerializer.serialize(DokdistDokument.builder().pdf(VEDLEGG2_TEST_CONTENT.getBytes()).build()));
     }
-    
+
     @Test
     @Order(Integer.MIN_VALUE)
     @Disabled
