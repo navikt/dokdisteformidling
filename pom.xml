@@ -26,14 +26,12 @@
 	<properties>
 		<java.version>11</java.version>
 		<camel.version>3.5.0</camel.version>
-		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<javax.inject.version>1</javax.inject.version>
 		<logstash-logback-encoder.version>6.4</logstash-logback-encoder.version>
 		<jakarta.xml.ws-api.version>2.3.3</jakarta.xml.ws-api.version>
 		<lombok.version>1.18.14</lombok.version>
 		<resilience4j.version>1.6.1</resilience4j.version>
-		<aws-java-sdk-s3.version>1.11.497</aws-java-sdk-s3.version>
+		<aws-java-sdk-s3.version>1.11.883</aws-java-sdk-s3.version>
 		<dokkat.version>11.0.5</dokkat.version>
 		<wmq.version>9.2.0.1</wmq.version>
 		<cxf.version>3.4.0</cxf.version>
@@ -243,18 +241,6 @@
 				<version>${resilience4j.version}</version>
 			</dependency>
 			<!-- test -->
-			<dependency>
-				<groupId>org.apache.camel</groupId>
-				<artifactId>camel-test-spring</artifactId>
-				<version>${camel.version}</version>
-				<scope>test</scope>
-			</dependency>
-			<dependency>
-				<groupId>org.apache.camel</groupId>
-				<artifactId>camel-test-junit5</artifactId>
-				<version>${camel.version}</version>
-				<scope>test</scope>
-			</dependency>
 			<dependency>
 				<groupId>org.mockito</groupId>
 				<artifactId>mockito-junit-jupiter</artifactId>

@@ -26,8 +26,9 @@ public class LastOppDokumentRoute extends RouteBuilder {
         from(ROUTE)
                 .routeId(ROUTE_ID)
                 .setExchangePattern(ExchangePattern.InOnly)
-                .setProperty(PROPERTY_FILNAVN, bodyAs(DokdistDokument.class).append("getDokumentObjektReferanse"))
-                .setBody(bodyAs(DokdistDokument.class).append("getPdf"))
+                .setProperty(PROPERTY_FILNAVN,  simple("${body.dokumentObjektReferanse}"))
+                .log(LoggingLevel.INFO,log , "${body.pdf}")
+                .setBody(simple("${body.pdf}"))
                 .to(SFTP_SERVER)
                 .log(LoggingLevel.INFO, log, "qdist011 har lastet opp ${exchangeProperty." + PROPERTY_FILNAVN + "}.pdf til NFS fileshare for distribusjon via DPI");
     }
