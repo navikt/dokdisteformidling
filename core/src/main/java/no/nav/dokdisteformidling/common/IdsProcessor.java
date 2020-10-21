@@ -7,7 +7,7 @@ import static org.apache.commons.lang3.StringUtils.isBlank;
 import no.nav.dokdisteformidling.exception.functional.ForsendelseManglerForsendelseIdFunctionalException;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
-import org.apache.camel.builder.xml.XPathBuilder;
+import org.apache.camel.language.xpath.XPathBuilder;
 import org.slf4j.MDC;
 
 import java.util.UUID;

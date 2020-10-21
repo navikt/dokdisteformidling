@@ -3,32 +3,33 @@ package no.nav.dokdisteformidling.qdist011;
 import no.nav.dokdisteformidling.storage.DokdistDokument;
 import org.apache.camel.ExchangePattern;
 import org.apache.camel.LoggingLevel;
-import org.apache.camel.spring.SpringRouteBuilder;
+import org.apache.camel.builder.RouteBuilder;
 import org.springframework.stereotype.Component;
 
 /**
  * @author Erik Bråten, Visma Consulting.
  */
 @Component
-public class LastOppDokumentRoute extends SpringRouteBuilder {
+public class LastOppDokumentRoute extends RouteBuilder {
 
-	public static final String ROUTE_ID = "LASTOPPDOKUMENT";
-	public static final String ROUTE = "direct:" + ROUTE_ID;
+    public static final String ROUTE_ID = "LASTOPPDOKUMENT";
+    public static final String ROUTE = "direct:" + ROUTE_ID;
 
-	private static final String PROPERTY_FILNAVN = "filnavn";
-	private static final String SFTP_FILETYPE = ".pdf";
-	private static final String SFTP_FILE_CONFIG = "autoCreate=false&binary=true&fileName=${exchangeProperty." + PROPERTY_FILNAVN + "}" + SFTP_FILETYPE + "&";
-	private static final String SFTP_SECURITY_CONFIG = "privateKeyFile={{sftp.privateKeyFile}}&privateKeyPassphrase={{sftp.privateKeyPassphrase}}&preferredAuthentications=publickey";
-	private static final String SFTP_SERVER = "sftp://{{sftp.url}}:{{sftp.port}}/{{sftp.remoteFilePath}}?username={{sftp.username}}&password=&" + SFTP_FILE_CONFIG + SFTP_SECURITY_CONFIG;
+    private static final String PROPERTY_FILNAVN = "filnavn";
+    private static final String SFTP_FILETYPE = ".pdf";
+    private static final String SFTP_FILE_CONFIG = "autoCreate=false&binary=true&fileName=${exchangeProperty." + PROPERTY_FILNAVN + "}" + SFTP_FILETYPE + "&";
+    private static final String SFTP_SECURITY_CONFIG = "privateKeyFile={{sftp.privateKeyFile}}&privateKeyPassphrase={{sftp.privateKeyPassphrase}}&preferredAuthentications=publickey";
+    private static final String SFTP_SERVER = "sftp://{{sftp.url}}:{{sftp.port}}/{{sftp.remoteFilePath}}?username={{sftp.username}}&password=&" + SFTP_FILE_CONFIG + SFTP_SECURITY_CONFIG;
 
-	@Override
-	public void configure() {
-		from(ROUTE)
-				.routeId(ROUTE_ID)
-				.setExchangePattern(ExchangePattern.InOnly)
-				.setProperty(PROPERTY_FILNAVN, bodyAs(DokdistDokument.class).method("getDokumentObjektReferanse"))
-				.setBody(bodyAs(DokdistDokument.class).method("getPdf"))
-				.to(SFTP_SERVER)
-				.log(LoggingLevel.INFO, log, "qdist011 har lastet opp ${exchangeProperty." + PROPERTY_FILNAVN + "}.pdf til NFS fileshare for distribusjon via DPI");
-	}
+    @Override
+    public void configure() {
+        from(ROUTE)
+                .routeId(ROUTE_ID)
+                .setExchangePattern(ExchangePattern.InOnly)
+                .setProperty(PROPERTY_FILNAVN,  simple("${body.dokumentObjektReferanse}"))
+                .log(LoggingLevel.INFO,log , "${body.pdf}")
+                .setBody(simple("${body.pdf}"))
+                .to(SFTP_SERVER)
+                .log(LoggingLevel.INFO, log, "qdist011 har lastet opp ${exchangeProperty." + PROPERTY_FILNAVN + "}.pdf til NFS fileshare for distribusjon via DPI");
+    }
 }

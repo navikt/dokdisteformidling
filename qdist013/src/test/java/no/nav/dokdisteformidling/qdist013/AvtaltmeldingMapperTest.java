@@ -23,6 +23,7 @@ import org.junit.jupiter.api.Test;
 import javax.xml.bind.JAXBElement;
 import java.math.BigInteger;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -69,6 +70,7 @@ import static org.mockito.Mockito.when;
  */
 class AvtaltmeldingMapperTest {
 
+    private static DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS");
     private static final String BESTILLINGS_ID = "bestillingsId";
     private static final String JOURNALPOST_ID = "987654321";
 
@@ -316,10 +318,10 @@ class AvtaltmeldingMapperTest {
                 .get(1);
         Dokumentobjekt dokumentobjektVedlegg = dokumentbeskrivelseVedlegg.getDokumentobjekt().get(0);
 
-        assertEquals(convertFromXmlGregorianCalendarToLocalDateTime(dokumentbeskrivelseHoveddok.getOpprettetDato()), DATO_JOURNALFOERT);
-        assertEquals(convertFromXmlGregorianCalendarToLocalDateTime(dokumentobjektHoveddok.getOpprettetDato()), DATO_JOURNALFOERT);
-        assertEquals(convertFromXmlGregorianCalendarToLocalDateTime(dokumentbeskrivelseVedlegg.getOpprettetDato()), DATO_JOURNALFOERT_ORIG_JP);
-        assertEquals(convertFromXmlGregorianCalendarToLocalDateTime(dokumentobjektVedlegg.getOpprettetDato()), DATO_JOURNALFOERT_ORIG_JP);
+        assertEquals(convertFromXmlGregorianCalendarToLocalDateTime(dokumentbeskrivelseHoveddok.getOpprettetDato()).toString(), DATO_JOURNALFOERT.format(dateTimeFormatter));
+        assertEquals(convertFromXmlGregorianCalendarToLocalDateTime(dokumentobjektHoveddok.getOpprettetDato()).toString(), DATO_JOURNALFOERT.format(dateTimeFormatter));
+        assertEquals(convertFromXmlGregorianCalendarToLocalDateTime(dokumentbeskrivelseVedlegg.getOpprettetDato()).toString(), DATO_JOURNALFOERT_ORIG_JP.format(dateTimeFormatter));
+        assertEquals(convertFromXmlGregorianCalendarToLocalDateTime(dokumentobjektVedlegg.getOpprettetDato()).toString(), DATO_JOURNALFOERT_ORIG_JP.format(dateTimeFormatter));
 
         verify(safJournalpostQueryServiceMock, times(18)).hentJournalpost(ORIGINAL_JPID_VEDLEGG);
     }
@@ -529,10 +531,10 @@ class AvtaltmeldingMapperTest {
         Saksmappe saksmappe = (Saksmappe) mappeList.get(0);
 
         assertEquals(saksmappe.getTittel(), TEMA_NAVN);
-        assertEquals(convertFromXmlGregorianCalendarToLocalDateTime(saksmappe.getOpprettetDato()), DATO_OPPRETTET_SAK);
+        assertEquals(convertFromXmlGregorianCalendarToLocalDateTime(saksmappe.getOpprettetDato()).toString(), DATO_OPPRETTET_SAK.format(dateTimeFormatter));
         assertEquals(saksmappe.getOpprettetAv(), OPPRETTET_AV_NAVN);
         assertRegistrering(saksmappe.getRegistrering());
-        assertEquals(convertFromXmlGregorianCalendarToLocalDateTime(saksmappe.getSaksdato()), DATO_OPPRETTET_SAK);
+        assertEquals(convertFromXmlGregorianCalendarToLocalDateTime(saksmappe.getSaksdato()).toString(), DATO_OPPRETTET_SAK.format(dateTimeFormatter));
         assertEquals(saksmappe.getAdministrativEnhet(), NAV_KLAGEINSTANS);
         assertEquals(saksmappe.getSaksansvarlig(), OPPRETTET_AV_NAVN);
         assertEquals(saksmappe.getSaksstatus(), UNDER_BEHANDLING);
@@ -545,13 +547,13 @@ class AvtaltmeldingMapperTest {
         assertTrue(registreringList.get(0) instanceof Journalpost);
 
         Journalpost registreringJp = (Journalpost) registreringList.get(0);
-        assertEquals(convertFromXmlGregorianCalendarToLocalDateTime(registreringJp.getOpprettetDato()), DATO_OPPRETTET_JOURNALPOST);
+        assertEquals(convertFromXmlGregorianCalendarToLocalDateTime(registreringJp.getOpprettetDato()).toString(), DATO_OPPRETTET_JOURNALPOST.format(dateTimeFormatter));
         assertEquals(registreringJp.getOpprettetAv(), OPPRETTET_AV_NAVN);
         assertDokumentbeskrivelseOpprettetAv(registreringJp.getDokumentbeskrivelse());
         assertEquals(registreringJp.getTittel(), TITTEL);
         assertEquals(registreringJp.getJournalposttype(), UTGAAENDE_DOKUMENT);
         assertEquals(registreringJp.getJournalstatus(), EKSPEDERT);
-        assertEquals(convertFromXmlGregorianCalendarToLocalDateTime(registreringJp.getJournaldato()), DATO_JOURNALFOERT);
+        assertEquals(convertFromXmlGregorianCalendarToLocalDateTime(registreringJp.getJournaldato()).toString(), DATO_JOURNALFOERT.format(dateTimeFormatter));
         assertKorrespondanseparter(registreringJp.getKorrespondansepart());
     }
 
@@ -617,7 +619,7 @@ class AvtaltmeldingMapperTest {
         assertEquals(dokumentbeskrivelseHoveddok.getDokumentnummer(), BigInteger.ONE);
         assertCommonAttributesVedleggDokumentbeskrivelseOpprettetAv(dokumentbeskrivelseHoveddok);
         assertEquals(dokumentbeskrivelseHoveddok.getTittel(), TITTEL_HOVEDDOK);
-        assertEquals(convertFromXmlGregorianCalendarToLocalDateTime(dokumentbeskrivelseHoveddok.getOpprettetDato()), DATO_JOURNALFOERT);
+        assertEquals(convertFromXmlGregorianCalendarToLocalDateTime(dokumentbeskrivelseHoveddok.getOpprettetDato()).toString(), DATO_JOURNALFOERT.format(dateTimeFormatter));
 
 
         assertDokumentobjektHoveddokument(dokumentbeskrivelseHoveddok.getDokumentobjekt());
@@ -628,7 +630,7 @@ class AvtaltmeldingMapperTest {
         assertEquals(dokumentbeskrivelseVedlegg.getDokumentnummer(), BigInteger.valueOf(2));
         assertCommonAttributesVedleggDokumentbeskrivelseOpprettetAv(dokumentbeskrivelseVedlegg);
         assertEquals(dokumentbeskrivelseVedlegg.getTittel(), TITTEL_VEDLEGG);
-        assertEquals(convertFromXmlGregorianCalendarToLocalDateTime(dokumentbeskrivelseVedlegg.getOpprettetDato()), DATO_JOURNALFOERT);
+        assertEquals(convertFromXmlGregorianCalendarToLocalDateTime(dokumentbeskrivelseVedlegg.getOpprettetDato()).toString(), DATO_JOURNALFOERT.format(dateTimeFormatter));
 
         assertDokumentobjektVedlegg(dokumentbeskrivelseVedlegg.getDokumentobjekt());
     }
@@ -639,7 +641,7 @@ class AvtaltmeldingMapperTest {
         Dokumentobjekt dokumentobjektHoveddok = dokumentobjektList.get(0);
         assertEquals(dokumentobjektHoveddok.getVersjonsnummer(), BigInteger.ONE);
         assertEquals(dokumentobjektHoveddok.getVariantformat(), DOKUMENT_HVOR_DELER_AV_INNHOLDET_ER_SKJERMET);
-        assertEquals(convertFromXmlGregorianCalendarToLocalDateTime(dokumentobjektHoveddok.getOpprettetDato()), DATO_JOURNALFOERT);
+        assertEquals(convertFromXmlGregorianCalendarToLocalDateTime(dokumentobjektHoveddok.getOpprettetDato()).toString(), DATO_JOURNALFOERT.format(dateTimeFormatter));
         assertEquals(dokumentobjektHoveddok.getOpprettetAv(), JOURNALFOERT_AV_NAVN);
         assertEquals(dokumentobjektHoveddok.getReferanseDokumentfil(), JOURNALPOST_ID + "-" + DOKUMENT_INFO_ID_HOVEDDOK + "-" + DOKUMENT_HVOR_DELER_AV_INNHOLDET_ER_SKJERMET + "-" + FILTYPE_PDF);
     }
@@ -650,7 +652,7 @@ class AvtaltmeldingMapperTest {
         Dokumentobjekt dokumentobjektVedlegg = dokumentobjektList.get(0);
         assertEquals(dokumentobjektVedlegg.getVersjonsnummer(), BigInteger.ONE);
         assertEquals(dokumentobjektVedlegg.getVariantformat(), ARKIVFORMAT);
-        assertEquals(convertFromXmlGregorianCalendarToLocalDateTime(dokumentobjektVedlegg.getOpprettetDato()), DATO_JOURNALFOERT);
+        assertEquals(convertFromXmlGregorianCalendarToLocalDateTime(dokumentobjektVedlegg.getOpprettetDato()).toString(), DATO_JOURNALFOERT.format(dateTimeFormatter));
         assertEquals(dokumentobjektVedlegg.getOpprettetAv(), JOURNALFOERT_AV_NAVN);
         assertEquals(dokumentobjektVedlegg.getReferanseDokumentfil(), JOURNALPOST_ID + "-" + DOKUMENT_INFO_ID_VEDLEGG + "-" + ARKIVFORMAT + "-" + FILTYPE_JPEG);
     }

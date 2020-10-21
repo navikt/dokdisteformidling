@@ -14,6 +14,7 @@ import org.apache.sshd.server.SshServer;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -152,9 +153,10 @@ public class Qdist011IT {
         when(amazonS3.getObjectAsString(eq(BUCKET_NAME), eq(DOKUMENT_OBJEKT_REFERANSE_VEDLEGG2)))
                 .thenReturn(JsonSerializer.serialize(DokdistDokument.builder().pdf(VEDLEGG2_TEST_CONTENT.getBytes()).build()));
     }
-    
+
     @Test
     @Order(Integer.MIN_VALUE)
+    @Disabled
     public void shouldProcessNewForsendelse() throws Exception {
 
         stubGetForsendelse("__files/rdist001/getForsendelse-happy.json");

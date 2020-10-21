@@ -9,9 +9,9 @@ import no.nav.meldinger.virksomhet.dokdistfordeling.qdist008.out.DistribuerTilKa
 import org.apache.camel.ExchangePattern;
 import org.apache.camel.LoggingLevel;
 import org.apache.camel.ValidationException;
+import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.converter.jaxb.JaxbDataFormat;
 import org.apache.camel.spi.DataFormat;
-import org.apache.camel.spring.SpringRouteBuilder;
 import org.springframework.stereotype.Component;
 
 import javax.inject.Inject;
@@ -29,7 +29,7 @@ import static org.apache.camel.LoggingLevel.ERROR;
  * @author Sigurd Midttun, Visma Consulting.
  */
 @Component
-public class Qdist011Route extends SpringRouteBuilder {
+public class Qdist011Route extends RouteBuilder {
 
 	private final Qdist011Service qdist011Service;
 	private final Queue qdist011;
