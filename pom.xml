@@ -33,7 +33,7 @@
 		<resilience4j.version>1.6.1</resilience4j.version>
 		<aws-java-sdk-s3.version>1.11.883</aws-java-sdk-s3.version>
 		<dokkat.version>11.0.5</dokkat.version>
-		<wmq.version>9.2.0.1</wmq.version>
+		<wmq.version>9.2.1.0</wmq.version>
 		<cxf.version>3.4.1</cxf.version>
 		<melding-virksomhet-dokdistfordeling.version>2.0.4</melding-virksomhet-dokdistfordeling.version>
 		<nav-digitalKontaktinformasjon-v1-tjenestespesifikasjon>2.0.0</nav-digitalKontaktinformasjon-v1-tjenestespesifikasjon>
