@@ -31,7 +31,7 @@
 		<jakarta.xml.ws-api.version>2.3.3</jakarta.xml.ws-api.version>
 		<lombok.version>1.18.14</lombok.version>
 		<resilience4j.version>1.6.1</resilience4j.version>
-		<aws-java-sdk-s3.version>1.11.883</aws-java-sdk-s3.version>
+		<aws-java-sdk-s3.version>1.11.925</aws-java-sdk-s3.version>
 		<dokkat.version>11.0.5</dokkat.version>
 		<wmq.version>9.2.0.1</wmq.version>
 		<cxf.version>3.4.1</cxf.version>
