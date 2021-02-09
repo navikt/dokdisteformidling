@@ -29,7 +29,7 @@ public class Qdist013MetricsRoutePolicy extends RoutePolicySupport {
 
 	private static final String QDIST013_PROCESS_TIMER = "dok_request_latency";
 	private static final String QDIST013_PROCESS_TIMER_DESCRIPTION = "prosesseringstid for kall inn til qdist013";
-	private static final String QDIST013_EXCEPTION = "request_exception_total";
+	private static final String QDIST013_EXCEPTION = "dok_request_exception_total";
 
 	@Inject
 	public Qdist013MetricsRoutePolicy(MeterRegistry registry) {
