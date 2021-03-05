@@ -6,7 +6,7 @@ import com.ibm.mq.jms.MQConnectionFactory;
 import com.ibm.mq.jms.MQQueue;
 import com.ibm.msg.client.wmq.WMQConstants;
 import no.nav.dokdisteformidling.config.alias.MqGatewayAlias;
-import no.nav.dokdisteformidling.config.props.SrvAppserverProperties;
+import no.nav.dokdisteformidling.config.alias.ServiceuserAlias;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -54,13 +54,13 @@ public class JmsConfig {
 	@Bean
 	public ConnectionFactory wmqConnectionFactory(final MqGatewayAlias mqGatewayAlias,
 												  final @Value("${dokdisteformidling_channel.name}") String channelName,
-												  final SrvAppserverProperties srvAppserverProperties) throws JMSException {
-		return createConnectionFactory(mqGatewayAlias, channelName, srvAppserverProperties);
+												  final ServiceuserAlias serviceuserAlias) throws JMSException {
+		return createConnectionFactory(mqGatewayAlias, channelName, serviceuserAlias);
 	}
 
 	private UserCredentialsConnectionFactoryAdapter createConnectionFactory(final MqGatewayAlias mqGatewayAlias,
 																			final String channelName,
-																			final SrvAppserverProperties srvAppserverProperties) throws JMSException {
+																			final ServiceuserAlias serviceuserAlias) throws JMSException {
 		MQConnectionFactory connectionFactory = new MQConnectionFactory();
 		connectionFactory.setHostName(mqGatewayAlias.getHostname());
 		connectionFactory.setPort(mqGatewayAlias.getPort());
@@ -72,8 +72,8 @@ public class JmsConfig {
 		connectionFactory.setIntProperty(WMQConstants.JMS_IBM_CHARACTER_SET, UTF_8_WITH_PUA);
 		UserCredentialsConnectionFactoryAdapter adapter = new UserCredentialsConnectionFactoryAdapter();
 		adapter.setTargetConnectionFactory(connectionFactory);
-		adapter.setUsername(srvAppserverProperties.getUsername());
-		adapter.setPassword(srvAppserverProperties.getPassword());
+		adapter.setUsername(serviceuserAlias.getUsername());
+		adapter.setPassword(serviceuserAlias.getPassword());
 		return adapter;
 	}
 }
