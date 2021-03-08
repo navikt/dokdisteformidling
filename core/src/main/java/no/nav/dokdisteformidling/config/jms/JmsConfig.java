@@ -4,6 +4,7 @@ package no.nav.dokdisteformidling.config.jms;
 import com.ibm.mq.constants.MQConstants;
 import com.ibm.mq.jms.MQConnectionFactory;
 import com.ibm.mq.jms.MQQueue;
+import com.ibm.msg.client.jms.JmsConstants;
 import com.ibm.msg.client.wmq.WMQConstants;
 import no.nav.dokdisteformidling.config.alias.MqGatewayAlias;
 import no.nav.dokdisteformidling.config.alias.ServiceuserAlias;
@@ -72,8 +73,15 @@ public class JmsConfig {
 		connectionFactory.setIntProperty(WMQConstants.JMS_IBM_CHARACTER_SET, UTF_8_WITH_PUA);
 		UserCredentialsConnectionFactoryAdapter adapter = new UserCredentialsConnectionFactoryAdapter();
 		adapter.setTargetConnectionFactory(connectionFactory);
-		adapter.setUsername(serviceuserAlias.getUsername());
-		adapter.setPassword(serviceuserAlias.getPassword());
+		if(mqGatewayAlias.isTlsbroker()) {
+			adapter.setUsername(serviceuserAlias.getUsername());
+			adapter.setPassword(serviceuserAlias.getPassword());
+		} else {
+			connectionFactory.setBooleanProperty(JmsConstants.USER_AUTHENTICATION_MQCSP, false);
+			adapter.setUsername(serviceuserAlias.getUsername());
+			adapter.setPassword(serviceuserAlias.getPassword());
+		}
+
 		return adapter;
 	}
 }
