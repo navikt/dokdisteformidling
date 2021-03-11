@@ -4,8 +4,10 @@ package no.nav.dokdisteformidling.config.jms;
 import com.ibm.mq.constants.MQConstants;
 import com.ibm.mq.jms.MQConnectionFactory;
 import com.ibm.mq.jms.MQQueue;
+import com.ibm.msg.client.jms.JmsConstants;
 import com.ibm.msg.client.wmq.WMQConstants;
 import no.nav.dokdisteformidling.config.alias.MqGatewayAlias;
+import no.nav.dokdisteformidling.config.alias.ServiceuserAlias;
 import no.nav.dokdisteformidling.config.props.SrvAppserverProperties;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -54,12 +56,13 @@ public class JmsConfig {
 	@Bean
 	public ConnectionFactory wmqConnectionFactory(final MqGatewayAlias mqGatewayAlias,
 												  final @Value("${dokdisteformidling_channel.name}") String channelName,
+												  final ServiceuserAlias serviceuserAlias,
 												  final SrvAppserverProperties srvAppserverProperties) throws JMSException {
-		return createConnectionFactory(mqGatewayAlias, channelName, srvAppserverProperties);
+		return createConnectionFactory(mqGatewayAlias, channelName, serviceuserAlias, srvAppserverProperties);
 	}
 
 	private UserCredentialsConnectionFactoryAdapter createConnectionFactory(final MqGatewayAlias mqGatewayAlias,
-																			final String channelName,
+																			final String channelName, final ServiceuserAlias serviceuserAlias,
 																			final SrvAppserverProperties srvAppserverProperties) throws JMSException {
 		MQConnectionFactory connectionFactory = new MQConnectionFactory();
 		connectionFactory.setHostName(mqGatewayAlias.getHostname());
@@ -72,8 +75,18 @@ public class JmsConfig {
 		connectionFactory.setIntProperty(WMQConstants.JMS_IBM_CHARACTER_SET, UTF_8_WITH_PUA);
 		UserCredentialsConnectionFactoryAdapter adapter = new UserCredentialsConnectionFactoryAdapter();
 		adapter.setTargetConnectionFactory(connectionFactory);
-		adapter.setUsername(srvAppserverProperties.getUsername());
-		adapter.setPassword(srvAppserverProperties.getPassword());
+		if (mqGatewayAlias.isTlsbroker()) {
+			// Konfigurasjon for IBM MQ broker med TLS og autorisasjon med serviceuser mot onpremise Active Directory.
+			adapter.setUsername(serviceuserAlias.getUsername());
+			adapter.setPassword(serviceuserAlias.getPassword());
+
+		} else {
+			// Legacy IBM MQ broker
+			connectionFactory.setBooleanProperty(JmsConstants.USER_AUTHENTICATION_MQCSP, false);
+			adapter.setUsername(srvAppserverProperties.getUsername());
+			adapter.setPassword(srvAppserverProperties.getPassword());
+		}
+
 		return adapter;
 	}
 }

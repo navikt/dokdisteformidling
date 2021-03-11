@@ -33,7 +33,7 @@
 		<resilience4j.version>1.6.1</resilience4j.version>
 		<aws-java-sdk-s3.version>1.11.883</aws-java-sdk-s3.version>
 		<dokkat.version>11.0.5</dokkat.version>
-		<wmq.version>9.2.0.1</wmq.version>
+		<wmq.version>9.2.1.0</wmq.version>
 		<cxf.version>3.4.1</cxf.version>
 		<melding-virksomhet-dokdistfordeling.version>2.0.4</melding-virksomhet-dokdistfordeling.version>
 		<nav-digitalKontaktinformasjon-v1-tjenestespesifikasjon>2.0.0</nav-digitalKontaktinformasjon-v1-tjenestespesifikasjon>
@@ -50,7 +50,7 @@
 		<activemq.version>5.16.0</activemq.version>
 		<junit5.mockito.version>2.25.1</junit5.mockito.version>
 		<sshd-sftp.version>2.0.0</sshd-sftp.version>
-		<spring-cloud-contract-wiremock.version>2.2.4.RELEASE</spring-cloud-contract-wiremock.version>
+		<spring-cloud-contract-wiremock.version>3.0.1</spring-cloud-contract-wiremock.version>
 		<!-- wiremock compat -->
 		<xmlunit-core.version>2.6.3</xmlunit-core.version>
 	</properties>
