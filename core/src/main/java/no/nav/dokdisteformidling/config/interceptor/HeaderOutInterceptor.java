@@ -2,7 +2,6 @@ package no.nav.dokdisteformidling.config.interceptor;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.cxf.binding.soap.saaj.SAAJOutInterceptor;
-import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
@@ -25,7 +24,7 @@ public class HeaderOutInterceptor extends AbstractPhaseInterceptor {
     }
 
     @Override
-    public void handleMessage(Message message) throws Fault {
+    public void handleMessage(Message message) {
         log.info("Adding Keep-Alive header");
         Map<String, List> headers = (Map<String, List>) message.get(Message.PROTOCOL_HEADERS);
         headers.put("Connection", Collections.singletonList("Keep-Alive"));

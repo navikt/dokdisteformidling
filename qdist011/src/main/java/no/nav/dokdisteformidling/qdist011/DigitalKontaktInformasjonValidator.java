@@ -1,5 +1,6 @@
 package no.nav.dokdisteformidling.qdist011;
 
+import static java.util.Calendar.MONTH;
 import static no.nav.dokdisteformidling.utils.DateConverterUtil.getNow;
 import static no.nav.dokdisteformidling.qdist011.constants.BridgeMotSDPMapperConstants.DATE_VALID_MONTHS;
 import static no.nav.dokdisteformidling.qdist011.constants.BridgeMotSDPMapperConstants.RESERVASJON;
@@ -59,7 +60,7 @@ public class DigitalKontaktInformasjonValidator {
 		if (dateTime != null) {
 			GregorianCalendar calendar = dateTime.toGregorianCalendar();
 			GregorianCalendar today = getNow().toGregorianCalendar();
-			today.add(GregorianCalendar.MONTH, -DATE_VALID_MONTHS);
+			today.add(MONTH, -DATE_VALID_MONTHS);
 			result = calendar.compareTo(today);        //If result is positive: calendar is later than (today - DATE_VALID_MONTHS):
 		}
 

@@ -5,7 +5,7 @@ package no.nav.dokdisteformidling.config.interceptor;
  */
 public class CookieStore {
 
-    private static ThreadLocal<Object> requestCookie= new ThreadLocal<>();
+    private static final ThreadLocal<Object> requestCookie= new ThreadLocal<>();
 
     public CookieStore() {
         throw new AssertionError("Instantiating cookies class");

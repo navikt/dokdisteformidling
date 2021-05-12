@@ -16,7 +16,7 @@ import java.util.List;
 import static no.nav.dokdisteformidling.constants.DomainConstants.DEFAULT_ZONE_ID;
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class EformidlingMessageUnpackagerTest {
+class EformidlingMessageUnpackagerTest {
 
     private final static String SENDERS_REFERENCE = "33259df3-18ae-45e6-9861-47f42e119a14";
     private final static String CONVERSATION_ID = "f1b3002b-1dea-4c14-8072-8c191183d04c";

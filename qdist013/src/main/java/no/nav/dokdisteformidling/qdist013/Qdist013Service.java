@@ -146,9 +146,9 @@ public class Qdist013Service {
 
     private Dokumentbeskrivelse getDokumentbeskrivelseByJpIdAndDokInfoId(Arkivmelding arkivmelding, String journalpostId, String dokumentInfoId) {
         Journalpost journalpost = (Journalpost) arkivmelding.getMappe().get(0).getRegistrering().get(0);
-        return (Dokumentbeskrivelse) journalpost.getDokumentbeskrivelse()
+        return journalpost.getDokumentbeskrivelse()
                 .stream()
-                .filter(dokumentbeskrivelse -> ((Dokumentbeskrivelse) dokumentbeskrivelse).getDokumentobjekt()
+                .filter(dokumentbeskrivelse -> (dokumentbeskrivelse).getDokumentobjekt()
                         .get(0).getReferanseDokumentfil().startsWith(format("%s-%s", journalpostId, dokumentInfoId)))
                 .findAny()
                 .orElseThrow(() -> new IkkeSammenfallendeIderFunctionalException(format("DokumentInfoId=%s finnes på foresendelsen i dokdistDb, men ikke i respons fra SAF på journalpostId=%s.", dokumentInfoId, journalpostId)));

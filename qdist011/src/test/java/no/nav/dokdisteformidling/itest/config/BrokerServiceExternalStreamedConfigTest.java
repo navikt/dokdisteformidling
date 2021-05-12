@@ -45,7 +45,6 @@ public class BrokerServiceExternalStreamedConfigTest extends AbstractCxfEndpoint
         return iBrokerServiceExternalStreamed;
     }
 
-
     private void setRequestContext(final Client client, DpoUserProperties dpoUserProperties) {
         client.getRequestContext().put("ws-security.must-understand", Boolean.TRUE);
         client.getRequestContext().put("ws-security.username", dpoUserProperties.getUsername());
