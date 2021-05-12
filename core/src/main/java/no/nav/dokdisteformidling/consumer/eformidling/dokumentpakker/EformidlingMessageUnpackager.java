@@ -8,7 +8,6 @@ import no.nav.dokdisteformidling.consumer.eformidling.altinn.from.DownloadedMess
 import no.nav.dokdisteformidling.consumer.eformidling.dokumentpakker.exceptions.DokumentUnpackingException;
 import no.nav.dokdisteformidling.consumer.eformidling.dokumentpakker.trygderetten.json.TrygderettenMelding;
 import no.nav.dokdisteformidling.consumer.eformidling.dokumentpakker.trygderetten.xml.BrokerServiceManifest;
-import no.nav.dokdisteformidling.utils.XmlUtils;
 import org.apache.commons.io.FileUtils;
 import org.springframework.stereotype.Component;
 
@@ -24,9 +23,9 @@ import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
-import static no.nav.dokdisteformidling.utils.XmlUtils.unmarshalXmlObject;
 import static no.nav.dokdisteformidling.consumer.eformidling.altinn.from.AltinnDokument.MANIFEST_XML;
 import static no.nav.dokdisteformidling.consumer.eformidling.altinn.from.AltinnDokument.SBD_JSON;
+import static no.nav.dokdisteformidling.utils.XmlUtils.unmarshalXmlObject;
 
 /**
  * Pakker ut en eformidling melding fra Altinn.

@@ -7,29 +7,30 @@ import no.nav.dokdisteformidling.exception.functional.SafJournalpostValidationEx
 import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
+import java.util.Collections;
 
 /**
  * @author Erik Bråten, Visma Consulting.
  */
-public class SafJournalpostValidatorQdist013Test extends SafJournalpostTest {
+class SafJournalpostValidatorQdist013Test extends SafJournalpostTest {
 
-	private static String JOURNALPOST_ID = "123456";
+	private static final String JOURNALPOST_ID = "123456";
 	private final SafJournalpostValidatorQdist013 validator = new SafJournalpostValidatorQdist013();
 
 	@Test
-	public void shouldValidate() {
+	void shouldValidate() {
 		validator.validate(createSafJournalpost().build(), JOURNALPOST_ID);
 	}
 
 	@Test
-	public void shouldValidateWhenMissingAvsenderMottaker() {
+	void shouldValidateWhenMissingAvsenderMottaker() {
 		SafJournalpost.SafJournalpostBuilder safJournalpostBuilder = createSafJournalpost();
 		SafJournalpost safJournalpost = safJournalpostBuilder.avsenderMottaker(null).build();
 		validator.validate(safJournalpost, JOURNALPOST_ID);
 	}
 
 	@Test
-	public void shouldThrowWhenMissingDokumenter() {
+	void shouldThrowWhenMissingDokumenter() {
 		SafJournalpost.SafJournalpostBuilder safJournalpostBuilder = createSafJournalpost();
 		SafJournalpost safJournalpost = safJournalpostBuilder.dokumenter(null).build();
 		assertThrows(SafJournalpostValidationException.class, () ->
@@ -37,7 +38,7 @@ public class SafJournalpostValidatorQdist013Test extends SafJournalpostTest {
 	}
 
 	@Test
-	public void shouldThrowWhenMissingJournalpostId() {
+	void shouldThrowWhenMissingJournalpostId() {
 		SafJournalpost.SafJournalpostBuilder safJournalpostBuilder = createSafJournalpost();
 		SafJournalpost safJournalpost = safJournalpostBuilder.journalpostId(null).build();
 		assertThrows(SafJournalpostValidationException.class, () ->
@@ -45,7 +46,7 @@ public class SafJournalpostValidatorQdist013Test extends SafJournalpostTest {
 	}
 
 	@Test
-	public void shouldThrowWhenEmptyOpprettetAvNavn() {
+	void shouldThrowWhenEmptyOpprettetAvNavn() {
 		SafJournalpost.SafJournalpostBuilder safJournalpostBuilder = createSafJournalpost();
 		SafJournalpost safJournalpost = safJournalpostBuilder.opprettetAvNavn("").build();
 		assertThrows(SafJournalpostValidationException.class, () ->
@@ -53,7 +54,7 @@ public class SafJournalpostValidatorQdist013Test extends SafJournalpostTest {
 	}
 
 	@Test
-	public void shouldThrowWhenMissingDatoOpprettet() {
+	void shouldThrowWhenMissingDatoOpprettet() {
 		SafJournalpost.SafJournalpostBuilder safJournalpostBuilder = createSafJournalpost();
 		SafJournalpost safJournalpost = safJournalpostBuilder.datoOpprettet(null).build();
 		assertThrows(SafJournalpostValidationException.class, () ->
@@ -61,7 +62,7 @@ public class SafJournalpostValidatorQdist013Test extends SafJournalpostTest {
 	}
 
 	@Test
-	public void shouldThrowWhenEmptyTittel() {
+	void shouldThrowWhenEmptyTittel() {
 		SafJournalpost.SafJournalpostBuilder safJournalpostBuilder = createSafJournalpost();
 		SafJournalpost safJournalpost = safJournalpostBuilder.tittel("").build();
 		assertThrows(SafJournalpostValidationException.class, () ->
@@ -69,7 +70,7 @@ public class SafJournalpostValidatorQdist013Test extends SafJournalpostTest {
 	}
 
 	@Test
-	public void shouldThrowWhenMissingJournalfortAvNavn() {
+	void shouldThrowWhenMissingJournalfortAvNavn() {
 		SafJournalpost.SafJournalpostBuilder safJournalpostBuilder = createSafJournalpost();
 		SafJournalpost safJournalpost = safJournalpostBuilder.journalfortAvNavn(null).build();
 		assertThrows(SafJournalpostValidationException.class, () ->
@@ -77,7 +78,7 @@ public class SafJournalpostValidatorQdist013Test extends SafJournalpostTest {
 	}
 
 	@Test
-	public void shouldThrowWhenEmptyTemanavn() {
+	void shouldThrowWhenEmptyTemanavn() {
 		SafJournalpost.SafJournalpostBuilder safJournalpostBuilder = createSafJournalpost();
 		SafJournalpost safJournalpost = safJournalpostBuilder.temanavn("").build();
 		assertThrows(SafJournalpostValidationException.class, () ->
@@ -85,7 +86,7 @@ public class SafJournalpostValidatorQdist013Test extends SafJournalpostTest {
 	}
 
 	@Test
-	public void shouldThrowWhenMissingJournalposttype() {
+	void shouldThrowWhenMissingJournalposttype() {
 		SafJournalpost.SafJournalpostBuilder safJournalpostBuilder = createSafJournalpost();
 		SafJournalpost safJournalpost = safJournalpostBuilder.journalposttype(null).build();
 		assertThrows(SafJournalpostValidationException.class, () ->
@@ -93,7 +94,7 @@ public class SafJournalpostValidatorQdist013Test extends SafJournalpostTest {
 	}
 
 	@Test
-	public void shouldThrowWhenEmptyJournalfoerendeEnhet() {
+	void shouldThrowWhenEmptyJournalfoerendeEnhet() {
 		SafJournalpost.SafJournalpostBuilder safJournalpostBuilder = createSafJournalpost();
 		SafJournalpost safJournalpost = safJournalpostBuilder.journalfoerendeEnhet("").build();
 		assertThrows(SafJournalpostValidationException.class, () ->
@@ -101,7 +102,7 @@ public class SafJournalpostValidatorQdist013Test extends SafJournalpostTest {
 	}
 
 	@Test
-	public void shouldThrowWhenMissingBruker() {
+	void shouldThrowWhenMissingBruker() {
 		SafJournalpost.SafJournalpostBuilder safJournalpostBuilder = createSafJournalpost();
 		SafJournalpost safJournalpost = safJournalpostBuilder.bruker(null).build();
 		assertThrows(SafJournalpostValidationException.class, () ->
@@ -109,7 +110,7 @@ public class SafJournalpostValidatorQdist013Test extends SafJournalpostTest {
 	}
 
 	@Test
-	public void shouldThrowWhenMissingBrukerId() {
+	void shouldThrowWhenMissingBrukerId() {
 		SafJournalpost.SafJournalpostBuilder safJournalpostBuilder = createSafJournalpost();
 		SafJournalpost safJournalpost = safJournalpostBuilder
 				.bruker(SafJournalpost.Bruker.builder().id(null).type(BRUKER_TYPE).build())
@@ -119,7 +120,7 @@ public class SafJournalpostValidatorQdist013Test extends SafJournalpostTest {
 	}
 
 	@Test
-	public void shouldThrowWhenEmptyBrukerType() {
+	void shouldThrowWhenEmptyBrukerType() {
 		SafJournalpost.SafJournalpostBuilder safJournalpostBuilder = createSafJournalpost();
 		SafJournalpost safJournalpost = safJournalpostBuilder
 				.bruker(SafJournalpost.Bruker.builder().id(BRUKER_ID).type("").build())
@@ -129,7 +130,7 @@ public class SafJournalpostValidatorQdist013Test extends SafJournalpostTest {
 	}
 
 	@Test
-	public void shouldThrowWhenMissingSak() {
+	void shouldThrowWhenMissingSak() {
 		SafJournalpost.SafJournalpostBuilder safJournalpostBuilder = createSafJournalpost();
 		SafJournalpost safJournalpost = safJournalpostBuilder.sak(null).build();
 		assertThrows(SafJournalpostValidationException.class, () ->
@@ -137,7 +138,7 @@ public class SafJournalpostValidatorQdist013Test extends SafJournalpostTest {
 	}
 
 	@Test
-	public void shouldThrowWhenMissingSakDatoOpprettet() {
+	void shouldThrowWhenMissingSakDatoOpprettet() {
 		SafJournalpost.SafJournalpostBuilder safJournalpostBuilder = createSafJournalpost();
 		SafJournalpost safJournalpost = safJournalpostBuilder
 				.sak(SafJournalpost.Sak.builder().datoOpprettet(null).build())
@@ -147,7 +148,7 @@ public class SafJournalpostValidatorQdist013Test extends SafJournalpostTest {
 	}
 
 	@Test
-	public void shouldThrowWhenMissingRelevanteDatoer() {
+	void shouldThrowWhenMissingRelevanteDatoer() {
 		SafJournalpost.SafJournalpostBuilder safJournalpostBuilder = createSafJournalpost();
 		SafJournalpost safJournalpost = safJournalpostBuilder.relevanteDatoer(null).build();
 		assertThrows(SafJournalpostValidationException.class, () ->
@@ -155,60 +156,60 @@ public class SafJournalpostValidatorQdist013Test extends SafJournalpostTest {
 	}
 
 	@Test
-	public void shouldThrowWhenRelevanteDatoerMissingDatoJournalfoert() {
+	void shouldThrowWhenRelevanteDatoerMissingDatoJournalfoert() {
 		SafJournalpost.SafJournalpostBuilder safJournalpostBuilder = createSafJournalpost();
 		SafJournalpost safJournalpost = safJournalpostBuilder
-				.relevanteDatoer(Arrays.asList(createRelevantDatoRegistrert()))
+				.relevanteDatoer(Collections.singletonList(createRelevantDatoRegistrert()))
 				.build();
 		assertThrows(SafJournalpostValidationException.class, () ->
 				validator.validate(safJournalpost, JOURNALPOST_ID));
 	}
 
 	@Test
-	public void shouldThrowWhenMissingDokumentInfoDokumentInfoid() {
+	void shouldThrowWhenMissingDokumentInfoDokumentInfoid() {
 		SafJournalpost.SafJournalpostBuilder safJournalpostBuilder = createSafJournalpost();
 		SafJournalpost.DokumentInfo.DokumentInfoBuilder dokumentInfoBuilder = createHovedDokumentInfo();
 		SafJournalpost.DokumentInfo dokumentInfo = dokumentInfoBuilder.dokumentInfoId(null).build();
 		SafJournalpost safJournalpost = safJournalpostBuilder
-				.dokumenter(Arrays.asList(dokumentInfo))
+				.dokumenter(Collections.singletonList(dokumentInfo))
 				.build();
 		assertThrows(SafJournalpostValidationException.class, () ->
 				validator.validate(safJournalpost, JOURNALPOST_ID));
 	}
 
 	@Test
-	public void shouldThrowWhenEmptyDokumentInfoTittel() {
+	void shouldThrowWhenEmptyDokumentInfoTittel() {
 		SafJournalpost.SafJournalpostBuilder safJournalpostBuilder = createSafJournalpost();
 		SafJournalpost.DokumentInfo.DokumentInfoBuilder dokumentInfoBuilder = createHovedDokumentInfo();
 		SafJournalpost.DokumentInfo dokumentInfo = dokumentInfoBuilder.tittel("").build();
 		SafJournalpost safJournalpost = safJournalpostBuilder
-				.dokumenter(Arrays.asList(dokumentInfo))
+				.dokumenter(Collections.singletonList(dokumentInfo))
 				.build();
 		assertThrows(SafJournalpostValidationException.class, () ->
 				validator.validate(safJournalpost, JOURNALPOST_ID));
 	}
 
 	@Test
-	public void shouldThrowWhenMissingDokumentInfoDokumentvarianter() {
+	void shouldThrowWhenMissingDokumentInfoDokumentvarianter() {
 		SafJournalpost.SafJournalpostBuilder safJournalpostBuilder = createSafJournalpost();
 		SafJournalpost.DokumentInfo.DokumentInfoBuilder dokumentInfoBuilder = createHovedDokumentInfo();
 		SafJournalpost.DokumentInfo dokumentInfo = dokumentInfoBuilder.dokumentvarianter(null).build();
 		SafJournalpost safJournalpost = safJournalpostBuilder
-				.dokumenter(Arrays.asList(dokumentInfo))
+				.dokumenter(Collections.singletonList(dokumentInfo))
 				.build();
 		assertThrows(SafJournalpostValidationException.class, () ->
 				validator.validate(safJournalpost, JOURNALPOST_ID));
 	}
 
 	@Test
-	public void shouldThrowWhenMissingDokumentInfoDokumentvariantSladdetOrArkiv() {
+	void shouldThrowWhenMissingDokumentInfoDokumentvariantSladdetOrArkiv() {
 		SafJournalpost.SafJournalpostBuilder safJournalpostBuilder = createSafJournalpost();
 		SafJournalpost.DokumentInfo.DokumentInfoBuilder dokumentInfoBuilder = createHovedDokumentInfo();
 		SafJournalpost.DokumentInfo dokumentInfo = dokumentInfoBuilder
-				.dokumentvarianter(Arrays.asList(createDokumentVariantOriginal()))
+				.dokumentvarianter(Collections.singletonList(createDokumentVariantOriginal()))
 				.build();
 		SafJournalpost safJournalpost = safJournalpostBuilder
-				.dokumenter(Arrays.asList(dokumentInfo))
+				.dokumenter(Collections.singletonList(dokumentInfo))
 				.build();
 		assertThrows(SafJournalpostValidationException.class, () ->
 				validator.validate(safJournalpost, JOURNALPOST_ID));
