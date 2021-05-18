@@ -48,9 +48,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * @author Heidi Elisabeth Sando, Visma Consulting.
  */
-
-
-public class BridgeMotSDPMapperTest {
+class BridgeMotSDPMapperTest {
 	private static final String BESTILLINGS_ID = "bestillingsId";
 	private static final String MODUS = "T";
 	private static final String FORSENDELSE_STATUS = "forsendelseStatus";
@@ -104,7 +102,7 @@ public class BridgeMotSDPMapperTest {
 	private final BridgeMotSDPMapper bridgeMotSDPMapper = new BridgeMotSDPMapper();
 
 	@Test
-	public void shouldMap() {
+	void shouldMap() {
 		SendDigitalPost sendDigitalPost = bridgeMotSDPMapper.map(createHentForsendelseResponsToBuilder().build(),
 				KONVERSASJON_ID,
 				createHentSikkerDigitalPostadresseResponseToBuilder().build(), createDokumenttypeInfoTo(),
@@ -114,7 +112,7 @@ public class BridgeMotSDPMapperTest {
 	}
 
 	@Test
-	public void shouldMapOkMinimal() {
+	void shouldMapOkMinimal() {
 
 		HentForsendelseResponseTo.HentForsendelseResponseToBuilder hentForsendelseResponseToBuilder =
 				createHentForsendelseResponsToBuilder();
@@ -160,12 +158,12 @@ public class BridgeMotSDPMapperTest {
 
 		assertNull(varsler.getSmsVarsel());
 		assertNull(varsler.getEpostVarsel().getRepetisjoner());
-		assertEquals(varsler.getEpostVarsel().getVarslingsTekst().getValue(), EPOST_VARSLINGS_TEKST);
-		assertEquals(varsler.getEpostVarsel().getEpostadresse(), EPOST_VALUE);
+		assertEquals(EPOST_VARSLINGS_TEKST, varsler.getEpostVarsel().getVarslingsTekst().getValue());
+		assertEquals(EPOST_VALUE, varsler.getEpostVarsel().getEpostadresse());
 	}
 
 	@Test
-	public void shouldMapOkWithPreferertKanalEpostWithSMS() {
+	void shouldMapOkWithPreferertKanalEpostWithSMS() {
 		HentSikkerDigitalPostadresseResponseTo.HentSikkerDigitalPostadresseResponseToBuilder
 				hentSikkerDigitalPostadresseResponseToBuilder = createHentSikkerDigitalPostadresseResponseToBuilder();
 		hentSikkerDigitalPostadresseResponseToBuilder.digitalKontaktinformasjon(HentSikkerDigitalPostadresseResponseTo
@@ -191,7 +189,7 @@ public class BridgeMotSDPMapperTest {
 	}
 
 	@Test
-	public void shouldMapOkWithPreferertKanalEpostWithEpostAndSMS() {
+	void shouldMapOkWithPreferertKanalEpostWithEpostAndSMS() {
 		HentSikkerDigitalPostadresseResponseTo.HentSikkerDigitalPostadresseResponseToBuilder
 				hentSikkerDigitalPostadresseResponseToBuilder = createHentSikkerDigitalPostadresseResponseToBuilder();
 		hentSikkerDigitalPostadresseResponseToBuilder.digitalKontaktinformasjon(HentSikkerDigitalPostadresseResponseTo
@@ -221,7 +219,7 @@ public class BridgeMotSDPMapperTest {
 	}
 
 	@Test
-	public void shouldMapOkWithPreferertKanalSMSWithEpost() {
+	void shouldMapOkWithPreferertKanalSMSWithEpost() {
 		HentSikkerDigitalPostadresseResponseTo.HentSikkerDigitalPostadresseResponseToBuilder
 				hentSikkerDigitalPostadresseResponseToBuilder = createHentSikkerDigitalPostadresseResponseToBuilder();
 		hentSikkerDigitalPostadresseResponseToBuilder.digitalKontaktinformasjon(HentSikkerDigitalPostadresseResponseTo
@@ -247,7 +245,7 @@ public class BridgeMotSDPMapperTest {
 	}
 
 	@Test
-	public void shouldMapOkWithPreferertKanalSMSWithSMS() {
+	void shouldMapOkWithPreferertKanalSMSWithSMS() {
 		HentSikkerDigitalPostadresseResponseTo.HentSikkerDigitalPostadresseResponseToBuilder
 				hentSikkerDigitalPostadresseResponseToBuilder = createHentSikkerDigitalPostadresseResponseToBuilder();
 		hentSikkerDigitalPostadresseResponseToBuilder.digitalKontaktinformasjon(HentSikkerDigitalPostadresseResponseTo
@@ -273,7 +271,7 @@ public class BridgeMotSDPMapperTest {
 	}
 
 	@Test
-	public void shouldMapOkWithPreferertKanalSMSWithEpostAndSMS() {
+	void shouldMapOkWithPreferertKanalSMSWithEpostAndSMS() {
 		HentSikkerDigitalPostadresseResponseTo.HentSikkerDigitalPostadresseResponseToBuilder
 				hentSikkerDigitalPostadresseResponseToBuilder = createHentSikkerDigitalPostadresseResponseToBuilder();
 		hentSikkerDigitalPostadresseResponseToBuilder.digitalKontaktinformasjon(HentSikkerDigitalPostadresseResponseTo
@@ -303,7 +301,7 @@ public class BridgeMotSDPMapperTest {
 	}
 
 	@Test
-	public void shouldMapOkWithPreferertKanalSMSAndEpostWithEpost() {
+	void shouldMapOkWithPreferertKanalSMSAndEpostWithEpost() {
 		HentSikkerDigitalPostadresseResponseTo.HentSikkerDigitalPostadresseResponseToBuilder
 				hentSikkerDigitalPostadresseResponseToBuilder = createHentSikkerDigitalPostadresseResponseToBuilder();
 		hentSikkerDigitalPostadresseResponseToBuilder.digitalKontaktinformasjon(HentSikkerDigitalPostadresseResponseTo
@@ -329,7 +327,7 @@ public class BridgeMotSDPMapperTest {
 	}
 
 	@Test
-	public void shouldMapOkWithPreferertKanalSMSAndEpostWithSMS() {
+	void shouldMapOkWithPreferertKanalSMSAndEpostWithSMS() {
 		HentSikkerDigitalPostadresseResponseTo.HentSikkerDigitalPostadresseResponseToBuilder
 				hentSikkerDigitalPostadresseResponseToBuilder = createHentSikkerDigitalPostadresseResponseToBuilder();
 		hentSikkerDigitalPostadresseResponseToBuilder.digitalKontaktinformasjon(HentSikkerDigitalPostadresseResponseTo
@@ -355,7 +353,7 @@ public class BridgeMotSDPMapperTest {
 	}
 
 	@Test
-	public void shouldMapOkWithEpostUgyldigDato() {
+	void shouldMapOkWithEpostUgyldigDato() {
 		HentSikkerDigitalPostadresseResponseTo.HentSikkerDigitalPostadresseResponseToBuilder
 				hentSikkerDigitalPostadresseResponseToBuilder = createHentSikkerDigitalPostadresseResponseToBuilder();
 		hentSikkerDigitalPostadresseResponseToBuilder.digitalKontaktinformasjon(HentSikkerDigitalPostadresseResponseTo
@@ -385,7 +383,7 @@ public class BridgeMotSDPMapperTest {
 	}
 
 	@Test
-	public void shouldMapOkWithSMSUgyldigDato() {
+	void shouldMapOkWithSMSUgyldigDato() {
 		HentSikkerDigitalPostadresseResponseTo.HentSikkerDigitalPostadresseResponseToBuilder
 				hentSikkerDigitalPostadresseResponseToBuilder = createHentSikkerDigitalPostadresseResponseToBuilder();
 		hentSikkerDigitalPostadresseResponseToBuilder.digitalKontaktinformasjon(HentSikkerDigitalPostadresseResponseTo
@@ -415,7 +413,7 @@ public class BridgeMotSDPMapperTest {
 	}
 
 	@Test
-	public void shouldMapOkWithSMSAndEpostUgyldigDato() {
+	void shouldMapOkWithSMSAndEpostUgyldigDato() {
 		HentSikkerDigitalPostadresseResponseTo.HentSikkerDigitalPostadresseResponseToBuilder
 				hentSikkerDigitalPostadresseResponseToBuilder = createHentSikkerDigitalPostadresseResponseToBuilder();
 		hentSikkerDigitalPostadresseResponseToBuilder.digitalKontaktinformasjon(HentSikkerDigitalPostadresseResponseTo
@@ -455,25 +453,25 @@ public class BridgeMotSDPMapperTest {
 
 		if (preferertKanalEpost && !preferertKanalSMS) {
 			assertNull(varsler.getSmsVarsel());
-			assertTrue(varsler.getEpostVarsel().getRepetisjoner().getDagerEtter().equals(ANTALL_DAGER_LISTE));
-			assertEquals(varsler.getEpostVarsel().getVarslingsTekst().getValue(), EPOST_VARSLINGS_TEKST);
-			assertEquals(varsler.getEpostVarsel().getVarslingsTekst().getLang(), SPRAAK_KODE);
-			assertEquals(varsler.getEpostVarsel().getEpostadresse(), EPOST_VALUE);
+			assertEquals(ANTALL_DAGER_LISTE, varsler.getEpostVarsel().getRepetisjoner().getDagerEtter());
+			assertEquals(EPOST_VARSLINGS_TEKST, varsler.getEpostVarsel().getVarslingsTekst().getValue());
+			assertEquals(SPRAAK_KODE, varsler.getEpostVarsel().getVarslingsTekst().getLang());
+			assertEquals(EPOST_VALUE, varsler.getEpostVarsel().getEpostadresse());
 		} else if (!preferertKanalEpost && preferertKanalSMS) {
 			assertNull(varsler.getEpostVarsel());
-			assertTrue(varsler.getSmsVarsel().getRepetisjoner().getDagerEtter().equals(ANTALL_DAGER_LISTE));
-			assertEquals(varsler.getSmsVarsel().getVarslingsTekst().getValue(), SMS_VARSLINGS_TEKST);
-			assertEquals(varsler.getSmsVarsel().getVarslingsTekst().getLang(), SPRAAK_KODE);
-			assertEquals(varsler.getSmsVarsel().getMobiltelefonnummer(), MOBIL_VALUE);
-		} else if (preferertKanalEpost && preferertKanalSMS) {
-			assertTrue(varsler.getSmsVarsel().getRepetisjoner().getDagerEtter().equals(ANTALL_DAGER_LISTE));
-			assertEquals(varsler.getSmsVarsel().getVarslingsTekst().getValue(), SMS_VARSLINGS_TEKST);
-			assertEquals(varsler.getSmsVarsel().getVarslingsTekst().getLang(), SPRAAK_KODE);
-			assertEquals(varsler.getSmsVarsel().getMobiltelefonnummer(), MOBIL_VALUE);
-			assertTrue(varsler.getEpostVarsel().getRepetisjoner().getDagerEtter().equals(ANTALL_DAGER_LISTE));
-			assertEquals(varsler.getEpostVarsel().getVarslingsTekst().getValue(), EPOST_VARSLINGS_TEKST);
-			assertEquals(varsler.getEpostVarsel().getVarslingsTekst().getLang(), SPRAAK_KODE);
-			assertEquals(varsler.getEpostVarsel().getEpostadresse(), EPOST_VALUE);
+			assertEquals(ANTALL_DAGER_LISTE, varsler.getSmsVarsel().getRepetisjoner().getDagerEtter());
+			assertEquals(SMS_VARSLINGS_TEKST, varsler.getSmsVarsel().getVarslingsTekst().getValue());
+			assertEquals(SPRAAK_KODE, varsler.getSmsVarsel().getVarslingsTekst().getLang());
+			assertEquals(MOBIL_VALUE, varsler.getSmsVarsel().getMobiltelefonnummer());
+		} else if (preferertKanalEpost) {
+			assertEquals(ANTALL_DAGER_LISTE, varsler.getSmsVarsel().getRepetisjoner().getDagerEtter());
+			assertEquals(SMS_VARSLINGS_TEKST, varsler.getSmsVarsel().getVarslingsTekst().getValue());
+			assertEquals(SPRAAK_KODE, varsler.getSmsVarsel().getVarslingsTekst().getLang());
+			assertEquals(MOBIL_VALUE, varsler.getSmsVarsel().getMobiltelefonnummer());
+			assertEquals(ANTALL_DAGER_LISTE, varsler.getEpostVarsel().getRepetisjoner().getDagerEtter());
+			assertEquals(EPOST_VARSLINGS_TEKST, varsler.getEpostVarsel().getVarslingsTekst().getValue());
+			assertEquals(SPRAAK_KODE, varsler.getEpostVarsel().getVarslingsTekst().getLang());
+			assertEquals(EPOST_VALUE, varsler.getEpostVarsel().getEpostadresse());
 		}
 	}
 

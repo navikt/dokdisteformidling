@@ -63,7 +63,7 @@ public class LightweightSafJournalpostQueryServiceImplQdist013 implements SafJou
                 .journalfortAvNavn(safJournalpost.getJournalfortAvNavn())
                 .journalposttype(safJournalpost.getJournalposttype())
                 .avsenderMottakerNavn(getAvsenderMottakerNavn(safJournalpost.getAvsenderMottaker()))
-                .datoJournalfoert(getDatoJournalfoert(safJournalpost.getRelevanteDatoer(), journalpostId))
+                .datoJournalfoert(getDatoJournalfoert(safJournalpost.getRelevanteDatoer()))
                 .build();
     }
 
@@ -75,7 +75,7 @@ public class LightweightSafJournalpostQueryServiceImplQdist013 implements SafJou
         }
     }
 
-    public LocalDateTime getDatoJournalfoert(List<SafJournalpost.RelevantDato> relevanteDatoer, String journalpostId) {
+    public LocalDateTime getDatoJournalfoert(List<SafJournalpost.RelevantDato> relevanteDatoer) {
 
         return isRelevantDatoNull(relevanteDatoer) ? null : relevanteDatoer.stream()
                 .filter(relevantDato -> DATO_JOURNALFOERT.name().equals(relevantDato.getDatotype()))

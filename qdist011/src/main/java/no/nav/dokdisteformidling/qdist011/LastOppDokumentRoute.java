@@ -1,6 +1,5 @@
 package no.nav.dokdisteformidling.qdist011;
 
-import no.nav.dokdisteformidling.storage.DokdistDokument;
 import org.apache.camel.ExchangePattern;
 import org.apache.camel.LoggingLevel;
 import org.apache.camel.builder.RouteBuilder;

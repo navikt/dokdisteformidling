@@ -41,18 +41,18 @@ class DigitalKontaktInformasjonValidatorTest {
 	private final DigitalKontaktInformasjonValidator digitalKontaktInformasjonValidator = new DigitalKontaktInformasjonValidator();
 
 	@Test
-	public void shouldValidateOk() {
+	void shouldValidateOk() {
 		digitalKontaktInformasjonValidator.validateKontaktinfo(createHentSikkerDigitalPostadresseResponseToBuilder().build(),
 				createVarselInfoToBuilder().build());
 	}
 
 	@Test
-	public void shouldValidateOkWitoutVarselInfoTo() {
+	void shouldValidateOkWitoutVarselInfoTo() {
 		digitalKontaktInformasjonValidator.validateKontaktinfo(createHentSikkerDigitalPostadresseResponseToBuilder().build(), null);
 	}
 
 	@Test
-	public void shouldValidateWithOneValidDateEpost() {
+	void shouldValidateWithOneValidDateEpost() {
 		HentSikkerDigitalPostadresseResponseTo.HentSikkerDigitalPostadresseResponseToBuilder hentSikkerDigitalPostadresseResponseToBuilder =
 				createHentSikkerDigitalPostadresseResponseToBuilder();
 		hentSikkerDigitalPostadresseResponseToBuilder.digitalKontaktinformasjon(
@@ -74,7 +74,7 @@ class DigitalKontaktInformasjonValidatorTest {
 	}
 
 	@Test
-	public void shouldValidateWithOneValidDateSMS() {
+	void shouldValidateWithOneValidDateSMS() {
 		HentSikkerDigitalPostadresseResponseTo.HentSikkerDigitalPostadresseResponseToBuilder hentSikkerDigitalPostadresseResponseToBuilder =
 				createHentSikkerDigitalPostadresseResponseToBuilder();
 		hentSikkerDigitalPostadresseResponseToBuilder.digitalKontaktinformasjon(
@@ -96,7 +96,7 @@ class DigitalKontaktInformasjonValidatorTest {
 	}
 
 	@Test
-	public void shouldFailWithoutEpostAndUgyldigSMS() {
+	void shouldFailWithoutEpostAndUgyldigSMS() {
 
 		HentSikkerDigitalPostadresseResponseTo.HentSikkerDigitalPostadresseResponseToBuilder hentSikkerDigitalPostadresseResponseToBuilder =
 				createHentSikkerDigitalPostadresseResponseToBuilder();
@@ -125,7 +125,7 @@ class DigitalKontaktInformasjonValidatorTest {
 	}
 
 	@Test
-	public void shouldFailWithoutSMSAndUgyldigEpost() {
+	void shouldFailWithoutSMSAndUgyldigEpost() {
 
 		HentSikkerDigitalPostadresseResponseTo.HentSikkerDigitalPostadresseResponseToBuilder hentSikkerDigitalPostadresseResponseToBuilder =
 				createHentSikkerDigitalPostadresseResponseToBuilder();
@@ -154,7 +154,7 @@ class DigitalKontaktInformasjonValidatorTest {
 	}
 
 	@Test
-	public void shouldFailWithoutEpostAndSMS() {
+	void shouldFailWithoutEpostAndSMS() {
 
 		HentSikkerDigitalPostadresseResponseTo.HentSikkerDigitalPostadresseResponseToBuilder hentSikkerDigitalPostadresseResponseToBuilder =
 				createHentSikkerDigitalPostadresseResponseToBuilder();
@@ -183,7 +183,7 @@ class DigitalKontaktInformasjonValidatorTest {
 	}
 
 	@Test
-	public void shouldFailWithUgyldigEpostAndSMS() {
+	void shouldFailWithUgyldigEpostAndSMS() {
 
 		HentSikkerDigitalPostadresseResponseTo.HentSikkerDigitalPostadresseResponseToBuilder hentSikkerDigitalPostadresseResponseToBuilder =
 				createHentSikkerDigitalPostadresseResponseToBuilder();
@@ -212,7 +212,7 @@ class DigitalKontaktInformasjonValidatorTest {
 	}
 
 	@Test
-	public void shouldFailWithReservasjon() {
+	void shouldFailWithReservasjon() {
 
 		HentSikkerDigitalPostadresseResponseTo.HentSikkerDigitalPostadresseResponseToBuilder hentSikkerDigitalPostadresseResponseToBuilder =
 				createHentSikkerDigitalPostadresseResponseToBuilder();
@@ -239,7 +239,7 @@ class DigitalKontaktInformasjonValidatorTest {
 	}
 
 	@Test
-	public void shouldFailNoSertifikat() {
+	void shouldFailNoSertifikat() {
 		HentSikkerDigitalPostadresseResponseTo.HentSikkerDigitalPostadresseResponseToBuilder hentSikkerDigitalPostadresseResponseToBuilder =
 				createHentSikkerDigitalPostadresseResponseToBuilder();
 		hentSikkerDigitalPostadresseResponseToBuilder.sertifikat(null);
@@ -251,7 +251,7 @@ class DigitalKontaktInformasjonValidatorTest {
 	}
 
 	@Test
-	public void shouldFailNoLeverandoerAdresse() {
+	void shouldFailNoLeverandoerAdresse() {
 		HentSikkerDigitalPostadresseResponseTo.HentSikkerDigitalPostadresseResponseToBuilder hentSikkerDigitalPostadresseResponseToBuilder =
 				createHentSikkerDigitalPostadresseResponseToBuilder();
 		hentSikkerDigitalPostadresseResponseToBuilder.sikkerDigitalPostkasse(HentSikkerDigitalPostadresseResponseTo.DigitalPostkasse
@@ -267,7 +267,7 @@ class DigitalKontaktInformasjonValidatorTest {
 	}
 
 	@Test
-	public void shouldFailNoBrukerAdresse() {
+	void shouldFailNoBrukerAdresse() {
 		HentSikkerDigitalPostadresseResponseTo.HentSikkerDigitalPostadresseResponseToBuilder hentSikkerDigitalPostadresseResponseToBuilder =
 				createHentSikkerDigitalPostadresseResponseToBuilder();
 		hentSikkerDigitalPostadresseResponseToBuilder.sikkerDigitalPostkasse(HentSikkerDigitalPostadresseResponseTo.DigitalPostkasse
@@ -313,5 +313,4 @@ class DigitalKontaktInformasjonValidatorTest {
 				.antallDagerListe(ANTALL_DAGER_LISTE)
 				.preferertKanal(makePreferertKanalSet(PREFERERT_KANAL_EPOST, PREFERERT_KANAL_SMS));
 	}
-
 }

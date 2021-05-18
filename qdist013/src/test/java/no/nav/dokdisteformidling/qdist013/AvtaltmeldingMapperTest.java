@@ -70,7 +70,7 @@ import static org.mockito.Mockito.when;
  */
 class AvtaltmeldingMapperTest {
 
-    private static DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS");
+    private static final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS");
     private static final String BESTILLINGS_ID = "bestillingsId";
     private static final String JOURNALPOST_ID = "987654321";
 
@@ -162,8 +162,8 @@ class AvtaltmeldingMapperTest {
         Saksmappe saksmappe = (Saksmappe) mappeList.get(0);
         Part sakspartDAP = saksmappe.getPart().get(1);
 
-        assertEquals(sakspartDAP.getPartNavn(), EREG_NAVN);
-        assertEquals(sakspartDAP.getPartRolle(), SAKSPART_ROLLE_DAP);
+        assertEquals(EREG_NAVN, sakspartDAP.getPartNavn());
+        assertEquals(SAKSPART_ROLLE_DAP, sakspartDAP.getPartRolle());
         assertNull(sakspartDAP.getKontaktperson());
 
         verify(eregMock, times(1)).hentNavn(BRUKER_ID_ORGNR);
@@ -191,8 +191,8 @@ class AvtaltmeldingMapperTest {
         Saksmappe saksmappe = (Saksmappe) mappeList.get(0);
         Part sakspartDAP = saksmappe.getPart().get(1);
 
-        assertEquals(sakspartDAP.getPartNavn(), TPS_NAVN);
-        assertEquals(sakspartDAP.getPartRolle(), SAKSPART_ROLLE_DAP);
+        assertEquals(TPS_NAVN, sakspartDAP.getPartNavn());
+        assertEquals(SAKSPART_ROLLE_DAP, sakspartDAP.getPartRolle());
         assertNull(sakspartDAP.getKontaktperson());
 
         verify(aktoerregisterMock, times(2)).hentIdentForAktoerId(BRUKER_ID_AKTOER_ID);
@@ -218,7 +218,7 @@ class AvtaltmeldingMapperTest {
         Dokumentbeskrivelse dokumentbeskrivelse = (Dokumentbeskrivelse) registreringJp.getDokumentbeskrivelse()
                 .get(1);
 
-        assertEquals(dokumentbeskrivelse.getTittel(), TITTEL_VEDLEGG);
+        assertEquals(TITTEL_VEDLEGG, dokumentbeskrivelse.getTittel());
 
         verify(safJournalpostQueryServiceMock, times(0)).hentJournalpost(ORIGINAL_JPID_VEDLEGG);
     }
@@ -311,10 +311,10 @@ class AvtaltmeldingMapperTest {
         Saksmappe saksmappe = (Saksmappe) mappeList.get(0);
         Journalpost registreringJp = (Journalpost) saksmappe.getRegistrering().get(0);
 
-        Dokumentbeskrivelse dokumentbeskrivelseHoveddok = (Dokumentbeskrivelse) registreringJp.getDokumentbeskrivelse()
+        Dokumentbeskrivelse dokumentbeskrivelseHoveddok = registreringJp.getDokumentbeskrivelse()
                 .get(0);
         Dokumentobjekt dokumentobjektHoveddok = dokumentbeskrivelseHoveddok.getDokumentobjekt().get(0);
-        Dokumentbeskrivelse dokumentbeskrivelseVedlegg = (Dokumentbeskrivelse) registreringJp.getDokumentbeskrivelse()
+        Dokumentbeskrivelse dokumentbeskrivelseVedlegg = registreringJp.getDokumentbeskrivelse()
                 .get(1);
         Dokumentobjekt dokumentobjektVedlegg = dokumentbeskrivelseVedlegg.getDokumentobjekt().get(0);
 
@@ -349,10 +349,10 @@ class AvtaltmeldingMapperTest {
                 .get(1);
         Dokumentobjekt dokumentobjektVedlegg = dokumentbeskrivelseVedlegg.getDokumentobjekt().get(0);
 
-        assertEquals(dokumentbeskrivelseHoveddok.getOpprettetAv(), JOURNALFOERT_AV_NAVN);
-        assertEquals(dokumentobjektHoveddok.getOpprettetAv(), JOURNALFOERT_AV_NAVN);
-        assertEquals(dokumentbeskrivelseVedlegg.getOpprettetAv(), JOURNALFOERT_AV_NAVN_ORIG_JP);
-        assertEquals(dokumentobjektVedlegg.getOpprettetAv(), JOURNALFOERT_AV_NAVN_ORIG_JP);
+        assertEquals(JOURNALFOERT_AV_NAVN, dokumentbeskrivelseHoveddok.getOpprettetAv());
+        assertEquals(JOURNALFOERT_AV_NAVN, dokumentobjektHoveddok.getOpprettetAv());
+        assertEquals(JOURNALFOERT_AV_NAVN_ORIG_JP, dokumentbeskrivelseVedlegg.getOpprettetAv());
+        assertEquals(JOURNALFOERT_AV_NAVN_ORIG_JP, dokumentobjektVedlegg.getOpprettetAv());
 
         verify(safJournalpostQueryServiceMock, times(18)).hentJournalpost(ORIGINAL_JPID_VEDLEGG);
     }
@@ -363,7 +363,7 @@ class AvtaltmeldingMapperTest {
         when(safJournalpostQueryServiceMock.hentJournalpost(ORIGINAL_JPID_VEDLEGG)).thenReturn(createLightweightSafJournalpostQdist013());
 
         JournalpostQdist013 journalpostQdist013 = createJournalpostQdist013Builder()
-                .dokumenter(Arrays.asList(createHoveddokumentBuilder()
+                .dokumenter(Collections.singletonList(createHoveddokumentBuilder()
                         .dokumentvarianter(Arrays.asList(JournalpostQdist013.DokumentInfo.Dokumentvariant.builder()
                                         .variantformat(VARIANTFORMAT_ARKIV)
                                         .filtype(FILTYPE_PDFA)
@@ -385,7 +385,7 @@ class AvtaltmeldingMapperTest {
                 .get(0);
         Dokumentobjekt dokumentobjektHoveddok = dokumentbeskrivelseHoveddok.getDokumentobjekt().get(0);
 
-        assertEquals(dokumentobjektHoveddok.getVariantformat(), PRODUKSJONSFORMAT);
+        assertEquals(PRODUKSJONSFORMAT, dokumentobjektHoveddok.getVariantformat());
         assertTrue(dokumentobjektHoveddok.getReferanseDokumentfil().contains(PRODUKSJONSFORMAT));
     }
 
@@ -395,7 +395,7 @@ class AvtaltmeldingMapperTest {
         when(safJournalpostQueryServiceMock.hentJournalpost(ORIGINAL_JPID_VEDLEGG)).thenReturn(createLightweightSafJournalpostQdist013());
 
         JournalpostQdist013 journalpostQdist013 = createJournalpostQdist013Builder()
-                .dokumenter(Arrays.asList(createHoveddokumentBuilder()
+                .dokumenter(Collections.singletonList(createHoveddokumentBuilder()
                         .dokumentvarianter(Arrays.asList(JournalpostQdist013.DokumentInfo.Dokumentvariant.builder()
                                         .variantformat(VARIANTFORMAT_ARKIV)
                                         .filtype(FILTYPE_PNG)
@@ -413,11 +413,11 @@ class AvtaltmeldingMapperTest {
         Saksmappe saksmappe = (Saksmappe) mappeList.get(0);
         Journalpost registreringJp = (Journalpost) saksmappe.getRegistrering().get(0);
 
-        Dokumentbeskrivelse dokumentbeskrivelseHoveddok = (Dokumentbeskrivelse) registreringJp.getDokumentbeskrivelse()
+        Dokumentbeskrivelse dokumentbeskrivelseHoveddok = registreringJp.getDokumentbeskrivelse()
                 .get(0);
         Dokumentobjekt dokumentobjektHoveddok = dokumentbeskrivelseHoveddok.getDokumentobjekt().get(0);
 
-        assertEquals(dokumentobjektHoveddok.getVariantformat(), ARKIVFORMAT);
+        assertEquals(ARKIVFORMAT, dokumentobjektHoveddok.getVariantformat());
         assertTrue(dokumentobjektHoveddok.getReferanseDokumentfil().contains(ARKIVFORMAT));
     }
 
@@ -427,7 +427,7 @@ class AvtaltmeldingMapperTest {
         when(safJournalpostQueryServiceMock.hentJournalpost(ORIGINAL_JPID_VEDLEGG)).thenReturn(createLightweightSafJournalpostQdist013());
 
         JournalpostQdist013 journalpostQdist013 = createJournalpostQdist013Builder()
-                .dokumenter(Arrays.asList(createHoveddokumentBuilder()
+                .dokumenter(Collections.singletonList(createHoveddokumentBuilder()
                         .dokumentvarianter(Arrays.asList(JournalpostQdist013.DokumentInfo.Dokumentvariant.builder()
                                         .variantformat(VARIANTFORMAT_ARKIV)
                                         .filtype(FILTYPE_JPEG)
@@ -449,7 +449,7 @@ class AvtaltmeldingMapperTest {
                 .get(0);
         Dokumentobjekt dokumentobjektHoveddok = dokumentbeskrivelseHoveddok.getDokumentobjekt().get(0);
 
-        assertEquals(dokumentobjektHoveddok.getVariantformat(), ARKIVFORMAT);
+        assertEquals(ARKIVFORMAT, dokumentobjektHoveddok.getVariantformat());
         assertTrue(dokumentobjektHoveddok.getReferanseDokumentfil().contains(ARKIVFORMAT));
     }
 
@@ -509,19 +509,19 @@ class AvtaltmeldingMapperTest {
         Saksmappe saksmappe = (Saksmappe) mappeList.get(0);
         Journalpost registreringJp = (Journalpost) saksmappe.getRegistrering().get(0);
 
-        Dokumentbeskrivelse dokumentBeskrivelseVedlegg = (Dokumentbeskrivelse) registreringJp.getDokumentbeskrivelse()
+        Dokumentbeskrivelse dokumentBeskrivelseVedlegg = registreringJp.getDokumentbeskrivelse()
                 .get(1);
         Dokumentobjekt dokumentVedlegg = dokumentBeskrivelseVedlegg.getDokumentobjekt().get(0);
 
-        assertEquals(dokumentVedlegg.getOpprettetAv(), UKJENT);
+        assertEquals(UKJENT, dokumentVedlegg.getOpprettetAv());
     }
 
     private void assertArkivmelding(Arkivmelding arkivmelding) {
         assertNotNull(arkivmelding);
-        assertEquals(arkivmelding.getSystem(), APP_NAME);
-        assertEquals(arkivmelding.getMeldingId(), BESTILLINGS_ID);
+        assertEquals(APP_NAME, arkivmelding.getSystem());
+        assertEquals(BESTILLINGS_ID, arkivmelding.getMeldingId());
         assertNotNull(arkivmelding.getTidspunkt());
-        assertEquals(arkivmelding.getAntallFiler(), 2);
+        assertEquals(2,arkivmelding.getAntallFiler());
         assertMappe(arkivmelding.getMappe());
     }
 
@@ -530,14 +530,14 @@ class AvtaltmeldingMapperTest {
         assertTrue(mappeList.get(0) instanceof Saksmappe);
         Saksmappe saksmappe = (Saksmappe) mappeList.get(0);
 
-        assertEquals(saksmappe.getTittel(), TEMA_NAVN);
+        assertEquals(TEMA_NAVN, saksmappe.getTittel());
         assertEquals(convertFromXmlGregorianCalendarToLocalDateTime(saksmappe.getOpprettetDato()).toString(), DATO_OPPRETTET_SAK.format(dateTimeFormatter));
-        assertEquals(saksmappe.getOpprettetAv(), OPPRETTET_AV_NAVN);
+        assertEquals(OPPRETTET_AV_NAVN, saksmappe.getOpprettetAv());
         assertRegistrering(saksmappe.getRegistrering());
         assertEquals(convertFromXmlGregorianCalendarToLocalDateTime(saksmappe.getSaksdato()).toString(), DATO_OPPRETTET_SAK.format(dateTimeFormatter));
-        assertEquals(saksmappe.getAdministrativEnhet(), NAV_KLAGEINSTANS);
-        assertEquals(saksmappe.getSaksansvarlig(), OPPRETTET_AV_NAVN);
-        assertEquals(saksmappe.getSaksstatus(), UNDER_BEHANDLING);
+        assertEquals(NAV_KLAGEINSTANS, saksmappe.getAdministrativEnhet());
+        assertEquals(OPPRETTET_AV_NAVN, saksmappe.getSaksansvarlig());
+        assertEquals(UNDER_BEHANDLING, saksmappe.getSaksstatus());
         assertSakspart(saksmappe.getPart());
 
     }
@@ -548,11 +548,11 @@ class AvtaltmeldingMapperTest {
 
         Journalpost registreringJp = (Journalpost) registreringList.get(0);
         assertEquals(convertFromXmlGregorianCalendarToLocalDateTime(registreringJp.getOpprettetDato()).toString(), DATO_OPPRETTET_JOURNALPOST.format(dateTimeFormatter));
-        assertEquals(registreringJp.getOpprettetAv(), OPPRETTET_AV_NAVN);
+        assertEquals(OPPRETTET_AV_NAVN, registreringJp.getOpprettetAv());
         assertDokumentbeskrivelseOpprettetAv(registreringJp.getDokumentbeskrivelse());
-        assertEquals(registreringJp.getTittel(), TITTEL);
-        assertEquals(registreringJp.getJournalposttype(), UTGAAENDE_DOKUMENT);
-        assertEquals(registreringJp.getJournalstatus(), EKSPEDERT);
+        assertEquals(TITTEL, registreringJp.getTittel());
+        assertEquals(UTGAAENDE_DOKUMENT, registreringJp.getJournalposttype());
+        assertEquals(EKSPEDERT, registreringJp.getJournalstatus());
         assertEquals(convertFromXmlGregorianCalendarToLocalDateTime(registreringJp.getJournaldato()).toString(), DATO_JOURNALFOERT.format(dateTimeFormatter));
         assertKorrespondanseparter(registreringJp.getKorrespondansepart());
     }
@@ -561,12 +561,12 @@ class AvtaltmeldingMapperTest {
         assertTrue(korrespondansepartList != null && korrespondansepartList.size() == 2);
 
         Korrespondansepart mottaker = korrespondansepartList.get(0);
-        assertEquals(mottaker.getKorrespondanseparttype(), MOTTAKER);
-        assertEquals(mottaker.getKorrespondansepartNavn(), TRYGDERETTEN);
+        assertEquals(MOTTAKER, mottaker.getKorrespondanseparttype());
+        assertEquals(TRYGDERETTEN, mottaker.getKorrespondansepartNavn());
 
         Korrespondansepart avsender = korrespondansepartList.get(1);
-        assertEquals(avsender.getKorrespondanseparttype(), AVSENDER);
-        assertEquals(avsender.getKorrespondansepartNavn(), NAV_KLAGEINSTANS);
+        assertEquals(AVSENDER, avsender.getKorrespondanseparttype());
+        assertEquals(NAV_KLAGEINSTANS, avsender.getKorrespondansepartNavn());
     }
 
     private void assertSakspart(List<Part> sakspartList) {
@@ -574,13 +574,13 @@ class AvtaltmeldingMapperTest {
 
         Part sakspartAMP = sakspartList.get(0);
         assertNull(sakspartAMP.getPartID());
-        assertEquals(sakspartAMP.getPartNavn(), NAV_KLAGEINSTANS);
-        assertEquals(sakspartAMP.getPartRolle(), SAKSPART_ROLLE_AMP);
-        assertEquals(sakspartAMP.getKontaktperson(), OPPRETTET_AV_NAVN);
+        assertEquals(NAV_KLAGEINSTANS, sakspartAMP.getPartNavn());
+        assertEquals(SAKSPART_ROLLE_AMP, sakspartAMP.getPartRolle());
+        assertEquals(OPPRETTET_AV_NAVN, sakspartAMP.getKontaktperson());
 
         Part sakspartDAP = sakspartList.get(1);
-        assertEquals(sakspartDAP.getPartNavn(), TPS_NAVN);
-        assertEquals(sakspartDAP.getPartRolle(), SAKSPART_ROLLE_DAP);
+        assertEquals(TPS_NAVN, sakspartDAP.getPartNavn());
+        assertEquals(SAKSPART_ROLLE_DAP, sakspartDAP.getPartRolle());
         assertNull(sakspartDAP.getKontaktperson());
     }
 
@@ -588,24 +588,24 @@ class AvtaltmeldingMapperTest {
     private void assertDokumentbeskrivelse(List<Dokumentbeskrivelse> dokumentbeskrivelseList) {
         assertTrue(dokumentbeskrivelseList != null && dokumentbeskrivelseList.size() == 2);
 
-        assertTrue(dokumentbeskrivelseList.get(0) instanceof Dokumentbeskrivelse);
-        Dokumentbeskrivelse dokumentbeskrivelseHoveddok = (Dokumentbeskrivelse) dokumentbeskrivelseList.get(0);
-        assertEquals(dokumentbeskrivelseHoveddok.getTilknyttetRegistreringSom(), AvtaltmeldingConstant.HOVEDDOKUMENT);
-        assertEquals(dokumentbeskrivelseHoveddok.getDokumentnummer(), BigInteger.ONE);
+        assertNotNull(dokumentbeskrivelseList.get(0));
+        Dokumentbeskrivelse dokumentbeskrivelseHoveddok = dokumentbeskrivelseList.get(0);
+        assertEquals(AvtaltmeldingConstant.HOVEDDOKUMENT, dokumentbeskrivelseHoveddok.getTilknyttetRegistreringSom());
+        assertEquals(BigInteger.ONE, dokumentbeskrivelseHoveddok.getDokumentnummer());
         assertCommonAttributesDokumentbeskrivelse(dokumentbeskrivelseHoveddok);
-        assertEquals(dokumentbeskrivelseHoveddok.getTittel(), TITTEL_HOVEDDOK);
-        assertEquals(convertFromXmlGregorianCalendarToLocalDateTime(dokumentbeskrivelseHoveddok.getOpprettetDato()), DATO_JOURNALFOERT);
+        assertEquals(TITTEL_HOVEDDOK, dokumentbeskrivelseHoveddok.getTittel());
+        assertEquals(DATO_JOURNALFOERT, convertFromXmlGregorianCalendarToLocalDateTime(dokumentbeskrivelseHoveddok.getOpprettetDato()));
 
 
         assertDokumentobjektHoveddokument(dokumentbeskrivelseHoveddok.getDokumentobjekt());
 
-        assertTrue(dokumentbeskrivelseList.get(1) instanceof Dokumentbeskrivelse);
-        Dokumentbeskrivelse dokumentbeskrivelseVedlegg = (Dokumentbeskrivelse) dokumentbeskrivelseList.get(1);
-        assertEquals(dokumentbeskrivelseVedlegg.getTilknyttetRegistreringSom(), VEDLEGG);
+        assertNotNull(dokumentbeskrivelseList.get(1));
+        Dokumentbeskrivelse dokumentbeskrivelseVedlegg = dokumentbeskrivelseList.get(1);
+        assertEquals(VEDLEGG, dokumentbeskrivelseVedlegg.getTilknyttetRegistreringSom());
         assertEquals(dokumentbeskrivelseVedlegg.getDokumentnummer(), BigInteger.valueOf(2));
         assertCommonAttributesVedleggDokumentbeskrivelse(dokumentbeskrivelseVedlegg);
-        assertEquals(dokumentbeskrivelseVedlegg.getTittel(), TITTEL_VEDLEGG);
-        assertEquals(convertFromXmlGregorianCalendarToLocalDateTime(dokumentbeskrivelseVedlegg.getOpprettetDato()), DATO_JOURNALFOERT);
+        assertEquals(TITTEL_VEDLEGG, dokumentbeskrivelseVedlegg.getTittel());
+        assertEquals(DATO_JOURNALFOERT, convertFromXmlGregorianCalendarToLocalDateTime(dokumentbeskrivelseVedlegg.getOpprettetDato()));
 
         assertDokumentobjektVedlegg(dokumentbeskrivelseVedlegg.getDokumentobjekt());
     }
@@ -613,23 +613,23 @@ class AvtaltmeldingMapperTest {
     private void assertDokumentbeskrivelseOpprettetAv(List<Dokumentbeskrivelse> dokumentbeskrivelseList) {
         assertTrue(dokumentbeskrivelseList != null && dokumentbeskrivelseList.size() == 2);
 
-        assertTrue(dokumentbeskrivelseList.get(0) instanceof Dokumentbeskrivelse);
+        assertNotNull(dokumentbeskrivelseList.get(0));
         Dokumentbeskrivelse dokumentbeskrivelseHoveddok = (Dokumentbeskrivelse) dokumentbeskrivelseList.get(0);
-        assertEquals(dokumentbeskrivelseHoveddok.getTilknyttetRegistreringSom(), AvtaltmeldingConstant.HOVEDDOKUMENT);
-        assertEquals(dokumentbeskrivelseHoveddok.getDokumentnummer(), BigInteger.ONE);
+        assertEquals(AvtaltmeldingConstant.HOVEDDOKUMENT, dokumentbeskrivelseHoveddok.getTilknyttetRegistreringSom());
+        assertEquals(BigInteger.ONE, dokumentbeskrivelseHoveddok.getDokumentnummer());
         assertCommonAttributesVedleggDokumentbeskrivelseOpprettetAv(dokumentbeskrivelseHoveddok);
-        assertEquals(dokumentbeskrivelseHoveddok.getTittel(), TITTEL_HOVEDDOK);
+        assertEquals(TITTEL_HOVEDDOK, dokumentbeskrivelseHoveddok.getTittel());
         assertEquals(convertFromXmlGregorianCalendarToLocalDateTime(dokumentbeskrivelseHoveddok.getOpprettetDato()).toString(), DATO_JOURNALFOERT.format(dateTimeFormatter));
 
 
         assertDokumentobjektHoveddokument(dokumentbeskrivelseHoveddok.getDokumentobjekt());
 
-        assertTrue(dokumentbeskrivelseList.get(1) instanceof Dokumentbeskrivelse);
-        Dokumentbeskrivelse dokumentbeskrivelseVedlegg = (Dokumentbeskrivelse) dokumentbeskrivelseList.get(1);
-        assertEquals(dokumentbeskrivelseVedlegg.getTilknyttetRegistreringSom(), VEDLEGG);
+        assertNotNull(dokumentbeskrivelseList.get(1));
+        Dokumentbeskrivelse dokumentbeskrivelseVedlegg = dokumentbeskrivelseList.get(1);
+        assertEquals(VEDLEGG, dokumentbeskrivelseVedlegg.getTilknyttetRegistreringSom());
         assertEquals(dokumentbeskrivelseVedlegg.getDokumentnummer(), BigInteger.valueOf(2));
         assertCommonAttributesVedleggDokumentbeskrivelseOpprettetAv(dokumentbeskrivelseVedlegg);
-        assertEquals(dokumentbeskrivelseVedlegg.getTittel(), TITTEL_VEDLEGG);
+        assertEquals(TITTEL_VEDLEGG, dokumentbeskrivelseVedlegg.getTittel());
         assertEquals(convertFromXmlGregorianCalendarToLocalDateTime(dokumentbeskrivelseVedlegg.getOpprettetDato()).toString(), DATO_JOURNALFOERT.format(dateTimeFormatter));
 
         assertDokumentobjektVedlegg(dokumentbeskrivelseVedlegg.getDokumentobjekt());
@@ -639,10 +639,10 @@ class AvtaltmeldingMapperTest {
     private void assertDokumentobjektHoveddokument(List<Dokumentobjekt> dokumentobjektList) {
         assertTrue(dokumentobjektList != null && dokumentobjektList.size() == 1);
         Dokumentobjekt dokumentobjektHoveddok = dokumentobjektList.get(0);
-        assertEquals(dokumentobjektHoveddok.getVersjonsnummer(), BigInteger.ONE);
-        assertEquals(dokumentobjektHoveddok.getVariantformat(), DOKUMENT_HVOR_DELER_AV_INNHOLDET_ER_SKJERMET);
+        assertEquals(BigInteger.ONE, dokumentobjektHoveddok.getVersjonsnummer());
+        assertEquals(DOKUMENT_HVOR_DELER_AV_INNHOLDET_ER_SKJERMET, dokumentobjektHoveddok.getVariantformat());
         assertEquals(convertFromXmlGregorianCalendarToLocalDateTime(dokumentobjektHoveddok.getOpprettetDato()).toString(), DATO_JOURNALFOERT.format(dateTimeFormatter));
-        assertEquals(dokumentobjektHoveddok.getOpprettetAv(), JOURNALFOERT_AV_NAVN);
+        assertEquals(JOURNALFOERT_AV_NAVN, dokumentobjektHoveddok.getOpprettetAv());
         assertEquals(dokumentobjektHoveddok.getReferanseDokumentfil(), JOURNALPOST_ID + "-" + DOKUMENT_INFO_ID_HOVEDDOK + "-" + DOKUMENT_HVOR_DELER_AV_INNHOLDET_ER_SKJERMET + "-" + FILTYPE_PDF);
     }
 
@@ -650,35 +650,35 @@ class AvtaltmeldingMapperTest {
     private void assertDokumentobjektVedlegg(List<Dokumentobjekt> dokumentobjektList) {
         assertTrue(dokumentobjektList != null && dokumentobjektList.size() == 1);
         Dokumentobjekt dokumentobjektVedlegg = dokumentobjektList.get(0);
-        assertEquals(dokumentobjektVedlegg.getVersjonsnummer(), BigInteger.ONE);
-        assertEquals(dokumentobjektVedlegg.getVariantformat(), ARKIVFORMAT);
+        assertEquals(BigInteger.ONE, dokumentobjektVedlegg.getVersjonsnummer());
+        assertEquals(ARKIVFORMAT, dokumentobjektVedlegg.getVariantformat());
         assertEquals(convertFromXmlGregorianCalendarToLocalDateTime(dokumentobjektVedlegg.getOpprettetDato()).toString(), DATO_JOURNALFOERT.format(dateTimeFormatter));
-        assertEquals(dokumentobjektVedlegg.getOpprettetAv(), JOURNALFOERT_AV_NAVN);
+        assertEquals(JOURNALFOERT_AV_NAVN, dokumentobjektVedlegg.getOpprettetAv());
         assertEquals(dokumentobjektVedlegg.getReferanseDokumentfil(), JOURNALPOST_ID + "-" + DOKUMENT_INFO_ID_VEDLEGG + "-" + ARKIVFORMAT + "-" + FILTYPE_JPEG);
     }
 
     private void assertCommonAttributesDokumentbeskrivelse(Dokumentbeskrivelse dokumentbeskrivelse) {
-        assertEquals(dokumentbeskrivelse.getDokumenttype(), DOKUMENTASJON);
-        assertEquals(dokumentbeskrivelse.getDokumentstatus(), DOKUMENTET_ER_FERDIGSTILT);
-        assertEquals(dokumentbeskrivelse.getOpprettetAv(), JOURNALFOERT_AV_NAVN);
+        assertEquals(DOKUMENTASJON, dokumentbeskrivelse.getDokumenttype());
+        assertEquals(DOKUMENTET_ER_FERDIGSTILT, dokumentbeskrivelse.getDokumentstatus());
+        assertEquals(JOURNALFOERT_AV_NAVN, dokumentbeskrivelse.getOpprettetAv());
         assertNotNull(dokumentbeskrivelse.getTilknyttetDato());
-        assertEquals(dokumentbeskrivelse.getTilknyttetAv(), JOURNALFOERT_AV_NAVN);
+        assertEquals(JOURNALFOERT_AV_NAVN, dokumentbeskrivelse.getTilknyttetAv());
     }
 
     private void assertCommonAttributesVedleggDokumentbeskrivelse(Dokumentbeskrivelse dokumentbeskrivelse) {
-        assertEquals(dokumentbeskrivelse.getDokumenttype(), DOKUMENTASJON);
-        assertEquals(dokumentbeskrivelse.getDokumentstatus(), DOKUMENTET_ER_FERDIGSTILT);
-        assertEquals(dokumentbeskrivelse.getOpprettetAv(), AVSENDER_MOTTAKER_NAVN_ORIG_JP);
+        assertEquals(DOKUMENTASJON, dokumentbeskrivelse.getDokumenttype());
+        assertEquals(DOKUMENTET_ER_FERDIGSTILT, dokumentbeskrivelse.getDokumentstatus());
+        assertEquals(AVSENDER_MOTTAKER_NAVN_ORIG_JP, dokumentbeskrivelse.getOpprettetAv());
         assertNotNull(dokumentbeskrivelse.getTilknyttetDato());
-        assertEquals(dokumentbeskrivelse.getTilknyttetAv(), JOURNALFOERT_AV_NAVN);
+        assertEquals(JOURNALFOERT_AV_NAVN, dokumentbeskrivelse.getTilknyttetAv());
     }
 
     private void assertCommonAttributesVedleggDokumentbeskrivelseOpprettetAv(Dokumentbeskrivelse dokumentbeskrivelse) {
-        assertEquals(dokumentbeskrivelse.getDokumenttype(), DOKUMENTASJON);
-        assertEquals(dokumentbeskrivelse.getDokumentstatus(), DOKUMENTET_ER_FERDIGSTILT);
-        assertEquals(dokumentbeskrivelse.getOpprettetAv(), JOURNALFOERT_AV_NAVN);
+        assertEquals(DOKUMENTASJON, dokumentbeskrivelse.getDokumenttype());
+        assertEquals(DOKUMENTET_ER_FERDIGSTILT, dokumentbeskrivelse.getDokumentstatus());
+        assertEquals(JOURNALFOERT_AV_NAVN, dokumentbeskrivelse.getOpprettetAv());
         assertNotNull(dokumentbeskrivelse.getTilknyttetDato());
-        assertEquals(dokumentbeskrivelse.getTilknyttetAv(), JOURNALFOERT_AV_NAVN);
+        assertEquals(JOURNALFOERT_AV_NAVN, dokumentbeskrivelse.getTilknyttetAv());
     }
 
     private JournalpostQdist013.JournalpostQdist013Builder createJournalpostQdist013Builder() {

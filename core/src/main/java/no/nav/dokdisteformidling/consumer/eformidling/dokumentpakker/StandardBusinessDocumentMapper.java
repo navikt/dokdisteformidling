@@ -1,6 +1,5 @@
 package no.nav.dokdisteformidling.consumer.eformidling.dokumentpakker;
 
-import no.arkivverket.standarder.noark5.arkivmelding.Arkivmelding;
 import no.nav.dokdisteformidling.consumer.eformidling.EformidlingConstants;
 import no.nav.dokdisteformidling.consumer.eformidling.dokumentpakker.sbdh.BusinessScope;
 import no.nav.dokdisteformidling.consumer.eformidling.dokumentpakker.sbdh.CorrelationInformation;

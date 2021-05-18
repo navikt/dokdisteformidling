@@ -44,7 +44,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @Slf4j
-public class Sdist001ServiceTest {
+class Sdist001ServiceTest {
 
     private final static String SENDERS_REFERENCE_1 = "33259df3-18ae-45e6-9861-47f42e119a11";
     private final static String SENDERS_REFERENCE_2 = "33259df3-18ae-45e6-9861-47f42e119a12";
@@ -91,7 +91,7 @@ public class Sdist001ServiceTest {
 
 
     @Test
-    public void navForsendelserShouldLoggWhenKvitteringStatusFraTrygdErMottatt() throws IOException {
+    void navForsendelserShouldLoggWhenKvitteringStatusFraTrygdErMottatt() throws IOException {
         InputStream inputStream = new ClassPathResource("__files/rdist001/getForsendelse_forAltinnTest.json").getInputStream();
 
         HentForsendelseResponseTo forsendelseResponseTo = deserializeToObject(inputStream, HentForsendelseResponseTo.class);
@@ -110,7 +110,7 @@ public class Sdist001ServiceTest {
     }
 
     @Test
-    public void navForsendelserShouldSetToExpedertWhenKvitteringStatusFraTrygdErLevert() throws IOException {
+    void navForsendelserShouldSetToExpedertWhenKvitteringStatusFraTrygdErLevert() throws IOException {
         InputStream inputStream = new ClassPathResource("__files/rdist001/getForsendelse_forAltinnTest.json").getInputStream();
 
         HentForsendelseResponseTo forsendelseResponseTo = deserializeToObject(inputStream, HentForsendelseResponseTo.class);
@@ -256,6 +256,4 @@ public class Sdist001ServiceTest {
                 .build();
 
     }
-
-
 }
