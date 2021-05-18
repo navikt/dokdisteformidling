@@ -13,7 +13,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 @Disabled("Manuell test")
-public class MaskinportenTokenConsumerManualTest {
+class MaskinportenTokenConsumerManualTest {
     private KeyStoreProperties keyStoreProperties = new KeyStoreProperties();
     private MaskinportenProperties maskinportenProperties = new MaskinportenProperties();
 
@@ -44,7 +44,7 @@ public class MaskinportenTokenConsumerManualTest {
     }
 
     @Test
-    public void shouldFetchTokenWhenSystemPropertiesSet() {
+    void shouldFetchTokenWhenSystemPropertiesSet() {
         MaskinportenTokenConsumer oidcTokenClient = new MaskinportenTokenConsumer(new AppCertificate(keyStoreProperties), maskinportenProperties, new RestTemplateBuilder());
 
         final OidcTokenResponse oidcTokenResponse = oidcTokenClient.fetchToken();

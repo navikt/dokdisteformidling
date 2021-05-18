@@ -11,7 +11,7 @@ import java.util.List;
 /**
  * @author Erik Bråten, Visma Consulting.
  */
-public class JournalpostQdist013MapperTest extends SafJournalpostTest {
+class JournalpostQdist013MapperTest extends SafJournalpostTest {
 
 	private final JournalpostQdist013Mapper journalpostQdist013Mapper = new JournalpostQdist013Mapper();
 

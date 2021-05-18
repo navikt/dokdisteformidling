@@ -57,7 +57,7 @@ class ServiceRegistryConsumerManualTest {
 	}
 
 	@Test
-	public void shouldFetchMottakerInfoWhenSystemPropertiesSet() {
+	void shouldFetchMottakerInfoWhenSystemPropertiesSet() {
 		MaskinportenTokenConsumer maskinportenTokenConsumer = new MaskinportenTokenConsumer(new AppCertificate(keyStoreProperties), maskinportenProperties, new RestTemplateBuilder());
 		ServiceRegistryConsumer serviceRegistryConsumer = new ServiceRegistryConsumer(serviceRegistryProperties, maskinportenTokenConsumer, new RestTemplateBuilder());
 

@@ -1,7 +1,6 @@
 package no.nav.dokdisteformidling.config.interceptor;
 
 import lombok.extern.slf4j.Slf4j;
-import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
@@ -22,7 +21,7 @@ public class CookiesOutInterceptor extends AbstractPhaseInterceptor {
     }
 
     @Override
-    public void handleMessage(Message message) throws Fault {
+    public void handleMessage(Message message) {
         Map<String, List> headers = (Map<String, List>) message.get(Message.PROTOCOL_HEADERS);
         if (CookieStore.getCookie() != null) {
             log.info("CookiesOUTInterceptor -- cookie to attach to header: " + CookieStore.getCookie());

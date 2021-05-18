@@ -90,7 +90,7 @@ import static wiremock.com.google.common.base.Strings.isNullOrEmpty;
         webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureWireMock(port = 0)
 @ActiveProfiles("itest")
-public class Qdist013ForAltinnIT {
+class Qdist013ForAltinnIT {
     private static final String FORSENDELSE_ID = "33333";
     private static final String DOKUMENT_OBJEKT_REFERANSE_HOVEDDOK = "dokumentObjektReferanseHoveddok";
     private static final String DOKUMENT_OBJEKT_REFERANSE_VEDLEGG1 = "dokumentObjektReferanseVedlegg1";
@@ -143,7 +143,7 @@ public class Qdist013ForAltinnIT {
 
 
     @Test
-    public void shouldHenteMottakerInfoFraServiceRegistery() {
+    void shouldHenteMottakerInfoFraServiceRegistery() {
         stubGetSecurityToken();
         stubPostMaskinporten();
         stubGetServiceRegistry();
@@ -159,7 +159,7 @@ public class Qdist013ForAltinnIT {
     }
 
     @Test
-    public void shouldIntiateBrokerService() {
+    void shouldIntiateBrokerService() {
         stubGetForsendelse("__files/rjoark001/getForsendelse-happy.json");
         stubGetSecurityToken();
         stubPostSafJournalpost("queryJournalpostId\":\"123\"", "saf/safQdist013GraphQlResponse-aktoerId.json");
@@ -179,7 +179,7 @@ public class Qdist013ForAltinnIT {
     }
 
     @Test
-    public void whenLightweightSafDataJournalfoertErNull() {
+    void whenLightweightSafDataJournalfoertErNull() {
         stubGetForsendelse("__files/rjoark001/getForsendelse-happy.json");
         stubGetSecurityToken();
         stubPostSafJournalpost("queryJournalpostId\":\"123\"", "saf/safQdist013GraphQlResponse-aktoerId.json");
@@ -197,7 +197,7 @@ public class Qdist013ForAltinnIT {
     }
 
     @Test
-    public void shouldThrowExceptionWhenDatoJournalfoertErNullInJpQdist013() {
+    void shouldThrowExceptionWhenDatoJournalfoertErNullInJpQdist013() {
         stubGetForsendelse("__files/rjoark001/getForsendelse-happy.json");
         stubGetSecurityToken();
         stubPostSafJournalpost("queryJournalpostId\":\"123\"", "saf/safQdist013GraphQlResponse-relevantdato-null.json");
@@ -215,7 +215,7 @@ public class Qdist013ForAltinnIT {
     }
 
     @Test
-    public void brokerserviceStreamedShouldUploadFileToAltinn() {
+    void brokerserviceStreamedShouldUploadFileToAltinn() {
 
         stubGetForsendelse("__files/rjoark001/getForsendelse-happy.json");
         stubGetSecurityToken();
@@ -239,9 +239,8 @@ public class Qdist013ForAltinnIT {
 
     }
 
-
     @Test
-    public void shouldProcessForsendelseWithFnr() {
+    void shouldProcessForsendelseWithFnr() {
 
         stubGetForsendelse("__files/rjoark001/getForsendelse-happy.json");
         stubGetSecurityToken();
@@ -264,7 +263,7 @@ public class Qdist013ForAltinnIT {
     }
 
     @Test
-    public void shouldProcessForsendelseWithOrgnr() {
+    void shouldProcessForsendelseWithOrgnr() {
 
         stubGetForsendelse("__files/rjoark001/getForsendelse-happy.json");
         stubGetSecurityToken();
@@ -287,7 +286,7 @@ public class Qdist013ForAltinnIT {
     }
 
     @Test
-    public void shouldThrowRdist001HentForsendelseFunctionalException() {
+    void shouldThrowRdist001HentForsendelseFunctionalException() {
         stubFor(get("/administrerforsendelse/" + FORSENDELSE_ID)
                 .willReturn(aResponse().withStatus(HttpStatus.NOT_FOUND.value())));
 
@@ -301,7 +300,7 @@ public class Qdist013ForAltinnIT {
     }
 
     @Test
-    public void shouldThrowS3FailedToGetDocumentTechnicalExceptionVedSdkClientException() {
+    void shouldThrowS3FailedToGetDocumentTechnicalExceptionVedSdkClientException() {
         when(amazonS3.getObjectAsString(eq(BUCKET_NAME),
                 eq(DOKUMENT_OBJEKT_REFERANSE_HOVEDDOK))).thenThrow(new SdkClientException("SdkClientException"));
 
@@ -317,7 +316,7 @@ public class Qdist013ForAltinnIT {
     }
 
     @Test
-    public void shouldThrowS3FailedToGetDocumentTechnicalExceptionVedSecurityException() {
+    void shouldThrowS3FailedToGetDocumentTechnicalExceptionVedSecurityException() {
         when(amazonS3.getObjectAsString(eq(BUCKET_NAME), eq(DOKUMENT_OBJEKT_REFERANSE_HOVEDDOK))).thenThrow(new SecurityException("SecurityException"));
 
         stubGetForsendelse("__files/rjoark001/getForsendelse-happy.json");
@@ -332,7 +331,7 @@ public class Qdist013ForAltinnIT {
     }
 
     @Test
-    public void shouldThrowStsTechnicalException() {
+    void shouldThrowStsTechnicalException() {
         stubGetForsendelse("__files/rjoark001/getForsendelse-happy.json");
         stubFor(get("/securitytoken?grant_type=client_credentials&scope=openid")
                 .willReturn(aResponse().withStatus(HttpStatus.INTERNAL_SERVER_ERROR.value())));
@@ -348,7 +347,7 @@ public class Qdist013ForAltinnIT {
     }
 
     @Test
-    public void shouldPutOnBackoutQueueWhenSafJournalpostIkkeFunnetException() {
+    void shouldPutOnBackoutQueueWhenSafJournalpostIkkeFunnetException() {
         stubGetForsendelse("__files/rjoark001/getForsendelse-happy.json");
         stubGetSecurityToken();
         stubFor(post(urlMatching("/safgraphql")).willReturn(aResponse().withStatus(HttpStatus.OK.value())
@@ -367,7 +366,7 @@ public class Qdist013ForAltinnIT {
     }
 
     @Test
-    public void shouldThrowSafJournalpostQueryUnauthorizedException() {
+    void shouldThrowSafJournalpostQueryUnauthorizedException() {
         stubGetForsendelse("__files/rjoark001/getForsendelse-happy.json");
         stubGetSecurityToken();
         stubFor(post(urlMatching("/safgraphql"))
@@ -385,7 +384,7 @@ public class Qdist013ForAltinnIT {
     }
 
     @Test
-    public void shouldThrowSafJournalpostQueryTechnicalException() {
+    void shouldThrowSafJournalpostQueryTechnicalException() {
         stubGetForsendelse("__files/rjoark001/getForsendelse-happy.json");
         stubGetSecurityToken();
         stubFor(post(urlMatching("/safgraphql"))
@@ -403,7 +402,7 @@ public class Qdist013ForAltinnIT {
     }
 
     @Test
-    public void shouldThrowSafJournalpostValidationException() {
+    void shouldThrowSafJournalpostValidationException() {
         stubGetForsendelse("__files/rjoark001/getForsendelse-happy.json");
         stubGetSecurityToken();
         stubPostSafJournalpost("queryJournalpostId\":\"123\"", "saf/safQdist013GraphQlResponse-tomJournalpostId.json");
@@ -420,7 +419,7 @@ public class Qdist013ForAltinnIT {
     }
 
     @Test
-    public void shouldPutMessageOnBackoutWhenSafJournalpostIkkeFunnetExceptionUsingLightweightService() {
+    void shouldPutMessageOnBackoutWhenSafJournalpostIkkeFunnetExceptionUsingLightweightService() {
         stubGetForsendelse("__files/rjoark001/getForsendelse-happy.json");
         stubGetSecurityToken();
         stubPostSafJournalpost("queryJournalpostId\":\"123\"", "saf/safQdist013GraphQlResponse-aktoerId.json");
@@ -446,7 +445,7 @@ public class Qdist013ForAltinnIT {
     }
 
     @Test
-    public void shouldThrowSafJournalpostQueryUnauthorizedExceptionLightweight() {
+    void shouldThrowSafJournalpostQueryUnauthorizedExceptionLightweight() {
         stubGetForsendelse("__files/rjoark001/getForsendelse-happy.json");
         stubGetSecurityToken();
         stubPostSafJournalpost("queryJournalpostId\":\"123\"", "saf/safQdist013GraphQlResponse-aktoerId.json");
@@ -468,7 +467,7 @@ public class Qdist013ForAltinnIT {
     }
 
     @Test
-    public void shouldThrowSafJournalpostQueryTechnicalExceptionLightweight() {
+    void shouldThrowSafJournalpostQueryTechnicalExceptionLightweight() {
         stubGetForsendelse("__files/rjoark001/getForsendelse-happy.json");
         stubGetSecurityToken();
         stubPostSafJournalpost("queryJournalpostId\":\"123\"", "saf/safQdist013GraphQlResponse-aktoerId.json");
@@ -493,7 +492,7 @@ public class Qdist013ForAltinnIT {
 
 
     @Test
-    public void shouldThrowAktoerHentIdentForAktoerIdFunctionalException() {
+    void shouldThrowAktoerHentIdentForAktoerIdFunctionalException() {
         stubGetForsendelse("__files/rjoark001/getForsendelse-happy.json");
         stubGetSecurityToken();
         stubPostSafJournalpost("queryJournalpostId\":\"123\"", "saf/safQdist013GraphQlResponse-aktoerId.json");
@@ -522,7 +521,7 @@ public class Qdist013ForAltinnIT {
     }
 
     @Test
-    public void shouldThrowAktoerHentIdentForAktoerIdFunctionalExceptionIngenResponse() {
+    void shouldThrowAktoerHentIdentForAktoerIdFunctionalExceptionIngenResponse() {
         stubGetForsendelse("__files/rjoark001/getForsendelse-happy.json");
         stubGetSecurityToken();
         stubPostSafJournalpost("queryJournalpostId\":\"123\"", "saf/safQdist013GraphQlResponse-aktoerId.json");
@@ -552,7 +551,7 @@ public class Qdist013ForAltinnIT {
     }
 
     @Test
-    public void shouldThrowAktoerHentIdentForAktoerIdFunctionalExceptionFeilmelding() {
+    void shouldThrowAktoerHentIdentForAktoerIdFunctionalExceptionFeilmelding() {
         stubGetForsendelse("__files/rjoark001/getForsendelse-happy.json");
         stubGetSecurityToken();
         stubPostSafJournalpost("queryJournalpostId\":\"123\"", "saf/safQdist013GraphQlResponse-aktoerId.json");
@@ -581,7 +580,7 @@ public class Qdist013ForAltinnIT {
     }
 
     @Test
-    public void shouldThrowAktoerHentIdentForAktoerIdFunctionalExceptionIngenIdent() {
+    void shouldThrowAktoerHentIdentForAktoerIdFunctionalExceptionIngenIdent() {
         stubGetForsendelse("__files/rjoark001/getForsendelse-happy.json");
         stubGetSecurityToken();
         stubPostSafJournalpost("queryJournalpostId\":\"123\"", "saf/safQdist013GraphQlResponse-aktoerId.json");
@@ -610,7 +609,7 @@ public class Qdist013ForAltinnIT {
     }
 
     @Test
-    public void shouldThrowAktoerHentIdentForAktoerIdTechnicalException() {
+    void shouldThrowAktoerHentIdentForAktoerIdTechnicalException() {
         stubGetForsendelse("__files/rjoark001/getForsendelse-happy.json");
         stubGetSecurityToken();
         stubPostSafJournalpost("queryJournalpostId\":\"123\"", "saf/safQdist013GraphQlResponse-aktoerId.json");
@@ -636,7 +635,7 @@ public class Qdist013ForAltinnIT {
     }
 
     @Test
-    public void shouldThrowTpsHentNavnFunctionalException() {
+    void shouldThrowTpsHentNavnFunctionalException() {
         stubGetForsendelse("__files/rjoark001/getForsendelse-happy.json");
         stubGetSecurityToken();
         stubPostSafJournalpost("queryJournalpostId\":\"123\"", "saf/safQdist013GraphQlResponse-fnr.json");
@@ -662,7 +661,7 @@ public class Qdist013ForAltinnIT {
     }
 
     @Test
-    public void shouldThrowTpsHentNavnTechnicalException() {
+    void shouldThrowTpsHentNavnTechnicalException() {
         stubGetForsendelse("__files/rjoark001/getForsendelse-happy.json");
         stubGetSecurityToken();
         stubPostSafJournalpost("queryJournalpostId\":\"123\"", "saf/safQdist013GraphQlResponse-fnr.json");
@@ -688,7 +687,7 @@ public class Qdist013ForAltinnIT {
     }
 
     @Test
-    public void shouldThrowEregHentNoekkelinfoFunctionalException() {
+    void shouldThrowEregHentNoekkelinfoFunctionalException() {
         stubGetForsendelse("__files/rjoark001/getForsendelse-happy.json");
         stubGetSecurityToken();
         stubPostSafJournalpost("queryJournalpostId\":\"123\"", "saf/safQdist013GraphQlResponse-orgnr.json");
@@ -710,7 +709,7 @@ public class Qdist013ForAltinnIT {
     }
 
     @Test
-    public void shouldThrowEregHentNoekkelinfoFunctionalExceptionIngenResponse() {
+    void shouldThrowEregHentNoekkelinfoFunctionalExceptionIngenResponse() {
         stubGetForsendelse("__files/rjoark001/getForsendelse-happy.json");
         stubGetSecurityToken();
         stubPostSafJournalpost("queryJournalpostId\":\"123\"", "saf/safQdist013GraphQlResponse-orgnr.json");
@@ -734,7 +733,7 @@ public class Qdist013ForAltinnIT {
     }
 
     @Test
-    public void shouldThrowEregHentNoekkelinfoFunctionalExceptionManglerNavn() {
+    void shouldThrowEregHentNoekkelinfoFunctionalExceptionManglerNavn() {
         stubGetForsendelse("__files/rjoark001/getForsendelse-happy.json");
         stubGetSecurityToken();
         stubPostSafJournalpost("queryJournalpostId\":\"123\"", "saf/safQdist013GraphQlResponse-orgnr.json");
@@ -757,7 +756,7 @@ public class Qdist013ForAltinnIT {
     }
 
     @Test
-    public void shouldThrowEregHentNoekkelinfoTechnicalException() {
+    void shouldThrowEregHentNoekkelinfoTechnicalException() {
         stubGetForsendelse("__files/rjoark001/getForsendelse-happy.json");
         stubGetSecurityToken();
         stubPostSafJournalpost("queryJournalpostId\":\"123\"", "saf/safQdist013GraphQlResponse-orgnr.json");
@@ -781,7 +780,7 @@ public class Qdist013ForAltinnIT {
 
     @Test
     @Disabled
-    public void altinnUploadFileshouldThrowTechnicalExceptionLast() {
+    void altinnUploadFileshouldThrowTechnicalExceptionLast() {
         stubGetForsendelse("__files/rjoark001/getForsendelse-happy.json");
         stubGetSecurityToken();
         stubPostSafJournalpost("queryJournalpostId\":\"123\"", "saf/safQdist013GraphQlResponse-orgnr.json");
@@ -811,7 +810,7 @@ public class Qdist013ForAltinnIT {
     }
 
     @Test
-    public void serviceRegistryShouldThrowTechnicalExceptionAndRetry() {
+    void serviceRegistryShouldThrowTechnicalExceptionAndRetry() {
         stubGetForsendelse("__files/rjoark001/getForsendelse-happy.json");
         stubGetSecurityToken();
         stubPostSafJournalpost("queryJournalpostId\":\"123\"", "saf/safQdist013GraphQlResponse-orgnr.json");
@@ -839,7 +838,7 @@ public class Qdist013ForAltinnIT {
     }
 
     @Test
-    public void shouldThrowInitiateBrokerServiceTechnicalException() {
+    void shouldThrowInitiateBrokerServiceTechnicalException() {
         stubGetForsendelse("__files/rjoark001/getForsendelse-happy.json");
         stubGetSecurityToken();
         stubPostSafJournalpost("queryJournalpostId\":\"123\"", "saf/safQdist013GraphQlResponse-orgnr.json");
@@ -871,7 +870,7 @@ public class Qdist013ForAltinnIT {
 
     @Test
     @Disabled
-    public void shouldThrowLagreJuridiskLoggFunctionalException() {
+    void shouldThrowLagreJuridiskLoggFunctionalException() {
         stubGetForsendelse("__files/rjoark001/getForsendelse-happy.json");
         stubGetSecurityToken();
         stubPostSafJournalpost("queryJournalpostId\":\"123\"", "saf/safQdist013GraphQlResponse-orgnr.json");
@@ -905,7 +904,7 @@ public class Qdist013ForAltinnIT {
     }
 
     @Test
-    public void shouldThrowLagreJuridiskLoggTechnicalException() {
+    void shouldThrowLagreJuridiskLoggTechnicalException() {
         stubGetForsendelse("__files/rjoark001/getForsendelse-happy.json");
         stubGetSecurityToken();
         stubPostSafJournalpost("queryJournalpostId\":\"123\"", "saf/safQdist013GraphQlResponse-orgnr.json");
@@ -939,7 +938,7 @@ public class Qdist013ForAltinnIT {
     }
 
     @Test
-    public void shouldThrowRdist001OppdaterForsendelseFunctionalException() {
+    void shouldThrowRdist001OppdaterForsendelseFunctionalException() {
         stubGetForsendelse("__files/rjoark001/getForsendelse-happy.json");
         stubGetSecurityToken();
         stubPostSafJournalpost("queryJournalpostId\":\"123\"", "saf/safQdist013GraphQlResponse-orgnr.json");
@@ -975,7 +974,7 @@ public class Qdist013ForAltinnIT {
     }
 
     @Test
-    public void shouldThrowRdist001OppdaterForsendelseTechnicalException() {
+    void shouldThrowRdist001OppdaterForsendelseTechnicalException() {
         stubGetForsendelse("__files/rjoark001/getForsendelse-happy.json");
         stubGetSecurityToken();
         stubPostSafJournalpost("queryJournalpostId\":\"123\"", "saf/safQdist013GraphQlResponse-orgnr.json");
@@ -1009,7 +1008,7 @@ public class Qdist013ForAltinnIT {
     }
 
     @Test
-    public void shouldThrowRdist001HentForsendelseTechnicalException() {
+    void shouldThrowRdist001HentForsendelseTechnicalException() {
         stubFor(get("/administrerforsendelse/" + FORSENDELSE_ID)
                 .willReturn(aResponse().withStatus(HttpStatus.INTERNAL_SERVER_ERROR.value())));
 
@@ -1023,7 +1022,7 @@ public class Qdist013ForAltinnIT {
     }
 
     @Test
-    public void shouldThrowInvalidForsendelseStatusException() {
+    void shouldThrowInvalidForsendelseStatusException() {
         stubGetForsendelse("__files/rjoark001/getForsendelse-oversendtForsendelseStatus.json");
 
         sendStringMessage(qdist013, classpathToString("qdist013/qdist013-happy.xml"));
@@ -1036,7 +1035,7 @@ public class Qdist013ForAltinnIT {
     }
 
     @Test
-    public void shouldThrowKunneIkkeDeserialisereS3PayloadFunctionalException() {
+    void shouldThrowKunneIkkeDeserialisereS3PayloadFunctionalException() {
         when(amazonS3.getObjectAsString(eq(BUCKET_NAME),
                 eq(DOKUMENT_OBJEKT_REFERANSE_VEDLEGG2))).thenReturn("notJsonSerializedString");
 
@@ -1363,6 +1362,4 @@ public class Qdist013ForAltinnIT {
             return msg;
         });
     }
-
-
 }

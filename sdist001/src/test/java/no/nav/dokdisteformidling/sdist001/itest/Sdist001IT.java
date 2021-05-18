@@ -49,7 +49,7 @@ import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
         webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureWireMock(port = 0)
 @ActiveProfiles("itest")
-public class Sdist001IT {
+class Sdist001IT {
 
     private static final Integer FORSENDELSE_ID = 1;
     public static final String SCENARIO_BROKERSERVICEEXTERNAL = "brokerserviceexternal";
@@ -66,7 +66,7 @@ public class Sdist001IT {
     }
 
     @Test
-    public void shouldOppdatereTilEkspedert() throws IOException {
+    void shouldOppdatereTilEkspedert() throws IOException {
         stubPostMaskinporten();
         stubGetServiceRegistry();
         stubGetHentEformidlingForsendelserBEKREFTETStatus();
