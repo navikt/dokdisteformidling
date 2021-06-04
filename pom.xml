@@ -102,7 +102,6 @@
 				<artifactId>melding-virksomhet-dokdistfordeling</artifactId>
 				<version>${melding-virksomhet-dokdistfordeling.version}</version>
 			</dependency>
-
 			<dependency>
 				<groupId>no.nav.tjenester</groupId>
 				<artifactId>nav-sdpkanal-tjenestespesifikasjon</artifactId>
@@ -119,7 +118,6 @@
 				<artifactId>logstash-logback-encoder</artifactId>
 				<version>${logstash-logback-encoder.version}</version>
 			</dependency>
-
 			<dependency>
 				<groupId>org.jvnet.jaxb2_commons</groupId>
 				<artifactId>jaxb2-basics-runtime</artifactId>
@@ -130,7 +128,6 @@
 				<artifactId>aws-java-sdk-s3</artifactId>
 				<version>${aws-java-sdk-s3.version}</version>
 			</dependency>
-
 			<dependency>
 				<groupId>jakarta.xml.ws</groupId>
 				<artifactId>jakarta.xml.ws-api</artifactId>
@@ -148,7 +145,6 @@
 				<artifactId>rxjava</artifactId>
 				<version>${rxjava.version}</version>
 			</dependency>
-
 			<dependency>
 				<groupId>com.ibm.mq</groupId>
 				<artifactId>com.ibm.mq.allclient</artifactId>
@@ -189,11 +185,8 @@
 			<dependency>
 				<groupId>org.apache.cxf</groupId>
 				<artifactId>cxf-core</artifactId>
-				<scope>compile</scope>
 				<version>${cxf.version}</version>
 			</dependency>
-
-
 			<dependency>
 				<groupId>no.difi.commons</groupId>
 				<artifactId>commons-asic</artifactId>
@@ -209,12 +202,6 @@
 				<artifactId>nimbus-jose-jwt</artifactId>
 				<version>${nimbus-jose-jwt.version}</version>
 			</dependency>
-			<dependency>
-				<groupId>org.projectlombok</groupId>
-				<artifactId>lombok</artifactId>
-				<version>${lombok.version}</version>
-				<scope>provided</scope>
-			</dependency>
 
 			<!--Tjenestegrensesnitt-->
 			<dependency>
@@ -223,8 +210,6 @@
 				<version>${nav-digitalKontaktinformasjon-v1-tjenestespesifikasjon}</version>
 				<classifier>jaxws</classifier>
 			</dependency>
-
-			<!--Selftest metrics-->
 			<dependency>
 				<groupId>io.github.resilience4j</groupId>
 				<artifactId>resilience4j-prometheus</artifactId>
@@ -239,6 +224,13 @@
 				<groupId>io.github.resilience4j</groupId>
 				<artifactId>resilience4j-circuitbreaker</artifactId>
 				<version>${resilience4j.version}</version>
+			</dependency>
+			<!-- provided -->
+			<dependency>
+				<groupId>org.projectlombok</groupId>
+				<artifactId>lombok</artifactId>
+				<version>${lombok.version}</version>
+				<scope>provided</scope>
 			</dependency>
 			<!-- test -->
 			<dependency>
@@ -287,13 +279,6 @@
 				<filtering>true</filtering>
 			</resource>
 		</resources>
-		<extensions>
-			<extension>
-				<groupId>org.apache.maven.wagon</groupId>
-				<artifactId>wagon-webdav-jackrabbit</artifactId>
-				<version>1.0</version>
-			</extension>
-		</extensions>
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
