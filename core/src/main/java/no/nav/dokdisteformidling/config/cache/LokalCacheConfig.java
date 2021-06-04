@@ -20,8 +20,6 @@ import java.util.concurrent.TimeUnit;
 @EnableCaching
 public class LokalCacheConfig {
 
-	public static final String TKAT020_CACHE = "tkat020Cache";
-	public static final String TKAT021_CACHE = "tkat021Cache";
 	public static final String STS_CACHE = "stsCache";
 	public static final String LIGHTWEIGHT_SAF_JOURNALPOST_QDIST013_CACHE = "LightweightSafJournalpostQdist013Cache";
 	public static final String SAF_JOURNALPOST_QDIST013_CACHE = "SafJournalpostQueryServiceImplQdist013Cache";
@@ -32,12 +30,6 @@ public class LokalCacheConfig {
 	CacheManager cacheManager() {
 		SimpleCacheManager manager = new SimpleCacheManager();
 		manager.setCaches(Arrays.asList(
-				new CaffeineCache(TKAT020_CACHE, Caffeine.newBuilder()
-						.expireAfterWrite(1, TimeUnit.DAYS)
-						.build()),
-				new CaffeineCache(TKAT021_CACHE, Caffeine.newBuilder()
-						.expireAfterWrite(1, TimeUnit.DAYS)
-						.build()),
 				new CaffeineCache(STS_CACHE, Caffeine.newBuilder()
 						.expireAfterWrite(55, TimeUnit.MINUTES)
 						.build()),

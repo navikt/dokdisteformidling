@@ -21,16 +21,6 @@ import javax.jms.Queue;
 public class JmsItestConfig {
 
 	@Bean
-	public Queue qdist011(@Value("${dokdisteformidling_qdist011_dist_til_dpi.queuename}") String qdist011QueueName) {
-		return new ActiveMQQueue(qdist011QueueName);
-	}
-
-	@Bean
-	public Queue qdist011FunksjonellFeil(@Value("${dokdisteformidling_qdist011_funk_feil.queuename}") String qdist011FunksjonellFeil) {
-		return new ActiveMQQueue(qdist011FunksjonellFeil);
-	}
-
-	@Bean
 	public Queue qdist013(@Value("${dokdisteformidling_qdist013_dist_trygderetten.queuename}") String qdist013QueueName) {
 		return new ActiveMQQueue(qdist013QueueName);
 	}
@@ -38,11 +28,6 @@ public class JmsItestConfig {
 	@Bean
 	public Queue qdist013FunksjonellFeil(@Value("${dokdisteformidling_qdist013_funk_feil.queuename}") String qdist013FunksjonellFeil) {
 		return new ActiveMQQueue(qdist013FunksjonellFeil);
-	}
-
-	@Bean
-	public Queue tdist005(@Value("${dokdistSdpBatchIntern.queuename}") String tdist005QueueName) {
-		return new ActiveMQQueue(tdist005QueueName);
 	}
 
 	@Bean

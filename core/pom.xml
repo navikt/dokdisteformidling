@@ -12,10 +12,6 @@
     <artifactId>core</artifactId>
     <dependencies>
         <dependency>
-            <groupId>no.nav.dokkat</groupId>
-            <artifactId>dokkat-schemas</artifactId>
-        </dependency>
-        <dependency>
             <groupId>no.nav.dokdisteformidling</groupId>
             <artifactId>schemas-avtaltmelding</artifactId>
         </dependency>
@@ -89,11 +85,6 @@
             <artifactId>logstash-logback-encoder</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
         </dependency>
@@ -133,20 +124,9 @@
             <groupId>io.reactivex.rxjava2</groupId>
             <artifactId>rxjava</artifactId>
         </dependency>
-        <!--Tjenestegrensesnitt-->
-        <dependency>
-            <groupId>no.nav.dokkat</groupId>
-            <artifactId>dokkat-api</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>no.nav.tjenester.fim</groupId>
-            <artifactId>nav-digitalKontaktinformasjon-v1-tjenestespesifikasjon</artifactId>
-            <classifier>jaxws</classifier>
-        </dependency>
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <version>${lombok.version}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
