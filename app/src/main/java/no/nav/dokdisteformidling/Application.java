@@ -1,7 +1,6 @@
 package no.nav.dokdisteformidling;
 
 import no.nav.dokdisteformidling.certificate.KeyStoreProperties;
-import no.nav.dokdisteformidling.config.alias.DigitalKontaktinformasjonV1Alias;
 import no.nav.dokdisteformidling.config.alias.MqGatewayAlias;
 import no.nav.dokdisteformidling.config.alias.ServiceuserAlias;
 import no.nav.dokdisteformidling.config.props.BrokerServiceExternalProperties;
@@ -26,7 +25,6 @@ import org.springframework.scheduling.annotation.EnableScheduling;
         KeyStoreProperties.class,
         MqGatewayAlias.class,
         SrvAppserverProperties.class,
-        DigitalKontaktinformasjonV1Alias.class,
         MaskinportenProperties.class,
         ServiceRegistryProperties.class})
 public class Application {

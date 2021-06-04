@@ -29,14 +29,6 @@ public final class FunctionalUtils {
         }
     }
 
-    public static String getDokumenttypeIdHoveddokument(HentForsendelseResponseTo hentForsendelseResponseTo) {
-        return hentForsendelseResponseTo.getDokumenter().stream()
-                .filter(dokumentTo -> DomainConstants.HOVEDDOKUMENT.equals(dokumentTo.getTilknyttetSom()))
-                .map(HentForsendelseResponseTo.DokumentTo::getDokumenttypeId)
-                .collect(Collectors.toList())
-                .get(0);
-    }
-
     public static DokdistDokument deserializeS3JsonPayloadToDokdistDokument(String jsonPayload, String objektReferanse) {
         DokdistDokument dokdistDokument;
         try {
