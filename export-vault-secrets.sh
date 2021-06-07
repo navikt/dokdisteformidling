@@ -10,11 +10,6 @@ then
     echo "Setting serviceuser_password"
     export  serviceuser_password=$(cat /secrets/serviceuser/srvdokdisteformidling/password)
 fi
-if test -f /secrets/privateKey/privateKeyPassphrase;
-then
-    echo "Setting sftp_privateKeyPassphrase"
-    export  sftp_privateKeyPassphrase=$(cat /secrets/privateKey/privateKeyPassphrase)
-fi
 if test -f /secrets/dpo/dpo.json
 then
     echo "Setting dpo_username"

@@ -1,10 +1,7 @@
 package no.nav.dokdisteformidling.qdist013.itest.config;
 
-import static org.mockito.Mockito.mock;
-
 import com.amazonaws.services.s3.AmazonS3;
 import no.nav.dokdisteformidling.certificate.KeyStoreProperties;
-import no.nav.dokdisteformidling.config.alias.DigitalKontaktinformasjonV1Alias;
 import no.nav.dokdisteformidling.config.alias.MqGatewayAlias;
 import no.nav.dokdisteformidling.config.alias.ServiceuserAlias;
 import no.nav.dokdisteformidling.config.cache.LokalCacheConfig;
@@ -24,6 +21,8 @@ import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Profile;
 import org.springframework.retry.annotation.EnableRetry;
 
+import static org.mockito.Mockito.mock;
+
 /**
  * @author Joakim Bjørnstad, Jbit AS
  */
@@ -37,12 +36,10 @@ import org.springframework.retry.annotation.EnableRetry;
 		KeyStoreProperties.class,
 		MqGatewayAlias.class,
 		SrvAppserverProperties.class,
-		DigitalKontaktinformasjonV1Alias.class,
 		MaskinportenProperties.class,
 		ServiceRegistryProperties.class})
 @Import({JmsItestConfig.class,
 		LokalCacheConfig.class,
-		STSTestConfig.class,
 		BrokerServiceExternalTestConfig.class,
 		BrokerServiceExternalStreamedConfigTest.class})
 @ComponentScan(basePackages = "no.nav.dokdisteformidling")
