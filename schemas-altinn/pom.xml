@@ -14,7 +14,6 @@
 		<dependency>
 			<groupId>jakarta.xml.ws</groupId>
 			<artifactId>jakarta.xml.ws-api</artifactId>
-			<type>pom</type>
 		</dependency>
 		<dependency>
 			<groupId>com.sun.xml.ws</groupId>

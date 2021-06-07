@@ -24,29 +24,28 @@
 
 	<properties>
 		<java.version>11</java.version>
-		<camel.version>3.7.4</camel.version>
+		<camel.version>3.10.0</camel.version>
 		<javax.inject.version>1</javax.inject.version>
 		<logstash-logback-encoder.version>6.6</logstash-logback-encoder.version>
 		<jakarta.xml.ws-api.version>2.3.3</jakarta.xml.ws-api.version>
 		<lombok.version>1.18.20</lombok.version>
 		<resilience4j.version>1.7.0</resilience4j.version>
-		<aws-java-sdk-s3.version>1.11.1016</aws-java-sdk-s3.version>
+		<aws-java-sdk-s3.version>1.11.1034</aws-java-sdk-s3.version>
 		<wmq.version>9.2.2.0</wmq.version>
 		<cxf.version>3.4.3</cxf.version>
 		<melding-virksomhet-dokdistfordeling.version>2.0.4</melding-virksomhet-dokdistfordeling.version>
-		<sdpkanal-tjenestespesifikasjon.version>1.1.0</sdpkanal-tjenestespesifikasjon.version>
 		<jaxb2-basics-runtime.version>1.11.1</jaxb2-basics-runtime.version>
 		<commons-lang3.version>3.12.0</commons-lang3.version>
 		<commons-io.version>2.8.0</commons-io.version>
 		<commons-asic.version>0.9.3</commons-asic.version>
 		<nimbus-jose-jwt.version>9.9.3</nimbus-jose-jwt.version>
-		<rxjava.version>2.2.20</rxjava.version>
-		<jaxws-ri.version>3.0.0-M1</jaxws-ri.version>
+		<rxjava.version>2.2.21</rxjava.version>
+		<jaxws-ri.version>3.0.1</jaxws-ri.version>
 		<!-- test -->
 		<awaitility.version>4.1.0</awaitility.version>
 		<activemq.version>5.16.2</activemq.version>
-		<junit5.mockito.version>3.9.0</junit5.mockito.version>
-		<spring-cloud-contract-wiremock.version>3.0.2</spring-cloud-contract-wiremock.version>
+		<mockito.version>3.11.0</mockito.version>
+		<spring-cloud-contract-wiremock.version>3.0.3</spring-cloud-contract-wiremock.version>
 		<!-- wiremock compat -->
 		<xmlunit-core.version>2.8.2</xmlunit-core.version>
 	</properties>
@@ -84,12 +83,6 @@
 				<version>${melding-virksomhet-dokdistfordeling.version}</version>
 			</dependency>
 			<dependency>
-				<groupId>no.nav.tjenester</groupId>
-				<artifactId>nav-sdpkanal-tjenestespesifikasjon</artifactId>
-				<version>${sdpkanal-tjenestespesifikasjon.version}</version>
-				<classifier>jaxws</classifier>
-			</dependency>
-			<dependency>
 				<groupId>javax.inject</groupId>
 				<artifactId>javax.inject</artifactId>
 				<version>${javax.inject.version}</version>
@@ -113,7 +106,6 @@
 				<groupId>jakarta.xml.ws</groupId>
 				<artifactId>jakarta.xml.ws-api</artifactId>
 				<version>${jakarta.xml.ws-api.version}</version>
-				<type>pom</type>
 			</dependency>
 			<dependency>
 				<groupId>com.sun.xml.ws</groupId>
@@ -209,7 +201,7 @@
 			<dependency>
 				<groupId>org.mockito</groupId>
 				<artifactId>mockito-junit-jupiter</artifactId>
-				<version>${junit5.mockito.version}</version>
+				<version>${mockito.version}</version>
 				<scope>test</scope>
 			</dependency>
 			<dependency>
