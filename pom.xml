@@ -11,7 +11,6 @@
 	<modules>
 		<module>app</module>
 		<module>core</module>
-		<module>qdist011</module>
 		<module>qdist013</module>
 		<module>sdist001</module>
 		<module>schemas-avtaltmelding</module>
@@ -25,32 +24,28 @@
 
 	<properties>
 		<java.version>11</java.version>
-		<camel.version>3.7.4</camel.version>
+		<camel.version>3.10.0</camel.version>
 		<javax.inject.version>1</javax.inject.version>
 		<logstash-logback-encoder.version>6.6</logstash-logback-encoder.version>
 		<jakarta.xml.ws-api.version>2.3.3</jakarta.xml.ws-api.version>
 		<lombok.version>1.18.20</lombok.version>
 		<resilience4j.version>1.7.0</resilience4j.version>
-		<aws-java-sdk-s3.version>1.11.1016</aws-java-sdk-s3.version>
-		<dokkat.version>11.0.5</dokkat.version>
+		<aws-java-sdk-s3.version>1.11.1034</aws-java-sdk-s3.version>
 		<wmq.version>9.2.2.0</wmq.version>
-		<cxf.version>3.4.1</cxf.version>
+		<cxf.version>3.4.3</cxf.version>
 		<melding-virksomhet-dokdistfordeling.version>2.0.4</melding-virksomhet-dokdistfordeling.version>
-		<nav-digitalKontaktinformasjon-v1-tjenestespesifikasjon>2.0.0</nav-digitalKontaktinformasjon-v1-tjenestespesifikasjon>
-		<sdpkanal-tjenestespesifikasjon.version>1.1.0</sdpkanal-tjenestespesifikasjon.version>
 		<jaxb2-basics-runtime.version>1.11.1</jaxb2-basics-runtime.version>
 		<commons-lang3.version>3.12.0</commons-lang3.version>
 		<commons-io.version>2.8.0</commons-io.version>
 		<commons-asic.version>0.9.3</commons-asic.version>
 		<nimbus-jose-jwt.version>9.9.3</nimbus-jose-jwt.version>
-		<rxjava.version>2.2.20</rxjava.version>
-		<jaxws-ri.version>3.0.0-M1</jaxws-ri.version>
+		<rxjava.version>2.2.21</rxjava.version>
+		<jaxws-ri.version>3.0.1</jaxws-ri.version>
 		<!-- test -->
 		<awaitility.version>4.1.0</awaitility.version>
 		<activemq.version>5.16.2</activemq.version>
-		<junit5.mockito.version>3.9.0</junit5.mockito.version>
-		<sshd-sftp.version>2.0.0</sshd-sftp.version>
-		<spring-cloud-contract-wiremock.version>3.0.2</spring-cloud-contract-wiremock.version>
+		<mockito.version>3.11.0</mockito.version>
+		<spring-cloud-contract-wiremock.version>3.0.3</spring-cloud-contract-wiremock.version>
 		<!-- wiremock compat -->
 		<xmlunit-core.version>2.8.2</xmlunit-core.version>
 	</properties>
@@ -60,11 +55,6 @@
 			<dependency>
 				<groupId>no.nav.dokdisteformidling</groupId>
 				<artifactId>core</artifactId>
-				<version>${project.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>no.nav.dokdisteformidling</groupId>
-				<artifactId>qdist011</artifactId>
 				<version>${project.version}</version>
 			</dependency>
 			<dependency>
@@ -88,26 +78,9 @@
 				<version>${project.version}</version>
 			</dependency>
 			<dependency>
-				<groupId>no.nav.dokkat</groupId>
-				<artifactId>dokkat-api</artifactId>
-				<version>${dokkat.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>no.nav.dokkat</groupId>
-				<artifactId>dokkat-schemas</artifactId>
-				<version>${dokkat.version}</version>
-			</dependency>
-			<dependency>
 				<groupId>no.nav.meldinger.virksomhet</groupId>
 				<artifactId>melding-virksomhet-dokdistfordeling</artifactId>
 				<version>${melding-virksomhet-dokdistfordeling.version}</version>
-			</dependency>
-
-			<dependency>
-				<groupId>no.nav.tjenester</groupId>
-				<artifactId>nav-sdpkanal-tjenestespesifikasjon</artifactId>
-				<version>${sdpkanal-tjenestespesifikasjon.version}</version>
-				<classifier>jaxws</classifier>
 			</dependency>
 			<dependency>
 				<groupId>javax.inject</groupId>
@@ -119,7 +92,6 @@
 				<artifactId>logstash-logback-encoder</artifactId>
 				<version>${logstash-logback-encoder.version}</version>
 			</dependency>
-
 			<dependency>
 				<groupId>org.jvnet.jaxb2_commons</groupId>
 				<artifactId>jaxb2-basics-runtime</artifactId>
@@ -130,12 +102,10 @@
 				<artifactId>aws-java-sdk-s3</artifactId>
 				<version>${aws-java-sdk-s3.version}</version>
 			</dependency>
-
 			<dependency>
 				<groupId>jakarta.xml.ws</groupId>
 				<artifactId>jakarta.xml.ws-api</artifactId>
 				<version>${jakarta.xml.ws-api.version}</version>
-				<type>pom</type>
 			</dependency>
 			<dependency>
 				<groupId>com.sun.xml.ws</groupId>
@@ -148,7 +118,6 @@
 				<artifactId>rxjava</artifactId>
 				<version>${rxjava.version}</version>
 			</dependency>
-
 			<dependency>
 				<groupId>com.ibm.mq</groupId>
 				<artifactId>com.ibm.mq.allclient</artifactId>
@@ -189,11 +158,8 @@
 			<dependency>
 				<groupId>org.apache.cxf</groupId>
 				<artifactId>cxf-core</artifactId>
-				<scope>compile</scope>
 				<version>${cxf.version}</version>
 			</dependency>
-
-
 			<dependency>
 				<groupId>no.difi.commons</groupId>
 				<artifactId>commons-asic</artifactId>
@@ -210,22 +176,6 @@
 				<version>${nimbus-jose-jwt.version}</version>
 			</dependency>
 			<dependency>
-				<groupId>org.projectlombok</groupId>
-				<artifactId>lombok</artifactId>
-				<version>${lombok.version}</version>
-				<scope>provided</scope>
-			</dependency>
-
-			<!--Tjenestegrensesnitt-->
-			<dependency>
-				<groupId>no.nav.tjenester.fim</groupId>
-				<artifactId>nav-digitalKontaktinformasjon-v1-tjenestespesifikasjon</artifactId>
-				<version>${nav-digitalKontaktinformasjon-v1-tjenestespesifikasjon}</version>
-				<classifier>jaxws</classifier>
-			</dependency>
-
-			<!--Selftest metrics-->
-			<dependency>
 				<groupId>io.github.resilience4j</groupId>
 				<artifactId>resilience4j-prometheus</artifactId>
 				<version>${resilience4j.version}</version>
@@ -240,23 +190,24 @@
 				<artifactId>resilience4j-circuitbreaker</artifactId>
 				<version>${resilience4j.version}</version>
 			</dependency>
+			<!-- provided -->
+			<dependency>
+				<groupId>org.projectlombok</groupId>
+				<artifactId>lombok</artifactId>
+				<version>${lombok.version}</version>
+				<scope>provided</scope>
+			</dependency>
 			<!-- test -->
 			<dependency>
 				<groupId>org.mockito</groupId>
 				<artifactId>mockito-junit-jupiter</artifactId>
-				<version>${junit5.mockito.version}</version>
+				<version>${mockito.version}</version>
 				<scope>test</scope>
 			</dependency>
 			<dependency>
 				<groupId>org.springframework.cloud</groupId>
 				<artifactId>spring-cloud-contract-wiremock</artifactId>
 				<version>${spring-cloud-contract-wiremock.version}</version>
-				<scope>test</scope>
-			</dependency>
-			<dependency>
-				<groupId>org.apache.sshd</groupId>
-				<artifactId>sshd-sftp</artifactId>
-				<version>${sshd-sftp.version}</version>
 				<scope>test</scope>
 			</dependency>
 			<dependency>
@@ -287,13 +238,6 @@
 				<filtering>true</filtering>
 			</resource>
 		</resources>
-		<extensions>
-			<extension>
-				<groupId>org.apache.maven.wagon</groupId>
-				<artifactId>wagon-webdav-jackrabbit</artifactId>
-				<version>1.0</version>
-			</extension>
-		</extensions>
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>

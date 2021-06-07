@@ -60,10 +60,10 @@ public class SafJournalpostQueryServiceImplQdist013 implements SafJournalpostQue
 	private final JournalpostQdist013Mapper journalpostQdist013Mapper;
 
 	public SafJournalpostQueryServiceImplQdist013(SafGraphqlConsumer safGraphqlConsumer,
-												  SafJournalpostValidatorQdist013 safJournalpostValidatorQdist011,
+												  SafJournalpostValidatorQdist013 safJournalpostValidatorQdist013,
 												  JournalpostQdist013Mapper journalpostQdist013Mapper) {
 		this.safGraphqlConsumer = safGraphqlConsumer;
-		this.safJournalpostValidatorQdist013 = safJournalpostValidatorQdist011;
+		this.safJournalpostValidatorQdist013 = safJournalpostValidatorQdist013;
 		this.journalpostQdist013Mapper = journalpostQdist013Mapper;
 	}
 

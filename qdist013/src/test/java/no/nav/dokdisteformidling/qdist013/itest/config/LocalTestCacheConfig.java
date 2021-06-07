@@ -14,8 +14,6 @@ import java.util.concurrent.TimeUnit;
 import static no.nav.dokdisteformidling.config.cache.LokalCacheConfig.LIGHTWEIGHT_SAF_JOURNALPOST_QDIST013_CACHE;
 import static no.nav.dokdisteformidling.config.cache.LokalCacheConfig.SAF_JOURNALPOST_QDIST013_CACHE;
 import static no.nav.dokdisteformidling.config.cache.LokalCacheConfig.STS_CACHE;
-import static no.nav.dokdisteformidling.config.cache.LokalCacheConfig.TKAT020_CACHE;
-import static no.nav.dokdisteformidling.config.cache.LokalCacheConfig.TKAT021_CACHE;
 
 /**
  * @author Joakim Bjørnstad, Jbit AS
@@ -28,14 +26,6 @@ public class LocalTestCacheConfig {
     CacheManager cacheManager() {
         SimpleCacheManager manager = new SimpleCacheManager();
         manager.setCaches(Arrays.asList(
-                new CaffeineCache(TKAT020_CACHE, Caffeine.newBuilder()
-                        .expireAfterWrite(0, TimeUnit.MINUTES)
-                        .maximumSize(0)
-                        .build()),
-                new CaffeineCache(TKAT021_CACHE, Caffeine.newBuilder()
-                        .expireAfterWrite(0, TimeUnit.MINUTES)
-                        .maximumSize(0)
-                        .build()),
                 new CaffeineCache(STS_CACHE, Caffeine.newBuilder()
                         .expireAfterWrite(0, TimeUnit.MINUTES)
                         .maximumSize(0)
