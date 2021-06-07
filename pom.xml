@@ -190,6 +190,11 @@
 				<artifactId>resilience4j-circuitbreaker</artifactId>
 				<version>${resilience4j.version}</version>
 			</dependency>
+			<dependency>
+				<groupId>org.apache.activemq</groupId>
+				<artifactId>activemq-jms-pool</artifactId>
+				<version>${activemq.version}</version>
+			</dependency>
 			<!-- provided -->
 			<dependency>
 				<groupId>org.projectlombok</groupId>
