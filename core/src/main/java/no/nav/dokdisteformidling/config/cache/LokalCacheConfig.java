@@ -13,6 +13,9 @@ import org.springframework.context.annotation.Profile;
 import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 
+import static java.util.concurrent.TimeUnit.MINUTES;
+import static java.util.concurrent.TimeUnit.SECONDS;
+
 /**
  * @author Joakim Bjørnstad, Jbit AS
  */
@@ -31,13 +34,13 @@ public class LokalCacheConfig {
 		SimpleCacheManager manager = new SimpleCacheManager();
 		manager.setCaches(Arrays.asList(
 				new CaffeineCache(STS_CACHE, Caffeine.newBuilder()
-						.expireAfterWrite(55, TimeUnit.MINUTES)
+						.expireAfterWrite(55, MINUTES)
 						.build()),
 				new CaffeineCache(LIGHTWEIGHT_SAF_JOURNALPOST_QDIST013_CACHE, Caffeine.newBuilder()
-						.expireAfterWrite(30, TimeUnit.SECONDS)
+						.expireAfterWrite(30, SECONDS)
 						.build()),
 				new CaffeineCache(SAF_JOURNALPOST_QDIST013_CACHE, Caffeine.newBuilder()
-						.expireAfterWrite(30, TimeUnit.SECONDS)
+						.expireAfterWrite(30, SECONDS)
 						.build())
 		));
 		return manager;
