@@ -8,7 +8,6 @@ import no.nav.dokdisteformidling.config.props.BrokerServiceExternalStreamedPrope
 import no.nav.dokdisteformidling.config.props.DpoUserProperties;
 import no.nav.dokdisteformidling.config.props.MaskinportenProperties;
 import no.nav.dokdisteformidling.config.props.ServiceRegistryProperties;
-import no.nav.dokdisteformidling.config.props.SrvAppserverProperties;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -24,7 +23,6 @@ import org.springframework.scheduling.annotation.EnableScheduling;
         BrokerServiceExternalStreamedProperties.class,
         KeyStoreProperties.class,
         MqGatewayAlias.class,
-        SrvAppserverProperties.class,
         MaskinportenProperties.class,
         ServiceRegistryProperties.class})
 public class Application {

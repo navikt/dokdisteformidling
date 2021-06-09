@@ -10,7 +10,6 @@ import no.nav.dokdisteformidling.config.props.BrokerServiceExternalStreamedPrope
 import no.nav.dokdisteformidling.config.props.DpoUserProperties;
 import no.nav.dokdisteformidling.config.props.MaskinportenProperties;
 import no.nav.dokdisteformidling.config.props.ServiceRegistryProperties;
-import no.nav.dokdisteformidling.config.props.SrvAppserverProperties;
 import no.nav.dokdisteformidling.storage.S3Storage;
 import no.nav.dokdisteformidling.storage.Storage;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -35,7 +34,6 @@ import static org.mockito.Mockito.mock;
 		BrokerServiceExternalStreamedProperties.class,
 		KeyStoreProperties.class,
 		MqGatewayAlias.class,
-		SrvAppserverProperties.class,
 		MaskinportenProperties.class,
 		ServiceRegistryProperties.class})
 @Import({JmsItestConfig.class,
