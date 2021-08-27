@@ -2,6 +2,7 @@ package no.nav.dokdisteformidling.qdist013.itest;
 
 import com.amazonaws.SdkClientException;
 import com.amazonaws.services.s3.AmazonS3;
+import com.github.tomakehurst.wiremock.admin.model.ListStubMappingsResult;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import com.github.tomakehurst.wiremock.verification.LoggedRequest;
 import no.altinn.brokerserviceexternal.InitiateBrokerService;
@@ -51,6 +52,7 @@ import static com.github.tomakehurst.wiremock.client.WireMock.equalToJson;
 import static com.github.tomakehurst.wiremock.client.WireMock.findAll;
 import static com.github.tomakehurst.wiremock.client.WireMock.get;
 import static com.github.tomakehurst.wiremock.client.WireMock.getRequestedFor;
+import static com.github.tomakehurst.wiremock.client.WireMock.listAllStubMappings;
 import static com.github.tomakehurst.wiremock.client.WireMock.matchingJsonPath;
 import static com.github.tomakehurst.wiremock.client.WireMock.post;
 import static com.github.tomakehurst.wiremock.client.WireMock.postRequestedFor;
@@ -74,6 +76,8 @@ import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
+import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
+import static org.springframework.http.HttpStatus.OK;
 import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE;
 import static org.springframework.http.MediaType.APPLICATION_XML_VALUE;
 import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
@@ -98,6 +102,11 @@ class Qdist013ForAltinnIT {
     private static final String HOVEDDOK_TEST_CONTENT = "HOVEDDOK_TEST_CONTENT";
     private static final String VEDLEGG1_TEST_CONTENT = "VEDLEGG1_TEST_CONTENT";
     private static final String VEDLEGG2_TEST_CONTENT = "VEDLEGG2_TEST_CONTENT";
+    private static final String PDL_PERSONNAVN_HAPPY =  "pdl/personnavn_happy.json";
+    public static final String PDL_PERSONNAVN_NOT_FOUND = "pdl/pdlident_not_found.json";
+    public static final String PDL_FORNAVN_NULL =  "pdl/personnavn_nullfornavn.json";
+    private static final String PDL_IDENT_NOT_FOUND = "pdl/pdlident_not_found.json";
+    private static final String PDL_IDENT_HAPPY = "pdl/pdlident_happy.json";
     private static final String BEARER_OIDC_TOKEN = "Bearer eyJraWQiOiIyZDYwNjZmNi1mM2ViLTRlYzktYjRlZS0wMzM1Nzg0MDY3MTMiLCJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJzdWIiOiJzcnZqb2Fya2FkbWluIiwiYXVkIjpbInNydmpvYXJrYWRtaW4iLCJwcmVwcm9kLmxvY2FsIl0sInZlciI6IjEuMCIsIm5iZiI6MTU1NjI2Nzg0NiwiYXpwIjoic3J2am9hcmthZG1pbiIsImlkZW50VHlwZSI6IlN5c3RlbXJlc3N1cnMiLCJhdXRoX3RpbWUiOjE1NTYyNjc4NDYsImlzcyI6Imh0dHBzOlwvXC9zZWN1cml0eS10b2tlbi1zZXJ2aWNlLm5haXMucHJlcHJvZC5sb2NhbCIsImV4cCI6MTU1NjI3MTQ0NiwiaWF0IjoxNTU2MjY3ODQ2LCJqdGkiOiI5NzVmMjY4YS00ZmI3LTQ2NWMtOTIyZS0xY2Q4OTNjZDEwY2QifQ.e7e1cKmLt0wYSBdURju0pZnplheXl-T5Df7t2QKcOWpKfERKgfSnMOHPYuS80GJbwvfZXE7F_WiTyB2Klsv_shS2Iy_DqqS2qRPUit4fCDyXX4TMBVWWqBY60Wg46NuZGz4kje6z0BcT84cyrQSPKNuVEmy9xcdIXrQ2xzJy9NyOseSvEkUPX4Xj4yfCh6CoEIOsNDQ-hW6XUkbAKjF3nkM6AwSQ2cZTi9T7j12LNw4RQyBwl9PINP8d3t2jeOJ8Gq7xVkzlyL60SHH2UnblBag0UhCYLYIzuSr1lkpvZ_8q5vqg9DXk7CQZGmZNfoOOQsy1pBTyzU3JjhGmBNWZEg";
 
     @Value("${altinn.brokerserviceexternal.endpointurl}")
@@ -164,18 +173,16 @@ class Qdist013ForAltinnIT {
         stubGetSecurityToken();
         stubPostSafJournalpost("queryJournalpostId\":\"123\"", "saf/safQdist013GraphQlResponse-aktoerId.json");
         stubPostSafJournalpost("queryJournalpostId\":\"448212366\"", "saf/safLightweightGraphQlResponse-happy.json");
-        stubGetTpsHentPersonNavn("20026900817");
-        stubGetAktoerregisterHentIdentForAktoerId("1000045110509");
+        postPdlGraphql(PDL_PERSONNAVN_HAPPY, OK.value());
         stubPostMaskinporten();
         stubGetServiceRegistry();
         stubPostIntiateBrokerService();
+        ListStubMappingsResult stubs = listAllStubMappings();
         sendStringMessage(qdist013, classpathToString("qdist013/qdist013-happy.xml"));
 
         await().atMost(10, SECONDS).untilAsserted(() -> {
-            verifyIntiateBrokerServiceStubs("", "20026900817", "1000045110509", 22, 1, 2);
+            verifyIntiateBrokerServiceStubs("", "20026900817", "1000045110509", 21, 1, 2, 2);
         });
-
-
     }
 
     @Test
@@ -185,14 +192,14 @@ class Qdist013ForAltinnIT {
         stubPostSafJournalpost("queryJournalpostId\":\"123\"", "saf/safQdist013GraphQlResponse-aktoerId.json");
         stubPostSafJournalpost("queryJournalpostId\":\"448212366\"", "saf/safLightweightGraphQlResponse-datojournalfoert-null.json");
         stubGetTpsHentPersonNavn("20026900817");
-        stubGetAktoerregisterHentIdentForAktoerId("1000045110509");
+        postPdlGraphql(PDL_PERSONNAVN_HAPPY, OK.value());
         stubPostMaskinporten();
         stubGetServiceRegistry();
         stubPostIntiateBrokerService();
         sendStringMessage(qdist013, classpathToString("qdist013/qdist013-happy.xml"));
 
         await().atMost(10, SECONDS).untilAsserted(() -> {
-            verifyIntiateBrokerServiceStubs("", "20026900817", "1000045110509", 18, 1, 2);
+            verifyIntiateBrokerServiceStubs("", "20026900817", "1000045110509", 17, 1, 2, 2);
         });
     }
 
@@ -221,8 +228,7 @@ class Qdist013ForAltinnIT {
         stubGetSecurityToken();
         stubPostSafJournalpost("queryJournalpostId\":\"123\"", "saf/safQdist013GraphQlResponse-aktoerId.json");
         stubPostSafJournalpost("queryJournalpostId\":\"448212366\"", "saf/safLightweightGraphQlResponse-happy.json");
-        stubGetTpsHentPersonNavn("20026900817");
-        stubGetAktoerregisterHentIdentForAktoerId("1000045110509");
+        postPdlGraphql(PDL_PERSONNAVN_HAPPY, OK.value());
         stubPostMaskinporten();
         stubGetServiceRegistry();
         stubPostIntiateBrokerService();
@@ -233,7 +239,7 @@ class Qdist013ForAltinnIT {
         sendStringMessage(qdist013, classpathToString("qdist013/qdist013-happy.xml"));
 
         await().atMost(10, SECONDS).untilAsserted(() -> {
-            verifyIntiateBrokerServiceStubs("", "20026900817", "1000045110509", 22, 1, 2);
+            verifyIntiateBrokerServiceStubs("", "20026900817", "1000045110509", 21, 1, 2, 2);
         });
 
 
@@ -246,7 +252,7 @@ class Qdist013ForAltinnIT {
         stubGetSecurityToken();
         stubPostSafJournalpost("queryJournalpostId\":\"123\"", "saf/safQdist013GraphQlResponse-fnr.json");
         stubPostSafJournalpost("queryJournalpostId\":\"448212366\"", "saf/safLightweightGraphQlResponse-happy.json");
-        stubGetTpsHentPersonNavn("01010012345");
+        postPdlGraphql(PDL_PERSONNAVN_HAPPY, OK.value());
         stubPostMaskinporten();
         stubGetServiceRegistry();
         stubPostIntiateBrokerService();
@@ -257,7 +263,7 @@ class Qdist013ForAltinnIT {
         sendStringMessage(qdist013, classpathToString("qdist013/qdist013-happy.xml"));
 
         await().atMost(10, SECONDS).untilAsserted(() -> {
-            verifyAllStubs("", "01010012345", "", 20, 1);
+            verifyAllStubs("", 20, 1,1);
         });
 
     }
@@ -280,7 +286,7 @@ class Qdist013ForAltinnIT {
         sendStringMessage(qdist013, classpathToString("qdist013/qdist013-happy.xml"));
 
         await().atMost(10, SECONDS).untilAsserted(() -> {
-            verifyAllStubs("123456789", "", "", 19, 1);
+            verifyAllStubs("123456789", 19, 1, 2);
         });
 
     }
@@ -334,7 +340,7 @@ class Qdist013ForAltinnIT {
     void shouldThrowStsTechnicalException() {
         stubGetForsendelse("__files/rjoark001/getForsendelse-happy.json");
         stubFor(get("/securitytoken?grant_type=client_credentials&scope=openid")
-                .willReturn(aResponse().withStatus(HttpStatus.INTERNAL_SERVER_ERROR.value())));
+                .willReturn(aResponse().withStatus(INTERNAL_SERVER_ERROR.value())));
 
         sendStringMessage(qdist013, classpathToString("qdist013/qdist013-happy.xml"));
 
@@ -350,7 +356,7 @@ class Qdist013ForAltinnIT {
     void shouldPutOnBackoutQueueWhenSafJournalpostIkkeFunnetException() {
         stubGetForsendelse("__files/rjoark001/getForsendelse-happy.json");
         stubGetSecurityToken();
-        stubFor(post(urlMatching("/safgraphql")).willReturn(aResponse().withStatus(HttpStatus.OK.value())
+        stubFor(post(urlMatching("/safgraphql")).willReturn(aResponse().withStatus(OK.value())
                 .withHeader(org.springframework.http.HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_UTF8_VALUE)
                 .withBody("")));
 
@@ -388,7 +394,7 @@ class Qdist013ForAltinnIT {
         stubGetForsendelse("__files/rjoark001/getForsendelse-happy.json");
         stubGetSecurityToken();
         stubFor(post(urlMatching("/safgraphql"))
-                .willReturn(aResponse().withStatus(HttpStatus.INTERNAL_SERVER_ERROR.value())));
+                .willReturn(aResponse().withStatus(INTERNAL_SERVER_ERROR.value())));
 
         sendStringMessage(qdist013, classpathToString("qdist013/qdist013-happy.xml"));
 
@@ -423,11 +429,10 @@ class Qdist013ForAltinnIT {
         stubGetForsendelse("__files/rjoark001/getForsendelse-happy.json");
         stubGetSecurityToken();
         stubPostSafJournalpost("queryJournalpostId\":\"123\"", "saf/safQdist013GraphQlResponse-aktoerId.json");
-        stubGetAktoerregisterHentIdentForAktoerId("1000045110509");
-        stubGetTpsHentPersonNavn("20026900817");
+        postPdlGraphql(PDL_PERSONNAVN_HAPPY, OK.value());
         stubFor(post(urlMatching("/safgraphql"))
                 .withRequestBody(containing("queryJournalpostId\":\"448212366\""))
-                .willReturn(aResponse().withStatus(HttpStatus.OK.value())
+                .willReturn(aResponse().withStatus(OK.value())
                         .withHeader(org.springframework.http.HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_UTF8_VALUE)
                         .withBody("")));
 
@@ -438,7 +443,7 @@ class Qdist013ForAltinnIT {
         });
 
         verifyGetForsendelse();
-        verifyGetSecurityToken(MAX_ATTEMPTS_SHORT + 4);
+        verifyGetSecurityToken(MAX_ATTEMPTS_SHORT + 3);
         verifyPostSafJournalpost();
         verify(1, postRequestedFor(urlEqualTo("/safgraphql"))
                 .withRequestBody(equalToJson(classpathToString("__files/saf/safLightweightGraphQlRequest.json"))));
@@ -471,11 +476,10 @@ class Qdist013ForAltinnIT {
         stubGetForsendelse("__files/rjoark001/getForsendelse-happy.json");
         stubGetSecurityToken();
         stubPostSafJournalpost("queryJournalpostId\":\"123\"", "saf/safQdist013GraphQlResponse-aktoerId.json");
-        stubGetAktoerregisterHentIdentForAktoerId("1000045110509");
-        stubGetTpsHentPersonNavn("20026900817");
+        postPdlGraphql(PDL_PERSONNAVN_HAPPY, OK.value());
         stubFor(post(urlMatching("/safgraphql"))
                 .withRequestBody(containing("queryJournalpostId\":\"448212366\""))
-                .willReturn(aResponse().withStatus(HttpStatus.INTERNAL_SERVER_ERROR.value())));
+                .willReturn(aResponse().withStatus(INTERNAL_SERVER_ERROR.value())));
 
         sendStringMessage(qdist013, classpathToString("qdist013/qdist013-happy.xml"));
 
@@ -484,12 +488,11 @@ class Qdist013ForAltinnIT {
         });
 
         verifyGetForsendelse();
-        verifyGetSecurityToken(4 + MAX_ATTEMPTS_SHORT);
+        verifyGetSecurityToken(6);
         verifyPostSafJournalpost();
         verify(1, postRequestedFor(urlEqualTo("/safgraphql"))
                 .withRequestBody(equalToJson(classpathToString("__files/saf/safLightweightGraphQlRequest.json"))));
     }
-
 
     @Test
     void shouldThrowAktoerHentIdentForAktoerIdFunctionalException() {
@@ -497,10 +500,7 @@ class Qdist013ForAltinnIT {
         stubGetSecurityToken();
         stubPostSafJournalpost("queryJournalpostId\":\"123\"", "saf/safQdist013GraphQlResponse-aktoerId.json");
         stubPostSafJournalpost("queryJournalpostId\":\"448212366\"", "saf/safLightweightGraphQlResponse-happy.json");
-        stubFor(get("/aktoerregister/identer?gjeldende=true&identgruppe=NorskIdent")
-                .withHeader("Nav-Personidenter", equalTo("1000045110509"))
-                .withHeader(AUTHORIZATION, equalTo(BEARER_OIDC_TOKEN))
-                .willReturn(aResponse().withStatus(HttpStatus.FORBIDDEN.value())));
+        postPdlGraphql(PDL_IDENT_HAPPY, INTERNAL_SERVER_ERROR.value());
         stubPostMaskinporten();
         stubGetServiceRegistry();
         stubPostIntiateBrokerService();
@@ -508,16 +508,14 @@ class Qdist013ForAltinnIT {
         sendStringMessage(qdist013, classpathToString("qdist013/qdist013-happy.xml"));
 
         await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
-            assertMessageOnQueue(qdist013FunksjonellFeil);
+            assertMessageOnQueue(backoutQueue);
         });
 
         verifyGetForsendelse();
-        verifyGetSecurityToken(1 + 1);
+        verifyGetSecurityToken(6);
         verifyPostSafJournalpost();
         verifyPostSafJournalpostLightweight(1);
-        verify(1, getRequestedFor(urlEqualTo("/aktoerregister/identer?gjeldende=true&identgruppe=NorskIdent"))
-                .withHeader("Nav-Personidenter", equalTo("1000045110509"))
-                .withHeader(AUTHORIZATION, equalTo(BEARER_OIDC_TOKEN)));
+        verify(5,postRequestedFor(urlEqualTo("/pdl")));
     }
 
     @Test
@@ -527,27 +525,19 @@ class Qdist013ForAltinnIT {
         stubPostSafJournalpost("queryJournalpostId\":\"123\"", "saf/safQdist013GraphQlResponse-aktoerId.json");
         stubPostSafJournalpost("queryJournalpostId\":\"448212366\"", "saf/safLightweightGraphQlResponse-happy.json");
         String nullStr = null;
-        stubFor(get("/aktoerregister/identer?gjeldende=true&identgruppe=NorskIdent")
-                .withHeader("Nav-Personidenter", equalTo("1000045110509"))
-                .withHeader(AUTHORIZATION, equalTo(BEARER_OIDC_TOKEN))
-                .willReturn(aResponse().withStatus(HttpStatus.OK
-                        .value())
-                        .withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
-                        .withBody(nullStr)));
+        postPdlGraphql(PDL_IDENT_HAPPY, INTERNAL_SERVER_ERROR.value());
 
         sendStringMessage(qdist013, classpathToString("qdist013/qdist013-happy.xml"));
 
         await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
-            assertMessageOnQueue(qdist013FunksjonellFeil);
+            assertMessageOnQueue(backoutQueue);
         });
 
         verifyGetForsendelse();
-        verifyGetSecurityToken(2);
+        verifyGetSecurityToken(6);
         verifyPostSafJournalpost();
         verifyPostSafJournalpostLightweight(1);
-        verify(1, getRequestedFor(urlEqualTo("/aktoerregister/identer?gjeldende=true&identgruppe=NorskIdent"))
-                .withHeader("Nav-Personidenter", equalTo("1000045110509"))
-                .withHeader(AUTHORIZATION, equalTo(BEARER_OIDC_TOKEN)));
+        verify(5, postRequestedFor(urlEqualTo("/pdl")));
     }
 
     @Test
@@ -556,13 +546,7 @@ class Qdist013ForAltinnIT {
         stubGetSecurityToken();
         stubPostSafJournalpost("queryJournalpostId\":\"123\"", "saf/safQdist013GraphQlResponse-aktoerId.json");
         stubPostSafJournalpost("queryJournalpostId\":\"448212366\"", "saf/safLightweightGraphQlResponse-happy.json");
-        stubFor(get("/aktoerregister/identer?gjeldende=true&identgruppe=NorskIdent")
-                .withHeader("Nav-Personidenter", equalTo("1000045110509"))
-                .withHeader(AUTHORIZATION, equalTo(BEARER_OIDC_TOKEN))
-                .willReturn(aResponse().withStatus(HttpStatus.OK
-                        .value())
-                        .withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
-                        .withBodyFile("aktoerregister/aktoerregisterHentIdentForAktoerFeilmelding.json")));
+        postPdlGraphql(PDL_IDENT_NOT_FOUND, OK.value());
 
         sendStringMessage(qdist013, classpathToString("qdist013/qdist013-happy.xml"));
 
@@ -574,9 +558,7 @@ class Qdist013ForAltinnIT {
         verifyGetSecurityToken(1 + 1);
         verifyPostSafJournalpost();
         verifyPostSafJournalpostLightweight(1);
-        verify(1, getRequestedFor(urlEqualTo("/aktoerregister/identer?gjeldende=true&identgruppe=NorskIdent"))
-                .withHeader("Nav-Personidenter", equalTo("1000045110509"))
-                .withHeader(AUTHORIZATION, equalTo(BEARER_OIDC_TOKEN)));
+        verify(1, postRequestedFor(urlEqualTo("/pdl")));
     }
 
     @Test
@@ -585,13 +567,7 @@ class Qdist013ForAltinnIT {
         stubGetSecurityToken();
         stubPostSafJournalpost("queryJournalpostId\":\"123\"", "saf/safQdist013GraphQlResponse-aktoerId.json");
         stubPostSafJournalpost("queryJournalpostId\":\"448212366\"", "saf/safLightweightGraphQlResponse-happy.json");
-        stubFor(get("/aktoerregister/identer?gjeldende=true&identgruppe=NorskIdent")
-                .withHeader("Nav-Personidenter", equalTo("1000045110509"))
-                .withHeader(AUTHORIZATION, equalTo(BEARER_OIDC_TOKEN))
-                .willReturn(aResponse().withStatus(HttpStatus.OK
-                        .value())
-                        .withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
-                        .withBodyFile("aktoerregister/aktoerregisterHentIdentForAktoerIngenIdent.json")));
+        postPdlGraphql(PDL_FORNAVN_NULL, OK.value());
 
         sendStringMessage(qdist013, classpathToString("qdist013/qdist013-happy.xml"));
 
@@ -603,21 +579,37 @@ class Qdist013ForAltinnIT {
         verifyGetSecurityToken(2);
         verifyPostSafJournalpost();
         verifyPostSafJournalpostLightweight(1);
-        verify(1, getRequestedFor(urlEqualTo("/aktoerregister/identer?gjeldende=true&identgruppe=NorskIdent"))
-                .withHeader("Nav-Personidenter", equalTo("1000045110509"))
-                .withHeader(AUTHORIZATION, equalTo(BEARER_OIDC_TOKEN)));
+        verify(1, postRequestedFor(urlEqualTo("/pdl")));
     }
 
     @Test
-    void shouldThrowAktoerHentIdentForAktoerIdTechnicalException() {
+    void shouldThrowFunctinalExceptionWhenPDLHentPersonWithNullFornavn() {
         stubGetForsendelse("__files/rjoark001/getForsendelse-happy.json");
         stubGetSecurityToken();
         stubPostSafJournalpost("queryJournalpostId\":\"123\"", "saf/safQdist013GraphQlResponse-aktoerId.json");
         stubPostSafJournalpost("queryJournalpostId\":\"448212366\"", "saf/safLightweightGraphQlResponse-happy.json");
-        stubFor(get("/aktoerregister/identer?gjeldende=true&identgruppe=NorskIdent")
-                .withHeader("Nav-Personidenter", equalTo("1000045110509"))
-                .withHeader(AUTHORIZATION, equalTo(BEARER_OIDC_TOKEN))
-                .willReturn(aResponse().withStatus(HttpStatus.INTERNAL_SERVER_ERROR.value())));
+        postPdlGraphql(PDL_FORNAVN_NULL, OK.value());
+
+        sendStringMessage(qdist013, classpathToString("qdist013/qdist013-happy.xml"));
+
+        await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
+            assertMessageOnQueue(qdist013FunksjonellFeil);
+        });
+
+        verifyGetForsendelse();
+        verifyGetSecurityToken(2);
+        verifyPostSafJournalpost();
+        verifyPostSafJournalpostLightweight(1);
+    }
+
+
+    @Test
+    void shouldThrowPDLHentPersonTechnicalException() {
+        stubGetForsendelse("__files/rjoark001/getForsendelse-happy.json");
+        stubGetSecurityToken();
+        stubPostSafJournalpost("queryJournalpostId\":\"123\"", "saf/safQdist013GraphQlResponse-aktoerId.json");
+        stubPostSafJournalpost("queryJournalpostId\":\"448212366\"", "saf/safLightweightGraphQlResponse-happy.json");
+        postPdlGraphql(PDL_PERSONNAVN_HAPPY, INTERNAL_SERVER_ERROR.value());
 
         sendStringMessage(qdist013, classpathToString("qdist013/qdist013-happy.xml"));
 
@@ -626,12 +618,9 @@ class Qdist013ForAltinnIT {
         });
 
         verifyGetForsendelse();
-        verifyGetSecurityToken(1 + MAX_ATTEMPTS_SHORT);
+        verifyGetSecurityToken(2);
         verifyPostSafJournalpost();
         verifyPostSafJournalpostLightweight(1);
-        verify(MAX_ATTEMPTS_SHORT, getRequestedFor(urlEqualTo("/aktoerregister/identer?gjeldende=true&identgruppe=NorskIdent"))
-                .withHeader("Nav-Personidenter", equalTo("1000045110509"))
-                .withHeader(AUTHORIZATION, equalTo(BEARER_OIDC_TOKEN)));
     }
 
     @Test
@@ -655,9 +644,7 @@ class Qdist013ForAltinnIT {
         verifyGetSecurityToken(1 + 1);
         verifyPostSafJournalpost();
         verifyPostSafJournalpostLightweight(1);
-        verify(1, getRequestedFor(urlEqualTo("/tps/v1/navn"))
-                .withHeader("Nav-Personident", equalTo("01010012345"))
-                .withHeader(AUTHORIZATION, equalTo(BEARER_OIDC_TOKEN)));
+        verify(1, postRequestedFor(urlEqualTo("/pdl")));
     }
 
     @Test
@@ -666,10 +653,7 @@ class Qdist013ForAltinnIT {
         stubGetSecurityToken();
         stubPostSafJournalpost("queryJournalpostId\":\"123\"", "saf/safQdist013GraphQlResponse-fnr.json");
         stubPostSafJournalpost("queryJournalpostId\":\"448212366\"", "saf/safLightweightGraphQlResponse-happy.json");
-        stubFor(get("/tps/v1/navn")
-                .withHeader("Nav-Personident", equalTo("01010012345"))
-                .withHeader(AUTHORIZATION, equalTo(BEARER_OIDC_TOKEN))
-                .willReturn(aResponse().withStatus(HttpStatus.INTERNAL_SERVER_ERROR.value())));
+        postPdlGraphql(PDL_PERSONNAVN_HAPPY, INTERNAL_SERVER_ERROR.value());
 
         sendStringMessage(qdist013, classpathToString("qdist013/qdist013-happy.xml"));
 
@@ -678,12 +662,9 @@ class Qdist013ForAltinnIT {
         });
 
         verifyGetForsendelse();
-        verifyGetSecurityToken(1 + MAX_ATTEMPTS_SHORT);
+        verifyGetSecurityToken(3 + MAX_ATTEMPTS_SHORT);
         verifyPostSafJournalpost();
         verifyPostSafJournalpostLightweight(1);
-        verify(MAX_ATTEMPTS_SHORT, getRequestedFor(urlEqualTo("/tps/v1/navn"))
-                .withHeader("Nav-Personident", equalTo("01010012345"))
-                .withHeader(AUTHORIZATION, equalTo(BEARER_OIDC_TOKEN)));
     }
 
     @Test
@@ -701,7 +682,7 @@ class Qdist013ForAltinnIT {
             assertMessageOnQueue(qdist013FunksjonellFeil);
         });
 
-        verifyGetForsendelse();
+        verifyGetForsendelse(1);
         verifyGetSecurityToken(1);
         verifyPostSafJournalpost();
         verifyPostSafJournalpostLightweight(1);
@@ -715,7 +696,7 @@ class Qdist013ForAltinnIT {
         stubPostSafJournalpost("queryJournalpostId\":\"123\"", "saf/safQdist013GraphQlResponse-orgnr.json");
         stubPostSafJournalpost("queryJournalpostId\":\"448212366\"", "saf/safLightweightGraphQlResponse-happy.json");
         String nullStr = null;
-        stubFor(get("/ereg/v1/organisasjon/" + "123456789" + "/noekkelinfo").willReturn(aResponse().withStatus(HttpStatus.OK.value())
+        stubFor(get("/ereg/v1/organisasjon/" + "123456789" + "/noekkelinfo").willReturn(aResponse().withStatus(OK.value())
                 .withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
                 .withBody(nullStr)));
 
@@ -738,7 +719,7 @@ class Qdist013ForAltinnIT {
         stubGetSecurityToken();
         stubPostSafJournalpost("queryJournalpostId\":\"123\"", "saf/safQdist013GraphQlResponse-orgnr.json");
         stubPostSafJournalpost("queryJournalpostId\":\"448212366\"", "saf/safLightweightGraphQlResponse-happy.json");
-        stubFor(get("/ereg/v1/organisasjon/" + "123456789" + "/noekkelinfo").willReturn(aResponse().withStatus(HttpStatus.OK.value())
+        stubFor(get("/ereg/v1/organisasjon/" + "123456789" + "/noekkelinfo").willReturn(aResponse().withStatus(OK.value())
                 .withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
                 .withBodyFile("ereg/eregHentNavn_manglerNavn.json")));
 
@@ -762,7 +743,7 @@ class Qdist013ForAltinnIT {
         stubPostSafJournalpost("queryJournalpostId\":\"123\"", "saf/safQdist013GraphQlResponse-orgnr.json");
         stubPostSafJournalpost("queryJournalpostId\":\"448212366\"", "saf/safLightweightGraphQlResponse-happy.json");
         stubFor(get("/ereg/v1/organisasjon/" + "123456789" + "/noekkelinfo")
-                .willReturn(aResponse().withStatus(HttpStatus.INTERNAL_SERVER_ERROR.value())));
+                .willReturn(aResponse().withStatus(INTERNAL_SERVER_ERROR.value())));
 
         sendStringMessage(qdist013, classpathToString("qdist013/qdist013-happy.xml"));
 
@@ -790,7 +771,7 @@ class Qdist013ForAltinnIT {
         stubGetServiceRegistry();
         stubPostIntiateBrokerService();
         stubFor(post(urlMatching("brokerserviceexternalstreamed/upload"))
-                .willReturn(aResponse().withStatus(HttpStatus.INTERNAL_SERVER_ERROR.value())));
+                .willReturn(aResponse().withStatus(INTERNAL_SERVER_ERROR.value())));
 
         sendStringMessage(qdist013, classpathToString("qdist013/qdist013-happy.xml"));
 
@@ -818,7 +799,7 @@ class Qdist013ForAltinnIT {
         stubGetEregHentOrgNavn("123456789");
         stubPostMaskinporten();
         stubFor(get(urlMatching("/serviceregistry/identifier/" + TRYGDERETTEN_ORGNUMMER + "/process/" + EformidlingConstants.AVTALTMELDING_PROCESS))
-                .willReturn(aResponse().withStatus(HttpStatus.INTERNAL_SERVER_ERROR.value())
+                .willReturn(aResponse().withStatus(INTERNAL_SERVER_ERROR.value())
                         .withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE)));
 
         sendStringMessage(qdist013, classpathToString("qdist013/qdist013-happy.xml"));
@@ -848,7 +829,7 @@ class Qdist013ForAltinnIT {
         stubGetServiceRegistry();
 
         stubFor(post(urlMatching("/brokerserviceexternal"))
-                .willReturn(aResponse().withStatus(HttpStatus.INTERNAL_SERVER_ERROR.value())
+                .willReturn(aResponse().withStatus(INTERNAL_SERVER_ERROR.value())
                         .withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_XML_VALUE)));
 
         sendStringMessage(qdist013, classpathToString("qdist013/qdist013-happy.xml"));
@@ -915,7 +896,7 @@ class Qdist013ForAltinnIT {
         stubPostIntiateBrokerService();
         stubUploadBrokerServiceStreamed();
         stubFor(post(urlMatching("/juridisklogg.*"))
-                .willReturn(aResponse().withStatus(HttpStatus.INTERNAL_SERVER_ERROR.value())));
+                .willReturn(aResponse().withStatus(INTERNAL_SERVER_ERROR.value())));
 
         sendStringMessage(qdist013, classpathToString("qdist013/qdist013-happy.xml"));
 
@@ -986,7 +967,7 @@ class Qdist013ForAltinnIT {
         stubUploadBrokerServiceStreamed();
         stubPostJuridiskLoggLagre();
         stubFor(put(urlMatching("/administrerforsendelse\\?forsendelseId=" + FORSENDELSE_ID + "\\&forsendelseStatus=OVERSENDT\\&konversasjonsId=.*"))
-                .willReturn(aResponse().withStatus(HttpStatus.INTERNAL_SERVER_ERROR.value())));
+                .willReturn(aResponse().withStatus(INTERNAL_SERVER_ERROR.value())));
 
         sendStringMessage(qdist013, classpathToString("qdist013/qdist013-happy.xml"));
 
@@ -1003,14 +984,14 @@ class Qdist013ForAltinnIT {
 
         verifyPostJuridiskLoggLagre();
         String conversationId = findConversationId();
-        verify(MAX_ATTEMPTS_SHORT, putRequestedFor(urlEqualTo("/administrerforsendelse?forsendelseId=" + FORSENDELSE_ID +
+        verify(3, putRequestedFor(urlEqualTo("/administrerforsendelse?forsendelseId=" + FORSENDELSE_ID +
                 "&forsendelseStatus=OVERSENDT&konversasjonsId=" + conversationId)));
     }
 
     @Test
     void shouldThrowRdist001HentForsendelseTechnicalException() {
         stubFor(get("/administrerforsendelse/" + FORSENDELSE_ID)
-                .willReturn(aResponse().withStatus(HttpStatus.INTERNAL_SERVER_ERROR.value())));
+                .willReturn(aResponse().withStatus(INTERNAL_SERVER_ERROR.value())));
 
         sendStringMessage(qdist013, classpathToString("qdist013/qdist013-happy.xml"));
 
@@ -1018,7 +999,7 @@ class Qdist013ForAltinnIT {
             assertMessageOnQueue(backoutQueue);
         });
 
-        verify(MAX_ATTEMPTS_SHORT, getRequestedFor(urlEqualTo("/administrerforsendelse/" + FORSENDELSE_ID)));
+        verify(3, getRequestedFor(urlEqualTo("/administrerforsendelse/" + FORSENDELSE_ID)));
     }
 
     @Test
@@ -1061,7 +1042,7 @@ class Qdist013ForAltinnIT {
         if (!isNullOrEmpty(orgnr)) {
             verifyGetEregHentOrgNavn(orgnr);
         } else {
-            verifyGetTpsHentPersonNavn(fnr);
+            verifyPostPDLHentPersonNavn();
         }
         if (!isNullOrEmpty(aktoerId)) {
             verifyGetAktoerregisterHentIdentForAktoerId(aktoerId);
@@ -1074,7 +1055,7 @@ class Qdist013ForAltinnIT {
     }
 
 
-    private void verifyAllStubs(String orgnr, String fnr, String aktoerId, int stsCount) {
+    private void verifyAllStubs(String orgnr, int stsCount, int pdlCount) {
         verifyGetForsendelse();
         verifyGetSecurityToken(stsCount);
         verifyPostSafJournalpost();
@@ -1082,12 +1063,8 @@ class Qdist013ForAltinnIT {
         if (!isNullOrEmpty(orgnr)) {
             verifyGetEregHentOrgNavn(orgnr);
         } else {
-            verifyGetTpsHentPersonNavn(fnr);
+            verifyPostPDLHentPersonNavn(pdlCount);
         }
-        if (!isNullOrEmpty(aktoerId)) {
-            verifyGetAktoerregisterHentIdentForAktoerId(aktoerId);
-        }
-
         verifyPostMaskinporten();
         verifyGetServiceRegistry();
         verifyPostIntiateBrokerService();
@@ -1099,7 +1076,7 @@ class Qdist013ForAltinnIT {
 
     }
 
-    private void verifyAllStubs(String orgnr, String fnr, String aktoerId, int stsCount, int safCount) {
+    private void verifyAllStubs(String orgnr, int stsCount, int safCount, int pdlCount) {
         verifyGetForsendelse();
         verifyGetSecurityToken(stsCount);
         verifyPostSafJournalpost();
@@ -1107,12 +1084,8 @@ class Qdist013ForAltinnIT {
         if (!isNullOrEmpty(orgnr)) {
             verifyGetEregHentOrgNavn(orgnr);
         } else {
-            verifyGetTpsHentPersonNavn(fnr);
+            verifyPostPDLHentPersonNavn(pdlCount);
         }
-        if (!isNullOrEmpty(aktoerId)) {
-            verifyGetAktoerregisterHentIdentForAktoerId(aktoerId);
-        }
-
         verifyPostMaskinporten();
         verifyGetServiceRegistry();
         verifyPostIntiateBrokerService();
@@ -1124,7 +1097,7 @@ class Qdist013ForAltinnIT {
 
     }
 
-    private void verifyIntiateBrokerServiceStubs(String orgnr, String fnr, String aktoerId, int stsCount, int safCount, int akoterCount) {
+    private void verifyIntiateBrokerServiceStubs(String orgnr, String fnr, String aktoerId, int stsCount, int safCount, int akoterCount, int pdlCount) {
         verifyGetForsendelse();
         verifyGetSecurityToken(stsCount);
         verifyPostSafJournalpost();
@@ -1132,10 +1105,7 @@ class Qdist013ForAltinnIT {
         if (!isNullOrEmpty(orgnr)) {
             verifyGetEregHentOrgNavn(orgnr);
         } else {
-            verifyGetTpsHentPersonNavn(fnr);
-        }
-        if (!isNullOrEmpty(aktoerId)) {
-            verifyGetAktoerregisterHentIdentForAktoerId(aktoerId, akoterCount);
+            verifyPostPDLHentPersonNavn(pdlCount);
         }
 
         verifyPostMaskinporten();
@@ -1144,11 +1114,12 @@ class Qdist013ForAltinnIT {
 
     }
 
+    private void verifyPostPDLHentPersonNavn(int count) {
+        verify(count, postRequestedFor(urlEqualTo("/pdl")));
+    }
 
-    private void verifyGetTpsHentPersonNavn(String fnr) {
-        verify(1, getRequestedFor(urlEqualTo("/tps/v1/navn"))
-                .withHeader("Nav-Personident", equalTo(fnr))
-                .withHeader(AUTHORIZATION, equalTo(BEARER_OIDC_TOKEN)));
+    private void verifyPostPDLHentPersonNavn() {
+        verify(1, postRequestedFor(urlEqualTo("/pdl")));
     }
 
     private void verifyGetAktoerregisterHentIdentForAktoerId(String aktoerId) {
@@ -1181,6 +1152,10 @@ class Qdist013ForAltinnIT {
 
     private void verifyGetForsendelse() {
         verify(1, getRequestedFor(urlMatching("/administrerforsendelse/" + FORSENDELSE_ID)));
+    }
+
+    private void verifyGetForsendelse(int count) {
+        verify(count, getRequestedFor(urlMatching("/administrerforsendelse/" + FORSENDELSE_ID)));
     }
 
     private void verifyGetSecurityToken(int stsCount) {
@@ -1246,14 +1221,14 @@ class Qdist013ForAltinnIT {
 
     private void stubPostIntiateBrokerService() {
         stubFor(post(urlMatching("/brokerserviceexternal"))
-                .willReturn(aResponse().withStatus(HttpStatus.OK.value())
+                .willReturn(aResponse().withStatus(OK.value())
                         .withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_XML_VALUE)
                         .withBody(classpathToString("__files/altinn/brokerserviceinit_happy_response.xml").replace("localurl", brokerserviceexternalUrl))));
     }
 
     private void stubUploadBrokerServiceStreamed() {
         stubFor(post(urlMatching("/brokerserviceexternalstreamed/upload"))
-                .willReturn(aResponse().withStatus(HttpStatus.OK.value())
+                .willReturn(aResponse().withStatus(OK.value())
                         .withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_XML_VALUE)
                         .withBody(classpathToString("__files/altinn/brokerserviceupload_happy_response.xml"))));
     }
@@ -1262,7 +1237,7 @@ class Qdist013ForAltinnIT {
         stubFor(get("/tps/v1/navn")
                 .withHeader("Nav-Personident", equalTo(fnr))
                 .withHeader(AUTHORIZATION, equalTo(BEARER_OIDC_TOKEN))
-                .willReturn(aResponse().withStatus(HttpStatus.OK.value())
+                .willReturn(aResponse().withStatus(OK.value())
                         .withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
                         .withBodyFile("tps/tpsHentNavn_happy.json")));
     }
@@ -1271,7 +1246,7 @@ class Qdist013ForAltinnIT {
         stubFor(get("/aktoerregister/identer?gjeldende=true&identgruppe=NorskIdent")
                 .withHeader("Nav-Personidenter", equalTo(aktoerId))
                 .withHeader(AUTHORIZATION, equalTo(BEARER_OIDC_TOKEN))
-                .willReturn(aResponse().withStatus(HttpStatus.OK
+                .willReturn(aResponse().withStatus(OK
                         .value())
                         .withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
                         .withBodyFile("aktoerregister/aktoerregisterHentIdentForAktoerHappy.json")));
@@ -1279,29 +1254,29 @@ class Qdist013ForAltinnIT {
 
     private void stubPostJuridiskLoggLagre() {
         stubFor(post(urlMatching("/juridisklogg.*"))
-                .willReturn(aResponse().withStatus(HttpStatus.OK.value())));
+                .willReturn(aResponse().withStatus(OK.value())));
     }
 
     private void stubPutAdministrerforsendelseOppdatertForsendelsestatusAndkonvId() {
         stubFor(put(urlMatching("/administrerforsendelse\\?forsendelseId=" + FORSENDELSE_ID + "\\&forsendelseStatus=OVERSENDT\\&konversasjonsId=.*"))
-                .willReturn(aResponse().withStatus(HttpStatus.OK.value())));
+                .willReturn(aResponse().withStatus(OK.value())));
     }
 
     private void stubGetEregHentOrgNavn(String orgnr) {
-        stubFor(get("/ereg/v1/organisasjon/" + orgnr + "/noekkelinfo").willReturn(aResponse().withStatus(HttpStatus.OK.value())
+        stubFor(get("/ereg/v1/organisasjon/" + orgnr + "/noekkelinfo").willReturn(aResponse().withStatus(OK.value())
                 .withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
                 .withBodyFile("ereg/eregHentNavn_happy.json")));
     }
 
     public static void stubGetServiceRegistry() {
         stubFor(get(urlMatching("/serviceregistry/identifier/" + TRYGDERETTEN_ORGNUMMER + "/process/" + EformidlingConstants.AVTALTMELDING_PROCESS))
-                .willReturn(aResponse().withStatus(HttpStatus.OK.value())
+                .willReturn(aResponse().withStatus(OK.value())
                         .withHeader(org.springframework.http.HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                         .withBody(classpathToString("__files/serviceregistry/serviceregistry_happy_response.json"))));
     }
 
     private void stubGetSecurityToken() {
-        stubFor(get("/securitytoken?grant_type=client_credentials&scope=openid").willReturn(aResponse().withStatus(HttpStatus.OK
+        stubFor(get("/securitytoken?grant_type=client_credentials&scope=openid").willReturn(aResponse().withStatus(OK
                 .value())
                 .withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
                 .withBodyFile("securitytoken/stsResponse_happy.json")));
@@ -1310,23 +1285,31 @@ class Qdist013ForAltinnIT {
     private void stubPostMaskinporten() {
 
         stubFor(post(urlMatching("/maskinporten"))
-                .willReturn(aResponse().withStatus(HttpStatus.OK.value())
+                .willReturn(aResponse().withStatus(OK.value())
                         .withHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                         .withBody(classpathToString("__files/maskinporten/maskinporten_happy_response.json"))));
 
     }
 
     private void stubGetForsendelse(String responsebody) {
-        stubFor(get("/administrerforsendelse/" + FORSENDELSE_ID).willReturn(aResponse().withStatus(HttpStatus.OK.value())
+        stubFor(get("/administrerforsendelse/" + FORSENDELSE_ID).willReturn(aResponse().withStatus(OK.value())
                 .withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE)
                 .withBody(classpathToString(responsebody).replace("insertCallIdHere", CALL_ID))));
     }
 
+    public static void postPdlGraphql(String filePath, int status) {
+        stubFor(post(urlMatching("/pdl"))
+                .willReturn(aResponse().withStatus(status)
+                        .withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
+                        .withBodyFile(filePath)));
+    }
+
+
     private void stubPostSafJournalpost(String stringInRequestBody, String returnBodyFileName) {
         stubFor(post(urlMatching("/safgraphql"))
                 .withRequestBody(containing(stringInRequestBody))
-                .willReturn(aResponse().withStatus(HttpStatus.OK.value())
-                        .withHeader(org.springframework.http.HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_UTF8_VALUE)
+                .willReturn(aResponse().withStatus(OK.value())
+                        .withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
                         .withBodyFile(returnBodyFileName)));
     }
 

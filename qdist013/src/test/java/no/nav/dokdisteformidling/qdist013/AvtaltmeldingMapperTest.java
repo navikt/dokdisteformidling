@@ -11,6 +11,8 @@ import no.arkivverket.standarder.noark5.arkivmelding.Registrering;
 import no.arkivverket.standarder.noark5.arkivmelding.Saksmappe;
 import no.nav.dokdisteformidling.consumer.aktoerregister.Aktoerregister;
 import no.nav.dokdisteformidling.consumer.ereg.Ereg;
+import no.nav.dokdisteformidling.consumer.pdl.HentPersonInfo;
+import no.nav.dokdisteformidling.consumer.pdl.PdlGraphQLConsumer;
 import no.nav.dokdisteformidling.consumer.saf.SafJournalpostQueryService;
 import no.nav.dokdisteformidling.consumer.tps.Tps;
 import no.nav.dokdisteformidling.qdist013.saf.lightweight.LightweightSafJournalpostQdist013;
@@ -60,6 +62,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -70,744 +73,752 @@ import static org.mockito.Mockito.when;
  */
 class AvtaltmeldingMapperTest {
 
-    private static final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS");
-    private static final String BESTILLINGS_ID = "bestillingsId";
-    private static final String JOURNALPOST_ID = "987654321";
-
-    private static final String ARKIV_SAKNUMMER = "111111";
-    private static final LocalDateTime DATO_OPPRETTET_SAK = LocalDateTime.now();
-    private static final LocalDateTime DATO_OPPRETTET_JOURNALPOST = LocalDateTime.now().minusDays(1);
-    private static final LocalDateTime DATO_JOURNALFOERT = LocalDateTime.now().minusDays(2);
-    private static final String OPPRETTET_AV_NAVN = "opprettetAvNavn";
-    private static final String BRUKER_ID_FNR = "brukerIdFnr";
-    private static final String BRUKER_TYPE_FNR = "FNR";
-    private static final String BRUKER_ID_ORGNR = "brukerIdOrgNr";
-    private static final String BRUKER_TYPE_ORGNR = "ORGNR";
-    private static final String BRUKER_ID_AKTOER_ID = "aktoerId";
-    private static final String BRUKER_TYPE_AKTOER_ID = "AKTOERID";
-    private static final String TITTEL = "tittel";
-    private static final String JOURNALFOERT_AV_NAVN = "journalfoertAvNavn";
-    private static final String TEMA_NAVN = "temaNavn";
-    private static final String OPPRETTET_AV_UKJENT = "UKJENT";
-
-    private static final String DOKUMENT_INFO_ID_HOVEDDOK = "1234567";
-    private static final String TITTEL_HOVEDDOK = "tittelHoveddok";
-
-    private static final String DOKUMENT_INFO_ID_VEDLEGG = "7654321";
-    private static final String TITTEL_VEDLEGG = "tittelVedlegg";
-    private static final String ORIGINAL_JPID_VEDLEGG = "1111111111";
-
-    private static final String DOKUMENT_INFO_ID_VEDLEGG_2 = "9876543";
-
-    private static final String FNR_FOR_AKTOER_ID = "222222222";
-    private static final String EREG_NAVN = "ereg_navn";
-    private static final String TPS_NAVN = "tps_navn";
-
-    private static final String AVSENDER_MOTTAKER_NAVN_ORIG_JP = "avsenderMottakerNavnOrigJp";
-    private static final String JOURNALFOERT_AV_NAVN_ORIG_JP = "ajournalfoertAvNavnOrigJp";
-    private static final LocalDateTime DATO_JOURNALFOERT_ORIG_JP = LocalDateTime.now().minusDays(5);
-
-    private static final String FILTYPE_PNG = "PNG";
-    private static final String FILTYPE_JPEG = "JPEG";
-    private static final String FILTYPE_PDF = "PDF";
-    private static final String FILTYPE_PDFA = "PDF/A";
-
-
-    private Aktoerregister aktoerregisterMock;
-    private Ereg eregMock;
-    private Tps tpsMock;
-    private SafJournalpostQueryService safJournalpostQueryServiceMock;
-    private AvtaltmeldingMapper avtaltmeldingMapper;
-
-    @BeforeEach
-    public void setUp() {
-        aktoerregisterMock = mock(Aktoerregister.class);
-        eregMock = mock(Ereg.class);
-        tpsMock = mock(Tps.class);
-        safJournalpostQueryServiceMock = mock(SafJournalpostQueryService.class);
-        avtaltmeldingMapper = new AvtaltmeldingMapper(safJournalpostQueryServiceMock, aktoerregisterMock, eregMock, tpsMock);
-    }
-
-    @Test
-    @DisplayName("Asserts all fields")
-    void fullHappyPath() {
-        when(tpsMock.hentNavn(any(String.class))).thenReturn(TPS_NAVN);
-        JAXBElement<Arkivmelding> arkivmeldingJAXBElement = avtaltmeldingMapper.createArkivMelding(createJournalpostQdist013Builder()
-                .build(), BESTILLINGS_ID);
-
-        assertThat(arkivmeldingJAXBElement, notNullValue());
-        Arkivmelding arkivmelding = arkivmeldingJAXBElement.getValue();
-        assertArkivmelding(arkivmelding);
-
-        verify(tpsMock, times(1)).hentNavn(BRUKER_ID_FNR);
-        verify(eregMock, times(0)).hentNavn(any(String.class));
-
-    }
-
-    @Test
-    @DisplayName("Case when bruker is organisasjon. Should get name from Ereg")
-    void happyPathBrukerIsOrgansisasjon() {
-        when(eregMock.hentNavn(any(String.class))).thenReturn(EREG_NAVN);
-
-        JournalpostQdist013 journalpostQdist013 = createJournalpostQdist013Builder()
-                .bruker(JournalpostQdist013.Bruker.builder()
-                        .id(BRUKER_ID_ORGNR)
-                        .type(BRUKER_TYPE_ORGNR)
-                        .build())
-                .build();
-
-        JAXBElement<Arkivmelding> arkivmeldingJAXBElement = avtaltmeldingMapper.createArkivMelding(journalpostQdist013, BESTILLINGS_ID);
-        Arkivmelding arkivmelding = arkivmeldingJAXBElement.getValue();
-        List<Mappe> mappeList = arkivmelding.getMappe();
-        Saksmappe saksmappe = (Saksmappe) mappeList.get(0);
-        Part sakspartDAP = saksmappe.getPart().get(1);
-
-        assertEquals(EREG_NAVN, sakspartDAP.getPartNavn());
-        assertEquals(SAKSPART_ROLLE_DAP, sakspartDAP.getPartRolle());
-        assertNull(sakspartDAP.getKontaktperson());
-
-        verify(eregMock, times(1)).hentNavn(BRUKER_ID_ORGNR);
-        verify(tpsMock, times(0)).hentNavn(any(String.class));
-        verify(safJournalpostQueryServiceMock, times(0)).hentJournalpost(any(String.class));
-
-    }
-
-    @Test
-    @DisplayName("Case when bruker is aktoer. Should get fnr from aktoerregister")
-    void happyPathBrukerIsAktoer() {
-        when(aktoerregisterMock.hentIdentForAktoerId(any(String.class))).thenReturn(FNR_FOR_AKTOER_ID);
-        when(tpsMock.hentNavn(any(String.class))).thenReturn(TPS_NAVN);
-
-        JournalpostQdist013 journalpostQdist013 = createJournalpostQdist013Builder()
-                .bruker(JournalpostQdist013.Bruker.builder()
-                        .id(BRUKER_ID_AKTOER_ID)
-                        .type(BRUKER_TYPE_AKTOER_ID)
-                        .build())
-                .build();
-
-        JAXBElement<Arkivmelding> arkivmeldingJAXBElement = avtaltmeldingMapper.createArkivMelding(journalpostQdist013, BESTILLINGS_ID);
-        Arkivmelding arkivmelding = arkivmeldingJAXBElement.getValue();
-        List<Mappe> mappeList = arkivmelding.getMappe();
-        Saksmappe saksmappe = (Saksmappe) mappeList.get(0);
-        Part sakspartDAP = saksmappe.getPart().get(1);
-
-        assertEquals(TPS_NAVN, sakspartDAP.getPartNavn());
-        assertEquals(SAKSPART_ROLLE_DAP, sakspartDAP.getPartRolle());
-        assertNull(sakspartDAP.getKontaktperson());
-
-        verify(aktoerregisterMock, times(2)).hentIdentForAktoerId(BRUKER_ID_AKTOER_ID);
-        verify(tpsMock, times(1)).hentNavn(FNR_FOR_AKTOER_ID);
-        verify(eregMock, times(0)).hentNavn(any(String.class));
-        verify(safJournalpostQueryServiceMock, times(0)).hentJournalpost(any(String.class));
-    }
-
-    @Test
-    @DisplayName("Case for satt originalJournalPostId men ukjent datoJournal")
-    void shouldMapOpprettetDatoWhenNullDatoJournalISafJournalpostgetJournalfortAndVedleggHasOriginalJpId() {
-        JournalpostQdist013 journalpostQdist013 = createJournalpostQdist013Builder()
-                .journalposttype(INNGAAENDE)
-                .dokumenter(Arrays.asList(createHoveddokumentBuilder().build(),
-                        createVedleggBuilderUtenDato().build()))
-                .build();
-
-        JAXBElement<Arkivmelding> arkivmeldingJAXBElement = avtaltmeldingMapper.createArkivMelding(journalpostQdist013, BESTILLINGS_ID);
-        Arkivmelding arkivmelding = arkivmeldingJAXBElement.getValue();
-        List<Mappe> mappeList = arkivmelding.getMappe();
-        Saksmappe saksmappe = (Saksmappe) mappeList.get(0);
-        Journalpost registreringJp = (Journalpost) saksmappe.getRegistrering().get(0);
-        Dokumentbeskrivelse dokumentbeskrivelse = (Dokumentbeskrivelse) registreringJp.getDokumentbeskrivelse()
-                .get(1);
-
-        assertEquals(TITTEL_VEDLEGG, dokumentbeskrivelse.getTittel());
-
-        verify(safJournalpostQueryServiceMock, times(0)).hentJournalpost(ORIGINAL_JPID_VEDLEGG);
-    }
-
-    @Test
-    @DisplayName("Case when journalposttype is inngaaende and vedlegg has original jpId. Should make a custom dokumenttittel")
-    void happyPathTestTittelWhenJpIsInngaaendeAndVedleggHasOriginalJpId() {
-        when(safJournalpostQueryServiceMock.hentJournalpost(ORIGINAL_JPID_VEDLEGG)).thenReturn(createLightweightSafJournalpostQdist013());
-
-        JournalpostQdist013 journalpostQdist013 = createJournalpostQdist013Builder()
-                .journalposttype(INNGAAENDE)
-                .dokumenter(Arrays.asList(createHoveddokumentBuilder().build(),
-                        createVedleggBuilder().originalJournalpostId(ORIGINAL_JPID_VEDLEGG).build()))
-                .build();
-
-        JAXBElement<Arkivmelding> arkivmeldingJAXBElement = avtaltmeldingMapper.createArkivMelding(journalpostQdist013, BESTILLINGS_ID);
-        Arkivmelding arkivmelding = arkivmeldingJAXBElement.getValue();
-        List<Mappe> mappeList = arkivmelding.getMappe();
-        Saksmappe saksmappe = (Saksmappe) mappeList.get(0);
-        Journalpost registreringJp = (Journalpost) saksmappe.getRegistrering().get(0);
-        Dokumentbeskrivelse dokumentbeskrivelse = (Dokumentbeskrivelse) registreringJp.getDokumentbeskrivelse()
-                .get(1);
-
-        assertEquals(dokumentbeskrivelse.getTittel(), TITTEL_VEDLEGG + ", Til " + AVSENDER_MOTTAKER_NAVN_ORIG_JP);
-
-        verify(safJournalpostQueryServiceMock, times(18)).hentJournalpost(ORIGINAL_JPID_VEDLEGG);
-    }
-
-    @Test
-    @DisplayName("Case when journalposttype is utgaaende and vedlegg has original jpId. Should make a custom dokumenttittel")
-    void happyPathTestTittelWhenJpIsUtgaaendeAndVedleggHasOriginalJpId() {
-        when(safJournalpostQueryServiceMock.hentJournalpost(ORIGINAL_JPID_VEDLEGG)).thenReturn(createLightweightSafJournalpostQdist013());
-
-        JournalpostQdist013 journalpostQdist013 = createJournalpostQdist013Builder()
-                .journalposttype(UTGAAENDE)
-                .dokumenter(Arrays.asList(createHoveddokumentBuilder().build(),
-                        createVedleggBuilder().originalJournalpostId(ORIGINAL_JPID_VEDLEGG).build()))
-                .build();
-
-        JAXBElement<Arkivmelding> arkivmeldingJAXBElement = avtaltmeldingMapper.createArkivMelding(journalpostQdist013, BESTILLINGS_ID);
-        Arkivmelding arkivmelding = arkivmeldingJAXBElement.getValue();
-        List<Mappe> mappeList = arkivmelding.getMappe();
-        Saksmappe saksmappe = (Saksmappe) mappeList.get(0);
-        Journalpost registreringJp = (Journalpost) saksmappe.getRegistrering().get(0);
-        Dokumentbeskrivelse dokumentbeskrivelse = (Dokumentbeskrivelse) registreringJp.getDokumentbeskrivelse()
-                .get(1);
-
-        assertEquals(dokumentbeskrivelse.getTittel(), TITTEL_VEDLEGG + ", Til " + AVSENDER_MOTTAKER_NAVN_ORIG_JP);
-
-        verify(safJournalpostQueryServiceMock, times(18)).hentJournalpost(ORIGINAL_JPID_VEDLEGG);
-    }
-
-    @Test
-    @DisplayName("Case when journalposttype is notat and vedlegg has original jpId. Should not make a custom dokumenttittel")
-    void happyPathTestTittelWhenJpIsNotatAndVedleggHasOriginalJpId() {
-        when(safJournalpostQueryServiceMock.hentJournalpost(ORIGINAL_JPID_VEDLEGG)).thenReturn(createLightweightSafJournalpostQdist013());
-
-        JournalpostQdist013 journalpostQdist013 = createJournalpostQdist013Builder()
-                .journalposttype("Notat")
-                .dokumenter(Arrays.asList(createHoveddokumentBuilder().build(),
-                        createVedleggBuilder().originalJournalpostId(ORIGINAL_JPID_VEDLEGG).build()))
-                .build();
-
-        JAXBElement<Arkivmelding> arkivmeldingJAXBElement = avtaltmeldingMapper.createArkivMelding(journalpostQdist013, BESTILLINGS_ID);
-        Arkivmelding arkivmelding = arkivmeldingJAXBElement.getValue();
-        List<Mappe> mappeList = arkivmelding.getMappe();
-        Saksmappe saksmappe = (Saksmappe) mappeList.get(0);
-        Journalpost registreringJp = (Journalpost) saksmappe.getRegistrering().get(0);
-        Dokumentbeskrivelse dokumentbeskrivelse = (Dokumentbeskrivelse) registreringJp.getDokumentbeskrivelse()
-                .get(1);
-
-        assertEquals(dokumentbeskrivelse.getTittel(), TITTEL_VEDLEGG + ", Til " + AVSENDER_MOTTAKER_NAVN_ORIG_JP);
-
-        verify(safJournalpostQueryServiceMock, times(18)).hentJournalpost(ORIGINAL_JPID_VEDLEGG);
-    }
-
-    @Test
-    @DisplayName("Case when vedlegg has original jpId. Should get opprettet dato from original journalpost")
-    void happyPathTestOpprettetDatoWhenVedleggHasOriginalJpId() {
-        when(safJournalpostQueryServiceMock.hentJournalpost(ORIGINAL_JPID_VEDLEGG)).thenReturn(createLightweightSafJournalpostQdist013());
-
-        JournalpostQdist013 journalpostQdist013 = createJournalpostQdist013Builder()
-                .dokumenter(Arrays.asList(createHoveddokumentBuilder().build(),
-                        createVedleggBuilder().originalJournalpostId(ORIGINAL_JPID_VEDLEGG).build()))
-                .build();
-
-        JAXBElement<Arkivmelding> arkivmeldingJAXBElement = avtaltmeldingMapper.createArkivMelding(journalpostQdist013, BESTILLINGS_ID);
-        Arkivmelding arkivmelding = arkivmeldingJAXBElement.getValue();
-        List<Mappe> mappeList = arkivmelding.getMappe();
-        Saksmappe saksmappe = (Saksmappe) mappeList.get(0);
-        Journalpost registreringJp = (Journalpost) saksmappe.getRegistrering().get(0);
-
-        Dokumentbeskrivelse dokumentbeskrivelseHoveddok = registreringJp.getDokumentbeskrivelse()
-                .get(0);
-        Dokumentobjekt dokumentobjektHoveddok = dokumentbeskrivelseHoveddok.getDokumentobjekt().get(0);
-        Dokumentbeskrivelse dokumentbeskrivelseVedlegg = registreringJp.getDokumentbeskrivelse()
-                .get(1);
-        Dokumentobjekt dokumentobjektVedlegg = dokumentbeskrivelseVedlegg.getDokumentobjekt().get(0);
-
-        assertEquals(convertFromXmlGregorianCalendarToLocalDateTime(dokumentbeskrivelseHoveddok.getOpprettetDato()).toString(), DATO_JOURNALFOERT.format(dateTimeFormatter));
-        assertEquals(convertFromXmlGregorianCalendarToLocalDateTime(dokumentobjektHoveddok.getOpprettetDato()).toString(), DATO_JOURNALFOERT.format(dateTimeFormatter));
-        assertEquals(convertFromXmlGregorianCalendarToLocalDateTime(dokumentbeskrivelseVedlegg.getOpprettetDato()).toString(), DATO_JOURNALFOERT_ORIG_JP.format(dateTimeFormatter));
-        assertEquals(convertFromXmlGregorianCalendarToLocalDateTime(dokumentobjektVedlegg.getOpprettetDato()).toString(), DATO_JOURNALFOERT_ORIG_JP.format(dateTimeFormatter));
-
-        verify(safJournalpostQueryServiceMock, times(18)).hentJournalpost(ORIGINAL_JPID_VEDLEGG);
-    }
-
-    @Test
-    @DisplayName("Case when vedlegg has original jpId. Should get opprettet av from original journalpost")
-    void happyPathTestOpprettetAvWhenVedleggHasOriginalJpId() {
-        when(safJournalpostQueryServiceMock.hentJournalpost(ORIGINAL_JPID_VEDLEGG)).thenReturn(createLightweightSafJournalpostQdist013());
-
-        JournalpostQdist013 journalpostQdist013 = createJournalpostQdist013Builder()
-                .dokumenter(Arrays.asList(createHoveddokumentBuilder().build(),
-                        createVedleggBuilder().originalJournalpostId(ORIGINAL_JPID_VEDLEGG).build()))
-                .build();
-
-        JAXBElement<Arkivmelding> arkivmeldingJAXBElement = avtaltmeldingMapper.createArkivMelding(journalpostQdist013, BESTILLINGS_ID);
-        Arkivmelding arkivmelding = arkivmeldingJAXBElement.getValue();
-        List<Mappe> mappeList = arkivmelding.getMappe();
-        Saksmappe saksmappe = (Saksmappe) mappeList.get(0);
-        Journalpost registreringJp = (Journalpost) saksmappe.getRegistrering().get(0);
-
-        Dokumentbeskrivelse dokumentbeskrivelseHoveddok = (Dokumentbeskrivelse) registreringJp.getDokumentbeskrivelse()
-                .get(0);
-        Dokumentobjekt dokumentobjektHoveddok = dokumentbeskrivelseHoveddok.getDokumentobjekt().get(0);
-        Dokumentbeskrivelse dokumentbeskrivelseVedlegg = (Dokumentbeskrivelse) registreringJp.getDokumentbeskrivelse()
-                .get(1);
-        Dokumentobjekt dokumentobjektVedlegg = dokumentbeskrivelseVedlegg.getDokumentobjekt().get(0);
-
-        assertEquals(JOURNALFOERT_AV_NAVN, dokumentbeskrivelseHoveddok.getOpprettetAv());
-        assertEquals(JOURNALFOERT_AV_NAVN, dokumentobjektHoveddok.getOpprettetAv());
-        assertEquals(JOURNALFOERT_AV_NAVN_ORIG_JP, dokumentbeskrivelseVedlegg.getOpprettetAv());
-        assertEquals(JOURNALFOERT_AV_NAVN_ORIG_JP, dokumentobjektVedlegg.getOpprettetAv());
-
-        verify(safJournalpostQueryServiceMock, times(18)).hentJournalpost(ORIGINAL_JPID_VEDLEGG);
-    }
-
-    @Test
-    @DisplayName("Case when dokument does not have variantformat SLADDET (variantformat is ARKIV) and filtype is not PNG or JPEG. Should set variantformat to Produksjonsformat")
-    void happyPathTestNoSladdetVariantAndFiltypeNotPngOrJPEG() {
-        when(safJournalpostQueryServiceMock.hentJournalpost(ORIGINAL_JPID_VEDLEGG)).thenReturn(createLightweightSafJournalpostQdist013());
-
-        JournalpostQdist013 journalpostQdist013 = createJournalpostQdist013Builder()
-                .dokumenter(Collections.singletonList(createHoveddokumentBuilder()
-                        .dokumentvarianter(Arrays.asList(JournalpostQdist013.DokumentInfo.Dokumentvariant.builder()
-                                        .variantformat(VARIANTFORMAT_ARKIV)
-                                        .filtype(FILTYPE_PDFA)
-                                        .build(),
-                                JournalpostQdist013.DokumentInfo.Dokumentvariant.builder()
-                                        .variantformat(VARIANTFORMAT_PRODUKSJON)
-                                        .filtype(FILTYPE_PDF)
-                                        .build()))
-                        .build()))
-                .build();
-
-        JAXBElement<Arkivmelding> arkivmeldingJAXBElement = avtaltmeldingMapper.createArkivMelding(journalpostQdist013, BESTILLINGS_ID);
-        Arkivmelding arkivmelding = arkivmeldingJAXBElement.getValue();
-        List<Mappe> mappeList = arkivmelding.getMappe();
-        Saksmappe saksmappe = (Saksmappe) mappeList.get(0);
-        Journalpost registreringJp = (Journalpost) saksmappe.getRegistrering().get(0);
-
-        Dokumentbeskrivelse dokumentbeskrivelseHoveddok = (Dokumentbeskrivelse) registreringJp.getDokumentbeskrivelse()
-                .get(0);
-        Dokumentobjekt dokumentobjektHoveddok = dokumentbeskrivelseHoveddok.getDokumentobjekt().get(0);
-
-        assertEquals(PRODUKSJONSFORMAT, dokumentobjektHoveddok.getVariantformat());
-        assertTrue(dokumentobjektHoveddok.getReferanseDokumentfil().contains(PRODUKSJONSFORMAT));
-    }
-
-    @Test
-    @DisplayName("Case when dokument does not have variantformat SLADDET (variantformat is ARKIV) and filtype is PNG. Should set variantformat to Arkivformat")
-    void happyPathTestNoSladdetVariantAndFiltypeIsPng() {
-        when(safJournalpostQueryServiceMock.hentJournalpost(ORIGINAL_JPID_VEDLEGG)).thenReturn(createLightweightSafJournalpostQdist013());
-
-        JournalpostQdist013 journalpostQdist013 = createJournalpostQdist013Builder()
-                .dokumenter(Collections.singletonList(createHoveddokumentBuilder()
-                        .dokumentvarianter(Arrays.asList(JournalpostQdist013.DokumentInfo.Dokumentvariant.builder()
-                                        .variantformat(VARIANTFORMAT_ARKIV)
-                                        .filtype(FILTYPE_PNG)
-                                        .build(),
-                                JournalpostQdist013.DokumentInfo.Dokumentvariant.builder()
-                                        .variantformat(VARIANTFORMAT_PRODUKSJON)
-                                        .filtype(FILTYPE_PDF)
-                                        .build()))
-                        .build()))
-                .build();
-
-        JAXBElement<Arkivmelding> arkivmeldingJAXBElement = avtaltmeldingMapper.createArkivMelding(journalpostQdist013, BESTILLINGS_ID);
-        Arkivmelding arkivmelding = arkivmeldingJAXBElement.getValue();
-        List<Mappe> mappeList = arkivmelding.getMappe();
-        Saksmappe saksmappe = (Saksmappe) mappeList.get(0);
-        Journalpost registreringJp = (Journalpost) saksmappe.getRegistrering().get(0);
-
-        Dokumentbeskrivelse dokumentbeskrivelseHoveddok = registreringJp.getDokumentbeskrivelse()
-                .get(0);
-        Dokumentobjekt dokumentobjektHoveddok = dokumentbeskrivelseHoveddok.getDokumentobjekt().get(0);
-
-        assertEquals(ARKIVFORMAT, dokumentobjektHoveddok.getVariantformat());
-        assertTrue(dokumentobjektHoveddok.getReferanseDokumentfil().contains(ARKIVFORMAT));
-    }
-
-    @Test
-    @DisplayName("Case when dokument does not have variantformat SLADDET (variantformat is ARKIV) and filtype is JPEG. Should set variantformat to Arkivformat")
-    void happyPathTestNoSladdetVariantAndFiltypeIsJPEG() {
-        when(safJournalpostQueryServiceMock.hentJournalpost(ORIGINAL_JPID_VEDLEGG)).thenReturn(createLightweightSafJournalpostQdist013());
-
-        JournalpostQdist013 journalpostQdist013 = createJournalpostQdist013Builder()
-                .dokumenter(Collections.singletonList(createHoveddokumentBuilder()
-                        .dokumentvarianter(Arrays.asList(JournalpostQdist013.DokumentInfo.Dokumentvariant.builder()
-                                        .variantformat(VARIANTFORMAT_ARKIV)
-                                        .filtype(FILTYPE_JPEG)
-                                        .build(),
-                                JournalpostQdist013.DokumentInfo.Dokumentvariant.builder()
-                                        .variantformat(VARIANTFORMAT_PRODUKSJON)
-                                        .filtype(FILTYPE_PDF)
-                                        .build()))
-                        .build()))
-                .build();
-
-        JAXBElement<Arkivmelding> arkivmeldingJAXBElement = avtaltmeldingMapper.createArkivMelding(journalpostQdist013, BESTILLINGS_ID);
-        Arkivmelding arkivmelding = arkivmeldingJAXBElement.getValue();
-        List<Mappe> mappeList = arkivmelding.getMappe();
-        Saksmappe saksmappe = (Saksmappe) mappeList.get(0);
-        Journalpost registreringJp = (Journalpost) saksmappe.getRegistrering().get(0);
-
-        Dokumentbeskrivelse dokumentbeskrivelseHoveddok = (Dokumentbeskrivelse) registreringJp.getDokumentbeskrivelse()
-                .get(0);
-        Dokumentobjekt dokumentobjektHoveddok = dokumentbeskrivelseHoveddok.getDokumentobjekt().get(0);
-
-        assertEquals(ARKIVFORMAT, dokumentobjektHoveddok.getVariantformat());
-        assertTrue(dokumentobjektHoveddok.getReferanseDokumentfil().contains(ARKIVFORMAT));
-    }
-
-    @Test
-    @DisplayName("Case when vedlegg has no dokumentstatus set. That vedlegg should be considered FERDIGSTILT.")
-    void happyPathVedleggFerdigstiltUtenStatus() {
-        JournalpostQdist013 journalpostQdist013 = createJournalpostQdist013Builder()
-                .dokumenter(Arrays.asList(createHoveddokumentBuilder().build(),
-                        createVedleggBuilder().dokumentstatus(null).build()))
-                .build();
-
-        JAXBElement<Arkivmelding> arkivmeldingJAXBElement = avtaltmeldingMapper.createArkivMelding(journalpostQdist013, BESTILLINGS_ID);
-        Arkivmelding arkivmelding = arkivmeldingJAXBElement.getValue();
-        List<Mappe> mappeList = arkivmelding.getMappe();
-        Saksmappe saksmappe = (Saksmappe) mappeList.get(0);
-        Journalpost registreringJp = (Journalpost) saksmappe.getRegistrering().get(0);
-
-        assertEquals(2, arkivmelding.getAntallFiler());
-        assertDokumentbeskrivelseOpprettetAv(registreringJp.getDokumentbeskrivelse());
-    }
-
-    @Test
-    @DisplayName("Case when vedlegg does not have dokumentstatus FERDIGSTILT. That vedlegg should not be mapped.")
-    void happyPathIkkeFerdigstiltVedlegg() {
-        when(safJournalpostQueryServiceMock.hentJournalpost(ORIGINAL_JPID_VEDLEGG)).thenReturn(createLightweightSafJournalpostQdist013());
-        JournalpostQdist013 journalpostQdist013 = createJournalpostQdist013Builder()
-                .dokumenter(Arrays.asList(createHoveddokumentBuilder().build(),
-                        createVedleggBuilder().dokumentInfoId(DOKUMENT_INFO_ID_VEDLEGG_2)
-                                .dokumentstatus("UNDER_REDIGERING")
-                                .build(),
-                        createVedleggBuilder().build()))
-                .build();
-
-        JAXBElement<Arkivmelding> arkivmeldingJAXBElement = avtaltmeldingMapper.createArkivMelding(journalpostQdist013, BESTILLINGS_ID);
-        Arkivmelding arkivmelding = arkivmeldingJAXBElement.getValue();
-        List<Mappe> mappeList = arkivmelding.getMappe();
-        Saksmappe saksmappe = (Saksmappe) mappeList.get(0);
-        Journalpost registreringJp = (Journalpost) saksmappe.getRegistrering().get(0);
-
-        assertEquals(2, arkivmelding.getAntallFiler());
-        assertDokumentbeskrivelseOpprettetAv(registreringJp.getDokumentbeskrivelse());
-    }
-
-    @Test
-    @DisplayName("Case for satt originalJournalPostId men ukjent journalfører")
-    void assertUkjentVedsafJournalpostgetJournalfortAvNavnErNull() {
-        when(safJournalpostQueryServiceMock.hentJournalpost(ORIGINAL_JPID_VEDLEGG)).thenReturn(createLightweightSafJournalpostQdist013NoJournalFoertAv());
-
-        JournalpostQdist013 journalpostQdist013 = createJournalpostQdist013BuilderNoJournalFoertAv()
-                .dokumenter(Arrays.asList(createHoveddokumentBuilder().build(),
-                        createVedleggBuilder().originalJournalpostId(ORIGINAL_JPID_VEDLEGG).build()))
-                .build();
-
-        JAXBElement<Arkivmelding> arkivmeldingJAXBElement = avtaltmeldingMapper.createArkivMelding(journalpostQdist013, BESTILLINGS_ID);
-        Arkivmelding arkivmelding = arkivmeldingJAXBElement.getValue();
-        List<Mappe> mappeList = arkivmelding.getMappe();
-        Saksmappe saksmappe = (Saksmappe) mappeList.get(0);
-        Journalpost registreringJp = (Journalpost) saksmappe.getRegistrering().get(0);
-
-        Dokumentbeskrivelse dokumentBeskrivelseVedlegg = registreringJp.getDokumentbeskrivelse()
-                .get(1);
-        Dokumentobjekt dokumentVedlegg = dokumentBeskrivelseVedlegg.getDokumentobjekt().get(0);
-
-        assertEquals(UKJENT, dokumentVedlegg.getOpprettetAv());
-    }
-
-    private void assertArkivmelding(Arkivmelding arkivmelding) {
-        assertNotNull(arkivmelding);
-        assertEquals(APP_NAME, arkivmelding.getSystem());
-        assertEquals(BESTILLINGS_ID, arkivmelding.getMeldingId());
-        assertNotNull(arkivmelding.getTidspunkt());
-        assertEquals(2,arkivmelding.getAntallFiler());
-        assertMappe(arkivmelding.getMappe());
-    }
-
-    private void assertMappe(List<Mappe> mappeList) {
-        assertTrue(mappeList != null && mappeList.size() == 1);
-        assertTrue(mappeList.get(0) instanceof Saksmappe);
-        Saksmappe saksmappe = (Saksmappe) mappeList.get(0);
-
-        assertEquals(TEMA_NAVN, saksmappe.getTittel());
-        assertEquals(convertFromXmlGregorianCalendarToLocalDateTime(saksmappe.getOpprettetDato()).toString(), DATO_OPPRETTET_SAK.format(dateTimeFormatter));
-        assertEquals(OPPRETTET_AV_NAVN, saksmappe.getOpprettetAv());
-        assertRegistrering(saksmappe.getRegistrering());
-        assertEquals(convertFromXmlGregorianCalendarToLocalDateTime(saksmappe.getSaksdato()).toString(), DATO_OPPRETTET_SAK.format(dateTimeFormatter));
-        assertEquals(NAV_KLAGEINSTANS, saksmappe.getAdministrativEnhet());
-        assertEquals(OPPRETTET_AV_NAVN, saksmappe.getSaksansvarlig());
-        assertEquals(UNDER_BEHANDLING, saksmappe.getSaksstatus());
-        assertSakspart(saksmappe.getPart());
-
-    }
-
-    private void assertRegistrering(List<Registrering> registreringList) {
-        assertTrue(registreringList != null && registreringList.size() == 1);
-        assertTrue(registreringList.get(0) instanceof Journalpost);
-
-        Journalpost registreringJp = (Journalpost) registreringList.get(0);
-        assertEquals(convertFromXmlGregorianCalendarToLocalDateTime(registreringJp.getOpprettetDato()).toString(), DATO_OPPRETTET_JOURNALPOST.format(dateTimeFormatter));
-        assertEquals(OPPRETTET_AV_NAVN, registreringJp.getOpprettetAv());
-        assertDokumentbeskrivelseOpprettetAv(registreringJp.getDokumentbeskrivelse());
-        assertEquals(TITTEL, registreringJp.getTittel());
-        assertEquals(UTGAAENDE_DOKUMENT, registreringJp.getJournalposttype());
-        assertEquals(EKSPEDERT, registreringJp.getJournalstatus());
-        assertEquals(convertFromXmlGregorianCalendarToLocalDateTime(registreringJp.getJournaldato()).toString(), DATO_JOURNALFOERT.format(dateTimeFormatter));
-        assertKorrespondanseparter(registreringJp.getKorrespondansepart());
-    }
-
-    private void assertKorrespondanseparter(List<Korrespondansepart> korrespondansepartList) {
-        assertTrue(korrespondansepartList != null && korrespondansepartList.size() == 2);
-
-        Korrespondansepart mottaker = korrespondansepartList.get(0);
-        assertEquals(MOTTAKER, mottaker.getKorrespondanseparttype());
-        assertEquals(TRYGDERETTEN, mottaker.getKorrespondansepartNavn());
-
-        Korrespondansepart avsender = korrespondansepartList.get(1);
-        assertEquals(AVSENDER, avsender.getKorrespondanseparttype());
-        assertEquals(NAV_KLAGEINSTANS, avsender.getKorrespondansepartNavn());
-    }
-
-    private void assertSakspart(List<Part> sakspartList) {
-        assertTrue(sakspartList != null && sakspartList.size() == 2);
-
-        Part sakspartAMP = sakspartList.get(0);
-        assertNull(sakspartAMP.getPartID());
-        assertEquals(NAV_KLAGEINSTANS, sakspartAMP.getPartNavn());
-        assertEquals(SAKSPART_ROLLE_AMP, sakspartAMP.getPartRolle());
-        assertEquals(OPPRETTET_AV_NAVN, sakspartAMP.getKontaktperson());
-
-        Part sakspartDAP = sakspartList.get(1);
-        assertEquals(TPS_NAVN, sakspartDAP.getPartNavn());
-        assertEquals(SAKSPART_ROLLE_DAP, sakspartDAP.getPartRolle());
-        assertNull(sakspartDAP.getKontaktperson());
-    }
-
-
-    private void assertDokumentbeskrivelse(List<Dokumentbeskrivelse> dokumentbeskrivelseList) {
-        assertTrue(dokumentbeskrivelseList != null && dokumentbeskrivelseList.size() == 2);
-
-        assertNotNull(dokumentbeskrivelseList.get(0));
-        Dokumentbeskrivelse dokumentbeskrivelseHoveddok = dokumentbeskrivelseList.get(0);
-        assertEquals(AvtaltmeldingConstant.HOVEDDOKUMENT, dokumentbeskrivelseHoveddok.getTilknyttetRegistreringSom());
-        assertEquals(BigInteger.ONE, dokumentbeskrivelseHoveddok.getDokumentnummer());
-        assertCommonAttributesDokumentbeskrivelse(dokumentbeskrivelseHoveddok);
-        assertEquals(TITTEL_HOVEDDOK, dokumentbeskrivelseHoveddok.getTittel());
-        assertEquals(DATO_JOURNALFOERT, convertFromXmlGregorianCalendarToLocalDateTime(dokumentbeskrivelseHoveddok.getOpprettetDato()));
-
-
-        assertDokumentobjektHoveddokument(dokumentbeskrivelseHoveddok.getDokumentobjekt());
-
-        assertNotNull(dokumentbeskrivelseList.get(1));
-        Dokumentbeskrivelse dokumentbeskrivelseVedlegg = dokumentbeskrivelseList.get(1);
-        assertEquals(VEDLEGG, dokumentbeskrivelseVedlegg.getTilknyttetRegistreringSom());
-        assertEquals(dokumentbeskrivelseVedlegg.getDokumentnummer(), BigInteger.valueOf(2));
-        assertCommonAttributesVedleggDokumentbeskrivelse(dokumentbeskrivelseVedlegg);
-        assertEquals(TITTEL_VEDLEGG, dokumentbeskrivelseVedlegg.getTittel());
-        assertEquals(DATO_JOURNALFOERT, convertFromXmlGregorianCalendarToLocalDateTime(dokumentbeskrivelseVedlegg.getOpprettetDato()));
-
-        assertDokumentobjektVedlegg(dokumentbeskrivelseVedlegg.getDokumentobjekt());
-    }
-
-    private void assertDokumentbeskrivelseOpprettetAv(List<Dokumentbeskrivelse> dokumentbeskrivelseList) {
-        assertTrue(dokumentbeskrivelseList != null && dokumentbeskrivelseList.size() == 2);
-
-        assertNotNull(dokumentbeskrivelseList.get(0));
-        Dokumentbeskrivelse dokumentbeskrivelseHoveddok = (Dokumentbeskrivelse) dokumentbeskrivelseList.get(0);
-        assertEquals(AvtaltmeldingConstant.HOVEDDOKUMENT, dokumentbeskrivelseHoveddok.getTilknyttetRegistreringSom());
-        assertEquals(BigInteger.ONE, dokumentbeskrivelseHoveddok.getDokumentnummer());
-        assertCommonAttributesVedleggDokumentbeskrivelseOpprettetAv(dokumentbeskrivelseHoveddok);
-        assertEquals(TITTEL_HOVEDDOK, dokumentbeskrivelseHoveddok.getTittel());
-        assertEquals(convertFromXmlGregorianCalendarToLocalDateTime(dokumentbeskrivelseHoveddok.getOpprettetDato()).toString(), DATO_JOURNALFOERT.format(dateTimeFormatter));
-
-
-        assertDokumentobjektHoveddokument(dokumentbeskrivelseHoveddok.getDokumentobjekt());
-
-        assertNotNull(dokumentbeskrivelseList.get(1));
-        Dokumentbeskrivelse dokumentbeskrivelseVedlegg = dokumentbeskrivelseList.get(1);
-        assertEquals(VEDLEGG, dokumentbeskrivelseVedlegg.getTilknyttetRegistreringSom());
-        assertEquals(dokumentbeskrivelseVedlegg.getDokumentnummer(), BigInteger.valueOf(2));
-        assertCommonAttributesVedleggDokumentbeskrivelseOpprettetAv(dokumentbeskrivelseVedlegg);
-        assertEquals(TITTEL_VEDLEGG, dokumentbeskrivelseVedlegg.getTittel());
-        assertEquals(convertFromXmlGregorianCalendarToLocalDateTime(dokumentbeskrivelseVedlegg.getOpprettetDato()).toString(), DATO_JOURNALFOERT.format(dateTimeFormatter));
-
-        assertDokumentobjektVedlegg(dokumentbeskrivelseVedlegg.getDokumentobjekt());
-    }
-
-
-    private void assertDokumentobjektHoveddokument(List<Dokumentobjekt> dokumentobjektList) {
-        assertTrue(dokumentobjektList != null && dokumentobjektList.size() == 1);
-        Dokumentobjekt dokumentobjektHoveddok = dokumentobjektList.get(0);
-        assertEquals(BigInteger.ONE, dokumentobjektHoveddok.getVersjonsnummer());
-        assertEquals(DOKUMENT_HVOR_DELER_AV_INNHOLDET_ER_SKJERMET, dokumentobjektHoveddok.getVariantformat());
-        assertEquals(convertFromXmlGregorianCalendarToLocalDateTime(dokumentobjektHoveddok.getOpprettetDato()).toString(), DATO_JOURNALFOERT.format(dateTimeFormatter));
-        assertEquals(JOURNALFOERT_AV_NAVN, dokumentobjektHoveddok.getOpprettetAv());
-        assertEquals(dokumentobjektHoveddok.getReferanseDokumentfil(), JOURNALPOST_ID + "-" + DOKUMENT_INFO_ID_HOVEDDOK + "-" + DOKUMENT_HVOR_DELER_AV_INNHOLDET_ER_SKJERMET + "-" + FILTYPE_PDF);
-    }
-
-
-    private void assertDokumentobjektVedlegg(List<Dokumentobjekt> dokumentobjektList) {
-        assertTrue(dokumentobjektList != null && dokumentobjektList.size() == 1);
-        Dokumentobjekt dokumentobjektVedlegg = dokumentobjektList.get(0);
-        assertEquals(BigInteger.ONE, dokumentobjektVedlegg.getVersjonsnummer());
-        assertEquals(ARKIVFORMAT, dokumentobjektVedlegg.getVariantformat());
-        assertEquals(convertFromXmlGregorianCalendarToLocalDateTime(dokumentobjektVedlegg.getOpprettetDato()).toString(), DATO_JOURNALFOERT.format(dateTimeFormatter));
-        assertEquals(JOURNALFOERT_AV_NAVN, dokumentobjektVedlegg.getOpprettetAv());
-        assertEquals(dokumentobjektVedlegg.getReferanseDokumentfil(), JOURNALPOST_ID + "-" + DOKUMENT_INFO_ID_VEDLEGG + "-" + ARKIVFORMAT + "-" + FILTYPE_JPEG);
-    }
-
-    private void assertCommonAttributesDokumentbeskrivelse(Dokumentbeskrivelse dokumentbeskrivelse) {
-        assertEquals(DOKUMENTASJON, dokumentbeskrivelse.getDokumenttype());
-        assertEquals(DOKUMENTET_ER_FERDIGSTILT, dokumentbeskrivelse.getDokumentstatus());
-        assertEquals(JOURNALFOERT_AV_NAVN, dokumentbeskrivelse.getOpprettetAv());
-        assertNotNull(dokumentbeskrivelse.getTilknyttetDato());
-        assertEquals(JOURNALFOERT_AV_NAVN, dokumentbeskrivelse.getTilknyttetAv());
-    }
-
-    private void assertCommonAttributesVedleggDokumentbeskrivelse(Dokumentbeskrivelse dokumentbeskrivelse) {
-        assertEquals(DOKUMENTASJON, dokumentbeskrivelse.getDokumenttype());
-        assertEquals(DOKUMENTET_ER_FERDIGSTILT, dokumentbeskrivelse.getDokumentstatus());
-        assertEquals(AVSENDER_MOTTAKER_NAVN_ORIG_JP, dokumentbeskrivelse.getOpprettetAv());
-        assertNotNull(dokumentbeskrivelse.getTilknyttetDato());
-        assertEquals(JOURNALFOERT_AV_NAVN, dokumentbeskrivelse.getTilknyttetAv());
-    }
-
-    private void assertCommonAttributesVedleggDokumentbeskrivelseOpprettetAv(Dokumentbeskrivelse dokumentbeskrivelse) {
-        assertEquals(DOKUMENTASJON, dokumentbeskrivelse.getDokumenttype());
-        assertEquals(DOKUMENTET_ER_FERDIGSTILT, dokumentbeskrivelse.getDokumentstatus());
-        assertEquals(JOURNALFOERT_AV_NAVN, dokumentbeskrivelse.getOpprettetAv());
-        assertNotNull(dokumentbeskrivelse.getTilknyttetDato());
-        assertEquals(JOURNALFOERT_AV_NAVN, dokumentbeskrivelse.getTilknyttetAv());
-    }
-
-    private JournalpostQdist013.JournalpostQdist013Builder createJournalpostQdist013Builder() {
-        return JournalpostQdist013.builder()
-                .journalpostId(JOURNALPOST_ID)
-                .sak(JournalpostQdist013.Sak.builder()
-                        .arkivsaksnummer(ARKIV_SAKNUMMER)
-                        .datoOpprettet(DATO_OPPRETTET_SAK)
-                        .build())
-                .opprettetAvNavn(OPPRETTET_AV_NAVN)
-                .bruker(JournalpostQdist013.Bruker.builder()
-                        .id(BRUKER_ID_FNR)
-                        .type(BRUKER_TYPE_FNR)
-                        .build())
-                .datoOpprettet(DATO_OPPRETTET_JOURNALPOST)
-                .tittel(TITTEL)
-                .journalfortAvNavn(JOURNALFOERT_AV_NAVN)
-                .temanavn(TEMA_NAVN)
-                .journalposttype(UTGAAENDE)
-                .relevanteDatoer(Collections.singletonList(JournalpostQdist013.RelevantDato.builder()
-                        .datotype(JournalpostQdist013.Datotype.DATO_JOURNALFOERT)
-                        .dato(DATO_JOURNALFOERT)
-                        .build()))
-                .dokumenter(Arrays.asList(createHoveddokumentBuilder().build(), createVedleggBuilder().build()
-                ));
-    }
-
-    private JournalpostQdist013.JournalpostQdist013Builder createJournalpostQdist013BuilderNoJournalFoertAv() {
-        return JournalpostQdist013.builder()
-                .journalpostId(JOURNALPOST_ID)
-                .sak(JournalpostQdist013.Sak.builder()
-                        .arkivsaksnummer(ARKIV_SAKNUMMER)
-                        .datoOpprettet(DATO_OPPRETTET_SAK)
-                        .build())
-                .opprettetAvNavn(OPPRETTET_AV_NAVN)
-                .bruker(JournalpostQdist013.Bruker.builder()
-                        .id(BRUKER_ID_FNR)
-                        .type(BRUKER_TYPE_FNR)
-                        .build())
-                .datoOpprettet(DATO_OPPRETTET_JOURNALPOST)
-                .tittel(TITTEL)
-                .temanavn(TEMA_NAVN)
-                .journalposttype(UTGAAENDE)
-                .relevanteDatoer(Collections.singletonList(JournalpostQdist013.RelevantDato.builder()
-                        .datotype(JournalpostQdist013.Datotype.DATO_JOURNALFOERT)
-                        .dato(DATO_JOURNALFOERT)
-                        .build()))
-                .dokumenter(Arrays.asList(createHoveddokumentBuilder().build(), createVedleggBuilder().build()
-                ));
-    }
-
-    private JournalpostQdist013.DokumentInfo.DokumentInfoBuilder createHoveddokumentBuilder() {
-        return JournalpostQdist013.DokumentInfo.builder()
-                .dokumentInfoId(DOKUMENT_INFO_ID_HOVEDDOK)
-                .dokumentstatus(FERDIGSTILT)
-                .tittel(TITTEL_HOVEDDOK)
-                .originalJournalpostId(null)
-                .dokumentvarianter(Arrays.asList(JournalpostQdist013.DokumentInfo.Dokumentvariant.builder()
-                                .variantformat(VARIANTFORMAT_ARKIV)
-                                .filtype(FILTYPE_PNG)
-                                .build(),
-                        JournalpostQdist013.DokumentInfo.Dokumentvariant.builder()
-                                .variantformat(VARIANTFORMAT_SLADDET)
-                                .filtype(FILTYPE_PDF)
-                                .build()));
-    }
-
-    private JournalpostQdist013.DokumentInfo.DokumentInfoBuilder createVedleggBuilderUtenDato() {
-        return JournalpostQdist013.DokumentInfo.builder()
-                .dokumentInfoId(DOKUMENT_INFO_ID_VEDLEGG)
-                .dokumentstatus(FERDIGSTILT)
-                .tittel(TITTEL_VEDLEGG)
-                .originalJournalpostId(null)
-                .dokumentvarianter(Arrays.asList(JournalpostQdist013.DokumentInfo.Dokumentvariant.builder()
-                                .variantformat(VARIANTFORMAT_ARKIV)
-                                .filtype(FILTYPE_JPEG)
-                                .build(),
-                        JournalpostQdist013.DokumentInfo.Dokumentvariant.builder()
-                                .variantformat(VARIANTFORMAT_PRODUKSJON)
-                                .filtype(FILTYPE_PDF)
-                                .build()));
-    }
-
-    private JournalpostQdist013.DokumentInfo.DokumentInfoBuilder createVedleggBuilder() {
-        return JournalpostQdist013.DokumentInfo.builder()
-                .dokumentInfoId(DOKUMENT_INFO_ID_VEDLEGG)
-                .dokumentstatus(FERDIGSTILT)
-                .tittel(TITTEL_VEDLEGG)
-                .originalJournalpostId(null)
-                .dokumentvarianter(Arrays.asList(JournalpostQdist013.DokumentInfo.Dokumentvariant.builder()
-                                .variantformat(VARIANTFORMAT_ARKIV)
-                                .filtype(FILTYPE_JPEG)
-                                .build(),
-                        JournalpostQdist013.DokumentInfo.Dokumentvariant.builder()
-                                .variantformat(VARIANTFORMAT_PRODUKSJON)
-                                .filtype(FILTYPE_PDF)
-                                .build()));
-    }
-
-    private LightweightSafJournalpostQdist013 createLightweightSafJournalpostQdist013() {
-        return LightweightSafJournalpostQdist013.builder()
-                .avsenderMottakerNavn(AVSENDER_MOTTAKER_NAVN_ORIG_JP)
-                .journalposttype(UTGAAENDE)
-                .journalfortAvNavn(JOURNALFOERT_AV_NAVN_ORIG_JP)
-                .datoJournalfoert(DATO_JOURNALFOERT_ORIG_JP)
-                .build();
-    }
-
-    private LightweightSafJournalpostQdist013 createLightweightSafJournalpostQdist013NoDatoJournal() {
-        return LightweightSafJournalpostQdist013.builder()
-                .avsenderMottakerNavn(AVSENDER_MOTTAKER_NAVN_ORIG_JP)
-                .journalfortAvNavn(JOURNALFOERT_AV_NAVN_ORIG_JP)
-                .datoJournalfoert(LocalDateTime.now().minusHours(5))
-                .build();
-    }
-
-    private LightweightSafJournalpostQdist013 createLightweightSafJournalpostQdist013NoJournalFoertAv() {
-        return LightweightSafJournalpostQdist013.builder()
-                .avsenderMottakerNavn(AVSENDER_MOTTAKER_NAVN_ORIG_JP)
-                .datoJournalfoert(DATO_JOURNALFOERT_ORIG_JP)
-                .build();
-    }
-
-    private boolean isUuid(String uuidCandidate) {
-        try {
-            UUID.fromString(uuidCandidate);
-            return true;
-        } catch (IllegalArgumentException e) {
-            return false;
-        }
-    }
+	private static final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS");
+	private static final String BESTILLINGS_ID = "bestillingsId";
+	private static final String JOURNALPOST_ID = "987654321";
+
+	private static final String ARKIV_SAKNUMMER = "111111";
+	private static final LocalDateTime DATO_OPPRETTET_SAK = LocalDateTime.now();
+	private static final LocalDateTime DATO_OPPRETTET_JOURNALPOST = LocalDateTime.now().minusDays(1);
+	private static final LocalDateTime DATO_JOURNALFOERT = LocalDateTime.now().minusDays(2);
+	private static final String OPPRETTET_AV_NAVN = "opprettetAvNavn";
+	private static final String BRUKER_ID_FNR = "20026900817";
+	private static final String BRUKER_TYPE_FNR = "FNR";
+	private static final String BRUKER_ID_ORGNR = "brukerIdOrgNr";
+	private static final String BRUKER_TYPE_ORGNR = "ORGNR";
+	private static final String BRUKER_ID_AKTOER_ID = "aktoerId";
+	private static final String BRUKER_TYPE_AKTOER_ID = "AKTOERID";
+	private static final String TITTEL = "tittel";
+	private static final String JOURNALFOERT_AV_NAVN = "journalfoertAvNavn";
+	private static final String TEMA_NAVN = "temaNavn";
+	private static final String OPPRETTET_AV_UKJENT = "UKJENT";
+
+	private static final String DOKUMENT_INFO_ID_HOVEDDOK = "1234567";
+	private static final String TITTEL_HOVEDDOK = "tittelHoveddok";
+
+	private static final String DOKUMENT_INFO_ID_VEDLEGG = "7654321";
+	private static final String TITTEL_VEDLEGG = "tittelVedlegg";
+	private static final String ORIGINAL_JPID_VEDLEGG = "1111111111";
+
+	private static final String DOKUMENT_INFO_ID_VEDLEGG_2 = "9876543";
+
+	private static final String FNR_FOR_AKTOER_ID = "222222222";
+	private static final String EREG_NAVN = "ereg_navn";
+	private static final String PDL_NAVN = "pdl_navn";
+
+	private static final String AVSENDER_MOTTAKER_NAVN_ORIG_JP = "avsenderMottakerNavnOrigJp";
+	private static final String JOURNALFOERT_AV_NAVN_ORIG_JP = "ajournalfoertAvNavnOrigJp";
+	private static final LocalDateTime DATO_JOURNALFOERT_ORIG_JP = LocalDateTime.now().minusDays(5);
+
+	private static final String FILTYPE_PNG = "PNG";
+	private static final String FILTYPE_JPEG = "JPEG";
+	private static final String FILTYPE_PDF = "PDF";
+	private static final String FILTYPE_PDFA = "PDF/A";
+
+
+	private Aktoerregister aktoerregisterMock;
+	private Ereg eregMock;
+	private Tps tpsMock;
+	private SafJournalpostQueryService safJournalpostQueryServiceMock;
+	private AvtaltmeldingMapper avtaltmeldingMapper;
+	private PdlGraphQLConsumer pdlGraphQLConsumer;
+
+	@BeforeEach
+	public void setUp() {
+		aktoerregisterMock = mock(Aktoerregister.class);
+		eregMock = mock(Ereg.class);
+		tpsMock = mock(Tps.class);
+		pdlGraphQLConsumer = mock(PdlGraphQLConsumer.class);
+		safJournalpostQueryServiceMock = mock(SafJournalpostQueryService.class);
+		avtaltmeldingMapper = new AvtaltmeldingMapper(safJournalpostQueryServiceMock, aktoerregisterMock, eregMock, pdlGraphQLConsumer, tpsMock);
+	}
+
+	@Test
+	@DisplayName("Asserts all fields")
+	void fullHappyPath() {
+		when(pdlGraphQLConsumer.hentNavn(anyString(), anyString())).thenReturn(creatHentPersonInfo());
+		JAXBElement<Arkivmelding> arkivmeldingJAXBElement = avtaltmeldingMapper.createArkivMelding(createJournalpostQdist013Builder()
+				.build(), BESTILLINGS_ID);
+
+		assertThat(arkivmeldingJAXBElement, notNullValue());
+		Arkivmelding arkivmelding = arkivmeldingJAXBElement.getValue();
+		assertArkivmelding(arkivmelding);
+
+		verify(pdlGraphQLConsumer, times(1)).hentNavn(anyString(), anyString());
+		verify(eregMock, times(0)).hentNavn(any(String.class));
+
+	}
+
+	@Test
+	@DisplayName("Case when bruker is organisasjon. Should get name from Ereg")
+	void happyPathBrukerIsOrgansisasjon() {
+		when(eregMock.hentNavn(any(String.class))).thenReturn(EREG_NAVN);
+
+		JournalpostQdist013 journalpostQdist013 = createJournalpostQdist013Builder()
+				.bruker(JournalpostQdist013.Bruker.builder()
+						.id(BRUKER_ID_ORGNR)
+						.type(BRUKER_TYPE_ORGNR)
+						.build())
+				.build();
+
+		JAXBElement<Arkivmelding> arkivmeldingJAXBElement = avtaltmeldingMapper.createArkivMelding(journalpostQdist013, BESTILLINGS_ID);
+		Arkivmelding arkivmelding = arkivmeldingJAXBElement.getValue();
+		List<Mappe> mappeList = arkivmelding.getMappe();
+		Saksmappe saksmappe = (Saksmappe) mappeList.get(0);
+		Part sakspartDAP = saksmappe.getPart().get(1);
+
+		assertEquals(EREG_NAVN, sakspartDAP.getPartNavn());
+		assertEquals(SAKSPART_ROLLE_DAP, sakspartDAP.getPartRolle());
+		assertNull(sakspartDAP.getKontaktperson());
+
+		verify(eregMock, times(1)).hentNavn(BRUKER_ID_ORGNR);
+		verify(safJournalpostQueryServiceMock, times(0)).hentJournalpost(any(String.class));
+
+	}
+
+	@Test
+	@DisplayName("Case when bruker is aktoer. Should get fnr from aktoerregister")
+	void happyPathBrukerIsAktoer() {
+		when(pdlGraphQLConsumer.hentNavn(anyString(), anyString())).thenReturn(creatHentPersonInfo());
+
+		JournalpostQdist013 journalpostQdist013 = createJournalpostQdist013Builder()
+				.bruker(JournalpostQdist013.Bruker.builder()
+						.id(BRUKER_ID_AKTOER_ID)
+						.type(BRUKER_TYPE_AKTOER_ID)
+						.build())
+				.build();
+
+		JAXBElement<Arkivmelding> arkivmeldingJAXBElement = avtaltmeldingMapper.createArkivMelding(journalpostQdist013, BESTILLINGS_ID);
+		Arkivmelding arkivmelding = arkivmeldingJAXBElement.getValue();
+		List<Mappe> mappeList = arkivmelding.getMappe();
+		Saksmappe saksmappe = (Saksmappe) mappeList.get(0);
+		Part sakspartDAP = saksmappe.getPart().get(1);
+
+		assertEquals(PDL_NAVN, sakspartDAP.getPartNavn());
+		assertEquals(SAKSPART_ROLLE_DAP, sakspartDAP.getPartRolle());
+		assertNull(sakspartDAP.getKontaktperson());
+
+		verify(pdlGraphQLConsumer, times(2)).hentNavn(anyString(), anyString());
+		verify(eregMock, times(0)).hentNavn(any(String.class));
+		verify(safJournalpostQueryServiceMock, times(0)).hentJournalpost(any(String.class));
+	}
+
+	@Test
+	@DisplayName("Case for satt originalJournalPostId men ukjent datoJournal")
+	void shouldMapOpprettetDatoWhenNullDatoJournalISafJournalpostgetJournalfortAndVedleggHasOriginalJpId() {
+		JournalpostQdist013 journalpostQdist013 = createJournalpostQdist013Builder()
+				.journalposttype(INNGAAENDE)
+				.dokumenter(Arrays.asList(createHoveddokumentBuilder().build(),
+						createVedleggBuilderUtenDato().build()))
+				.build();
+        when(pdlGraphQLConsumer.hentNavn(anyString(), anyString())).thenReturn(creatHentPersonInfo());
+		JAXBElement<Arkivmelding> arkivmeldingJAXBElement = avtaltmeldingMapper.createArkivMelding(journalpostQdist013, BESTILLINGS_ID);
+		Arkivmelding arkivmelding = arkivmeldingJAXBElement.getValue();
+		List<Mappe> mappeList = arkivmelding.getMappe();
+		Saksmappe saksmappe = (Saksmappe) mappeList.get(0);
+		Journalpost registreringJp = (Journalpost) saksmappe.getRegistrering().get(0);
+		Dokumentbeskrivelse dokumentbeskrivelse = (Dokumentbeskrivelse) registreringJp.getDokumentbeskrivelse()
+				.get(1);
+
+		assertEquals(TITTEL_VEDLEGG, dokumentbeskrivelse.getTittel());
+
+		verify(safJournalpostQueryServiceMock, times(0)).hentJournalpost(ORIGINAL_JPID_VEDLEGG);
+	}
+
+	@Test
+	@DisplayName("Case when journalposttype is inngaaende and vedlegg has original jpId. Should make a custom dokumenttittel")
+	void happyPathTestTittelWhenJpIsInngaaendeAndVedleggHasOriginalJpId() {
+		when(safJournalpostQueryServiceMock.hentJournalpost(ORIGINAL_JPID_VEDLEGG)).thenReturn(createLightweightSafJournalpostQdist013());
+        when(pdlGraphQLConsumer.hentNavn(anyString(), anyString())).thenReturn(creatHentPersonInfo());
+		JournalpostQdist013 journalpostQdist013 = createJournalpostQdist013Builder()
+				.journalposttype(INNGAAENDE)
+				.dokumenter(Arrays.asList(createHoveddokumentBuilder().build(),
+						createVedleggBuilder().originalJournalpostId(ORIGINAL_JPID_VEDLEGG).build()))
+				.build();
+
+		JAXBElement<Arkivmelding> arkivmeldingJAXBElement = avtaltmeldingMapper.createArkivMelding(journalpostQdist013, BESTILLINGS_ID);
+		Arkivmelding arkivmelding = arkivmeldingJAXBElement.getValue();
+		List<Mappe> mappeList = arkivmelding.getMappe();
+		Saksmappe saksmappe = (Saksmappe) mappeList.get(0);
+		Journalpost registreringJp = (Journalpost) saksmappe.getRegistrering().get(0);
+		Dokumentbeskrivelse dokumentbeskrivelse = (Dokumentbeskrivelse) registreringJp.getDokumentbeskrivelse()
+				.get(1);
+
+		assertEquals(dokumentbeskrivelse.getTittel(), TITTEL_VEDLEGG + ", Til " + AVSENDER_MOTTAKER_NAVN_ORIG_JP);
+
+		verify(safJournalpostQueryServiceMock, times(18)).hentJournalpost(ORIGINAL_JPID_VEDLEGG);
+	}
+
+	@Test
+	@DisplayName("Case when journalposttype is utgaaende and vedlegg has original jpId. Should make a custom dokumenttittel")
+	void happyPathTestTittelWhenJpIsUtgaaendeAndVedleggHasOriginalJpId() {
+		when(safJournalpostQueryServiceMock.hentJournalpost(ORIGINAL_JPID_VEDLEGG)).thenReturn(createLightweightSafJournalpostQdist013());
+        when(pdlGraphQLConsumer.hentNavn(anyString(), anyString())).thenReturn(creatHentPersonInfo());
+		JournalpostQdist013 journalpostQdist013 = createJournalpostQdist013Builder()
+				.journalposttype(UTGAAENDE)
+				.dokumenter(Arrays.asList(createHoveddokumentBuilder().build(),
+						createVedleggBuilder().originalJournalpostId(ORIGINAL_JPID_VEDLEGG).build()))
+				.build();
+
+		JAXBElement<Arkivmelding> arkivmeldingJAXBElement = avtaltmeldingMapper.createArkivMelding(journalpostQdist013, BESTILLINGS_ID);
+		Arkivmelding arkivmelding = arkivmeldingJAXBElement.getValue();
+		List<Mappe> mappeList = arkivmelding.getMappe();
+		Saksmappe saksmappe = (Saksmappe) mappeList.get(0);
+		Journalpost registreringJp = (Journalpost) saksmappe.getRegistrering().get(0);
+		Dokumentbeskrivelse dokumentbeskrivelse = (Dokumentbeskrivelse) registreringJp.getDokumentbeskrivelse()
+				.get(1);
+
+		assertEquals(dokumentbeskrivelse.getTittel(), TITTEL_VEDLEGG + ", Til " + AVSENDER_MOTTAKER_NAVN_ORIG_JP);
+
+		verify(safJournalpostQueryServiceMock, times(18)).hentJournalpost(ORIGINAL_JPID_VEDLEGG);
+	}
+
+	@Test
+	@DisplayName("Case when journalposttype is notat and vedlegg has original jpId. Should not make a custom dokumenttittel")
+	void happyPathTestTittelWhenJpIsNotatAndVedleggHasOriginalJpId() {
+		when(safJournalpostQueryServiceMock.hentJournalpost(ORIGINAL_JPID_VEDLEGG)).thenReturn(createLightweightSafJournalpostQdist013());
+        when(pdlGraphQLConsumer.hentNavn(anyString(), anyString())).thenReturn(creatHentPersonInfo());
+		JournalpostQdist013 journalpostQdist013 = createJournalpostQdist013Builder()
+				.journalposttype("Notat")
+				.dokumenter(Arrays.asList(createHoveddokumentBuilder().build(),
+						createVedleggBuilder().originalJournalpostId(ORIGINAL_JPID_VEDLEGG).build()))
+				.build();
+
+		JAXBElement<Arkivmelding> arkivmeldingJAXBElement = avtaltmeldingMapper.createArkivMelding(journalpostQdist013, BESTILLINGS_ID);
+		Arkivmelding arkivmelding = arkivmeldingJAXBElement.getValue();
+		List<Mappe> mappeList = arkivmelding.getMappe();
+		Saksmappe saksmappe = (Saksmappe) mappeList.get(0);
+		Journalpost registreringJp = (Journalpost) saksmappe.getRegistrering().get(0);
+		Dokumentbeskrivelse dokumentbeskrivelse = (Dokumentbeskrivelse) registreringJp.getDokumentbeskrivelse()
+				.get(1);
+
+		assertEquals(dokumentbeskrivelse.getTittel(), TITTEL_VEDLEGG + ", Til " + AVSENDER_MOTTAKER_NAVN_ORIG_JP);
+
+		verify(safJournalpostQueryServiceMock, times(18)).hentJournalpost(ORIGINAL_JPID_VEDLEGG);
+	}
+
+	@Test
+	@DisplayName("Case when vedlegg has original jpId. Should get opprettet dato from original journalpost")
+	void happyPathTestOpprettetDatoWhenVedleggHasOriginalJpId() {
+		when(safJournalpostQueryServiceMock.hentJournalpost(ORIGINAL_JPID_VEDLEGG)).thenReturn(createLightweightSafJournalpostQdist013());
+        when(pdlGraphQLConsumer.hentNavn(anyString(), anyString())).thenReturn(creatHentPersonInfo());
+		JournalpostQdist013 journalpostQdist013 = createJournalpostQdist013Builder()
+				.dokumenter(Arrays.asList(createHoveddokumentBuilder().build(),
+						createVedleggBuilder().originalJournalpostId(ORIGINAL_JPID_VEDLEGG).build()))
+				.build();
+
+		JAXBElement<Arkivmelding> arkivmeldingJAXBElement = avtaltmeldingMapper.createArkivMelding(journalpostQdist013, BESTILLINGS_ID);
+		Arkivmelding arkivmelding = arkivmeldingJAXBElement.getValue();
+		List<Mappe> mappeList = arkivmelding.getMappe();
+		Saksmappe saksmappe = (Saksmappe) mappeList.get(0);
+		Journalpost registreringJp = (Journalpost) saksmappe.getRegistrering().get(0);
+
+		Dokumentbeskrivelse dokumentbeskrivelseHoveddok = registreringJp.getDokumentbeskrivelse()
+				.get(0);
+		Dokumentobjekt dokumentobjektHoveddok = dokumentbeskrivelseHoveddok.getDokumentobjekt().get(0);
+		Dokumentbeskrivelse dokumentbeskrivelseVedlegg = registreringJp.getDokumentbeskrivelse()
+				.get(1);
+		Dokumentobjekt dokumentobjektVedlegg = dokumentbeskrivelseVedlegg.getDokumentobjekt().get(0);
+
+		assertEquals(convertFromXmlGregorianCalendarToLocalDateTime(dokumentbeskrivelseHoveddok.getOpprettetDato()).toString(), DATO_JOURNALFOERT.format(dateTimeFormatter));
+		assertEquals(convertFromXmlGregorianCalendarToLocalDateTime(dokumentobjektHoveddok.getOpprettetDato()).toString(), DATO_JOURNALFOERT.format(dateTimeFormatter));
+		assertEquals(convertFromXmlGregorianCalendarToLocalDateTime(dokumentbeskrivelseVedlegg.getOpprettetDato()).toString(), DATO_JOURNALFOERT_ORIG_JP.format(dateTimeFormatter));
+		assertEquals(convertFromXmlGregorianCalendarToLocalDateTime(dokumentobjektVedlegg.getOpprettetDato()).toString(), DATO_JOURNALFOERT_ORIG_JP.format(dateTimeFormatter));
+
+		verify(safJournalpostQueryServiceMock, times(18)).hentJournalpost(ORIGINAL_JPID_VEDLEGG);
+	}
+
+	@Test
+	@DisplayName("Case when vedlegg has original jpId. Should get opprettet av from original journalpost")
+	void happyPathTestOpprettetAvWhenVedleggHasOriginalJpId() {
+		when(safJournalpostQueryServiceMock.hentJournalpost(ORIGINAL_JPID_VEDLEGG)).thenReturn(createLightweightSafJournalpostQdist013());
+        when(pdlGraphQLConsumer.hentNavn(anyString(), anyString())).thenReturn(creatHentPersonInfo());
+		JournalpostQdist013 journalpostQdist013 = createJournalpostQdist013Builder()
+				.dokumenter(Arrays.asList(createHoveddokumentBuilder().build(),
+						createVedleggBuilder().originalJournalpostId(ORIGINAL_JPID_VEDLEGG).build()))
+				.build();
+
+		JAXBElement<Arkivmelding> arkivmeldingJAXBElement = avtaltmeldingMapper.createArkivMelding(journalpostQdist013, BESTILLINGS_ID);
+		Arkivmelding arkivmelding = arkivmeldingJAXBElement.getValue();
+		List<Mappe> mappeList = arkivmelding.getMappe();
+		Saksmappe saksmappe = (Saksmappe) mappeList.get(0);
+		Journalpost registreringJp = (Journalpost) saksmappe.getRegistrering().get(0);
+
+		Dokumentbeskrivelse dokumentbeskrivelseHoveddok = (Dokumentbeskrivelse) registreringJp.getDokumentbeskrivelse()
+				.get(0);
+		Dokumentobjekt dokumentobjektHoveddok = dokumentbeskrivelseHoveddok.getDokumentobjekt().get(0);
+		Dokumentbeskrivelse dokumentbeskrivelseVedlegg = (Dokumentbeskrivelse) registreringJp.getDokumentbeskrivelse()
+				.get(1);
+		Dokumentobjekt dokumentobjektVedlegg = dokumentbeskrivelseVedlegg.getDokumentobjekt().get(0);
+
+		assertEquals(JOURNALFOERT_AV_NAVN, dokumentbeskrivelseHoveddok.getOpprettetAv());
+		assertEquals(JOURNALFOERT_AV_NAVN, dokumentobjektHoveddok.getOpprettetAv());
+		assertEquals(JOURNALFOERT_AV_NAVN_ORIG_JP, dokumentbeskrivelseVedlegg.getOpprettetAv());
+		assertEquals(JOURNALFOERT_AV_NAVN_ORIG_JP, dokumentobjektVedlegg.getOpprettetAv());
+
+		verify(safJournalpostQueryServiceMock, times(18)).hentJournalpost(ORIGINAL_JPID_VEDLEGG);
+	}
+
+	@Test
+	@DisplayName("Case when dokument does not have variantformat SLADDET (variantformat is ARKIV) and filtype is not PNG or JPEG. Should set variantformat to Produksjonsformat")
+	void happyPathTestNoSladdetVariantAndFiltypeNotPngOrJPEG() {
+		when(safJournalpostQueryServiceMock.hentJournalpost(ORIGINAL_JPID_VEDLEGG)).thenReturn(createLightweightSafJournalpostQdist013());
+        when(pdlGraphQLConsumer.hentNavn(anyString(), anyString())).thenReturn(creatHentPersonInfo());
+		JournalpostQdist013 journalpostQdist013 = createJournalpostQdist013Builder()
+				.dokumenter(Collections.singletonList(createHoveddokumentBuilder()
+						.dokumentvarianter(Arrays.asList(JournalpostQdist013.DokumentInfo.Dokumentvariant.builder()
+										.variantformat(VARIANTFORMAT_ARKIV)
+										.filtype(FILTYPE_PDFA)
+										.build(),
+								JournalpostQdist013.DokumentInfo.Dokumentvariant.builder()
+										.variantformat(VARIANTFORMAT_PRODUKSJON)
+										.filtype(FILTYPE_PDF)
+										.build()))
+						.build()))
+				.build();
+
+		JAXBElement<Arkivmelding> arkivmeldingJAXBElement = avtaltmeldingMapper.createArkivMelding(journalpostQdist013, BESTILLINGS_ID);
+		Arkivmelding arkivmelding = arkivmeldingJAXBElement.getValue();
+		List<Mappe> mappeList = arkivmelding.getMappe();
+		Saksmappe saksmappe = (Saksmappe) mappeList.get(0);
+		Journalpost registreringJp = (Journalpost) saksmappe.getRegistrering().get(0);
+
+		Dokumentbeskrivelse dokumentbeskrivelseHoveddok = (Dokumentbeskrivelse) registreringJp.getDokumentbeskrivelse()
+				.get(0);
+		Dokumentobjekt dokumentobjektHoveddok = dokumentbeskrivelseHoveddok.getDokumentobjekt().get(0);
+
+		assertEquals(PRODUKSJONSFORMAT, dokumentobjektHoveddok.getVariantformat());
+		assertTrue(dokumentobjektHoveddok.getReferanseDokumentfil().contains(PRODUKSJONSFORMAT));
+	}
+
+	@Test
+	@DisplayName("Case when dokument does not have variantformat SLADDET (variantformat is ARKIV) and filtype is PNG. Should set variantformat to Arkivformat")
+	void happyPathTestNoSladdetVariantAndFiltypeIsPng() {
+		when(safJournalpostQueryServiceMock.hentJournalpost(ORIGINAL_JPID_VEDLEGG)).thenReturn(createLightweightSafJournalpostQdist013());
+        when(pdlGraphQLConsumer.hentNavn(anyString(), anyString())).thenReturn(creatHentPersonInfo());
+		JournalpostQdist013 journalpostQdist013 = createJournalpostQdist013Builder()
+				.dokumenter(Collections.singletonList(createHoveddokumentBuilder()
+						.dokumentvarianter(Arrays.asList(JournalpostQdist013.DokumentInfo.Dokumentvariant.builder()
+										.variantformat(VARIANTFORMAT_ARKIV)
+										.filtype(FILTYPE_PNG)
+										.build(),
+								JournalpostQdist013.DokumentInfo.Dokumentvariant.builder()
+										.variantformat(VARIANTFORMAT_PRODUKSJON)
+										.filtype(FILTYPE_PDF)
+										.build()))
+						.build()))
+				.build();
+
+		JAXBElement<Arkivmelding> arkivmeldingJAXBElement = avtaltmeldingMapper.createArkivMelding(journalpostQdist013, BESTILLINGS_ID);
+		Arkivmelding arkivmelding = arkivmeldingJAXBElement.getValue();
+		List<Mappe> mappeList = arkivmelding.getMappe();
+		Saksmappe saksmappe = (Saksmappe) mappeList.get(0);
+		Journalpost registreringJp = (Journalpost) saksmappe.getRegistrering().get(0);
+
+		Dokumentbeskrivelse dokumentbeskrivelseHoveddok = registreringJp.getDokumentbeskrivelse()
+				.get(0);
+		Dokumentobjekt dokumentobjektHoveddok = dokumentbeskrivelseHoveddok.getDokumentobjekt().get(0);
+
+		assertEquals(ARKIVFORMAT, dokumentobjektHoveddok.getVariantformat());
+		assertTrue(dokumentobjektHoveddok.getReferanseDokumentfil().contains(ARKIVFORMAT));
+	}
+
+	@Test
+	@DisplayName("Case when dokument does not have variantformat SLADDET (variantformat is ARKIV) and filtype is JPEG. Should set variantformat to Arkivformat")
+	void happyPathTestNoSladdetVariantAndFiltypeIsJPEG() {
+		when(safJournalpostQueryServiceMock.hentJournalpost(ORIGINAL_JPID_VEDLEGG)).thenReturn(createLightweightSafJournalpostQdist013());
+        when(pdlGraphQLConsumer.hentNavn(anyString(), anyString())).thenReturn(creatHentPersonInfo());
+		JournalpostQdist013 journalpostQdist013 = createJournalpostQdist013Builder()
+				.dokumenter(Collections.singletonList(createHoveddokumentBuilder()
+						.dokumentvarianter(Arrays.asList(JournalpostQdist013.DokumentInfo.Dokumentvariant.builder()
+										.variantformat(VARIANTFORMAT_ARKIV)
+										.filtype(FILTYPE_JPEG)
+										.build(),
+								JournalpostQdist013.DokumentInfo.Dokumentvariant.builder()
+										.variantformat(VARIANTFORMAT_PRODUKSJON)
+										.filtype(FILTYPE_PDF)
+										.build()))
+						.build()))
+				.build();
+
+		JAXBElement<Arkivmelding> arkivmeldingJAXBElement = avtaltmeldingMapper.createArkivMelding(journalpostQdist013, BESTILLINGS_ID);
+		Arkivmelding arkivmelding = arkivmeldingJAXBElement.getValue();
+		List<Mappe> mappeList = arkivmelding.getMappe();
+		Saksmappe saksmappe = (Saksmappe) mappeList.get(0);
+		Journalpost registreringJp = (Journalpost) saksmappe.getRegistrering().get(0);
+
+		Dokumentbeskrivelse dokumentbeskrivelseHoveddok = (Dokumentbeskrivelse) registreringJp.getDokumentbeskrivelse()
+				.get(0);
+		Dokumentobjekt dokumentobjektHoveddok = dokumentbeskrivelseHoveddok.getDokumentobjekt().get(0);
+
+		assertEquals(ARKIVFORMAT, dokumentobjektHoveddok.getVariantformat());
+		assertTrue(dokumentobjektHoveddok.getReferanseDokumentfil().contains(ARKIVFORMAT));
+	}
+
+	@Test
+	@DisplayName("Case when vedlegg has no dokumentstatus set. That vedlegg should be considered FERDIGSTILT.")
+	void happyPathVedleggFerdigstiltUtenStatus() {
+        when(pdlGraphQLConsumer.hentNavn(anyString(), anyString())).thenReturn(creatHentPersonInfo());
+		JournalpostQdist013 journalpostQdist013 = createJournalpostQdist013Builder()
+				.dokumenter(Arrays.asList(createHoveddokumentBuilder().build(),
+						createVedleggBuilder().dokumentstatus(null).build()))
+				.build();
+
+		JAXBElement<Arkivmelding> arkivmeldingJAXBElement = avtaltmeldingMapper.createArkivMelding(journalpostQdist013, BESTILLINGS_ID);
+		Arkivmelding arkivmelding = arkivmeldingJAXBElement.getValue();
+		List<Mappe> mappeList = arkivmelding.getMappe();
+		Saksmappe saksmappe = (Saksmappe) mappeList.get(0);
+		Journalpost registreringJp = (Journalpost) saksmappe.getRegistrering().get(0);
+
+		assertEquals(2, arkivmelding.getAntallFiler());
+		assertDokumentbeskrivelseOpprettetAv(registreringJp.getDokumentbeskrivelse());
+	}
+
+	@Test
+	@DisplayName("Case when vedlegg does not have dokumentstatus FERDIGSTILT. That vedlegg should not be mapped.")
+	void happyPathIkkeFerdigstiltVedlegg() {
+        when(pdlGraphQLConsumer.hentNavn(anyString(), anyString())).thenReturn(creatHentPersonInfo());
+		when(safJournalpostQueryServiceMock.hentJournalpost(ORIGINAL_JPID_VEDLEGG)).thenReturn(createLightweightSafJournalpostQdist013());
+		JournalpostQdist013 journalpostQdist013 = createJournalpostQdist013Builder()
+				.dokumenter(Arrays.asList(createHoveddokumentBuilder().build(),
+						createVedleggBuilder().dokumentInfoId(DOKUMENT_INFO_ID_VEDLEGG_2)
+								.dokumentstatus("UNDER_REDIGERING")
+								.build(),
+						createVedleggBuilder().build()))
+				.build();
+
+		JAXBElement<Arkivmelding> arkivmeldingJAXBElement = avtaltmeldingMapper.createArkivMelding(journalpostQdist013, BESTILLINGS_ID);
+		Arkivmelding arkivmelding = arkivmeldingJAXBElement.getValue();
+		List<Mappe> mappeList = arkivmelding.getMappe();
+		Saksmappe saksmappe = (Saksmappe) mappeList.get(0);
+		Journalpost registreringJp = (Journalpost) saksmappe.getRegistrering().get(0);
+
+		assertEquals(2, arkivmelding.getAntallFiler());
+		assertDokumentbeskrivelseOpprettetAv(registreringJp.getDokumentbeskrivelse());
+	}
+
+	@Test
+	@DisplayName("Case for satt originalJournalPostId men ukjent journalfører")
+	void assertUkjentVedsafJournalpostgetJournalfortAvNavnErNull() {
+		when(safJournalpostQueryServiceMock.hentJournalpost(ORIGINAL_JPID_VEDLEGG)).thenReturn(createLightweightSafJournalpostQdist013NoJournalFoertAv());
+        when(pdlGraphQLConsumer.hentNavn(anyString(), anyString())).thenReturn(creatHentPersonInfo());
+		JournalpostQdist013 journalpostQdist013 = createJournalpostQdist013BuilderNoJournalFoertAv()
+				.dokumenter(Arrays.asList(createHoveddokumentBuilder().build(),
+						createVedleggBuilder().originalJournalpostId(ORIGINAL_JPID_VEDLEGG).build()))
+				.build();
+
+		JAXBElement<Arkivmelding> arkivmeldingJAXBElement = avtaltmeldingMapper.createArkivMelding(journalpostQdist013, BESTILLINGS_ID);
+		Arkivmelding arkivmelding = arkivmeldingJAXBElement.getValue();
+		List<Mappe> mappeList = arkivmelding.getMappe();
+		Saksmappe saksmappe = (Saksmappe) mappeList.get(0);
+		Journalpost registreringJp = (Journalpost) saksmappe.getRegistrering().get(0);
+
+		Dokumentbeskrivelse dokumentBeskrivelseVedlegg = registreringJp.getDokumentbeskrivelse()
+				.get(1);
+		Dokumentobjekt dokumentVedlegg = dokumentBeskrivelseVedlegg.getDokumentobjekt().get(0);
+
+		assertEquals(UKJENT, dokumentVedlegg.getOpprettetAv());
+	}
+
+	private void assertArkivmelding(Arkivmelding arkivmelding) {
+		assertNotNull(arkivmelding);
+		assertEquals(APP_NAME, arkivmelding.getSystem());
+		assertEquals(BESTILLINGS_ID, arkivmelding.getMeldingId());
+		assertNotNull(arkivmelding.getTidspunkt());
+		assertEquals(2, arkivmelding.getAntallFiler());
+		assertMappe(arkivmelding.getMappe());
+	}
+
+	private void assertMappe(List<Mappe> mappeList) {
+		assertTrue(mappeList != null && mappeList.size() == 1);
+		assertTrue(mappeList.get(0) instanceof Saksmappe);
+		Saksmappe saksmappe = (Saksmappe) mappeList.get(0);
+
+		assertEquals(TEMA_NAVN, saksmappe.getTittel());
+		assertEquals(convertFromXmlGregorianCalendarToLocalDateTime(saksmappe.getOpprettetDato()).toString(), DATO_OPPRETTET_SAK.format(dateTimeFormatter));
+		assertEquals(OPPRETTET_AV_NAVN, saksmappe.getOpprettetAv());
+		assertRegistrering(saksmappe.getRegistrering());
+		assertEquals(convertFromXmlGregorianCalendarToLocalDateTime(saksmappe.getSaksdato()).toString(), DATO_OPPRETTET_SAK.format(dateTimeFormatter));
+		assertEquals(NAV_KLAGEINSTANS, saksmappe.getAdministrativEnhet());
+		assertEquals(OPPRETTET_AV_NAVN, saksmappe.getSaksansvarlig());
+		assertEquals(UNDER_BEHANDLING, saksmappe.getSaksstatus());
+		assertSakspart(saksmappe.getPart());
+
+	}
+
+	private void assertRegistrering(List<Registrering> registreringList) {
+		assertTrue(registreringList != null && registreringList.size() == 1);
+		assertTrue(registreringList.get(0) instanceof Journalpost);
+
+		Journalpost registreringJp = (Journalpost) registreringList.get(0);
+		assertEquals(convertFromXmlGregorianCalendarToLocalDateTime(registreringJp.getOpprettetDato()).toString(), DATO_OPPRETTET_JOURNALPOST.format(dateTimeFormatter));
+		assertEquals(OPPRETTET_AV_NAVN, registreringJp.getOpprettetAv());
+		assertDokumentbeskrivelseOpprettetAv(registreringJp.getDokumentbeskrivelse());
+		assertEquals(TITTEL, registreringJp.getTittel());
+		assertEquals(UTGAAENDE_DOKUMENT, registreringJp.getJournalposttype());
+		assertEquals(EKSPEDERT, registreringJp.getJournalstatus());
+		assertEquals(convertFromXmlGregorianCalendarToLocalDateTime(registreringJp.getJournaldato()).toString(), DATO_JOURNALFOERT.format(dateTimeFormatter));
+		assertKorrespondanseparter(registreringJp.getKorrespondansepart());
+	}
+
+	private void assertKorrespondanseparter(List<Korrespondansepart> korrespondansepartList) {
+		assertTrue(korrespondansepartList != null && korrespondansepartList.size() == 2);
+
+		Korrespondansepart mottaker = korrespondansepartList.get(0);
+		assertEquals(MOTTAKER, mottaker.getKorrespondanseparttype());
+		assertEquals(TRYGDERETTEN, mottaker.getKorrespondansepartNavn());
+
+		Korrespondansepart avsender = korrespondansepartList.get(1);
+		assertEquals(AVSENDER, avsender.getKorrespondanseparttype());
+		assertEquals(NAV_KLAGEINSTANS, avsender.getKorrespondansepartNavn());
+	}
+
+	private void assertSakspart(List<Part> sakspartList) {
+		assertTrue(sakspartList != null && sakspartList.size() == 2);
+
+		Part sakspartAMP = sakspartList.get(0);
+		assertNull(sakspartAMP.getPartID());
+		assertEquals(NAV_KLAGEINSTANS, sakspartAMP.getPartNavn());
+		assertEquals(SAKSPART_ROLLE_AMP, sakspartAMP.getPartRolle());
+		assertEquals(OPPRETTET_AV_NAVN, sakspartAMP.getKontaktperson());
+
+		Part sakspartDAP = sakspartList.get(1);
+		assertEquals(PDL_NAVN, sakspartDAP.getPartNavn());
+		assertEquals(SAKSPART_ROLLE_DAP, sakspartDAP.getPartRolle());
+		assertNull(sakspartDAP.getKontaktperson());
+	}
+
+
+	private void assertDokumentbeskrivelse(List<Dokumentbeskrivelse> dokumentbeskrivelseList) {
+		assertTrue(dokumentbeskrivelseList != null && dokumentbeskrivelseList.size() == 2);
+
+		assertNotNull(dokumentbeskrivelseList.get(0));
+		Dokumentbeskrivelse dokumentbeskrivelseHoveddok = dokumentbeskrivelseList.get(0);
+		assertEquals(AvtaltmeldingConstant.HOVEDDOKUMENT, dokumentbeskrivelseHoveddok.getTilknyttetRegistreringSom());
+		assertEquals(BigInteger.ONE, dokumentbeskrivelseHoveddok.getDokumentnummer());
+		assertCommonAttributesDokumentbeskrivelse(dokumentbeskrivelseHoveddok);
+		assertEquals(TITTEL_HOVEDDOK, dokumentbeskrivelseHoveddok.getTittel());
+		assertEquals(DATO_JOURNALFOERT, convertFromXmlGregorianCalendarToLocalDateTime(dokumentbeskrivelseHoveddok.getOpprettetDato()));
+
+
+		assertDokumentobjektHoveddokument(dokumentbeskrivelseHoveddok.getDokumentobjekt());
+
+		assertNotNull(dokumentbeskrivelseList.get(1));
+		Dokumentbeskrivelse dokumentbeskrivelseVedlegg = dokumentbeskrivelseList.get(1);
+		assertEquals(VEDLEGG, dokumentbeskrivelseVedlegg.getTilknyttetRegistreringSom());
+		assertEquals(dokumentbeskrivelseVedlegg.getDokumentnummer(), BigInteger.valueOf(2));
+		assertCommonAttributesVedleggDokumentbeskrivelse(dokumentbeskrivelseVedlegg);
+		assertEquals(TITTEL_VEDLEGG, dokumentbeskrivelseVedlegg.getTittel());
+		assertEquals(DATO_JOURNALFOERT, convertFromXmlGregorianCalendarToLocalDateTime(dokumentbeskrivelseVedlegg.getOpprettetDato()));
+
+		assertDokumentobjektVedlegg(dokumentbeskrivelseVedlegg.getDokumentobjekt());
+	}
+
+	private void assertDokumentbeskrivelseOpprettetAv(List<Dokumentbeskrivelse> dokumentbeskrivelseList) {
+		assertTrue(dokumentbeskrivelseList != null && dokumentbeskrivelseList.size() == 2);
+
+		assertNotNull(dokumentbeskrivelseList.get(0));
+		Dokumentbeskrivelse dokumentbeskrivelseHoveddok = (Dokumentbeskrivelse) dokumentbeskrivelseList.get(0);
+		assertEquals(AvtaltmeldingConstant.HOVEDDOKUMENT, dokumentbeskrivelseHoveddok.getTilknyttetRegistreringSom());
+		assertEquals(BigInteger.ONE, dokumentbeskrivelseHoveddok.getDokumentnummer());
+		assertCommonAttributesVedleggDokumentbeskrivelseOpprettetAv(dokumentbeskrivelseHoveddok);
+		assertEquals(TITTEL_HOVEDDOK, dokumentbeskrivelseHoveddok.getTittel());
+		assertEquals(convertFromXmlGregorianCalendarToLocalDateTime(dokumentbeskrivelseHoveddok.getOpprettetDato()).toString(), DATO_JOURNALFOERT.format(dateTimeFormatter));
+
+
+		assertDokumentobjektHoveddokument(dokumentbeskrivelseHoveddok.getDokumentobjekt());
+
+		assertNotNull(dokumentbeskrivelseList.get(1));
+		Dokumentbeskrivelse dokumentbeskrivelseVedlegg = dokumentbeskrivelseList.get(1);
+		assertEquals(VEDLEGG, dokumentbeskrivelseVedlegg.getTilknyttetRegistreringSom());
+		assertEquals(dokumentbeskrivelseVedlegg.getDokumentnummer(), BigInteger.valueOf(2));
+		assertCommonAttributesVedleggDokumentbeskrivelseOpprettetAv(dokumentbeskrivelseVedlegg);
+		assertEquals(TITTEL_VEDLEGG, dokumentbeskrivelseVedlegg.getTittel());
+		assertEquals(convertFromXmlGregorianCalendarToLocalDateTime(dokumentbeskrivelseVedlegg.getOpprettetDato()).toString(), DATO_JOURNALFOERT.format(dateTimeFormatter));
+
+		assertDokumentobjektVedlegg(dokumentbeskrivelseVedlegg.getDokumentobjekt());
+	}
+
+
+	private void assertDokumentobjektHoveddokument(List<Dokumentobjekt> dokumentobjektList) {
+		assertTrue(dokumentobjektList != null && dokumentobjektList.size() == 1);
+		Dokumentobjekt dokumentobjektHoveddok = dokumentobjektList.get(0);
+		assertEquals(BigInteger.ONE, dokumentobjektHoveddok.getVersjonsnummer());
+		assertEquals(DOKUMENT_HVOR_DELER_AV_INNHOLDET_ER_SKJERMET, dokumentobjektHoveddok.getVariantformat());
+		assertEquals(convertFromXmlGregorianCalendarToLocalDateTime(dokumentobjektHoveddok.getOpprettetDato()).toString(), DATO_JOURNALFOERT.format(dateTimeFormatter));
+		assertEquals(JOURNALFOERT_AV_NAVN, dokumentobjektHoveddok.getOpprettetAv());
+		assertEquals(dokumentobjektHoveddok.getReferanseDokumentfil(), JOURNALPOST_ID + "-" + DOKUMENT_INFO_ID_HOVEDDOK + "-" + DOKUMENT_HVOR_DELER_AV_INNHOLDET_ER_SKJERMET + "-" + FILTYPE_PDF);
+	}
+
+
+	private void assertDokumentobjektVedlegg(List<Dokumentobjekt> dokumentobjektList) {
+		assertTrue(dokumentobjektList != null && dokumentobjektList.size() == 1);
+		Dokumentobjekt dokumentobjektVedlegg = dokumentobjektList.get(0);
+		assertEquals(BigInteger.ONE, dokumentobjektVedlegg.getVersjonsnummer());
+		assertEquals(ARKIVFORMAT, dokumentobjektVedlegg.getVariantformat());
+		assertEquals(convertFromXmlGregorianCalendarToLocalDateTime(dokumentobjektVedlegg.getOpprettetDato()).toString(), DATO_JOURNALFOERT.format(dateTimeFormatter));
+		assertEquals(JOURNALFOERT_AV_NAVN, dokumentobjektVedlegg.getOpprettetAv());
+		assertEquals(dokumentobjektVedlegg.getReferanseDokumentfil(), JOURNALPOST_ID + "-" + DOKUMENT_INFO_ID_VEDLEGG + "-" + ARKIVFORMAT + "-" + FILTYPE_JPEG);
+	}
+
+	private void assertCommonAttributesDokumentbeskrivelse(Dokumentbeskrivelse dokumentbeskrivelse) {
+		assertEquals(DOKUMENTASJON, dokumentbeskrivelse.getDokumenttype());
+		assertEquals(DOKUMENTET_ER_FERDIGSTILT, dokumentbeskrivelse.getDokumentstatus());
+		assertEquals(JOURNALFOERT_AV_NAVN, dokumentbeskrivelse.getOpprettetAv());
+		assertNotNull(dokumentbeskrivelse.getTilknyttetDato());
+		assertEquals(JOURNALFOERT_AV_NAVN, dokumentbeskrivelse.getTilknyttetAv());
+	}
+
+	private void assertCommonAttributesVedleggDokumentbeskrivelse(Dokumentbeskrivelse dokumentbeskrivelse) {
+		assertEquals(DOKUMENTASJON, dokumentbeskrivelse.getDokumenttype());
+		assertEquals(DOKUMENTET_ER_FERDIGSTILT, dokumentbeskrivelse.getDokumentstatus());
+		assertEquals(AVSENDER_MOTTAKER_NAVN_ORIG_JP, dokumentbeskrivelse.getOpprettetAv());
+		assertNotNull(dokumentbeskrivelse.getTilknyttetDato());
+		assertEquals(JOURNALFOERT_AV_NAVN, dokumentbeskrivelse.getTilknyttetAv());
+	}
+
+	private void assertCommonAttributesVedleggDokumentbeskrivelseOpprettetAv(Dokumentbeskrivelse dokumentbeskrivelse) {
+		assertEquals(DOKUMENTASJON, dokumentbeskrivelse.getDokumenttype());
+		assertEquals(DOKUMENTET_ER_FERDIGSTILT, dokumentbeskrivelse.getDokumentstatus());
+		assertEquals(JOURNALFOERT_AV_NAVN, dokumentbeskrivelse.getOpprettetAv());
+		assertNotNull(dokumentbeskrivelse.getTilknyttetDato());
+		assertEquals(JOURNALFOERT_AV_NAVN, dokumentbeskrivelse.getTilknyttetAv());
+	}
+
+	private JournalpostQdist013.JournalpostQdist013Builder createJournalpostQdist013Builder() {
+		return JournalpostQdist013.builder()
+				.journalpostId(JOURNALPOST_ID)
+				.sak(JournalpostQdist013.Sak.builder()
+						.arkivsaksnummer(ARKIV_SAKNUMMER)
+						.datoOpprettet(DATO_OPPRETTET_SAK)
+						.build())
+				.opprettetAvNavn(OPPRETTET_AV_NAVN)
+				.bruker(JournalpostQdist013.Bruker.builder()
+						.id(BRUKER_ID_FNR)
+						.type(BRUKER_TYPE_FNR)
+						.build())
+				.datoOpprettet(DATO_OPPRETTET_JOURNALPOST)
+				.tittel(TITTEL)
+				.journalfortAvNavn(JOURNALFOERT_AV_NAVN)
+				.temanavn(TEMA_NAVN)
+				.journalposttype(UTGAAENDE)
+				.relevanteDatoer(Collections.singletonList(JournalpostQdist013.RelevantDato.builder()
+						.datotype(JournalpostQdist013.Datotype.DATO_JOURNALFOERT)
+						.dato(DATO_JOURNALFOERT)
+						.build()))
+				.dokumenter(Arrays.asList(createHoveddokumentBuilder().build(), createVedleggBuilder().build()
+				));
+	}
+
+	private JournalpostQdist013.JournalpostQdist013Builder createJournalpostQdist013BuilderNoJournalFoertAv() {
+		return JournalpostQdist013.builder()
+				.journalpostId(JOURNALPOST_ID)
+				.sak(JournalpostQdist013.Sak.builder()
+						.arkivsaksnummer(ARKIV_SAKNUMMER)
+						.datoOpprettet(DATO_OPPRETTET_SAK)
+						.build())
+				.opprettetAvNavn(OPPRETTET_AV_NAVN)
+				.bruker(JournalpostQdist013.Bruker.builder()
+						.id(BRUKER_ID_FNR)
+						.type(BRUKER_TYPE_FNR)
+						.build())
+				.datoOpprettet(DATO_OPPRETTET_JOURNALPOST)
+				.tittel(TITTEL)
+				.temanavn(TEMA_NAVN)
+				.journalposttype(UTGAAENDE)
+				.relevanteDatoer(Collections.singletonList(JournalpostQdist013.RelevantDato.builder()
+						.datotype(JournalpostQdist013.Datotype.DATO_JOURNALFOERT)
+						.dato(DATO_JOURNALFOERT)
+						.build()))
+				.dokumenter(Arrays.asList(createHoveddokumentBuilder().build(), createVedleggBuilder().build()
+				));
+	}
+
+	private JournalpostQdist013.DokumentInfo.DokumentInfoBuilder createHoveddokumentBuilder() {
+		return JournalpostQdist013.DokumentInfo.builder()
+				.dokumentInfoId(DOKUMENT_INFO_ID_HOVEDDOK)
+				.dokumentstatus(FERDIGSTILT)
+				.tittel(TITTEL_HOVEDDOK)
+				.originalJournalpostId(null)
+				.dokumentvarianter(Arrays.asList(JournalpostQdist013.DokumentInfo.Dokumentvariant.builder()
+								.variantformat(VARIANTFORMAT_ARKIV)
+								.filtype(FILTYPE_PNG)
+								.build(),
+						JournalpostQdist013.DokumentInfo.Dokumentvariant.builder()
+								.variantformat(VARIANTFORMAT_SLADDET)
+								.filtype(FILTYPE_PDF)
+								.build()));
+	}
+
+	private JournalpostQdist013.DokumentInfo.DokumentInfoBuilder createVedleggBuilderUtenDato() {
+		return JournalpostQdist013.DokumentInfo.builder()
+				.dokumentInfoId(DOKUMENT_INFO_ID_VEDLEGG)
+				.dokumentstatus(FERDIGSTILT)
+				.tittel(TITTEL_VEDLEGG)
+				.originalJournalpostId(null)
+				.dokumentvarianter(Arrays.asList(JournalpostQdist013.DokumentInfo.Dokumentvariant.builder()
+								.variantformat(VARIANTFORMAT_ARKIV)
+								.filtype(FILTYPE_JPEG)
+								.build(),
+						JournalpostQdist013.DokumentInfo.Dokumentvariant.builder()
+								.variantformat(VARIANTFORMAT_PRODUKSJON)
+								.filtype(FILTYPE_PDF)
+								.build()));
+	}
+
+	private JournalpostQdist013.DokumentInfo.DokumentInfoBuilder createVedleggBuilder() {
+		return JournalpostQdist013.DokumentInfo.builder()
+				.dokumentInfoId(DOKUMENT_INFO_ID_VEDLEGG)
+				.dokumentstatus(FERDIGSTILT)
+				.tittel(TITTEL_VEDLEGG)
+				.originalJournalpostId(null)
+				.dokumentvarianter(Arrays.asList(JournalpostQdist013.DokumentInfo.Dokumentvariant.builder()
+								.variantformat(VARIANTFORMAT_ARKIV)
+								.filtype(FILTYPE_JPEG)
+								.build(),
+						JournalpostQdist013.DokumentInfo.Dokumentvariant.builder()
+								.variantformat(VARIANTFORMAT_PRODUKSJON)
+								.filtype(FILTYPE_PDF)
+								.build()));
+	}
+
+	private static HentPersonInfo creatHentPersonInfo() {
+		return HentPersonInfo.builder()
+				.ident(BRUKER_ID_FNR)
+				.fulltnavn(PDL_NAVN)
+				.build();
+	}
+
+	private LightweightSafJournalpostQdist013 createLightweightSafJournalpostQdist013() {
+		return LightweightSafJournalpostQdist013.builder()
+				.avsenderMottakerNavn(AVSENDER_MOTTAKER_NAVN_ORIG_JP)
+				.journalposttype(UTGAAENDE)
+				.journalfortAvNavn(JOURNALFOERT_AV_NAVN_ORIG_JP)
+				.datoJournalfoert(DATO_JOURNALFOERT_ORIG_JP)
+				.build();
+	}
+
+	private LightweightSafJournalpostQdist013 createLightweightSafJournalpostQdist013NoDatoJournal() {
+		return LightweightSafJournalpostQdist013.builder()
+				.avsenderMottakerNavn(AVSENDER_MOTTAKER_NAVN_ORIG_JP)
+				.journalfortAvNavn(JOURNALFOERT_AV_NAVN_ORIG_JP)
+				.datoJournalfoert(LocalDateTime.now().minusHours(5))
+				.build();
+	}
+
+	private LightweightSafJournalpostQdist013 createLightweightSafJournalpostQdist013NoJournalFoertAv() {
+		return LightweightSafJournalpostQdist013.builder()
+				.avsenderMottakerNavn(AVSENDER_MOTTAKER_NAVN_ORIG_JP)
+				.datoJournalfoert(DATO_JOURNALFOERT_ORIG_JP)
+				.build();
+	}
+
+	private boolean isUuid(String uuidCandidate) {
+		try {
+			UUID.fromString(uuidCandidate);
+			return true;
+		} catch (IllegalArgumentException e) {
+			return false;
+		}
+	}
 }
