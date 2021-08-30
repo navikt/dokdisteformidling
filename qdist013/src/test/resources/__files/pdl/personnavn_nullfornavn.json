@@ -1,0 +1,21 @@
+{
+  "data": {
+    "hentPerson": {
+      "navn": [
+        {
+          "fornavn": null,
+          "mellomnavn": null,
+          "etternavn": "MÅPENDE",
+          "forkortetNavn": "KAKE GUL MÅPENDE"
+        }
+      ],
+      "folkeregisteridentifikator": [
+        {
+          "identifikasjonsnummer": "02128520476",
+          "type": "FNR",
+          "status": "I_BRUK"
+        }
+      ]
+    }
+  }
+}

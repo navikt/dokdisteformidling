@@ -10,10 +10,10 @@ import no.arkivverket.standarder.noark5.arkivmelding.Korrespondansepart;
 import no.arkivverket.standarder.noark5.arkivmelding.ObjectFactory;
 import no.arkivverket.standarder.noark5.arkivmelding.Part;
 import no.arkivverket.standarder.noark5.arkivmelding.Saksmappe;
-import no.nav.dokdisteformidling.consumer.aktoerregister.Aktoerregister;
 import no.nav.dokdisteformidling.consumer.ereg.Ereg;
+import no.nav.dokdisteformidling.consumer.pdl.HentPersonInfo;
+import no.nav.dokdisteformidling.consumer.pdl.PdlGraphQLConsumer;
 import no.nav.dokdisteformidling.consumer.saf.SafJournalpostQueryService;
-import no.nav.dokdisteformidling.consumer.tps.Tps;
 import no.nav.dokdisteformidling.qdist013.saf.lightweight.LightweightSafJournalpostQdist013;
 import no.nav.dokdisteformidling.qdist013.saf.main.JournalpostQdist013;
 import org.springframework.stereotype.Component;
@@ -69,19 +69,15 @@ public class AvtaltmeldingMapper {
     public static final String UKJENT = "UKJENT";
 
 
-    private final Aktoerregister aktoerregister;
+    private final PdlGraphQLConsumer pdlGraphQLConsumer;
     private final Ereg ereg;
-    private final Tps tps;
     private final SafJournalpostQueryService<LightweightSafJournalpostQdist013> safJournalpostQueryService;
 
     public AvtaltmeldingMapper(@Named("LightweightSafJournalpostQueryServiceQdist013") SafJournalpostQueryService<LightweightSafJournalpostQdist013> safJournalpostQueryService,
-                               Aktoerregister aktoerregister,
-                               Ereg ereg,
-                               Tps tps) {
+                               Ereg ereg, PdlGraphQLConsumer pdlGraphQLConsumer) {
         this.safJournalpostQueryService = safJournalpostQueryService;
-        this.aktoerregister = aktoerregister;
         this.ereg = ereg;
-        this.tps = tps;
+        this.pdlGraphQLConsumer = pdlGraphQLConsumer;
     }
 
     public JAXBElement<Arkivmelding> createArkivMelding(JournalpostQdist013 journalpostQdist013, String bestillingsId) {
@@ -323,8 +319,7 @@ public class AvtaltmeldingMapper {
 
     private Part createAndPopulatePartDAP(JournalpostQdist013 journalpostQdist013, ObjectFactory objectFactory) {
         Part partDAP = objectFactory.createPart();
-        final String fnrObtainedFromAktoerId = getFoedselsnummer(journalpostQdist013);
-        partDAP.setPartNavn(getSakspartNavnDAP(journalpostQdist013, fnrObtainedFromAktoerId));
+        partDAP.setPartNavn(getSakspartNavnDAP(journalpostQdist013));
         partDAP.setPartRolle(SAKSPART_ROLLE_DAP);
         partDAP.setOrganisasjonsnummer(EnhetsidentifikatorType.builder()
                 .withOrganisasjonsnummer(hentOrgNummerDAP(journalpostQdist013))
@@ -346,10 +341,9 @@ public class AvtaltmeldingMapper {
         return partAMP;
     }
 
-
     private String getFoedselsnummer(JournalpostQdist013 journalpostQdist013) {
         if (brukerTypeIsAktoerId(journalpostQdist013)) {
-            return aktoerregister.hentIdentForAktoerId(journalpostQdist013.getBruker().getId());
+            return pdlGraphQLConsumer.hentNavn(journalpostQdist013.getBruker().getId(), journalpostQdist013.getTemanavn()).getIdent();
         } else if (isBrukerTypeFnr(journalpostQdist013)) {
             return journalpostQdist013.getBruker().getId();
         } else {
@@ -361,15 +355,15 @@ public class AvtaltmeldingMapper {
         return brukerTypeIsOrgnr(journalpostQdist013) ? journalpostQdist013.getBruker().getId() : null;
     }
 
-    private String getSakspartNavnDAP(JournalpostQdist013 journalpostQdist013, String fnrObtainedFromAktoerId) {
+    private String getSakspartNavnDAP(JournalpostQdist013 journalpostQdist013) {
         if (brukerTypeIsOrgnr(journalpostQdist013)) {
             return ereg.hentNavn(journalpostQdist013.getBruker().getId());
-        } else if (brukerTypeIsAktoerId(journalpostQdist013)) {
-            return tps.hentNavn(fnrObtainedFromAktoerId);
         } else {
-            return tps.hentNavn(journalpostQdist013.getBruker().getId());
+            return getHentPersonInfo(journalpostQdist013.getBruker().getId(), journalpostQdist013.getTemanavn()).getFulltnavn();
         }
     }
 
-
+    private HentPersonInfo getHentPersonInfo(String ident, String tema) {
+        return pdlGraphQLConsumer.hentNavn(ident, tema);
+    }
 }
