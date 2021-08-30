@@ -9,12 +9,10 @@ import no.arkivverket.standarder.noark5.arkivmelding.Mappe;
 import no.arkivverket.standarder.noark5.arkivmelding.Part;
 import no.arkivverket.standarder.noark5.arkivmelding.Registrering;
 import no.arkivverket.standarder.noark5.arkivmelding.Saksmappe;
-import no.nav.dokdisteformidling.consumer.aktoerregister.Aktoerregister;
 import no.nav.dokdisteformidling.consumer.ereg.Ereg;
 import no.nav.dokdisteformidling.consumer.pdl.HentPersonInfo;
 import no.nav.dokdisteformidling.consumer.pdl.PdlGraphQLConsumer;
 import no.nav.dokdisteformidling.consumer.saf.SafJournalpostQueryService;
-import no.nav.dokdisteformidling.consumer.tps.Tps;
 import no.nav.dokdisteformidling.qdist013.saf.lightweight.LightweightSafJournalpostQdist013;
 import no.nav.dokdisteformidling.qdist013.saf.main.JournalpostQdist013;
 import no.nav.dokdisteformidling.qdist013.util.AvtaltmeldingConstant;
@@ -116,21 +114,17 @@ class AvtaltmeldingMapperTest {
 	private static final String FILTYPE_PDFA = "PDF/A";
 
 
-	private Aktoerregister aktoerregisterMock;
 	private Ereg eregMock;
-	private Tps tpsMock;
 	private SafJournalpostQueryService safJournalpostQueryServiceMock;
 	private AvtaltmeldingMapper avtaltmeldingMapper;
 	private PdlGraphQLConsumer pdlGraphQLConsumer;
 
 	@BeforeEach
 	public void setUp() {
-		aktoerregisterMock = mock(Aktoerregister.class);
 		eregMock = mock(Ereg.class);
-		tpsMock = mock(Tps.class);
 		pdlGraphQLConsumer = mock(PdlGraphQLConsumer.class);
 		safJournalpostQueryServiceMock = mock(SafJournalpostQueryService.class);
-		avtaltmeldingMapper = new AvtaltmeldingMapper(safJournalpostQueryServiceMock, aktoerregisterMock, eregMock, pdlGraphQLConsumer, tpsMock);
+		avtaltmeldingMapper = new AvtaltmeldingMapper(safJournalpostQueryServiceMock, eregMock, pdlGraphQLConsumer);
 	}
 
 	@Test

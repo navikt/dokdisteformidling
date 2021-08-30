@@ -10,12 +10,10 @@ import no.arkivverket.standarder.noark5.arkivmelding.Korrespondansepart;
 import no.arkivverket.standarder.noark5.arkivmelding.ObjectFactory;
 import no.arkivverket.standarder.noark5.arkivmelding.Part;
 import no.arkivverket.standarder.noark5.arkivmelding.Saksmappe;
-import no.nav.dokdisteformidling.consumer.aktoerregister.Aktoerregister;
 import no.nav.dokdisteformidling.consumer.ereg.Ereg;
 import no.nav.dokdisteformidling.consumer.pdl.HentPersonInfo;
 import no.nav.dokdisteformidling.consumer.pdl.PdlGraphQLConsumer;
 import no.nav.dokdisteformidling.consumer.saf.SafJournalpostQueryService;
-import no.nav.dokdisteformidling.consumer.tps.Tps;
 import no.nav.dokdisteformidling.qdist013.saf.lightweight.LightweightSafJournalpostQdist013;
 import no.nav.dokdisteformidling.qdist013.saf.main.JournalpostQdist013;
 import org.springframework.stereotype.Component;
@@ -71,21 +69,15 @@ public class AvtaltmeldingMapper {
     public static final String UKJENT = "UKJENT";
 
 
-    private final Aktoerregister aktoerregister;
     private final PdlGraphQLConsumer pdlGraphQLConsumer;
     private final Ereg ereg;
-    private final Tps tps;
     private final SafJournalpostQueryService<LightweightSafJournalpostQdist013> safJournalpostQueryService;
 
     public AvtaltmeldingMapper(@Named("LightweightSafJournalpostQueryServiceQdist013") SafJournalpostQueryService<LightweightSafJournalpostQdist013> safJournalpostQueryService,
-                               Aktoerregister aktoerregister,
-                               Ereg ereg, PdlGraphQLConsumer pdlGraphQLConsumer,
-                               Tps tps) {
+                               Ereg ereg, PdlGraphQLConsumer pdlGraphQLConsumer) {
         this.safJournalpostQueryService = safJournalpostQueryService;
-        this.aktoerregister = aktoerregister;
         this.ereg = ereg;
         this.pdlGraphQLConsumer = pdlGraphQLConsumer;
-        this.tps = tps;
     }
 
     public JAXBElement<Arkivmelding> createArkivMelding(JournalpostQdist013 journalpostQdist013, String bestillingsId) {
