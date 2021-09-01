@@ -28,32 +28,33 @@ public class SafJournalpostValidatorQdist013 {
 	private void assertJournalpostBody(SafJournalpost safJournalpost, String journalpostId) {
 		assertFieldOnSafJournalpostBodyNotNullOrEmpty("journalpost.journalpostId", safJournalpost.getJournalpostId(), journalpostId);
 		assertFieldOnSafJournalpostBodyNotNullOrEmpty("journalpost.opprettetAvNavn", safJournalpost.getOpprettetAvNavn(), journalpostId);
-		assertObjectOnSafJournalpostBodyNotNull("jounalpost.datoOpprettet", safJournalpost.getDatoOpprettet(), journalpostId);
-		assertFieldOnSafJournalpostBodyNotNullOrEmpty("jounalpost.tittel", safJournalpost.getTittel(), journalpostId);
-		assertFieldOnSafJournalpostBodyNotNullOrEmpty("jounalpost.journalfortAvNavn", safJournalpost.getJournalfortAvNavn(), journalpostId);
-		assertFieldOnSafJournalpostBodyNotNullOrEmpty("jounalpost.temanavn", safJournalpost.getTemanavn(), journalpostId);
-		assertFieldOnSafJournalpostBodyNotNullOrEmpty("jounalpost.journalposttype", safJournalpost.getJournalposttype(), journalpostId);
-		assertFieldOnSafJournalpostBodyNotNullOrEmpty("jounalpost.journalfoerendeEnhet", safJournalpost.getJournalfoerendeEnhet(), journalpostId);
+		assertObjectOnSafJournalpostBodyNotNull("journalpost.datoOpprettet", safJournalpost.getDatoOpprettet(), journalpostId);
+		assertFieldOnSafJournalpostBodyNotNullOrEmpty("journalpost.tittel", safJournalpost.getTittel(), journalpostId);
+		assertFieldOnSafJournalpostBodyNotNullOrEmpty("journalpost.journalfortAvNavn", safJournalpost.getJournalfortAvNavn(), journalpostId);
+		assertFieldOnSafJournalpostBodyNotNullOrEmpty("journalpost.temanavn", safJournalpost.getTemanavn(), journalpostId);
+		assertFieldOnSafJournalpostBodyNotNullOrEmpty("journalpost.tema", safJournalpost.getTema(), journalpostId);
+		assertFieldOnSafJournalpostBodyNotNullOrEmpty("journalpost.journalposttype", safJournalpost.getJournalposttype(), journalpostId);
+		assertFieldOnSafJournalpostBodyNotNullOrEmpty("journalpost.journalfoerendeEnhet", safJournalpost.getJournalfoerendeEnhet(), journalpostId);
 		assertThatRelevanteDatoerContainsDatoJournalfoert(safJournalpost, journalpostId);
 
 	}
 
 	private void assertBruker(SafJournalpost safJournalpost, String journalpostId) {
-		assertObjectOnSafJournalpostBodyNotNull("jounalpost.bruker", safJournalpost.getBruker(), journalpostId);
-		assertFieldOnSafJournalpostBodyNotNullOrEmpty("jounalpost.bruker.id", safJournalpost.getBruker()
+		assertObjectOnSafJournalpostBodyNotNull("journalpost.bruker", safJournalpost.getBruker(), journalpostId);
+		assertFieldOnSafJournalpostBodyNotNullOrEmpty("journalpost.bruker.id", safJournalpost.getBruker()
 				.getId(), journalpostId);
-		assertFieldOnSafJournalpostBodyNotNullOrEmpty("jounalpost.bruker.type", safJournalpost.getBruker()
+		assertFieldOnSafJournalpostBodyNotNullOrEmpty("journalpost.bruker.type", safJournalpost.getBruker()
 				.getType(), journalpostId);
 	}
 
 	private void assertSak(SafJournalpost safJournalpost, String journalpostId) {
-		assertObjectOnSafJournalpostBodyNotNull("jounalpost.sak", safJournalpost.getSak(), journalpostId);
+		assertObjectOnSafJournalpostBodyNotNull("journalpost.sak", safJournalpost.getSak(), journalpostId);
 		assertObjectOnSafJournalpostBodyNotNull("journalpost.sak.arkivsaksnummer", safJournalpost.getSak().getArkivsaksnummer(), journalpostId);
 		assertObjectOnSafJournalpostBodyNotNull("journalpost.sak.datoOpprettet", safJournalpost.getSak().getDatoOpprettet(), journalpostId);
 	}
 
 	private void assertThatRelevanteDatoerContainsDatoJournalfoert(SafJournalpost safJournalpost, String journalpostId) {
-		assertObjectOnSafJournalpostBodyNotNull("jounalpost.relevanteDatoer", safJournalpost.getRelevanteDatoer(), journalpostId);
+		assertObjectOnSafJournalpostBodyNotNull("journalpost.relevanteDatoer", safJournalpost.getRelevanteDatoer(), journalpostId);
 		safJournalpost.getRelevanteDatoer().stream()
 				.filter(relevantDato -> DATO_JOURNALFOERT.name().equals(relevantDato.getDatotype()))
 				.findAny()
@@ -61,7 +62,7 @@ public class SafJournalpostValidatorQdist013 {
 	}
 
 	private void assertDokumenter(List<SafJournalpost.DokumentInfo> dokumenter, String journalpostId) {
-		assertObjectOnSafJournalpostBodyNotNull("jounalpost.dokumenter", dokumenter, journalpostId);
+		assertObjectOnSafJournalpostBodyNotNull("journalpost.dokumenter", dokumenter, journalpostId);
 		dokumenter.forEach(dokumentInfo -> {
 					assertFieldOnSafDokumenterNotNullOrEmpty("dokumentInfo.dokumentInfoid", dokumentInfo.getDokumentInfoId(), journalpostId, dokumentInfo
 							.getDokumentInfoId());
