@@ -3,6 +3,7 @@ package no.nav.dokdisteformidling.utils;
 import no.nav.dokdisteformidling.exception.functional.SafJournalpostValidationException;
 
 import static java.lang.String.format;
+import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 
 /**
@@ -20,6 +21,9 @@ public final class SafAssertionUtils {
 	}
 
 	public static void assertFieldOnSafJournalpostBodyNotNullOrEmpty(String field, String value, String journalpostId) {
+		String x = " ";
+		isBlank(x);
+		isEmpty(x);
 		if (isEmpty(value)) {
 			throw new SafJournalpostValidationException(format("Feltet %s kan ikke være null eller tomt i journalpost-respons fra SAF. journalpostId=%s", field, journalpostId));
 		}

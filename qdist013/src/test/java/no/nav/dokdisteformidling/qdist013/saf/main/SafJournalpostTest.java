@@ -20,6 +20,7 @@ public abstract class SafJournalpostTest {
 	protected final static String JOURNALPOST_TYPE = "journalposttype";
 	protected final static String OPPRETTET_AV_NAVN = "opprettetAvNavn";
 	protected final static String TEMANAVN = "temanavn";
+	protected final static String TEMA = "DAG";
 	protected final static String TITTEL = "tittel";
 	protected final static LocalDateTime DATO_OPPRETTET_SAK = LocalDateTime.now().minusHours(2);
 	protected final static String ORIGINAL_JOURNALPOST_ID = "originalJournalpostId";

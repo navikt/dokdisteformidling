@@ -19,6 +19,7 @@ public class SafJournalpost {
 	private final String tittel;
 	private final String journalfortAvNavn;
 	private final String temanavn;
+	private final String tema;
 	private final String journalposttype;
 	private final String journalfoerendeEnhet;
 	private final AvsenderMottaker avsenderMottaker;
