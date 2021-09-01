@@ -21,9 +21,6 @@ public final class SafAssertionUtils {
 	}
 
 	public static void assertFieldOnSafJournalpostBodyNotNullOrEmpty(String field, String value, String journalpostId) {
-		String x = " ";
-		isBlank(x);
-		isEmpty(x);
 		if (isEmpty(value)) {
 			throw new SafJournalpostValidationException(format("Feltet %s kan ikke være null eller tomt i journalpost-respons fra SAF. journalpostId=%s", field, journalpostId));
 		}
