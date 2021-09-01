@@ -19,12 +19,12 @@ class SafJournalpostValidatorQdist013Test extends SafJournalpostTest {
 
 	@Test
 	void shouldValidate() {
-		validator.validate(createSafJournalpost().build(), JOURNALPOST_ID);
+		validator.validate(createSafJournalpost().tema(TEMA).build(), JOURNALPOST_ID);
 	}
 
 	@Test
 	void shouldValidateWhenMissingAvsenderMottaker() {
-		SafJournalpost.SafJournalpostBuilder safJournalpostBuilder = createSafJournalpost();
+		SafJournalpost.SafJournalpostBuilder safJournalpostBuilder = createSafJournalpost().tema(TEMA);
 		SafJournalpost safJournalpost = safJournalpostBuilder.avsenderMottaker(null).build();
 		validator.validate(safJournalpost, JOURNALPOST_ID);
 	}
@@ -143,6 +143,14 @@ class SafJournalpostValidatorQdist013Test extends SafJournalpostTest {
 		SafJournalpost safJournalpost = safJournalpostBuilder
 				.sak(SafJournalpost.Sak.builder().datoOpprettet(null).build())
 				.build();
+		assertThrows(SafJournalpostValidationException.class, () ->
+				validator.validate(safJournalpost, JOURNALPOST_ID));
+	}
+
+	@Test
+	void shouldThrowWhenMissingTema() {
+		SafJournalpost.SafJournalpostBuilder safJournalpostBuilder = createSafJournalpost();
+		SafJournalpost safJournalpost = safJournalpostBuilder.tema(null).build();
 		assertThrows(SafJournalpostValidationException.class, () ->
 				validator.validate(safJournalpost, JOURNALPOST_ID));
 	}

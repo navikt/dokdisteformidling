@@ -28,6 +28,7 @@ public class JournalpostQdist013Mapper {
 				.tittel(safJournalpost.getTittel())
 				.journalfortAvNavn(safJournalpost.getJournalfortAvNavn())
 				.temanavn(safJournalpost.getTemanavn())
+				.tema(safJournalpost.getTema())
 				.relevanteDatoer(Arrays.asList(safJournalpost.getRelevanteDatoer().stream()
 						.filter(relevantDato -> DATO_JOURNALFOERT.name().equals(relevantDato.getDatotype()))
 						.map(relevantDato ->

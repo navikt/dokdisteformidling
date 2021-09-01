@@ -89,7 +89,7 @@ class AvtaltmeldingMapperTest {
 	private static final String TITTEL = "tittel";
 	private static final String JOURNALFOERT_AV_NAVN = "journalfoertAvNavn";
 	private static final String TEMA_NAVN = "temaNavn";
-	private static final String OPPRETTET_AV_UKJENT = "UKJENT";
+	private static final String TEMA = "DAG";
 
 	private static final String DOKUMENT_INFO_ID_HOVEDDOK = "1234567";
 	private static final String TITTEL_HOVEDDOK = "tittelHoveddok";
@@ -132,6 +132,7 @@ class AvtaltmeldingMapperTest {
 	void fullHappyPath() {
 		when(pdlGraphQLConsumer.hentNavn(anyString(), anyString())).thenReturn(creatHentPersonInfo());
 		JAXBElement<Arkivmelding> arkivmeldingJAXBElement = avtaltmeldingMapper.createArkivMelding(createJournalpostQdist013Builder()
+				.tema(TEMA)
 				.build(), BESTILLINGS_ID);
 
 		assertThat(arkivmeldingJAXBElement, notNullValue());
@@ -149,6 +150,7 @@ class AvtaltmeldingMapperTest {
 		when(eregMock.hentNavn(any(String.class))).thenReturn(EREG_NAVN);
 
 		JournalpostQdist013 journalpostQdist013 = createJournalpostQdist013Builder()
+				.tema(TEMA)
 				.bruker(JournalpostQdist013.Bruker.builder()
 						.id(BRUKER_ID_ORGNR)
 						.type(BRUKER_TYPE_ORGNR)
@@ -176,6 +178,7 @@ class AvtaltmeldingMapperTest {
 		when(pdlGraphQLConsumer.hentNavn(anyString(), anyString())).thenReturn(creatHentPersonInfo());
 
 		JournalpostQdist013 journalpostQdist013 = createJournalpostQdist013Builder()
+				.tema(TEMA)
 				.bruker(JournalpostQdist013.Bruker.builder()
 						.id(BRUKER_ID_AKTOER_ID)
 						.type(BRUKER_TYPE_AKTOER_ID)
@@ -201,6 +204,7 @@ class AvtaltmeldingMapperTest {
 	@DisplayName("Case for satt originalJournalPostId men ukjent datoJournal")
 	void shouldMapOpprettetDatoWhenNullDatoJournalISafJournalpostgetJournalfortAndVedleggHasOriginalJpId() {
 		JournalpostQdist013 journalpostQdist013 = createJournalpostQdist013Builder()
+				.tema(TEMA)
 				.journalposttype(INNGAAENDE)
 				.dokumenter(Arrays.asList(createHoveddokumentBuilder().build(),
 						createVedleggBuilderUtenDato().build()))
@@ -225,6 +229,7 @@ class AvtaltmeldingMapperTest {
 		when(safJournalpostQueryServiceMock.hentJournalpost(ORIGINAL_JPID_VEDLEGG)).thenReturn(createLightweightSafJournalpostQdist013());
         when(pdlGraphQLConsumer.hentNavn(anyString(), anyString())).thenReturn(creatHentPersonInfo());
 		JournalpostQdist013 journalpostQdist013 = createJournalpostQdist013Builder()
+				.tema(TEMA)
 				.journalposttype(INNGAAENDE)
 				.dokumenter(Arrays.asList(createHoveddokumentBuilder().build(),
 						createVedleggBuilder().originalJournalpostId(ORIGINAL_JPID_VEDLEGG).build()))
@@ -249,6 +254,7 @@ class AvtaltmeldingMapperTest {
 		when(safJournalpostQueryServiceMock.hentJournalpost(ORIGINAL_JPID_VEDLEGG)).thenReturn(createLightweightSafJournalpostQdist013());
         when(pdlGraphQLConsumer.hentNavn(anyString(), anyString())).thenReturn(creatHentPersonInfo());
 		JournalpostQdist013 journalpostQdist013 = createJournalpostQdist013Builder()
+				.tema(TEMA)
 				.journalposttype(UTGAAENDE)
 				.dokumenter(Arrays.asList(createHoveddokumentBuilder().build(),
 						createVedleggBuilder().originalJournalpostId(ORIGINAL_JPID_VEDLEGG).build()))
@@ -273,6 +279,7 @@ class AvtaltmeldingMapperTest {
 		when(safJournalpostQueryServiceMock.hentJournalpost(ORIGINAL_JPID_VEDLEGG)).thenReturn(createLightweightSafJournalpostQdist013());
         when(pdlGraphQLConsumer.hentNavn(anyString(), anyString())).thenReturn(creatHentPersonInfo());
 		JournalpostQdist013 journalpostQdist013 = createJournalpostQdist013Builder()
+				.tema(TEMA)
 				.journalposttype("Notat")
 				.dokumenter(Arrays.asList(createHoveddokumentBuilder().build(),
 						createVedleggBuilder().originalJournalpostId(ORIGINAL_JPID_VEDLEGG).build()))
@@ -297,6 +304,7 @@ class AvtaltmeldingMapperTest {
 		when(safJournalpostQueryServiceMock.hentJournalpost(ORIGINAL_JPID_VEDLEGG)).thenReturn(createLightweightSafJournalpostQdist013());
         when(pdlGraphQLConsumer.hentNavn(anyString(), anyString())).thenReturn(creatHentPersonInfo());
 		JournalpostQdist013 journalpostQdist013 = createJournalpostQdist013Builder()
+				.tema(TEMA)
 				.dokumenter(Arrays.asList(createHoveddokumentBuilder().build(),
 						createVedleggBuilder().originalJournalpostId(ORIGINAL_JPID_VEDLEGG).build()))
 				.build();
@@ -328,6 +336,7 @@ class AvtaltmeldingMapperTest {
 		when(safJournalpostQueryServiceMock.hentJournalpost(ORIGINAL_JPID_VEDLEGG)).thenReturn(createLightweightSafJournalpostQdist013());
         when(pdlGraphQLConsumer.hentNavn(anyString(), anyString())).thenReturn(creatHentPersonInfo());
 		JournalpostQdist013 journalpostQdist013 = createJournalpostQdist013Builder()
+				.tema(TEMA)
 				.dokumenter(Arrays.asList(createHoveddokumentBuilder().build(),
 						createVedleggBuilder().originalJournalpostId(ORIGINAL_JPID_VEDLEGG).build()))
 				.build();
@@ -359,6 +368,7 @@ class AvtaltmeldingMapperTest {
 		when(safJournalpostQueryServiceMock.hentJournalpost(ORIGINAL_JPID_VEDLEGG)).thenReturn(createLightweightSafJournalpostQdist013());
         when(pdlGraphQLConsumer.hentNavn(anyString(), anyString())).thenReturn(creatHentPersonInfo());
 		JournalpostQdist013 journalpostQdist013 = createJournalpostQdist013Builder()
+				.tema(TEMA)
 				.dokumenter(Collections.singletonList(createHoveddokumentBuilder()
 						.dokumentvarianter(Arrays.asList(JournalpostQdist013.DokumentInfo.Dokumentvariant.builder()
 										.variantformat(VARIANTFORMAT_ARKIV)
@@ -391,6 +401,7 @@ class AvtaltmeldingMapperTest {
 		when(safJournalpostQueryServiceMock.hentJournalpost(ORIGINAL_JPID_VEDLEGG)).thenReturn(createLightweightSafJournalpostQdist013());
         when(pdlGraphQLConsumer.hentNavn(anyString(), anyString())).thenReturn(creatHentPersonInfo());
 		JournalpostQdist013 journalpostQdist013 = createJournalpostQdist013Builder()
+				.tema(TEMA)
 				.dokumenter(Collections.singletonList(createHoveddokumentBuilder()
 						.dokumentvarianter(Arrays.asList(JournalpostQdist013.DokumentInfo.Dokumentvariant.builder()
 										.variantformat(VARIANTFORMAT_ARKIV)
@@ -423,6 +434,7 @@ class AvtaltmeldingMapperTest {
 		when(safJournalpostQueryServiceMock.hentJournalpost(ORIGINAL_JPID_VEDLEGG)).thenReturn(createLightweightSafJournalpostQdist013());
         when(pdlGraphQLConsumer.hentNavn(anyString(), anyString())).thenReturn(creatHentPersonInfo());
 		JournalpostQdist013 journalpostQdist013 = createJournalpostQdist013Builder()
+				.tema(TEMA)
 				.dokumenter(Collections.singletonList(createHoveddokumentBuilder()
 						.dokumentvarianter(Arrays.asList(JournalpostQdist013.DokumentInfo.Dokumentvariant.builder()
 										.variantformat(VARIANTFORMAT_ARKIV)
@@ -454,6 +466,7 @@ class AvtaltmeldingMapperTest {
 	void happyPathVedleggFerdigstiltUtenStatus() {
         when(pdlGraphQLConsumer.hentNavn(anyString(), anyString())).thenReturn(creatHentPersonInfo());
 		JournalpostQdist013 journalpostQdist013 = createJournalpostQdist013Builder()
+				.tema(TEMA)
 				.dokumenter(Arrays.asList(createHoveddokumentBuilder().build(),
 						createVedleggBuilder().dokumentstatus(null).build()))
 				.build();
@@ -474,6 +487,7 @@ class AvtaltmeldingMapperTest {
         when(pdlGraphQLConsumer.hentNavn(anyString(), anyString())).thenReturn(creatHentPersonInfo());
 		when(safJournalpostQueryServiceMock.hentJournalpost(ORIGINAL_JPID_VEDLEGG)).thenReturn(createLightweightSafJournalpostQdist013());
 		JournalpostQdist013 journalpostQdist013 = createJournalpostQdist013Builder()
+				.tema(TEMA)
 				.dokumenter(Arrays.asList(createHoveddokumentBuilder().build(),
 						createVedleggBuilder().dokumentInfoId(DOKUMENT_INFO_ID_VEDLEGG_2)
 								.dokumentstatus("UNDER_REDIGERING")
@@ -497,6 +511,7 @@ class AvtaltmeldingMapperTest {
 		when(safJournalpostQueryServiceMock.hentJournalpost(ORIGINAL_JPID_VEDLEGG)).thenReturn(createLightweightSafJournalpostQdist013NoJournalFoertAv());
         when(pdlGraphQLConsumer.hentNavn(anyString(), anyString())).thenReturn(creatHentPersonInfo());
 		JournalpostQdist013 journalpostQdist013 = createJournalpostQdist013BuilderNoJournalFoertAv()
+				.tema(TEMA)
 				.dokumenter(Arrays.asList(createHoveddokumentBuilder().build(),
 						createVedleggBuilder().originalJournalpostId(ORIGINAL_JPID_VEDLEGG).build()))
 				.build();

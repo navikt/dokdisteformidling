@@ -343,7 +343,7 @@ public class AvtaltmeldingMapper {
 
     private String getFoedselsnummer(JournalpostQdist013 journalpostQdist013) {
         if (brukerTypeIsAktoerId(journalpostQdist013)) {
-            return pdlGraphQLConsumer.hentNavn(journalpostQdist013.getBruker().getId(), journalpostQdist013.getTemanavn()).getIdent();
+            return pdlGraphQLConsumer.hentNavn(journalpostQdist013.getBruker().getId(), journalpostQdist013.getTema()).getIdent();
         } else if (isBrukerTypeFnr(journalpostQdist013)) {
             return journalpostQdist013.getBruker().getId();
         } else {
@@ -359,7 +359,7 @@ public class AvtaltmeldingMapper {
         if (brukerTypeIsOrgnr(journalpostQdist013)) {
             return ereg.hentNavn(journalpostQdist013.getBruker().getId());
         } else {
-            return getHentPersonInfo(journalpostQdist013.getBruker().getId(), journalpostQdist013.getTemanavn()).getFulltnavn();
+            return getHentPersonInfo(journalpostQdist013.getBruker().getId(), journalpostQdist013.getTema()).getFulltnavn();
         }
     }
 
