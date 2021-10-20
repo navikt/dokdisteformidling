@@ -21,5 +21,7 @@
   "DOKDISTEFORMIDLING_VAULT": "/kv/preprod/fss/dokdisteformidling/q2",
   "VIRKSOMHETSSERTIFIKAT_VAULT": "/secret/virksomhetssertifikat/preprod/shared/",
   "DPO_LOGIN_VAULT": "/secret/dpo-eformidling-altinn/dpo",
-  "NAMESPACE": "teamdokumenthandtering"
+  "NAMESPACE": "teamdokumenthandtering",
+  "MIN_REPLICAS": "1",
+  "MAX_REPLICAS": "2"
 }
