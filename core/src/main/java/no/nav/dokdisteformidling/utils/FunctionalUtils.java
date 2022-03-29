@@ -1,15 +1,12 @@
 package no.nav.dokdisteformidling.utils;
 
-import com.amazonaws.SdkClientException;
 import no.nav.dokdisteformidling.constants.DomainConstants;
-import no.nav.dokdisteformidling.consumer.rdist001.HentForsendelseResponseTo;
 import no.nav.dokdisteformidling.exception.functional.InvalidForsendelseStatusFunctionalException;
-import no.nav.dokdisteformidling.exception.functional.KunneIkkeDeserialisereS3JsonPayloadFunctionalException;
+import no.nav.dokdisteformidling.exception.functional.KunneIkkeDeserialisereBucketJsonPayloadFunctionalException;
 import no.nav.dokdisteformidling.storage.DokdistDokument;
 import no.nav.dokdisteformidling.storage.JsonSerializer;
 
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 import static java.lang.String.format;
 
@@ -29,13 +26,13 @@ public final class FunctionalUtils {
         }
     }
 
-    public static DokdistDokument deserializeS3JsonPayloadToDokdistDokument(String jsonPayload, String objektReferanse) {
+    public static DokdistDokument deserializeBucketJsonPayloadToDokdistDokument(String jsonPayload, String objektReferanse) {
         DokdistDokument dokdistDokument;
         try {
             dokdistDokument = JsonSerializer.deserialize(jsonPayload, DokdistDokument.class);
             dokdistDokument.setDokumentObjektReferanse(objektReferanse);
-        } catch (SdkClientException e) {
-            throw new KunneIkkeDeserialisereS3JsonPayloadFunctionalException(format("Kunne ikke deserialisere jsonPayload fra s3 bucket for dokument med dokumentobjektreferanse=%s. Dokumentet er ikke persistert til s3 med korrekt format!", objektReferanse));
+        } catch (IllegalStateException e) {
+            throw new KunneIkkeDeserialisereBucketJsonPayloadFunctionalException(format("Kunne ikke deserialisere jsonPayload fra bucket for dokument med dokumentobjektreferanse=%s. Dokumentet er ikke persistert til bucket med korrekt format!", objektReferanse));
         }
         return dokdistDokument;
     }

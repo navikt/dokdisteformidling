@@ -22,6 +22,10 @@
   "VIRKSOMHETSSERTIFIKAT_VAULT": "/secret/virksomhetssertifikat/preprod/shared/",
   "DPO_LOGIN_VAULT": "/secret/dpo-eformidling-altinn/dpo",
   "NAMESPACE": "q1",
+  "DOKDISTMELLOMLAGER_PROJECTID": "teamdokumenthandteri-dev-2c5a",
+  "DOKDISTMELLOMLAGER_BUCKET": "dokdistmellomlager-dev",
+  "DOKDISTMELLOMLAGER_KEYRING": "dokdistmellomlager-keyring-dev",
+  "DOKDISTMELLOMLAGER_KEYID": "dokdistmellomlager-symmetric-dev",
   "MIN_REPLICAS": "1",
   "MAX_REPLICAS": "2"
 }
