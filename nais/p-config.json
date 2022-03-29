@@ -1,4 +1,5 @@
 {
+  "APP_NAME": "dokdisteformidling",
   "ADMINISTRERFORSENDELSE_V1_URL": "https://app.adeo.no/dokdist/rest/v1/administrerforsendelse",
   "SECURITY_TOKEN_SERVICE_TOKEN_URL": "https://security-token-service.nais.adeo.no/rest/v1/sts/token",
   "DOKDISTEFORMIDLING_CHANNEL_NAME": "P_DOKDISTEFORMIDLING",
@@ -18,7 +19,6 @@
   "ALTINN_BROKERSERVICEEXTERNALSTREAMED_ENDPOINTURL": "https://www.altinn.no/ServiceEngineExternal/BrokerServiceExternalStreamed.svc",
   "INGRESSES": "https://dokdisteformidling.nais.adeo.no",
   "SRVDOKDISTEFORMIDLING": "/serviceuser/data/prod/srvdokdisteformidling",
-  "DOKDISTEFORMIDLING_VAULT": "/kv/prod/fss/dokdisteformidling/default",
   "VIRKSOMHETSSERTIFIKAT_VAULT": "/secret/virksomhetssertifikat/prod/sdp",
   "DPO_LOGIN_VAULT": "/secret/dpo-eformidling-altinn/dpo",
   "NAMESPACE": "teamdokumenthandtering",

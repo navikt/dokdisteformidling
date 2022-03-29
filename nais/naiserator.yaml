@@ -75,9 +75,7 @@ spec:
     paths:
       - kvPath: {{ SRVDOKDISTEFORMIDLING }}
         mountPath: "/secrets/serviceuser/srvdokdisteformidling"
-      - kvPath: {{ DOKDISTEFORMIDLING_VAULT }}
-        mountPath: "/var/run/secrets/nais.io/vault"
-      - kvPath: {{ VIRKSOMHETSSERTIFIKAT_VAULT }}
+      - kvPath: {{ KLAGEINSTANS_VAULT }}
         mountPath: "/secrets/virksomhetssertifikat"
       - kvPath: {{ DPO_LOGIN_VAULT }}
         mountPath: "/secrets/dpo"
