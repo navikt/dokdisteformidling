@@ -1,6 +1,5 @@
 package no.nav.dokdisteformidling.qdist013.itest.config;
 
-import com.amazonaws.services.s3.AmazonS3;
 import no.nav.dokdisteformidling.certificate.KeyStoreProperties;
 import no.nav.dokdisteformidling.config.alias.MqGatewayAlias;
 import no.nav.dokdisteformidling.config.alias.ServiceuserAlias;
@@ -10,8 +9,7 @@ import no.nav.dokdisteformidling.config.props.BrokerServiceExternalStreamedPrope
 import no.nav.dokdisteformidling.config.props.DpoUserProperties;
 import no.nav.dokdisteformidling.config.props.MaskinportenProperties;
 import no.nav.dokdisteformidling.config.props.ServiceRegistryProperties;
-import no.nav.dokdisteformidling.storage.S3Storage;
-import no.nav.dokdisteformidling.storage.Storage;
+import no.nav.dokdisteformidling.storage.BucketStorage;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -44,13 +42,8 @@ import static org.mockito.Mockito.mock;
 public class ApplicationTestConfig {
 
 	@Bean
-	public AmazonS3 s3() {
-		return mock(AmazonS3.class);
-	}
-
-	@Bean
-	public Storage storage(AmazonS3 s3) {
-		return new S3Storage(s3);
+	public BucketStorage bucketStorage() {
+		return mock(BucketStorage.class);
 	}
 
 }

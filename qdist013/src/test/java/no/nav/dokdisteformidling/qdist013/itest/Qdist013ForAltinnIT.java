@@ -1,16 +1,17 @@
 package no.nav.dokdisteformidling.qdist013.itest;
 
-import com.amazonaws.SdkClientException;
-import com.amazonaws.services.s3.AmazonS3;
 import com.github.tomakehurst.wiremock.admin.model.ListStubMappingsResult;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import com.github.tomakehurst.wiremock.verification.LoggedRequest;
+import com.google.cloud.storage.StorageException;
 import no.altinn.brokerserviceexternal.InitiateBrokerService;
 import no.altinn.brokerserviceexternal.Manifest;
 import no.nav.dokdisteformidling.consumer.eformidling.EformidlingConstants;
 import no.nav.dokdisteformidling.consumer.eformidling.serviceregistry.EformidlingMottakerInfoService;
 import no.nav.dokdisteformidling.consumer.eformidling.serviceregistry.MottakerInfo;
+import no.nav.dokdisteformidling.exception.technical.BucketFailedToDownloadTechnicalException;
 import no.nav.dokdisteformidling.qdist013.itest.config.ApplicationTestConfig;
+import no.nav.dokdisteformidling.storage.BucketStorage;
 import no.nav.dokdisteformidling.storage.DokdistDokument;
 import no.nav.dokdisteformidling.storage.JsonSerializer;
 import org.apache.activemq.command.ActiveMQTextMessage;
@@ -66,13 +67,13 @@ import static java.util.concurrent.TimeUnit.SECONDS;
 import static no.nav.dokdisteformidling.constants.RetryConstants.MAX_ATTEMPTS_SHORT;
 import static no.nav.dokdisteformidling.consumer.eformidling.EformidlingConstants.TRYGDERETTEN_ORGNUMMER;
 import static no.nav.dokdisteformidling.qdist013.TestUtil.classpathToString;
-import static no.nav.dokdisteformidling.storage.S3Configuration.BUCKET_NAME;
 import static org.awaitility.Awaitility.await;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.fail;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
@@ -122,10 +123,8 @@ class Qdist013ForAltinnIT {
 	private Queue backoutQueue;
 	@Inject
 	private JmsTemplate jmsTemplate;
-
 	@Inject
-	private AmazonS3 amazonS3;
-
+	private BucketStorage bucketStorage;
 
 	@Inject
 	private EformidlingMottakerInfoService eformidlingMottakerInfoService;
@@ -138,18 +137,15 @@ class Qdist013ForAltinnIT {
 		WireMock.reset();
 		WireMock.resetAllRequests();
 		WireMock.removeAllMappings();
-		Mockito.reset(amazonS3);
+		Mockito.reset(bucketStorage);
 
-		when(amazonS3.getObjectAsString(eq(BUCKET_NAME), eq(DOKUMENT_OBJEKT_REFERANSE_HOVEDDOK)))
+		when(bucketStorage.downloadObject(eq(DOKUMENT_OBJEKT_REFERANSE_HOVEDDOK), anyString()))
 				.thenReturn(JsonSerializer.serialize(DokdistDokument.builder().pdf(HOVEDDOK_TEST_CONTENT.getBytes()).build()));
-		when(amazonS3.getObjectAsString(eq(BUCKET_NAME), eq(DOKUMENT_OBJEKT_REFERANSE_VEDLEGG1)))
+		when(bucketStorage.downloadObject(eq(DOKUMENT_OBJEKT_REFERANSE_VEDLEGG1), anyString()))
 				.thenReturn(JsonSerializer.serialize(DokdistDokument.builder().pdf(VEDLEGG1_TEST_CONTENT.getBytes()).build()));
-		when(amazonS3.getObjectAsString(eq(BUCKET_NAME), eq(DOKUMENT_OBJEKT_REFERANSE_VEDLEGG2)))
+		when(bucketStorage.downloadObject(eq(DOKUMENT_OBJEKT_REFERANSE_VEDLEGG2), anyString()))
 				.thenReturn(JsonSerializer.serialize(DokdistDokument.builder().pdf(VEDLEGG2_TEST_CONTENT.getBytes()).build()));
-
-
 	}
-
 
 	@Test
 	void shouldHenteMottakerInfoFraServiceRegistery() {
@@ -305,9 +301,8 @@ class Qdist013ForAltinnIT {
 	}
 
 	@Test
-	void shouldThrowS3FailedToGetDocumentTechnicalExceptionVedSdkClientException() {
-		when(amazonS3.getObjectAsString(eq(BUCKET_NAME),
-				eq(DOKUMENT_OBJEKT_REFERANSE_HOVEDDOK))).thenThrow(new SdkClientException("SdkClientException"));
+	void shouldThrowBucketFailedToDownloadTechnicalExceptionVedStorageException() {
+		when(bucketStorage.downloadObject(eq(DOKUMENT_OBJEKT_REFERANSE_HOVEDDOK), anyString())).thenThrow(new StorageException(1, "StorageException"));
 
 		stubGetForsendelse("__files/rjoark001/getForsendelse-happy.json");
 
@@ -321,8 +316,8 @@ class Qdist013ForAltinnIT {
 	}
 
 	@Test
-	void shouldThrowS3FailedToGetDocumentTechnicalExceptionVedSecurityException() {
-		when(amazonS3.getObjectAsString(eq(BUCKET_NAME), eq(DOKUMENT_OBJEKT_REFERANSE_HOVEDDOK))).thenThrow(new SecurityException("SecurityException"));
+	void shouldThrowBucketFailedToDownloadTechnicalException() {
+		when(bucketStorage.downloadObject(eq(DOKUMENT_OBJEKT_REFERANSE_HOVEDDOK), anyString())).thenThrow(new BucketFailedToDownloadTechnicalException("Fail"));
 
 		stubGetForsendelse("__files/rjoark001/getForsendelse-happy.json");
 
@@ -1015,9 +1010,8 @@ class Qdist013ForAltinnIT {
 	}
 
 	@Test
-	void shouldThrowKunneIkkeDeserialisereS3PayloadFunctionalException() {
-		when(amazonS3.getObjectAsString(eq(BUCKET_NAME),
-				eq(DOKUMENT_OBJEKT_REFERANSE_VEDLEGG2))).thenReturn("notJsonSerializedString");
+	void shouldThrowKunneIkkeDeserialisereBucketPayloadFunctionalException() {
+		when(bucketStorage.downloadObject(eq(DOKUMENT_OBJEKT_REFERANSE_VEDLEGG2), anyString())).thenReturn("notJsonSerializedString");
 
 		stubGetForsendelse("__files/rjoark001/getForsendelse-happy.json");
 

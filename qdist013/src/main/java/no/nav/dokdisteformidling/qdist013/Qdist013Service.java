@@ -14,8 +14,8 @@ import no.nav.dokdisteformidling.consumer.saf.SafJournalpostQueryService;
 import no.nav.dokdisteformidling.exception.functional.IkkeSammenfallendeIderFunctionalException;
 import no.nav.dokdisteformidling.exception.technical.KunneIkkeMarshalleArkivmeldingTechnicalException;
 import no.nav.dokdisteformidling.qdist013.saf.main.JournalpostQdist013;
+import no.nav.dokdisteformidling.storage.BucketStorage;
 import no.nav.dokdisteformidling.storage.DokdistDokument;
-import no.nav.dokdisteformidling.storage.Storage;
 import org.apache.camel.Exchange;
 import org.apache.camel.Handler;
 import org.springframework.stereotype.Service;
@@ -38,7 +38,7 @@ import static no.nav.dokdisteformidling.constants.RouteConstants.PROPERTY_CONVER
 import static no.nav.dokdisteformidling.constants.RouteConstants.PROPERTY_JOURNALPOST_ID;
 import static no.nav.dokdisteformidling.consumer.eformidling.NavDokument.fromAvtaltmelding;
 import static no.nav.dokdisteformidling.consumer.eformidling.NavDokument.fromVedlegg;
-import static no.nav.dokdisteformidling.utils.FunctionalUtils.deserializeS3JsonPayloadToDokdistDokument;
+import static no.nav.dokdisteformidling.utils.FunctionalUtils.deserializeBucketJsonPayloadToDokdistDokument;
 import static no.nav.dokdisteformidling.utils.FunctionalUtils.generateRandomUUID;
 import static no.nav.dokdisteformidling.utils.FunctionalUtils.validateThatForsendelseStatusIsKlarForDist;
 
@@ -49,8 +49,7 @@ import static no.nav.dokdisteformidling.utils.FunctionalUtils.validateThatForsen
 @Service
 public class Qdist013Service {
 
-
-    private final Storage s3Storage;
+    private final BucketStorage bucketStorage;
     private final AdministrerForsendelse administrerForsendelse;
     private final SafJournalpostQueryService<JournalpostQdist013> safJournalpostQueryService;
     private final JuridiskLogg juridiskLogg;
@@ -58,14 +57,14 @@ public class Qdist013Service {
     private final AvtaltmeldingMapper avtaltmeldingMapper;
     private final Eformidling eformidling;
 
-    public Qdist013Service(Storage s3Storage,
+    public Qdist013Service(BucketStorage bucketStorage,
                            AdministrerForsendelse administrerForsendelse,
                            @Named("SafJournalpostQueryServiceQdist013") SafJournalpostQueryService<JournalpostQdist013> safJournalpostQueryService,
                            JuridiskLogg juridiskLogg,
                            LagreJuridiskLoggMapper lagreJuridiskLoggMapper,
                            AvtaltmeldingMapper avtaltmeldingMapper,
                            Eformidling eformidling) {
-        this.s3Storage = s3Storage;
+        this.bucketStorage = bucketStorage;
         this.administrerForsendelse = administrerForsendelse;
         this.safJournalpostQueryService = safJournalpostQueryService;
         this.juridiskLogg = juridiskLogg;
@@ -87,7 +86,7 @@ public class Qdist013Service {
         exchange.setProperty(PROPERTY_CONVERSATION_ID, conversationId);
         validateThatForsendelseStatusIsKlarForDist(hentForsendelseResponseTo.getForsendelseStatus());
 
-        final List<DokdistDokument> dokdistDokumentList = getDocumentsFromS3(hentForsendelseResponseTo);
+        final List<DokdistDokument> dokdistDokumentList = getDocumentsFromBucket(hentForsendelseResponseTo);
         exchange.setProperty(PROPERTY_ANTALL_DOK, dokdistDokumentList.size());
         final JournalpostQdist013 journalpostQdist013 = safJournalpostQueryService.hentJournalpost(hentForsendelseResponseTo.getArkivInformasjon()
                 .getArkivId());
@@ -109,11 +108,11 @@ public class Qdist013Service {
 
     }
 
-    private List<DokdistDokument> getDocumentsFromS3(HentForsendelseResponseTo hentForsendelseResponseTo) {
+    private List<DokdistDokument> getDocumentsFromBucket(HentForsendelseResponseTo hentForsendelseResponseTo) {
         return hentForsendelseResponseTo.getDokumenter().stream()
                 .map(dokumentTo -> {
-                    String jsonPayload = s3Storage.get(dokumentTo.getDokumentObjektReferanse());
-                    DokdistDokument dokdistDokument = deserializeS3JsonPayloadToDokdistDokument(jsonPayload, dokumentTo.getDokumentObjektReferanse());
+                    String jsonPayload = bucketStorage.downloadObject(dokumentTo.getDokumentObjektReferanse(), hentForsendelseResponseTo.getBestillingsId());
+                    DokdistDokument dokdistDokument = deserializeBucketJsonPayloadToDokdistDokument(jsonPayload, dokumentTo.getDokumentObjektReferanse());
                     dokdistDokument.setDokumentInfoId(dokumentTo.getArkivDokumentInfoId());
                     return dokdistDokument;
                 })

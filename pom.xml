@@ -30,7 +30,8 @@
 		<jakarta.xml.ws-api.version>2.3.3</jakarta.xml.ws-api.version>
 		<lombok.version>1.18.20</lombok.version>
 		<resilience4j.version>1.7.0</resilience4j.version>
-		<aws-java-sdk-s3.version>1.11.1034</aws-java-sdk-s3.version>
+		<google-cloud.version>25.0.0</google-cloud.version>
+		<google-tink.version>1.6.1</google-tink.version>
 		<wmq.version>9.2.2.0</wmq.version>
 		<cxf.version>3.4.3</cxf.version>
 		<melding-virksomhet-dokdistfordeling.version>2.0.4</melding-virksomhet-dokdistfordeling.version>
@@ -98,11 +99,22 @@
 				<version>${jaxb2-basics-runtime.version}</version>
 			</dependency>
 			<dependency>
-				<groupId>com.amazonaws</groupId>
-				<artifactId>aws-java-sdk-s3</artifactId>
-				<version>${aws-java-sdk-s3.version}</version>
+				<groupId>com.google.cloud</groupId>
+				<artifactId>libraries-bom</artifactId>
+				<version>${google-cloud.version}</version>
+				<type>pom</type>
+				<scope>import</scope>
 			</dependency>
 			<dependency>
+				<groupId>com.google.crypto.tink</groupId>
+				<artifactId>tink</artifactId>
+				<version>${google-tink.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.google.crypto.tink</groupId>
+				<artifactId>tink-gcpkms</artifactId>
+				<version>${google-tink.version}</version>
+			</dependency>			<dependency>
 				<groupId>jakarta.xml.ws</groupId>
 				<artifactId>jakarta.xml.ws-api</artifactId>
 				<version>${jakarta.xml.ws-api.version}</version>
