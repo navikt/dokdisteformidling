@@ -1,5 +1,4 @@
 {
-  "APP_NAME": "dokdisteformidling",
   "ADMINISTRERFORSENDELSE_V1_URL": "https://app-q2.adeo.no/dokdist/rest/v1/administrerforsendelse",
   "SECURITY_TOKEN_SERVICE_TOKEN_URL": "https://security-token-service.nais.preprod.local/rest/v1/sts/token",
   "DOKDISTEFORMIDLING_CHANNEL_NAME": "Q2_DOKDISTEFORMIDLIN",
@@ -19,7 +18,8 @@
   "ALTINN_BROKERSERVICEEXTERNALSTREAMED_ENDPOINTURL": "https://www.altinn.no/ServiceEngineExternal/BrokerServiceExternalStreamed.svc",
   "INGRESSES": "https://dokdisteformidling.dev.intern.nav.no",
   "SRVDOKDISTEFORMIDLING": "/serviceuser/data/dev/srvdokdisteformidling",
-  "KLAGEINSTANS_VAULT": "/secret/virksomhetssertifikat/preprod/klageinstans/",
+  "DOKDISTEFORMIDLING_VAULT": "/kv/preprod/fss/dokdisteformidling/q2",
+  "VIRKSOMHETSSERTIFIKAT_VAULT": "/secret/virksomhetssertifikat/preprod/shared/",
   "DPO_LOGIN_VAULT": "/secret/dpo-eformidling-altinn/dpo",
   "NAMESPACE": "teamdokumenthandtering",
   "DOKDISTMELLOMLAGER_PROJECTID": "teamdokumenthandteri-dev-2c5a",

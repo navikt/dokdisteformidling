@@ -19,7 +19,7 @@
   "ALTINN_BROKERSERVICEEXTERNALSTREAMED_ENDPOINTURL": "https://www.altinn.no/ServiceEngineExternal/BrokerServiceExternalStreamed.svc",
   "INGRESSES": "https://dokdisteformidling-q1.dev.intern.nav.no",
   "SRVDOKDISTEFORMIDLING": "/serviceuser/data/dev/srvdokdisteformidling",
-  "KLAGEINSTANS_VAULT": "/secret/virksomhetssertifikat/preprod/klageinstans/",
+  "VIRKSOMHETSSERTIFIKAT_VAULT": "/secret/virksomhetssertifikat/preprod/shared/",
   "DPO_LOGIN_VAULT": "/secret/dpo-eformidling-altinn/dpo",
   "NAMESPACE": "teamdokumenthandtering",
   "DOKDISTMELLOMLAGER_PROJECTID": "teamdokumenthandteri-dev-2c5a",

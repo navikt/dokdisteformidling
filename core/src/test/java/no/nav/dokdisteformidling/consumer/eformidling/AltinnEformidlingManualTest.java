@@ -51,7 +51,7 @@ class AltinnEformidlingManualTest {
 		System.setProperty("https.proxyPort", "8088");
 		System.setProperty("https.nonProxyHosts", "*.155.55.|*.192.168.|*.10.|*.local|*.rtv.gov|*.adeo.no|*.nav.no|*.aetat.no|*.devillo.no|*.oera.no");
 		maskinportenProperties.setAudience("https://oidc-ver1.difi.no/idporten-oidc-provider/");
-		maskinportenProperties.setClientid("MOVE_IP_991078045");
+		maskinportenProperties.setClientid("MOVE_IP_889640782");
 		maskinportenProperties.setUrl(new URL("https://oidc-ver1.difi.no/idporten-oidc-provider/token"));
 		keyStoreProperties.setType(System.getProperty("virksomhetssertifikat.type"));
 		keyStoreProperties.setAlias(System.getProperty("virksomhetssertifikat.alias"));
