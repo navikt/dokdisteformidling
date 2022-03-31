@@ -31,3 +31,9 @@ then
     echo "Setting virksomhetssertifikat_path"
     export virksomhetssertifikat_path="file:///secrets/virksomhetssertifikat/key.p12.b64"
 fi
+
+if test -f /var/run/secrets/nais.io/vault/gcloud_serviceaccount
+then
+    echo "Setting GOOGLE_APPLICATION_CREDENTIALS"
+    export GOOGLE_APPLICATION_CREDENTIALS=/var/run/secrets/nais.io/vault/gcloud_serviceaccount
+fi

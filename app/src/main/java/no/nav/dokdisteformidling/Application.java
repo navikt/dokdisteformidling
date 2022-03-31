@@ -5,6 +5,7 @@ import no.nav.dokdisteformidling.config.alias.MqGatewayAlias;
 import no.nav.dokdisteformidling.config.alias.ServiceuserAlias;
 import no.nav.dokdisteformidling.config.props.BrokerServiceExternalProperties;
 import no.nav.dokdisteformidling.config.props.BrokerServiceExternalStreamedProperties;
+import no.nav.dokdisteformidling.config.props.DokdistmellomlagerProperties;
 import no.nav.dokdisteformidling.config.props.DpoUserProperties;
 import no.nav.dokdisteformidling.config.props.MaskinportenProperties;
 import no.nav.dokdisteformidling.config.props.ServiceRegistryProperties;
@@ -24,7 +25,8 @@ import org.springframework.scheduling.annotation.EnableScheduling;
         KeyStoreProperties.class,
         MqGatewayAlias.class,
         MaskinportenProperties.class,
-        ServiceRegistryProperties.class})
+        ServiceRegistryProperties.class,
+		DokdistmellomlagerProperties.class})
 public class Application {
 
     public static void main(String[] args) {
