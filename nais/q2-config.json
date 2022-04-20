@@ -21,7 +21,6 @@
   "SRVDOKDISTEFORMIDLING": "/serviceuser/data/dev/srvdokdisteformidling",
   "DOKDISTEFORMIDLING_VAULT": "/kv/preprod/fss/dokdisteformidling/teamdokumenthandtering",
   "KLAGEINSTANS_VAULT": "/secret/virksomhetssertifikat/preprod/klageinstans/",
-  "DPO_LOGIN_VAULT": "/secret/dpo-eformidling-altinn/dpo",
   "NAMESPACE": "teamdokumenthandtering",
   "DOKDISTMELLOMLAGER_PROJECTID": "teamdokumenthandteri-dev-2c5a",
   "DOKDISTMELLOMLAGER_BUCKET": "dokdistmellomlager-dev",
