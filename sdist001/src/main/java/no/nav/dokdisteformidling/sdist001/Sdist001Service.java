@@ -16,6 +16,7 @@ import no.nav.dokdisteformidling.sdist001.domain.EformidlingStatusOppdatering;
 import no.nav.dokdisteformidling.sdist001.domain.ForsendelseStatusEndringer;
 import no.nav.dokdisteformidling.sdist001.domain.to.AltinnKvitteringStatus;
 import org.springframework.stereotype.Service;
+import com.fasterxml.jackson.datatype.joda.JodaModule;
 
 import java.util.List;
 
@@ -128,7 +129,7 @@ public class Sdist001Service {
                 eformidlingStatusOppdateringMapper.map(konversasjonId, trygderettenKvitteringStatus);
 
         try {
-            byte[] meldingsInnhold = new ObjectMapper().writeValueAsBytes(eformidlingStatusOppdatering);
+            byte[] meldingsInnhold = new ObjectMapper().registerModule(new JodaModule()).writeValueAsBytes(eformidlingStatusOppdatering);
             LoggMeldingRequest loggMeldingRequest = lagreJuridiskLoggMapper.map(hentForsendelseResponseTo, meldingsInnhold);
             juridiskLogg.lagreJuridiskLogg(loggMeldingRequest);
         } catch (JsonProcessingException e) {
