@@ -26,7 +26,7 @@
 		<java.version>17</java.version>
 		<camel.version>3.16.0</camel.version>
 		<javax.inject.version>1</javax.inject.version>
-		<logstash-logback-encoder.version>6.6</logstash-logback-encoder.version>
+		<logstash-logback-encoder.version>7.0.1</logstash-logback-encoder.version>
 		<jakarta.xml.ws-api.version>2.3.3</jakarta.xml.ws-api.version>
 		<lombok.version>1.18.20</lombok.version>
 		<resilience4j.version>1.7.0</resilience4j.version>
