@@ -24,7 +24,7 @@
 
 	<properties>
 		<java.version>17</java.version>
-		<camel.version>3.10.0</camel.version>
+		<camel.version>3.16.0</camel.version>
 		<javax.inject.version>1</javax.inject.version>
 		<logstash-logback-encoder.version>6.6</logstash-logback-encoder.version>
 		<jakarta.xml.ws-api.version>2.3.3</jakarta.xml.ws-api.version>
@@ -33,7 +33,7 @@
 		<google-cloud.version>25.0.0</google-cloud.version>
 		<google-tink.version>1.6.1</google-tink.version>
 		<wmq.version>9.2.2.0</wmq.version>
-		<cxf.version>3.4.3</cxf.version>
+		<cxf.version>3.5.2</cxf.version>
 		<melding-virksomhet-dokdistfordeling.version>2.0.4</melding-virksomhet-dokdistfordeling.version>
 		<jaxb2-basics-runtime.version>1.11.1</jaxb2-basics-runtime.version>
 		<jaxb-api.version>2.3.6</jaxb-api.version>
