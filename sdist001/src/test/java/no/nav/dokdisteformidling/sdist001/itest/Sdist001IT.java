@@ -38,6 +38,7 @@ import static com.github.tomakehurst.wiremock.client.WireMock.verify;
 import static no.nav.dokdisteformidling.consumer.eformidling.EformidlingConstants.TRYGDERETTEN_ORGNUMMER;
 import static no.nav.dokdisteformidling.testUtils.classpathToByteArray;
 import static no.nav.dokdisteformidling.testUtils.classpathToString;
+import static org.apache.http.HttpHeaders.CONTENT_TYPE;
 import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
 
 /**
@@ -80,7 +81,7 @@ class Sdist001IT {
         sdist001Service.oppdatereDokDistEformidlingStatus();
         verify(1, postRequestedFor(urlEqualTo("/maskinporten")));
         verify(1, getRequestedFor(urlEqualTo("/serviceregistry/identifier/" + TRYGDERETTEN_ORGNUMMER + "/process/" + EformidlingConstants.AVTALTMELDING_PROCESS)));
-        verify(1, getRequestedFor(urlEqualTo("/administrerforsendelse/henteformidlingforsendelser")));
+        verify(1, getRequestedFor(urlEqualTo("/administrerforsendelse/henteformidlingforsendelser?distribusjonKanal=TRYGDERETTEN")));
         verify(2, postRequestedFor(urlEqualTo("/brokerserviceexternal")));
         verify(1, postRequestedFor(urlEqualTo("/brokerserviceexternalstreamed")));
         verify(1, getRequestedFor(urlEqualTo("/administrerforsendelse/1")));
@@ -92,21 +93,21 @@ class Sdist001IT {
     private void stubPostMaskinporten() {
         stubFor(post(urlMatching("/maskinporten"))
                 .willReturn(aResponse().withStatus(HttpStatus.OK.value())
-                        .withHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                        .withHeader(CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                         .withBodyFile("maskinporten/maskinporten_happy_response.json")));
     }
 
     private void stubGetServiceRegistry() {
         stubFor(get(urlMatching("/serviceregistry/identifier/" + EformidlingConstants.TRYGDERETTEN_ORGNUMMER + "/process/" + EformidlingConstants.AVTALTMELDING_PROCESS))
                 .willReturn(aResponse().withStatus(HttpStatus.OK.value())
-                        .withHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                        .withHeader(CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                         .withBodyFile("serviceregistry/serviceregistry_happy_response.json")));
     }
 
     private void stubGetHentEformidlingForsendelserBEKREFTETStatus() {
-        stubFor(get("/administrerforsendelse/henteformidlingforsendelser")
+        stubFor(get("/administrerforsendelse/henteformidlingforsendelser?distribusjonKanal=TRYGDERETTEN")
                 .willReturn(aResponse().withStatus(HttpStatus.OK.value())
-                        .withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE)
+                        .withHeader(CONTENT_TYPE, APPLICATION_JSON_VALUE)
                         .withBodyFile("rdist001/henteformidlingforsendelser-bekreftetStatus.json")));
     }
 
@@ -116,7 +117,7 @@ class Sdist001IT {
                 .whenScenarioStateIs(Scenario.STARTED)
                 .willSetStateTo(SCENARIO_STATE_GET_AVAILABLE_FILES_DONE)
                 .willReturn(aResponse().withStatus(HttpStatus.OK.value())
-                        .withHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_XML_VALUE)
+                        .withHeader(CONTENT_TYPE, MediaType.APPLICATION_XML_VALUE)
                         .withBodyFile("altinn/brokerserviceexternal/getavailablefiles_happy_response.xml")));
     }
 
@@ -125,7 +126,7 @@ class Sdist001IT {
 
         stubFor(post(urlMatching("/brokerserviceexternalstreamed"))
                 .willReturn(aResponse().withStatus(HttpStatus.OK.value())
-                        .withHeader(HttpHeaders.CONTENT_TYPE, String.format("multipart/related; type=\"application/xop+xml\"; start=\"<http://tempuri.org/1>\"; boundary=\"%s\"; start-info=\"text/xml\"", boundary))
+                        .withHeader(CONTENT_TYPE, String.format("multipart/related; type=\"application/xop+xml\"; start=\"<http://tempuri.org/1>\"; boundary=\"%s\"; start-info=\"text/xml\"", boundary))
                         .withHeader(HttpHeaders.TRANSFER_ENCODING, "chunked")
                         .withHeader("MIME-Version", "1.0")
                         .withBody(getDownloadBody(boundary))));
@@ -154,7 +155,7 @@ class Sdist001IT {
 
     private void stubGetAdministrerforsendleseHentForsendelse() {
         stubFor(get("/administrerforsendelse/" + FORSENDELSE_ID).willReturn(aResponse().withStatus(HttpStatus.OK.value())
-                .withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE)
+                .withHeader(CONTENT_TYPE, APPLICATION_JSON_VALUE)
                 .withBodyFile("rdist001/getForsendelse-BEKREFTET.json")));
     }
 
@@ -173,7 +174,7 @@ class Sdist001IT {
                 .whenScenarioStateIs(SCENARIO_STATE_GET_AVAILABLE_FILES_DONE)
                 .willReturn(aResponse()
                         .withStatus(HttpStatus.OK.value())
-                        .withHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_XML_VALUE)
+                        .withHeader(CONTENT_TYPE, MediaType.APPLICATION_XML_VALUE)
                         .withBodyFile("altinn/brokerserviceexternal/confirmdownloaded_happy_response.xml")));
     }
 }
