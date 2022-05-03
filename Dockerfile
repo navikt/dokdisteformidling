@@ -1,4 +1,4 @@
-FROM navikt/java:11
+FROM navikt/java:17
 
 USER root
 # Brukes for å hente config fra json filer
