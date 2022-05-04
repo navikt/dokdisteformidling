@@ -300,7 +300,7 @@ public class AvtaltmeldingMapper {
     private Korrespondansepart createAndPolpulateKorrespondanspartAvsender(ObjectFactory objectFactory) {
         Korrespondansepart korrespondansepartAvsender = objectFactory.createKorrespondansepart();
         korrespondansepartAvsender.setKorrespondanseparttype(AVSENDER);
-        korrespondansepartAvsender.setKorrespondansepartNavn(NAV_KLAGEINSTANS); //TODO Må avklares. Skal kanskje bare være "NAV"
+        korrespondansepartAvsender.setKorrespondansepartNavn(NAV_KLAGEINSTANS);
         korrespondansepartAvsender.setOrganisasjonsnummer(EnhetsidentifikatorType.builder()
                 .withOrganisasjonsnummer(TRYGDERETTEN_ORGNUMMER)
                 .build());
