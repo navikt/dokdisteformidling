@@ -10,12 +10,12 @@ then
     echo "Setting serviceuser_password"
     export  serviceuser_password=$(cat /secrets/serviceuser/srvdokdisteformidling/password)
 fi
-if test -f /secrets/dpo/dpo.json
+if test -f /var/run/secrets/nais.io/vault/dpo.json
 then
     echo "Setting dpo_username"
-    export dpo_username="$(cat /secrets/dpo/dpo.json | jq -r '.username')"
+    export dpo_username="$(cat /var/run/secrets/nais.io/vault/dpo.json | jq -r '.username')"
     echo "Setting dpo_password"
-    export dpo_password="$(cat /secrets/dpo/dpo.json | jq -r '.password')"
+    export dpo_password="$(cat /var/run/secrets/nais.io/vault/dpo.json | jq -r '.password')"
 fi
 if test -f /secrets/virksomhetssertifikat/credentials.json
 then
