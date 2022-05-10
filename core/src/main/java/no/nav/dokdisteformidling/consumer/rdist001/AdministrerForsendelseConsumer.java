@@ -32,9 +32,6 @@ import java.time.Duration;
 
 import static no.nav.dokdisteformidling.constants.DomainConstants.DISTRIBUSJONSKANAL;
 
-/**
- * @author Sigurd Midttœun, Visma Consulting.
- */
 @Slf4j
 @Component
 public class AdministrerForsendelseConsumer implements AdministrerForsendelse {
