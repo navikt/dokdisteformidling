@@ -13,6 +13,7 @@ import no.nav.dokdisteformidling.exception.technical.Rdist001HentForsendelseTech
 import no.nav.dokdisteformidling.exception.technical.Rdist001OppdaterForsendelseTechnicalException;
 import no.nav.dokdisteformidling.metrics.Monitor;
 import org.slf4j.MDC;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.HttpEntity;
@@ -27,12 +28,10 @@ import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import javax.inject.Inject;
 import java.time.Duration;
 
-/**
- * @author Sigurd Midttun, Visma Consulting.
- */
+import static no.nav.dokdisteformidling.constants.DomainConstants.DISTRIBUSJONSKANAL;
+
 @Slf4j
 @Component
 public class AdministrerForsendelseConsumer implements AdministrerForsendelse {
@@ -40,7 +39,7 @@ public class AdministrerForsendelseConsumer implements AdministrerForsendelse {
 	private final String administrerforsendelseV1Url;
 	private final RestTemplate restTemplate;
 
-	@Inject
+	@Autowired
 	public AdministrerForsendelseConsumer(@Value("${administrerforsendelse.v1.url}") String administrerforsendelseV1Url,
 										  RestTemplateBuilder restTemplateBuilder,
 										  final ServiceuserAlias serviceuserAlias) {
@@ -108,9 +107,13 @@ public class AdministrerForsendelseConsumer implements AdministrerForsendelse {
 	@Retryable(include = AbstractDokdisteformidlingTechnicalException.class, backoff = @Backoff(delay = RetryConstants.DELAY_SHORT, multiplier = RetryConstants.MULTIPLIER_SHORT))
 	@Monitor(value = "dok_consumer", extraTags = {"process", "hentEformidlingForsendelser"}, histogram = true)
 	public HentEformidlingforsendelserResponseTo hentEformidlingForsendelser() {
+		String uri = UriComponentsBuilder.fromHttpUrl(administrerforsendelseV1Url)
+				.path("/henteformidlingforsendelser")
+				.queryParam("distribusjonKanal", DISTRIBUSJONSKANAL)
+				.toUriString();
 		try {
 			HttpEntity entity = new HttpEntity<>(createHeaders());
-			return restTemplate.exchange(this.administrerforsendelseV1Url + "/henteformidlingforsendelser", HttpMethod.GET, entity, HentEformidlingforsendelserResponseTo.class)
+			return restTemplate.exchange(uri, HttpMethod.GET, entity, HentEformidlingforsendelserResponseTo.class)
 					.getBody();
 		} catch (HttpClientErrorException e) {
 			throw new Rdist001HentEformidlingforsendelserFunctionalException(
