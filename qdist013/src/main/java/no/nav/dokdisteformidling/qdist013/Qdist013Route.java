@@ -1,12 +1,5 @@
 package no.nav.dokdisteformidling.qdist013;
 
-import static no.nav.dokdisteformidling.constants.RouteConstants.PROPERTY_BESTILLINGS_ID;
-import static no.nav.dokdisteformidling.constants.RouteConstants.PROPERTY_CONVERSATION_ID;
-import static no.nav.dokdisteformidling.constants.RouteConstants.PROPERTY_FORSENDELSE_ID;
-import static no.nav.dokdisteformidling.constants.RouteConstants.PROPERTY_JOURNALPOST_ID;
-import static no.nav.dokdisteformidling.constants.RouteConstants.QDIST013_SERVICE_ID;
-import static org.apache.camel.LoggingLevel.ERROR;
-
 import no.nav.dokdisteformidling.common.DokdistAdministrerForsendelseUpdater;
 import no.nav.dokdisteformidling.common.IdsProcessor;
 import no.nav.dokdisteformidling.exception.functional.AbstractDokdisteformidlingFunctionalException;
@@ -21,6 +14,13 @@ import org.springframework.stereotype.Component;
 import javax.inject.Inject;
 import javax.jms.Queue;
 import javax.xml.bind.JAXBContext;
+
+import static no.nav.dokdisteformidling.constants.RouteConstants.PROPERTY_BESTILLINGS_ID;
+import static no.nav.dokdisteformidling.constants.RouteConstants.PROPERTY_CONVERSATION_ID;
+import static no.nav.dokdisteformidling.constants.RouteConstants.PROPERTY_FORSENDELSE_ID;
+import static no.nav.dokdisteformidling.constants.RouteConstants.PROPERTY_JOURNALPOST_ID;
+import static no.nav.dokdisteformidling.constants.RouteConstants.QDIST013_SERVICE_ID;
+import static org.apache.camel.LoggingLevel.ERROR;
 
 
 /**
@@ -72,7 +72,7 @@ public class Qdist013Route extends RouteBuilder {
 				.routePolicy(qdist0013MetricsRoutePolicy)
 				.setExchangePattern(ExchangePattern.InOnly)
 				.process(new IdsProcessor())
-				.log(LoggingLevel.INFO, log, "qdist013 har mottatt forsendelse med " + getIdsForLogging())
+				.log(LoggingLevel.INFO, log, "qdist013 har mottatt forsendelse med forsendelseId=${exchangeProperty." + PROPERTY_FORSENDELSE_ID + "}")
 				.to("validator:no/nav/meldinger/virksomhet/dokdistfordeling/xsd/qdist008/out/distribuertilkanal.xsd")
 				.unmarshal(new JaxbDataFormat(JAXBContext.newInstance(DistribuerTilKanal.class)))
 				.bean(distribuerForsendelseTilTrygderettenMapper)
