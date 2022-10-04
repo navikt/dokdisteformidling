@@ -41,9 +41,6 @@ import static no.nav.dokdisteformidling.testUtils.classpathToString;
 import static org.apache.http.HttpHeaders.CONTENT_TYPE;
 import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
 
-/**
- * @author Erik Bråten, Visma Consulting
- */
 @ExtendWith(SpringExtension.class)
 @EnableAutoConfiguration
 @SpringBootTest(classes = {ApplicationTestConfig.class},
@@ -65,7 +62,6 @@ class Sdist001IT {
         WireMock.resetAllRequests();
         WireMock.removeAllMappings();
     }
-
     @Test
     void shouldOppdatereTilEkspedert() throws IOException {
         stubPostMaskinporten();
