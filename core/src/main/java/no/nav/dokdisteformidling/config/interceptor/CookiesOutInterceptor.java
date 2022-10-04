@@ -24,7 +24,6 @@ public class CookiesOutInterceptor extends AbstractPhaseInterceptor {
     public void handleMessage(Message message) {
         Map<String, List> headers = (Map<String, List>) message.get(Message.PROTOCOL_HEADERS);
         if (CookieStore.getCookie() != null) {
-            log.info("CookiesOUTInterceptor -- cookie to attach to header: " + CookieStore.getCookie());
             headers.put("Cookie", Collections.singletonList(CookieStore.getCookie()));
         }
     }

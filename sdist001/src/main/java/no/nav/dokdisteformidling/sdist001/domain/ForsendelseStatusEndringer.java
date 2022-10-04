@@ -16,7 +16,7 @@ public class ForsendelseStatusEndringer {
 	@Override
 	public String toString() {
 		return """
-				sdist001 satte antall_bekreftet=%d, bekreftet=%s. antall_ekspedert=%d, ekspedert=%s. antall_feilet=%d, feilet=%s."""
+				antall_bekreftet=%d, bekreftet=%s. antall_ekspedert=%d, ekspedert=%s. antall_feilet=%d, feilet=%s."""
 				.formatted(getBekreftet().size(), bekreftet, getEkspedert().size(), getEkspedert(), getFeilet().size(), getFeilet());
 	}
 }
