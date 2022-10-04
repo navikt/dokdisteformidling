@@ -16,7 +16,6 @@ import no.nav.dokdisteformidling.consumer.rdist001.AdministrerForsendelseConsume
 import no.nav.dokdisteformidling.consumer.rdist001.HentEformidlingforsendelserResponseTo;
 import no.nav.dokdisteformidling.consumer.rdist001.HentForsendelseResponseTo;
 import no.nav.dokdisteformidling.sdist001.Sdist001Service;
-import no.nav.dokdisteformidling.sdist001.domain.ForsendelseStatusEndringer;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.core.io.ClassPathResource;
@@ -74,19 +73,13 @@ class Sdist001ServiceTest {
     @Inject
     private LagreJuridiskLoggMapper lagreJuridiskLoggMapper;
 
-    private ForsendelseStatusEndringer forsendelseStatusEndringer;
-
-
-    @BeforeEach
+	@BeforeEach
     public void setUp() {
-        forsendelseStatusEndringer = new ForsendelseStatusEndringer();
         eformidling = mock(AltinnEformidling.class);
         administrerForsendelse = mock(AdministrerForsendelseConsumer.class);
         lagreJuridiskLoggMapper = mock(LagreJuridiskLoggMapper.class);
         juridiskLogg = mock(JuridiskLoggConsumer.class);
         sdist001Service = new Sdist001Service(administrerForsendelse, juridiskLogg, eformidling, lagreJuridiskLoggMapper);
-        forsendelseStatusEndringer = new ForsendelseStatusEndringer();
-
     }
 
 
