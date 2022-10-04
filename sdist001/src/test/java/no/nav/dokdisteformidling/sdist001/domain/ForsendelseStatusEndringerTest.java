@@ -11,7 +11,7 @@ class ForsendelseStatusEndringerTest {
 		ForsendelseStatusEndringer forsendelseStatusEndringer = createForsendelseStatusEndringer();
 
 		assertThat(forsendelseStatusEndringer.toString())
-				.isEqualTo("sdist001 satte antall_bekreftet=2, bekreftet=[1, 2]. antall_ekspedert=1, ekspedert=[4]. antall_feilet=1, feilet=[3].");
+				.isEqualTo("antall_bekreftet=2, bekreftet=[1, 2]. antall_ekspedert=1, ekspedert=[4]. antall_feilet=1, feilet=[3].");
 	}
 
 	@Test
@@ -20,7 +20,7 @@ class ForsendelseStatusEndringerTest {
 		forsendelseStatusEndringer.getFeilet().clear();
 
 		assertThat(forsendelseStatusEndringer.toString())
-				.isEqualTo("sdist001 satte antall_bekreftet=2, bekreftet=[1, 2]. antall_ekspedert=1, ekspedert=[4]. antall_feilet=0, feilet=[].");
+				.isEqualTo("antall_bekreftet=2, bekreftet=[1, 2]. antall_ekspedert=1, ekspedert=[4]. antall_feilet=0, feilet=[].");
 	}
 
 	private ForsendelseStatusEndringer createForsendelseStatusEndringer() {
