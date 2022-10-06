@@ -3,7 +3,7 @@
   "ADMINISTRERFORSENDELSE_V1_URL": "https://app-q2.adeo.no/dokdist/rest/v1/administrerforsendelse",
   "SECURITY_TOKEN_SERVICE_TOKEN_URL": "https://security-token-service.nais.preprod.local/rest/v1/sts/token",
   "MQGATEWAY01_CHANNEL_NAME": "Q2_DOKDISTEFORMIDLING",
-  "MQGATEWAY01_CHANNEL_SECURENAME": "Q2_DOKDISTEFORMIDLING",
+  "MQGATEWAY01_CHANNEL_SECURENAME": "Q2_DOKDISTEFORMID_SE",
   "MQGATEWAY01_CHANNEL_ENABLETLS": "true",
   "MQGATEWAY01_NAME": "MQLS01",
   "MQGATEWAY01_HOSTNAME": "mqls01.preprod.local",
