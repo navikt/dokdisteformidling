@@ -11,8 +11,12 @@ spec:
       value: {{ ADMINISTRERFORSENDELSE_V1_URL }}
     - name: SECURITY_TOKEN_SERVICE_TOKEN_URL
       value: {{ SECURITY_TOKEN_SERVICE_TOKEN_URL }}
-    - name: DOKDISTEFORMIDLING_CHANNEL_NAME
-      value: {{ DOKDISTEFORMIDLING_CHANNEL_NAME }}
+    - name: MQGATEWAY01_CHANNEL_NAME
+      value: {{ MQGATEWAY01_CHANNEL_NAME }}
+    - name: MQGATEWAY01_CHANNEL_SECURENAME
+      value: {{ MQGATEWAY01_CHANNEL_SECURENAME }}
+    - name: MQGATEWAY01_CHANNEL_ENABLETLS
+      value: "{{ MQGATEWAY01_CHANNEL_ENABLETLS }}"
     - name: MQGATEWAY01_NAME
       value: {{ MQGATEWAY01_NAME }}
     - name: MQGATEWAY01_HOSTNAME
@@ -87,4 +91,6 @@ spec:
         mountPath: "/var/run/secrets/nais.io/vault"
       - kvPath: {{ KLAGEINSTANS_VAULT }}
         mountPath: "/secrets/virksomhetssertifikat"
+      - kvPath: {{ DOKDISEFORMIDLING_CERT }}
+        mountPath: /var/run/secrets/nais.io/certificate
   webproxy: true
