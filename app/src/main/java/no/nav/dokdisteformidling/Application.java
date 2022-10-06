@@ -15,6 +15,9 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.retry.annotation.EnableRetry;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
+import static java.lang.System.getenv;
+import static java.lang.System.setProperty;
+
 @SpringBootApplication
 @EnableRetry
 @EnableScheduling
@@ -30,6 +33,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 public class Application {
 
     public static void main(String[] args) {
-        SpringApplication.run(Application.class, args);
+		setProperty("javax.net.ssl.keyStorePassword", getenv("DOKDISTEFORMIDLING_KEYSTORE_PASSWORD"));
+		SpringApplication.run(Application.class, args);
     }
 }
