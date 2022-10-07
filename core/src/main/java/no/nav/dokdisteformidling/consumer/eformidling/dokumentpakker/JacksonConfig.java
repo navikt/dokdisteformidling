@@ -12,7 +12,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 
-import javax.inject.Named;
 import java.time.Clock;
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -34,8 +33,7 @@ import static no.nav.dokdisteformidling.constants.DomainConstants.DEFAULT_ZONE_I
 @Configuration
 public class JacksonConfig {
 
-	@Bean
-	@Named("eformidlingObjectMapper")
+	@Bean("eformidlingObjectMapper")
 	public ObjectMapper eformidlingObjectMapper(Clock clock) {
 		return new Jackson2ObjectMapperBuilder()
 				.deserializerByType(OffsetDateTime.class, new IsoDateTimeDeserializer(clock))

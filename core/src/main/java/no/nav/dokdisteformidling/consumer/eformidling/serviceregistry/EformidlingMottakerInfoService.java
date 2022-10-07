@@ -2,7 +2,6 @@ package no.nav.dokdisteformidling.consumer.eformidling.serviceregistry;
 
 import org.springframework.stereotype.Component;
 
-import javax.inject.Inject;
 import java.util.Optional;
 
 import static no.nav.dokdisteformidling.consumer.eformidling.EformidlingConstants.AVTALTMELDING_PROCESS;
@@ -16,7 +15,6 @@ import static no.nav.dokdisteformidling.consumer.eformidling.serviceregistry.Ser
 public class EformidlingMottakerInfoService {
 	private final ServiceRegistryConsumer serviceRegistryConsumer;
 
-	@Inject
 	public EformidlingMottakerInfoService(ServiceRegistryConsumer serviceRegistryConsumer) {
 		this.serviceRegistryConsumer = serviceRegistryConsumer;
 	}

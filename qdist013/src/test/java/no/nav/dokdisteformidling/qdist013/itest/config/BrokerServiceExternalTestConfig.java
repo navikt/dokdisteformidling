@@ -16,7 +16,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 
-import javax.inject.Inject;
 import java.io.IOException;
 
 
@@ -24,7 +23,6 @@ import java.io.IOException;
 @Profile("itest")
 public class BrokerServiceExternalTestConfig extends AbstractCxfEndpointConfig {
 
-    @Inject
     public BrokerServiceExternalTestConfig(Bus bus) {
         super(bus);
     }

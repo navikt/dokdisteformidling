@@ -10,6 +10,7 @@ import org.apache.http.HttpHeaders;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.cloud.contract.wiremock.AutoConfigureWireMock;
@@ -18,7 +19,6 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import javax.inject.Inject;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -53,7 +53,7 @@ class Sdist001IT {
     public static final String SCENARIO_BROKERSERVICEEXTERNAL = "brokerserviceexternal";
     public static final String SCENARIO_STATE_GET_AVAILABLE_FILES_DONE = "GetAvailableFilesDone";
 
-    @Inject
+    @Autowired
     private Sdist001Service sdist001Service;
 
     @BeforeEach

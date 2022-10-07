@@ -15,12 +15,10 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 
-import javax.inject.Inject;
-
 @Configuration
 @Profile("nais")
 public class BrokerServiceExternalStreamedConfig extends AbstractCxfEndpointConfig {
-    @Inject
+
     public BrokerServiceExternalStreamedConfig(Bus bus) {
         super(bus);
     }
