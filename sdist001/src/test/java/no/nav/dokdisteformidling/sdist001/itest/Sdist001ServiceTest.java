@@ -18,9 +18,9 @@ import no.nav.dokdisteformidling.consumer.rdist001.HentForsendelseResponseTo;
 import no.nav.dokdisteformidling.sdist001.Sdist001Service;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 
-import javax.inject.Inject;
 import java.io.IOException;
 import java.io.InputStream;
 import java.time.LocalDateTime;
@@ -60,17 +60,17 @@ class Sdist001ServiceTest {
     private static final String FORSENDELSE_ID_3 = "1233";
     private static final String FORSENDELSE_ID_4 = "1234";
 
-    @Inject
+    @Autowired
     private Eformidling eformidling;
 
-    @Inject
+    @Autowired
     private Sdist001Service sdist001Service;
-    @Inject
+    @Autowired
     private AdministrerForsendelse administrerForsendelse;
-    @Inject
+    @Autowired
     private JuridiskLogg juridiskLogg;
 
-    @Inject
+    @Autowired
     private LagreJuridiskLoggMapper lagreJuridiskLoggMapper;
 
 	@BeforeEach

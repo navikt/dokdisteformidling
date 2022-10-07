@@ -27,7 +27,6 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestTemplate;
 
-import javax.inject.Inject;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.security.cert.CertificateEncodingException;
@@ -52,7 +51,6 @@ public class MaskinportenTokenConsumer {
 	private final MaskinportenProperties maskinportenProperties;
 	private final RestTemplate restTemplate;
 
-	@Inject
 	public MaskinportenTokenConsumer(AppCertificate appCertificate,
 									 MaskinportenProperties maskinportenProperties,
 									 RestTemplateBuilder restTemplateBuilder) {

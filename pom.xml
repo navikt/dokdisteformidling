@@ -19,15 +19,13 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>2.7.2</version>
+		<version>2.7.4</version>
 	</parent>
 
 	<properties>
 		<java.version>17</java.version>
 		<camel.version>3.18.1</camel.version>
-		<javax.inject.version>1</javax.inject.version>
 		<logstash-logback-encoder.version>7.2</logstash-logback-encoder.version>
-		<jakarta.xml.ws-api.version>2.3.3</jakarta.xml.ws-api.version>
 		<resilience4j.version>1.7.1</resilience4j.version>
 		<google-cloud.version>25.4.0</google-cloud.version>
 		<google-tink.version>1.7.0</google-tink.version>
@@ -39,14 +37,9 @@
 		<commons-io.version>2.11.0</commons-io.version>
 		<commons-asic.version>0.9.3</commons-asic.version>
 		<nimbus-jose-jwt.version>9.23</nimbus-jose-jwt.version>
-		<rxjava.version>2.2.21</rxjava.version>
 		<jaxws-ri.version>3.0.1</jaxws-ri.version>
 		<!-- test -->
-		<awaitility.version>4.1.0</awaitility.version>
-		<activemq.version>5.16.2</activemq.version>
 		<spring-cloud-contract-wiremock.version>3.0.3</spring-cloud-contract-wiremock.version>
-		<!-- wiremock compat -->
-		<xmlunit-core.version>2.8.2</xmlunit-core.version>
 	</properties>
 
 	<dependencyManagement>
@@ -82,11 +75,6 @@
 				<version>${melding-virksomhet-dokdistfordeling.version}</version>
 			</dependency>
 			<dependency>
-				<groupId>javax.inject</groupId>
-				<artifactId>javax.inject</artifactId>
-				<version>${javax.inject.version}</version>
-			</dependency>
-			<dependency>
 				<groupId>net.logstash.logback</groupId>
 				<artifactId>logstash-logback-encoder</artifactId>
 				<version>${logstash-logback-encoder.version}</version>
@@ -114,20 +102,10 @@
 				<version>${google-tink.version}</version>
 			</dependency>
 			<dependency>
-				<groupId>jakarta.xml.ws</groupId>
-				<artifactId>jakarta.xml.ws-api</artifactId>
-				<version>${jakarta.xml.ws-api.version}</version>
-			</dependency>
-			<dependency>
 				<groupId>com.sun.xml.ws</groupId>
 				<artifactId>jaxws-ri</artifactId>
 				<version>${jaxws-ri.version}</version>
 				<type>pom</type>
-			</dependency>
-			<dependency>
-				<groupId>io.reactivex.rxjava2</groupId>
-				<artifactId>rxjava</artifactId>
-				<version>${rxjava.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>com.ibm.mq</groupId>
@@ -196,39 +174,11 @@
 				<artifactId>resilience4j-circuitbreaker</artifactId>
 				<version>${resilience4j.version}</version>
 			</dependency>
-			<dependency>
-				<groupId>org.apache.activemq</groupId>
-				<artifactId>activemq-jms-pool</artifactId>
-				<version>${activemq.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>com.fasterxml.jackson.datatype</groupId>
-				<artifactId>jackson-datatype-joda</artifactId>
-				<version>2.13.2</version>
-			</dependency>
 			<!-- test -->
 			<dependency>
 				<groupId>org.springframework.cloud</groupId>
 				<artifactId>spring-cloud-contract-wiremock</artifactId>
 				<version>${spring-cloud-contract-wiremock.version}</version>
-				<scope>test</scope>
-			</dependency>
-			<dependency>
-				<groupId>org.apache.activemq</groupId>
-				<artifactId>activemq-broker</artifactId>
-				<version>${activemq.version}</version>
-				<scope>test</scope>
-			</dependency>
-			<dependency>
-				<groupId>org.awaitility</groupId>
-				<artifactId>awaitility</artifactId>
-				<version>${awaitility.version}</version>
-				<scope>test</scope>
-			</dependency>
-			<dependency>
-				<groupId>org.xmlunit</groupId>
-				<artifactId>xmlunit-assertj</artifactId>
-				<version>${xmlunit-core.version}</version>
 				<scope>test</scope>
 			</dependency>
 		</dependencies>

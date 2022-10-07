@@ -22,6 +22,7 @@ import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -32,7 +33,6 @@ import org.springframework.jms.core.JmsTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import javax.inject.Inject;
 import javax.jms.Queue;
 import javax.jms.TextMessage;
 import javax.xml.bind.JAXBContext;
@@ -114,19 +114,19 @@ class Qdist013ForAltinnIT {
 	private String brokerserviceexternalUrl;
 
 	private static String CALL_ID;
-	@Inject
+	@Autowired
 	private Queue qdist013;
 
-	@Inject
+	@Autowired
 	private Queue qdist013FunksjonellFeil;
-	@Inject
+	@Autowired
 	private Queue backoutQueue;
-	@Inject
+	@Autowired
 	private JmsTemplate jmsTemplate;
-	@Inject
+	@Autowired
 	private BucketStorage bucketStorage;
 
-	@Inject
+	@Autowired
 	private EformidlingMottakerInfoService eformidlingMottakerInfoService;
 
 
