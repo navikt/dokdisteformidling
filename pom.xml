@@ -24,7 +24,7 @@
 
 	<properties>
 		<java.version>17</java.version>
-		<camel.version>3.18.0</camel.version>
+		<camel.version>3.18.1</camel.version>
 		<javax.inject.version>1</javax.inject.version>
 		<logstash-logback-encoder.version>7.2</logstash-logback-encoder.version>
 		<jakarta.xml.ws-api.version>2.3.3</jakarta.xml.ws-api.version>
