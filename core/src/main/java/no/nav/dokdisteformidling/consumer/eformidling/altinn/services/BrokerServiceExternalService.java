@@ -23,15 +23,14 @@ import no.nav.dokdisteformidling.exception.technical.AltinnBrokerServiceWsExcept
 import no.nav.dokdisteformidling.metrics.Monitor;
 import org.springframework.stereotype.Component;
 
-import javax.inject.Inject;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static no.nav.dokdisteformidling.utils.DateConverterUtil.convertLocalDateTimeToXmlGregorianCalendar;
 import static no.nav.dokdisteformidling.consumer.eformidling.EformidlingConstants.NAV_ORGNUMMER;
 import static no.nav.dokdisteformidling.consumer.eformidling.EformidlingConstants.TRYGDERETTEN_ORGNUMMER;
+import static no.nav.dokdisteformidling.utils.DateConverterUtil.convertLocalDateTimeToXmlGregorianCalendar;
 
 @Slf4j
 @Component
@@ -44,7 +43,6 @@ public class BrokerServiceExternalService {
     private final IBrokerServiceExternal brokerServiceExternal;
     private final ObjectFactory objectFactory;
 
-    @Inject
     public BrokerServiceExternalService(final IBrokerServiceExternal brokerServiceExternal) {
         this.brokerServiceExternal = brokerServiceExternal;
         this.objectFactory = new ObjectFactory();

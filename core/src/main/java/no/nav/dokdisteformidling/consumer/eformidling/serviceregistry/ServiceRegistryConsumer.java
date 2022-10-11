@@ -18,7 +18,6 @@ import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import javax.inject.Inject;
 import java.net.URI;
 import java.time.Duration;
 import java.util.Collections;
@@ -38,7 +37,6 @@ public class ServiceRegistryConsumer {
     private final RestTemplate restTemplate;
     private final String baseUrl;
 
-    @Inject
     public ServiceRegistryConsumer(ServiceRegistryProperties serviceRegistryProperties,
                                    MaskinportenTokenConsumer maskinportenTokenConsumer,
                                    RestTemplateBuilder restTemplateBuilder) {

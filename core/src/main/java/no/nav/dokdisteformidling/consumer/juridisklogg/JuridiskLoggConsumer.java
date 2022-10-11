@@ -1,7 +1,5 @@
 package no.nav.dokdisteformidling.consumer.juridisklogg;
 
-import static java.lang.String.format;
-
 import no.nav.dokdisteformidling.config.alias.ServiceuserAlias;
 import no.nav.dokdisteformidling.constants.RetryConstants;
 import no.nav.dokdisteformidling.exception.functional.LagreJuridiskLoggFunctionalException;
@@ -17,8 +15,9 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestTemplate;
 
-import javax.inject.Inject;
 import java.time.Duration;
+
+import static java.lang.String.format;
 
 /**
  * @author Sigurd Midttun, Visma Consulting.
@@ -29,7 +28,6 @@ public class JuridiskLoggConsumer implements JuridiskLogg {
 	private final String juridiskLoggUrl;
 	private final RestTemplate restTemplate;
 
-	@Inject
 	public JuridiskLoggConsumer(@Value("${LagreJuridiskLogg_Rest_Url}") String juridiskLoggUrl,
 								RestTemplateBuilder restTemplateBuilder,
 								final ServiceuserAlias serviceuserAlias) {

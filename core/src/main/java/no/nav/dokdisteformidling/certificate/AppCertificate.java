@@ -3,7 +3,6 @@ package no.nav.dokdisteformidling.certificate;
 import lombok.Getter;
 import org.springframework.stereotype.Component;
 
-import javax.inject.Inject;
 import java.security.KeyPair;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
@@ -30,7 +29,6 @@ public class AppCertificate {
 	private final KeyStoreProperties properties;
 	private final KeyStore keyStore;
 
-	@Inject
 	public AppCertificate(KeyStoreProperties properties) {
 		this.properties = properties;
 		try {

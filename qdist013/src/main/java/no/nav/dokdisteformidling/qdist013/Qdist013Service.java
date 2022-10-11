@@ -18,9 +18,9 @@ import no.nav.dokdisteformidling.storage.BucketStorage;
 import no.nav.dokdisteformidling.storage.DokdistDokument;
 import org.apache.camel.Exchange;
 import org.apache.camel.Handler;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
-import javax.inject.Named;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
@@ -59,7 +59,7 @@ public class Qdist013Service {
 
     public Qdist013Service(BucketStorage bucketStorage,
                            AdministrerForsendelse administrerForsendelse,
-                           @Named("SafJournalpostQueryServiceQdist013") SafJournalpostQueryService<JournalpostQdist013> safJournalpostQueryService,
+                           @Qualifier("SafJournalpostQueryServiceQdist013") SafJournalpostQueryService<JournalpostQdist013> safJournalpostQueryService,
                            JuridiskLogg juridiskLogg,
                            LagreJuridiskLoggMapper lagreJuridiskLoggMapper,
                            AvtaltmeldingMapper avtaltmeldingMapper,

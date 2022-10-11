@@ -1,9 +1,5 @@
 package no.nav.dokdisteformidling.consumer.saf.graphql;
 
-import static no.nav.dokdisteformidling.constants.DomainConstants.BEARER_PREFIX;
-import static no.nav.dokdisteformidling.constants.RetryConstants.DELAY_SHORT;
-import static no.nav.dokdisteformidling.constants.RetryConstants.MAX_ATTEMPTS_SHORT;
-
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
@@ -29,8 +25,11 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestTemplate;
 
-import javax.inject.Inject;
 import java.time.Duration;
+
+import static no.nav.dokdisteformidling.constants.DomainConstants.BEARER_PREFIX;
+import static no.nav.dokdisteformidling.constants.RetryConstants.DELAY_SHORT;
+import static no.nav.dokdisteformidling.constants.RetryConstants.MAX_ATTEMPTS_SHORT;
 
 @Component
 @Slf4j
@@ -40,7 +39,6 @@ public class SafGraphqlConsumer {
 	private final String graphQLurl;
 	private final StsRestConsumer stsRestConsumer;
 
-	@Inject
 	public SafGraphqlConsumer(RestTemplateBuilder restTemplateBuilder,
 							  @Value("${saf.graphql.url}") String graphQLurl,
 							  StsRestConsumer stsRestConsumer) {

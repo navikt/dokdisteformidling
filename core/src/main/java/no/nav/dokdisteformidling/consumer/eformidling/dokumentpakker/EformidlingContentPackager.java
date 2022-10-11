@@ -5,7 +5,6 @@ import no.nav.dokdisteformidling.consumer.eformidling.NavDokumentpakke;
 import no.nav.dokdisteformidling.consumer.eformidling.dokumentpakker.exceptions.DokumentpakkingException;
 import org.springframework.stereotype.Component;
 
-import javax.inject.Inject;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -23,7 +22,6 @@ public class EformidlingContentPackager {
     private final AsiceCreator asiceCreator;
     private final CmsUtil cmsUtil;
 
-    @Inject
     public EformidlingContentPackager() {
         this.asiceCreator = new AsiceCreator();
         this.cmsUtil = new CmsUtil();

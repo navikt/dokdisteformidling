@@ -12,7 +12,6 @@ import no.nav.dokdisteformidling.consumer.eformidling.dokumentpakker.sbdh.Standa
 import no.nav.dokdisteformidling.consumer.eformidling.dokumentpakker.sbdh.StandardBusinessDocumentHeader;
 import org.springframework.stereotype.Component;
 
-import javax.inject.Inject;
 import java.time.Clock;
 import java.time.Duration;
 import java.time.OffsetDateTime;
@@ -41,7 +40,6 @@ public class StandardBusinessDocumentMapper {
 
 	private final Clock clock;
 
-	@Inject
 	public StandardBusinessDocumentMapper(Clock clock) {
 		this.clock = clock;
 	}

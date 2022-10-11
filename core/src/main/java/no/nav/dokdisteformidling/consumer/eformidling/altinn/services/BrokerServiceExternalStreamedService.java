@@ -19,7 +19,6 @@ import org.apache.cxf.jaxb.JAXBDataBinding;
 import org.springframework.stereotype.Component;
 
 import javax.activation.DataHandler;
-import javax.inject.Inject;
 import javax.xml.bind.JAXBException;
 import javax.xml.namespace.QName;
 import javax.xml.ws.BindingProvider;
@@ -43,7 +42,6 @@ public class BrokerServiceExternalStreamedService {
     private final IBrokerServiceExternalStreamed brokerServiceExternalStreamed;
     private final ObjectFactory objectFactory;
 
-    @Inject
     public BrokerServiceExternalStreamedService(final IBrokerServiceExternalStreamed brokerServiceExternalStreamed) {
         this.brokerServiceExternalStreamed = brokerServiceExternalStreamed;
         this.objectFactory = new ObjectFactory();

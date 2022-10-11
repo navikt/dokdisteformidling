@@ -11,7 +11,6 @@ import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.converter.jaxb.JaxbDataFormat;
 import org.springframework.stereotype.Component;
 
-import javax.inject.Inject;
 import javax.jms.Queue;
 import javax.xml.bind.JAXBContext;
 
@@ -36,8 +35,6 @@ public class Qdist013Route extends RouteBuilder {
 	private final DistribuerForsendelseTilTrygderettenMapper distribuerForsendelseTilTrygderettenMapper;
 	private final DokdistAdministrerForsendelseUpdater dokdistAdministrerforsendelseUpdater;
 
-
-	@Inject
 	public Qdist013Route(Qdist013Service qdist013Service,
 						 Queue qdist013,
 						 Queue qdist013FunksjonellFeil,
