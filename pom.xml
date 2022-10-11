@@ -39,7 +39,7 @@
 		<nimbus-jose-jwt.version>9.23</nimbus-jose-jwt.version>
 		<jaxws-ri.version>3.0.1</jaxws-ri.version>
 		<!-- test -->
-		<spring-cloud-contract-wiremock.version>3.0.3</spring-cloud-contract-wiremock.version>
+		<spring-cloud-contract-wiremock.version>3.1.4</spring-cloud-contract-wiremock.version>
 	</properties>
 
 	<dependencyManagement>
