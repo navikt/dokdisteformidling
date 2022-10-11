@@ -16,9 +16,9 @@ import no.nav.dokdisteformidling.consumer.pdl.PdlGraphQLConsumer;
 import no.nav.dokdisteformidling.consumer.saf.SafJournalpostQueryService;
 import no.nav.dokdisteformidling.qdist013.saf.lightweight.LightweightSafJournalpostQdist013;
 import no.nav.dokdisteformidling.qdist013.saf.main.JournalpostQdist013;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
-import javax.inject.Named;
 import javax.xml.bind.JAXBElement;
 import javax.xml.datatype.XMLGregorianCalendar;
 import java.math.BigInteger;
@@ -73,7 +73,7 @@ public class AvtaltmeldingMapper {
     private final Ereg ereg;
     private final SafJournalpostQueryService<LightweightSafJournalpostQdist013> safJournalpostQueryService;
 
-    public AvtaltmeldingMapper(@Named("LightweightSafJournalpostQueryServiceQdist013") SafJournalpostQueryService<LightweightSafJournalpostQdist013> safJournalpostQueryService,
+    public AvtaltmeldingMapper(@Qualifier("LightweightSafJournalpostQueryServiceQdist013") SafJournalpostQueryService<LightweightSafJournalpostQdist013> safJournalpostQueryService,
                                Ereg ereg, PdlGraphQLConsumer pdlGraphQLConsumer) {
         this.safJournalpostQueryService = safJournalpostQueryService;
         this.ereg = ereg;

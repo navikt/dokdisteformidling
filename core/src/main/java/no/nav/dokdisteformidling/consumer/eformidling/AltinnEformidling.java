@@ -23,7 +23,6 @@ import no.nav.dokdisteformidling.consumer.eformidling.serviceregistry.MottakerIn
 import org.springframework.stereotype.Component;
 
 import javax.activation.DataHandler;
-import javax.inject.Inject;
 import java.io.InputStream;
 import java.util.List;
 
@@ -44,7 +43,6 @@ public class AltinnEformidling implements Eformidling {
     private final BrokerServiceExternalStreamedService brokerServiceExternalStreamedService;
     private static final String FILE_NAME = "sbd.zip";
 
-    @Inject
     AltinnEformidling(AppCertificate appCertificate,
                       EformidlingMottakerInfoService eformidlingMottakerInfoService,
                       EformidlingMessagePackager eformidlingMessagePackager,

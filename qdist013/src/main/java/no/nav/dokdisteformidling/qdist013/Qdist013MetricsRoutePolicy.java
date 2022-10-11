@@ -1,12 +1,5 @@
 package no.nav.dokdisteformidling.qdist013;
 
-import static no.nav.dokdisteformidling.constants.RouteConstants.QDIST013_SERVICE_ID;
-import static no.nav.dokdisteformidling.metrics.MetricLabels.LABEL_ERROR_TYPE;
-import static no.nav.dokdisteformidling.metrics.MetricLabels.LABEL_EXCEPTION_NAME;
-import static no.nav.dokdisteformidling.metrics.MetricLabels.LABEL_PROCESS;
-import static no.nav.dokdisteformidling.metrics.MetricLabels.TYPE_FUNCTIONAL_EXCEPTION;
-import static no.nav.dokdisteformidling.metrics.MetricLabels.TYPE_TECHNICAL_EXCEPTION;
-
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Timer;
 import no.nav.dokdisteformidling.exception.functional.AbstractDokdisteformidlingFunctionalException;
@@ -16,7 +9,12 @@ import org.apache.camel.ValidationException;
 import org.apache.camel.support.RoutePolicySupport;
 import org.springframework.stereotype.Component;
 
-import javax.inject.Inject;
+import static no.nav.dokdisteformidling.constants.RouteConstants.QDIST013_SERVICE_ID;
+import static no.nav.dokdisteformidling.metrics.MetricLabels.LABEL_ERROR_TYPE;
+import static no.nav.dokdisteformidling.metrics.MetricLabels.LABEL_EXCEPTION_NAME;
+import static no.nav.dokdisteformidling.metrics.MetricLabels.LABEL_PROCESS;
+import static no.nav.dokdisteformidling.metrics.MetricLabels.TYPE_FUNCTIONAL_EXCEPTION;
+import static no.nav.dokdisteformidling.metrics.MetricLabels.TYPE_TECHNICAL_EXCEPTION;
 
 /**
  * @author Ugur Alpay Cenar, Visma Consulting.
@@ -31,7 +29,6 @@ public class Qdist013MetricsRoutePolicy extends RoutePolicySupport {
 	private static final String QDIST013_PROCESS_TIMER_DESCRIPTION = "prosesseringstid for kall inn til qdist013";
 	private static final String QDIST013_EXCEPTION = "dok_request_exception_total";
 
-	@Inject
 	public Qdist013MetricsRoutePolicy(MeterRegistry registry) {
 		this.registry = registry;
 	}

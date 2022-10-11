@@ -7,10 +7,9 @@ import no.nav.dokdisteformidling.consumer.eformidling.NavDokumentpakke;
 import no.nav.dokdisteformidling.consumer.eformidling.dokumentpakker.exceptions.DokumentpakkingException;
 import no.nav.dokdisteformidling.consumer.eformidling.dokumentpakker.sbdh.StandardBusinessDocument;
 import org.apache.commons.io.IOUtils;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
-import javax.inject.Inject;
-import javax.inject.Named;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -42,8 +41,7 @@ public class EformidlingMessagePackager {
     private final StandardBusinessDocumentMapper standardBusinessDocumentMapper;
     private final EformidlingContentPackager eformidlingContentPackager;
 
-    @Inject
-    public EformidlingMessagePackager(@Named("eformidlingObjectMapper") ObjectMapper eformidlingObjectMapper,
+    public EformidlingMessagePackager(@Qualifier("eformidlingObjectMapper") ObjectMapper eformidlingObjectMapper,
                                       StandardBusinessDocumentMapper standardBusinessDocumentMapper,
                                       EformidlingContentPackager eformidlingContentPackager) {
         this.objectMapper = eformidlingObjectMapper;

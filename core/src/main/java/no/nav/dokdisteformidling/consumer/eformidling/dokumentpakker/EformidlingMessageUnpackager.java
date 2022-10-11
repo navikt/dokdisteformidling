@@ -9,10 +9,9 @@ import no.nav.dokdisteformidling.consumer.eformidling.dokumentpakker.exceptions.
 import no.nav.dokdisteformidling.consumer.eformidling.dokumentpakker.trygderetten.json.TrygderettenMelding;
 import no.nav.dokdisteformidling.consumer.eformidling.dokumentpakker.trygderetten.xml.BrokerServiceManifest;
 import org.apache.commons.io.FileUtils;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
-import javax.inject.Inject;
-import javax.inject.Named;
 import javax.xml.bind.JAXBException;
 import java.io.File;
 import java.io.IOException;
@@ -42,8 +41,7 @@ public class EformidlingMessageUnpackager {
 
     private final ObjectMapper objectMapper;
 
-    @Inject
-    public EformidlingMessageUnpackager(@Named("eformidlingObjectMapper") ObjectMapper eformidlingObjectMapper) {
+    public EformidlingMessageUnpackager(@Qualifier("eformidlingObjectMapper") ObjectMapper eformidlingObjectMapper) {
         this.objectMapper = eformidlingObjectMapper;
     }
 

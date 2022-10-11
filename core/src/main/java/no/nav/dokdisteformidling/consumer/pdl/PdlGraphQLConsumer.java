@@ -17,16 +17,13 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestTemplate;
-import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import javax.inject.Inject;
 import java.net.URI;
 import java.time.Duration;
 import java.util.HashMap;
 
 import static java.util.Objects.isNull;
-import static java.util.Objects.nonNull;
 import static java.util.Objects.requireNonNull;
 import static no.nav.dokdisteformidling.constants.MdcConstants.CALL_ID;
 import static no.nav.dokdisteformidling.constants.MdcConstants.NAV_CALL_ID;
@@ -48,7 +45,6 @@ public class PdlGraphQLConsumer {
 	private final URI pdlUrl;
 	private final MapHentNavnResponse mapHentNavnResponse;
 
-	@Inject
 	public PdlGraphQLConsumer(RestTemplateBuilder restTemplateBuilder,
 							  StsRestConsumer stsConsumer, @Value("${pdl.url}") String pdlUrl) {
 		this.restTemplate = restTemplateBuilder

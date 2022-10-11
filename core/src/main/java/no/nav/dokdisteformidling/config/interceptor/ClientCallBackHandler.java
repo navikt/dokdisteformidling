@@ -3,7 +3,6 @@ package no.nav.dokdisteformidling.config.interceptor;
 import no.nav.dokdisteformidling.config.props.DpoUserProperties;
 import org.apache.wss4j.common.ext.WSPasswordCallback;
 
-import javax.inject.Inject;
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
 
@@ -11,7 +10,6 @@ public class ClientCallBackHandler implements CallbackHandler {
 
     private final DpoUserProperties dpoUserProperties;
 
-    @Inject
     public ClientCallBackHandler(DpoUserProperties dpoUserProperties) {
         this.dpoUserProperties = dpoUserProperties;
     }
