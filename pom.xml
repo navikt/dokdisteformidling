@@ -30,7 +30,7 @@
 		<google-cloud.version>25.4.0</google-cloud.version>
 		<google-tink.version>1.7.0</google-tink.version>
 		<wmq.version>9.2.5.0</wmq.version>
-		<cxf.version>3.5.3</cxf.version>
+		<cxf.version>3.5.5</cxf.version>
 		<melding-virksomhet-dokdistfordeling.version>2.0.4</melding-virksomhet-dokdistfordeling.version>
 		<jaxb2-basics-runtime.version>1.11.1</jaxb2-basics-runtime.version>
 		<jaxb-api.version>2.3.6</jaxb-api.version>
