@@ -12,8 +12,5 @@ JMS grensesnitt:
 Periodisk jobb:
 * [SDIST001 - Oppdater eFormidling status](https://confluence.adeo.no/display/BOA/SDIST001+-+oppdaterEformidlingStatus?src=contextnavpagetreemode)
 
-## Deploy
-Bygges og deployes gjennom [dok-jenkins pipeline](https://dok-jenkins.adeo.no/view/Dokumentdistribusjon/job/dokdisteformidling/).
-
 ### Henvendelser
 Spørsmål om koden eller prosjektet kan rettes til [Slack-kanalen for \#Team Dokumentløsninger](https://nav-it.slack.com/archives/C6W9E5GPJ)
