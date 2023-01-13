@@ -17,14 +17,7 @@
 			<groupId>no.nav.dokdisteformidling</groupId>
 			<artifactId>core</artifactId>
 		</dependency>
-		<dependency>
-			<groupId>no.nav.dokdisteformidling</groupId>
-			<artifactId>schemas-avtaltmelding</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>commons-io</groupId>
-			<artifactId>commons-io</artifactId>
-		</dependency>
+
 		<dependency>
 			<groupId>no.nav.meldinger.virksomhet</groupId>
 			<artifactId>melding-virksomhet-dokdistfordeling</artifactId>

@@ -25,6 +25,7 @@
 			<groupId>no.nav.dokdisteformidling</groupId>
 			<artifactId>sdist001</artifactId>
 		</dependency>
+
 		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
