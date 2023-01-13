@@ -1,13 +1,10 @@
-FROM navikt/java:17
+FROM ghcr.io/navikt/baseimages/temurin:17
 
-USER root
 # Brukes for å hente config fra json filer
-RUN export "http_proxy=http://webproxy-utvikler.nav.no:8088/" \
-    && export "https_proxy=http://webproxy-utvikler.nav.no:8088/" \
-    && apt-get install -y --no-install-recommends jq
+USER root
+RUN apt-get install -y --no-install-recommends jq
 
 USER apprunner
-
 COPY app/target/app.jar /app/app.jar
 COPY export-vault-secrets.sh /init-scripts/10-export-vault-secrets.sh
 COPY dokdisteformidling-java-opts.sh /init-scripts/12-dokdisteformidling-java-opts.sh
