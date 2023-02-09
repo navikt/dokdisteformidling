@@ -5,9 +5,6 @@ import no.nav.dokdisteformidling.consumer.eformidling.altinn.to.UploadResponse;
 
 import java.util.List;
 
-/**
- * @author Joakim Bjørnstad, Jbit AS
- */
 public interface Eformidling {
     UploadResponse send(NavDokumentpakke navDokumentpakke, String arkivmelding);
 

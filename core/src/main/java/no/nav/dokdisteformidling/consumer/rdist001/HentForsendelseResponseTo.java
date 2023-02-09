@@ -6,9 +6,6 @@ import lombok.Value;
 
 import java.util.List;
 
-/**
- * @author Sigurd Midttun, Visma Consulting.
- */
 @Data
 @Builder
 public class HentForsendelseResponseTo {
@@ -41,12 +38,12 @@ public class HentForsendelseResponseTo {
 	@Value
 	@Builder
 	public static class PostadresseTo {
-		private final String adresselinje1;
-		private final String adresselinje2;
-		private final String adresselinje3;
-		private final String postnummer;
-		private final String poststed;
-		private final String landkode;
+		String adresselinje1;
+		String adresselinje2;
+		String adresselinje3;
+		String postnummer;
+		String poststed;
+		String landkode;
 	}
 
 	@Data

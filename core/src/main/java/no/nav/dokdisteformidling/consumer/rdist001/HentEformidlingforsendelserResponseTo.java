@@ -5,9 +5,6 @@ import lombok.Data;
 
 import java.util.List;
 
-/**
- * @author Erik Bråten, Visma Consulting.
- */
 @Data
 @Builder
 public class HentEformidlingforsendelserResponseTo {

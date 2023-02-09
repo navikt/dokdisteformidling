@@ -55,6 +55,7 @@ public class Sdist001Service {
 		var endringer = new ForsendelseStatusEndringer();
 		List<HentEformidlingforsendelserResponseTo.ForsendelseTo> forsendelserTo = administrerForsendelse.hentEformidlingForsendelser().getForsendelser();
 		log.info("Hentet eformidlingforsendelser fra rdist001 {} ", forsendelserTo);
+
 		eformidling.hent()
 				.forEach(downloadResponse -> {
 					log.info("Hentet trygderetten kvittering melding fra Altinn med konversasjonId={}, SendersReference={}, KvitteringStatus={}",
@@ -63,6 +64,7 @@ public class Sdist001Service {
 							.filter(forsendelse -> validateForsendelse(forsendelse, downloadResponse))
 							.forEach(behandleForsendelse(downloadResponse, endringer));
 				});
+
 		log.info("sdist001 har oppdatert status for eFormidlingforsendelser: {}", endringer);
 	}
 
