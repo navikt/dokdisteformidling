@@ -1,6 +1,8 @@
 {
   "APP_NAME":  "dokdisteformidling",
   "ADMINISTRERFORSENDELSE_V1_URL": "https://app.adeo.no/dokdist/rest/v1/administrerforsendelse",
+  "DOKDISTEFORMIDLING_ENDPOINTS_DOKDISTADMIN_URL": "https://dokdistadmin.intern.nav.no/rest/v1/administrerforsendelse",
+  "DOKDISTEFORMIDLING_ENDPOINTS_DOKDISTADMIN_SCOPE": "api://prod-fss.teamdokumenthandtering.dokdistadmin/.default",
   "SECURITY_TOKEN_SERVICE_TOKEN_URL": "https://security-token-service.nais.adeo.no/rest/v1/sts/token",
   "MQGATEWAY01_CHANNEL_NAME": "P_DOKDISTEFORMIDLING",
   "MQGATEWAY01_CHANNEL_SECURENAME": "P_DOKDISTEFORMID_SEC",

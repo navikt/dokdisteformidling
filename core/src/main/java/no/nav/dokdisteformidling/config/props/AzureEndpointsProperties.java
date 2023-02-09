@@ -8,7 +8,7 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
 @Data
-@ConfigurationProperties("dokdisteformidling.azure")
+@ConfigurationProperties("dokdisteformidling")
 public class AzureEndpointsProperties {
 
 	private final Endpoints endpoints = new Endpoints();
