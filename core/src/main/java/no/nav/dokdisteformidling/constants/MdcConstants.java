@@ -1,8 +1,5 @@
 package no.nav.dokdisteformidling.constants;
 
-/**
- * @author Sigurd Midttun, Visma Consulting.
- */
 public final class MdcConstants {
 
 	public static final String CALL_ID = "callId";

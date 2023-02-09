@@ -3,6 +3,7 @@ package no.nav.dokdisteformidling;
 import no.nav.dokdisteformidling.certificate.KeyStoreProperties;
 import no.nav.dokdisteformidling.config.alias.MqGatewayAlias;
 import no.nav.dokdisteformidling.config.alias.ServiceuserAlias;
+import no.nav.dokdisteformidling.config.props.AzureEndpointsProperties;
 import no.nav.dokdisteformidling.config.props.BrokerServiceExternalProperties;
 import no.nav.dokdisteformidling.config.props.BrokerServiceExternalStreamedProperties;
 import no.nav.dokdisteformidling.config.props.DokdistmellomlagerProperties;
@@ -29,7 +30,8 @@ import static java.lang.System.setProperty;
         MqGatewayAlias.class,
         MaskinportenProperties.class,
         ServiceRegistryProperties.class,
-		DokdistmellomlagerProperties.class})
+		DokdistmellomlagerProperties.class,
+		AzureEndpointsProperties.class})
 public class Application {
 
     public static void main(String[] args) {

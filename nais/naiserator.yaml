@@ -93,4 +93,7 @@ spec:
         mountPath: "/secrets/virksomhetssertifikat"
       - kvPath: {{ DOKDISTEFORMIDLING_CERT }}
         mountPath: /var/run/secrets/nais.io/certificate
+  azure:
+    application:
+      enabled: true
   webproxy: true

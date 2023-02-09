@@ -5,10 +5,6 @@ import no.nav.dokdisteformidling.consumer.leaderelection.LeaderElection;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-
-/**
- * @author Erik Bråten, Visma Consulting.
- */
 @Slf4j
 @Component
 public class Sdist001Scheduled {
