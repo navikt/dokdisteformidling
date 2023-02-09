@@ -29,9 +29,6 @@ import java.util.List;
 import static java.util.stream.Collectors.toList;
 import static no.nav.dokdisteformidling.consumer.eformidling.EformidlingConstants.NAV_ORGNUMMER;
 
-/**
- * @author Joakim Bjørnstad, Jbit AS
- */
 @Component
 @Slf4j
 public class AltinnEformidling implements Eformidling {
@@ -97,11 +94,11 @@ public class AltinnEformidling implements Eformidling {
 
         log.info("Henter meldinger fra Altinn");
         List<DownloadedMessageFromAltinn> messagesFromAltinn = brokerServiceExternalStreamedService.downloadFilesFromAltinn(filreferanser);
-        log.info("Hentet {} meldinger fra Altinn, referanser={}", messagesFromAltinn.size(), messagesFromAltinn.stream().map(DownloadedMessageFromAltinn::getFilreferanse).collect(toList()).toString());
+        log.info("Hentet {} meldinger fra Altinn, referanser={}", messagesFromAltinn.size(), messagesFromAltinn.stream().map(DownloadedMessageFromAltinn::getFilreferanse).toList());
 
         log.info("Pakker ut meldinger fra Altinn");
         List<AltinnDokument> altinnDokuments = eformidlingMessageUnpackager.unpackageMessages(messagesFromAltinn);
-        log.info("Pakket ut {} meldinger fra Altinn, referanser={}", altinnDokuments.size(), altinnDokuments.stream().map(AltinnDokument::getFileReference).collect(toList()).toString());
+        log.info("Pakket ut {} meldinger fra Altinn, referanser={}", altinnDokuments.size(), altinnDokuments.stream().map(AltinnDokument::getFileReference).toList());
         List<DownloadResponse> downloadResponses = getDownloadResponses(altinnDokuments);
         log.info("Meldinger fra Altinn={}", downloadResponses);
 
