@@ -56,7 +56,6 @@
             <groupId>com.github.ben-manes.caffeine</groupId>
             <artifactId>caffeine</artifactId>
         </dependency>
-
         <dependency>
             <groupId>com.google.cloud</groupId>
             <artifactId>google-cloud-storage</artifactId>
@@ -69,7 +68,6 @@
             <groupId>com.google.crypto.tink</groupId>
             <artifactId>tink-gcpkms</artifactId>
         </dependency>
-
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-spring-boot-starter-jaxws</artifactId>
@@ -94,7 +92,6 @@
             <groupId>org.apache.camel.springboot</groupId>
             <artifactId>camel-jaxb-starter</artifactId>
         </dependency>
-
         <dependency>
             <groupId>net.logstash.logback</groupId>
             <artifactId>logstash-logback-encoder</artifactId>
@@ -139,7 +136,6 @@
             <groupId>org.apache.activemq</groupId>
             <artifactId>activemq-jms-pool</artifactId>
         </dependency>
-
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>

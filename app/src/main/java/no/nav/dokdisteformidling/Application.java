@@ -3,9 +3,9 @@ package no.nav.dokdisteformidling;
 import no.nav.dokdisteformidling.certificate.KeyStoreProperties;
 import no.nav.dokdisteformidling.config.alias.MqGatewayAlias;
 import no.nav.dokdisteformidling.config.alias.ServiceuserAlias;
-import no.nav.dokdisteformidling.config.props.AzureEndpointsProperties;
 import no.nav.dokdisteformidling.config.props.BrokerServiceExternalProperties;
 import no.nav.dokdisteformidling.config.props.BrokerServiceExternalStreamedProperties;
+import no.nav.dokdisteformidling.config.props.DokdisteformidlingProperties;
 import no.nav.dokdisteformidling.config.props.DokdistmellomlagerProperties;
 import no.nav.dokdisteformidling.config.props.DpoUserProperties;
 import no.nav.dokdisteformidling.config.props.MaskinportenProperties;
@@ -24,18 +24,18 @@ import static java.lang.System.setProperty;
 @EnableScheduling
 @EnableConfigurationProperties({ServiceuserAlias.class,
 		DpoUserProperties.class,
-        BrokerServiceExternalProperties.class,
-        BrokerServiceExternalStreamedProperties.class,
-        KeyStoreProperties.class,
-        MqGatewayAlias.class,
-        MaskinportenProperties.class,
-        ServiceRegistryProperties.class,
+		BrokerServiceExternalProperties.class,
+		BrokerServiceExternalStreamedProperties.class,
+		KeyStoreProperties.class,
+		MqGatewayAlias.class,
+		MaskinportenProperties.class,
+		ServiceRegistryProperties.class,
 		DokdistmellomlagerProperties.class,
-		AzureEndpointsProperties.class})
+		DokdisteformidlingProperties.class})
 public class Application {
 
-    public static void main(String[] args) {
+	public static void main(String[] args) {
 		setProperty("javax.net.ssl.keyStorePassword", getenv("DOKDISTEFORMIDLING_KEYSTORE_PASSWORD"));
 		SpringApplication.run(Application.class, args);
-    }
+	}
 }

@@ -9,7 +9,7 @@ import javax.validation.constraints.NotNull;
 
 @Data
 @ConfigurationProperties("dokdisteformidling")
-public class AzureEndpointsProperties {
+public class DokdisteformidlingProperties {
 
 	private final Endpoints endpoints = new Endpoints();
 

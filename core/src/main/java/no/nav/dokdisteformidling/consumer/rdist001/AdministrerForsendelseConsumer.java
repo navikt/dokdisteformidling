@@ -4,7 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import no.nav.dokdisteformidling.azure.AzureAuthenticationFilter;
 import no.nav.dokdisteformidling.azure.AzureToken;
 import no.nav.dokdisteformidling.config.alias.ServiceuserAlias;
-import no.nav.dokdisteformidling.config.props.AzureEndpointsProperties;
+import no.nav.dokdisteformidling.config.props.DokdisteformidlingProperties;
 import no.nav.dokdisteformidling.constants.MdcConstants;
 import no.nav.dokdisteformidling.exception.functional.DokdistadminFunctionalException;
 import no.nav.dokdisteformidling.exception.functional.Rdist001HentForsendelseFunctionalException;
@@ -55,7 +55,7 @@ public class AdministrerForsendelseConsumer implements AdministrerForsendelse {
 										  RestTemplateBuilder restTemplateBuilder,
 										  final ServiceuserAlias serviceuserAlias,
 										  WebClient webClient,
-										  AzureEndpointsProperties azureEndpointsProperties,
+										  DokdisteformidlingProperties dokdisteformidlingProperties,
 										  AzureToken azureToken) {
 		this.administrerforsendelseV1Url = administrerforsendelseV1Url;
 		this.restTemplate = restTemplateBuilder
@@ -64,9 +64,9 @@ public class AdministrerForsendelseConsumer implements AdministrerForsendelse {
 				.basicAuthentication(serviceuserAlias.getUsername(), serviceuserAlias.getPassword())
 				.build();
 		this.webClient = webClient.mutate()
-				.baseUrl(azureEndpointsProperties.getEndpoints().getDokdistadmin().getUrl())
+				.baseUrl(dokdisteformidlingProperties.getEndpoints().getDokdistadmin().getUrl())
 				.defaultHeader(CONTENT_TYPE, APPLICATION_JSON_VALUE)
-				.filter(new AzureAuthenticationFilter(azureToken, azureEndpointsProperties.getEndpoints().getDokdistadmin()))
+				.filter(new AzureAuthenticationFilter(azureToken, dokdisteformidlingProperties.getEndpoints().getDokdistadmin()))
 				.filter(new NavHeadersFilter())
 				.build();
 	}
