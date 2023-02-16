@@ -5,7 +5,6 @@ import no.nav.dokdisteformidling.azure.AzureAuthenticationFilter;
 import no.nav.dokdisteformidling.azure.AzureToken;
 import no.nav.dokdisteformidling.config.alias.ServiceuserAlias;
 import no.nav.dokdisteformidling.config.props.DokdisteformidlingProperties;
-import no.nav.dokdisteformidling.constants.MdcConstants;
 import no.nav.dokdisteformidling.exception.functional.DokdistadminFunctionalException;
 import no.nav.dokdisteformidling.exception.functional.Rdist001HentForsendelseFunctionalException;
 import no.nav.dokdisteformidling.exception.functional.Rdist001OppdaterForsendelseFunctionalException;
@@ -15,7 +14,6 @@ import no.nav.dokdisteformidling.exception.technical.Rdist001HentForsendelseTech
 import no.nav.dokdisteformidling.exception.technical.Rdist001OppdaterForsendelseTechnicalException;
 import no.nav.dokdisteformidling.metrics.Monitor;
 import no.nav.dokdisteformidling.utils.NavHeadersFilter;
-import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
@@ -36,8 +34,10 @@ import org.springframework.web.util.UriComponentsBuilder;
 import java.time.Duration;
 
 import static no.nav.dokdisteformidling.constants.DomainConstants.DISTRIBUSJONSKANAL;
+import static no.nav.dokdisteformidling.constants.NavHeaders.NAV_CALLID;
 import static no.nav.dokdisteformidling.constants.RetryConstants.DELAY_SHORT;
 import static no.nav.dokdisteformidling.constants.RetryConstants.MULTIPLIER_SHORT;
+import static no.nav.dokdisteformidling.utils.MDCUtils.getCallId;
 import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
@@ -167,7 +167,7 @@ public class AdministrerForsendelseConsumer implements AdministrerForsendelse {
 	private HttpHeaders createHeaders() {
 		HttpHeaders headers = new HttpHeaders();
 		headers.setContentType(MediaType.APPLICATION_JSON);
-		headers.set(MdcConstants.CALL_ID, MDC.get(MdcConstants.CALL_ID));
+		headers.set(NAV_CALLID, getCallId());
 		return headers;
 	}
 
