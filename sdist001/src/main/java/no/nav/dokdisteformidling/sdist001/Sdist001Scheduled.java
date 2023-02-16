@@ -5,28 +5,33 @@ import no.nav.dokdisteformidling.consumer.leaderelection.LeaderElection;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import static no.nav.dokdisteformidling.utils.MDCUtils.clearMDC;
+import static no.nav.dokdisteformidling.utils.MDCUtils.generateNewCallId;
 
-/**
- * @author Erik Bråten, Visma Consulting.
- */
 @Slf4j
 @Component
 public class Sdist001Scheduled {
 
-    private final Sdist001Service sdist001Service;
-    private final LeaderElection leaderElection;
+	private final Sdist001Service sdist001Service;
+	private final LeaderElection leaderElection;
 
-    public Sdist001Scheduled(Sdist001Service sdist001Service,
-                             LeaderElection leaderElection) {
-        this.sdist001Service = sdist001Service;
-        this.leaderElection = leaderElection;
-    }
+	public Sdist001Scheduled(Sdist001Service sdist001Service,
+							 LeaderElection leaderElection) {
+		this.sdist001Service = sdist001Service;
+		this.leaderElection = leaderElection;
+	}
 
-    @Scheduled(fixedDelayString = "${sdist001.intervall:600000}")
-    public void triggerOppdatering() {
-        if (leaderElection.isLeader()) {
-            sdist001Service.oppdatereDokDistEformidlingStatus();
-        }
-    }
+	@Scheduled(fixedDelayString = "${sdist001.intervall:600000}")
+	public void triggerOppdatering() {
+		if (leaderElection.isLeader()) {
+			generateNewCallId();
+
+			try {
+				sdist001Service.oppdatereDokDistEformidlingStatus();
+			} finally {
+				clearMDC();
+			}
+		}
+	}
 
 }

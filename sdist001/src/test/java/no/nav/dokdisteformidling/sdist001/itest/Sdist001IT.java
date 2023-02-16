@@ -6,18 +6,13 @@ import no.nav.dokdisteformidling.consumer.eformidling.EformidlingConstants;
 import no.nav.dokdisteformidling.sdist001.Sdist001Service;
 import no.nav.dokdisteformidling.sdist001.itest.config.ApplicationTestConfig;
 import org.apache.commons.io.IOUtils;
-import org.apache.http.HttpHeaders;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.cloud.contract.wiremock.AutoConfigureWireMock;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -38,13 +33,16 @@ import static com.github.tomakehurst.wiremock.client.WireMock.verify;
 import static no.nav.dokdisteformidling.consumer.eformidling.EformidlingConstants.TRYGDERETTEN_ORGNUMMER;
 import static no.nav.dokdisteformidling.testUtils.classpathToByteArray;
 import static no.nav.dokdisteformidling.testUtils.classpathToString;
-import static org.apache.http.HttpHeaders.CONTENT_TYPE;
-import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
+import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
+import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
+import static org.springframework.http.HttpHeaders.TRANSFER_ENCODING;
+import static org.springframework.http.HttpStatus.OK;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.springframework.http.MediaType.APPLICATION_XML_VALUE;
 
-@ExtendWith(SpringExtension.class)
 @EnableAutoConfiguration
 @SpringBootTest(classes = {ApplicationTestConfig.class},
-        webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+        webEnvironment = RANDOM_PORT)
 @AutoConfigureWireMock(port = 0)
 @ActiveProfiles("itest")
 class Sdist001IT {
@@ -61,7 +59,10 @@ class Sdist001IT {
         WireMock.reset();
         WireMock.resetAllRequests();
         WireMock.removeAllMappings();
+
+        stubAzure();
     }
+
     @Test
     void shouldOppdatereTilEkspedert() throws IOException {
         stubPostMaskinporten();
@@ -85,24 +86,31 @@ class Sdist001IT {
         verify(1, putRequestedFor(urlEqualTo("/administrerforsendelse?forsendelseId=1&forsendelseStatus=EKSPEDERT")));
     }
 
+    void stubAzure() {
+        stubFor(post("/azure_token")
+                .willReturn(aResponse()
+                        .withStatus(OK.value())
+                        .withHeader(CONTENT_TYPE, APPLICATION_JSON_VALUE)
+                        .withBodyFile("azure/token_response.json")));
+    }
 
     private void stubPostMaskinporten() {
         stubFor(post(urlMatching("/maskinporten"))
-                .willReturn(aResponse().withStatus(HttpStatus.OK.value())
-                        .withHeader(CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                .willReturn(aResponse().withStatus(OK.value())
+                        .withHeader(CONTENT_TYPE, APPLICATION_JSON_VALUE)
                         .withBodyFile("maskinporten/maskinporten_happy_response.json")));
     }
 
     private void stubGetServiceRegistry() {
         stubFor(get(urlMatching("/serviceregistry/identifier/" + EformidlingConstants.TRYGDERETTEN_ORGNUMMER + "/process/" + EformidlingConstants.AVTALTMELDING_PROCESS))
-                .willReturn(aResponse().withStatus(HttpStatus.OK.value())
-                        .withHeader(CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                .willReturn(aResponse().withStatus(OK.value())
+                        .withHeader(CONTENT_TYPE, APPLICATION_JSON_VALUE)
                         .withBodyFile("serviceregistry/serviceregistry_happy_response.json")));
     }
 
     private void stubGetHentEformidlingForsendelserBEKREFTETStatus() {
         stubFor(get("/administrerforsendelse/henteformidlingforsendelser?distribusjonKanal=TRYGDERETTEN")
-                .willReturn(aResponse().withStatus(HttpStatus.OK.value())
+                .willReturn(aResponse().withStatus(OK.value())
                         .withHeader(CONTENT_TYPE, APPLICATION_JSON_VALUE)
                         .withBodyFile("rdist001/henteformidlingforsendelser-bekreftetStatus.json")));
     }
@@ -112,8 +120,8 @@ class Sdist001IT {
                 .inScenario(SCENARIO_BROKERSERVICEEXTERNAL)
                 .whenScenarioStateIs(Scenario.STARTED)
                 .willSetStateTo(SCENARIO_STATE_GET_AVAILABLE_FILES_DONE)
-                .willReturn(aResponse().withStatus(HttpStatus.OK.value())
-                        .withHeader(CONTENT_TYPE, MediaType.APPLICATION_XML_VALUE)
+                .willReturn(aResponse().withStatus(OK.value())
+                        .withHeader(CONTENT_TYPE, APPLICATION_XML_VALUE)
                         .withBodyFile("altinn/brokerserviceexternal/getavailablefiles_happy_response.xml")));
     }
 
@@ -121,9 +129,9 @@ class Sdist001IT {
         String boundary = "uuid:c678c2f3-c620-4d19-9884-fc1c36c1d29a+id=174513";
 
         stubFor(post(urlMatching("/brokerserviceexternalstreamed"))
-                .willReturn(aResponse().withStatus(HttpStatus.OK.value())
+                .willReturn(aResponse().withStatus(OK.value())
                         .withHeader(CONTENT_TYPE, String.format("multipart/related; type=\"application/xop+xml\"; start=\"<http://tempuri.org/1>\"; boundary=\"%s\"; start-info=\"text/xml\"", boundary))
-                        .withHeader(HttpHeaders.TRANSFER_ENCODING, "chunked")
+                        .withHeader(TRANSFER_ENCODING, "chunked")
                         .withHeader("MIME-Version", "1.0")
                         .withBody(getDownloadBody(boundary))));
     }
@@ -150,18 +158,18 @@ class Sdist001IT {
     }
 
     private void stubGetAdministrerforsendleseHentForsendelse() {
-        stubFor(get("/administrerforsendelse/" + FORSENDELSE_ID).willReturn(aResponse().withStatus(HttpStatus.OK.value())
+        stubFor(get("/administrerforsendelse/" + FORSENDELSE_ID).willReturn(aResponse().withStatus(OK.value())
                 .withHeader(CONTENT_TYPE, APPLICATION_JSON_VALUE)
                 .withBodyFile("rdist001/getForsendelse-BEKREFTET.json")));
     }
 
     private void stubPostLagreJuridiskLogg() {
-        stubFor(post(urlMatching("/juridiskLogg")).willReturn(aResponse().withStatus(HttpStatus.OK.value())));
+        stubFor(post(urlMatching("/juridiskLogg")).willReturn(aResponse().withStatus(OK.value())));
     }
 
     private void stubPutAdministrerForsendelseOppdaterForsendelseTilEKSPEDERT() {
         stubFor(put("/administrerforsendelse?forsendelseId=" + FORSENDELSE_ID + "&forsendelseStatus=EKSPEDERT")
-                .willReturn(aResponse().withStatus(HttpStatus.OK.value())));
+                .willReturn(aResponse().withStatus(OK.value())));
     }
 
     private void stubPostBrokerserviceExternalConfirmDownloaded() {
@@ -169,8 +177,8 @@ class Sdist001IT {
                 .inScenario(SCENARIO_BROKERSERVICEEXTERNAL)
                 .whenScenarioStateIs(SCENARIO_STATE_GET_AVAILABLE_FILES_DONE)
                 .willReturn(aResponse()
-                        .withStatus(HttpStatus.OK.value())
-                        .withHeader(CONTENT_TYPE, MediaType.APPLICATION_XML_VALUE)
+                        .withStatus(OK.value())
+                        .withHeader(CONTENT_TYPE, APPLICATION_XML_VALUE)
                         .withBodyFile("altinn/brokerserviceexternal/confirmdownloaded_happy_response.xml")));
     }
 }

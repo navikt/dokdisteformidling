@@ -9,6 +9,10 @@ spec:
   env:
     - name: ADMINISTRERFORSENDELSE_V1_URL
       value: {{ ADMINISTRERFORSENDELSE_V1_URL }}
+    - name: DOKDISTEFORMIDLING_ENDPOINTS_DOKDISTADMIN_URL
+      value: {{ DOKDISTEFORMIDLING_ENDPOINTS_DOKDISTADMIN_URL }}
+    - name: DOKDISTEFORMIDLING_ENDPOINTS_DOKDISTADMIN_SCOPE
+      value: {{ DOKDISTEFORMIDLING_ENDPOINTS_DOKDISTADMIN_SCOPE }}
     - name: SECURITY_TOKEN_SERVICE_TOKEN_URL
       value: {{ SECURITY_TOKEN_SERVICE_TOKEN_URL }}
     - name: MQGATEWAY01_CHANNEL_NAME
@@ -93,4 +97,7 @@ spec:
         mountPath: "/secrets/virksomhetssertifikat"
       - kvPath: {{ DOKDISTEFORMIDLING_CERT }}
         mountPath: /var/run/secrets/nais.io/certificate
+  azure:
+    application:
+      enabled: true
   webproxy: true

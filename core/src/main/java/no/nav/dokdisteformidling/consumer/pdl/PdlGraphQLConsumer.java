@@ -25,7 +25,7 @@ import java.util.HashMap;
 
 import static java.util.Objects.isNull;
 import static java.util.Objects.requireNonNull;
-import static no.nav.dokdisteformidling.constants.MdcConstants.CALL_ID;
+import static no.nav.dokdisteformidling.constants.MdcConstants.MDC_CALL_ID;
 import static no.nav.dokdisteformidling.constants.MdcConstants.NAV_CALL_ID;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
@@ -88,7 +88,7 @@ public class PdlGraphQLConsumer {
 				.header(CONTENT_TYPE, APPLICATION_JSON_VALUE)
 				.header(AUTHORIZATION, serviceUserToken)
 				.header(NAV_CONSUMER_TOKEN, serviceUserToken)
-				.header(NAV_CALL_ID, MDC.get(CALL_ID));
+				.header(NAV_CALL_ID, MDC.get(MDC_CALL_ID));
 	}
 
 	private PDLRequest mapRequest(final String ident, String query) {

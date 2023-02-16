@@ -1,16 +1,15 @@
 package no.nav.dokdisteformidling.common;
 
-import static no.nav.dokdisteformidling.constants.MdcConstants.CALL_ID;
-import static no.nav.dokdisteformidling.constants.RouteConstants.PROPERTY_FORSENDELSE_ID;
-import static org.apache.commons.lang3.StringUtils.isBlank;
-
 import no.nav.dokdisteformidling.exception.functional.ForsendelseManglerForsendelseIdFunctionalException;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
 import org.apache.camel.language.xpath.XPathBuilder;
-import org.slf4j.MDC;
 
-import java.util.UUID;
+import static no.nav.dokdisteformidling.constants.MdcConstants.MDC_CALL_ID;
+import static no.nav.dokdisteformidling.constants.RouteConstants.PROPERTY_FORSENDELSE_ID;
+import static no.nav.dokdisteformidling.utils.MDCUtils.getCallId;
+import static no.nav.dokdisteformidling.utils.MDCUtils.setCallId;
+import static org.apache.commons.lang3.StringUtils.isBlank;
 
 /**
  * @author Heidi Elisabeth Sando, Visma Consulting.
@@ -24,13 +23,12 @@ public class IdsProcessor implements Processor {
 	}
 
 	private void setOrGenerateCallIdToMdc(Exchange exchange) {
-		final String callId = exchange.getIn().getHeader(CALL_ID, String.class);
-		if (callId == null || isBlank(callId)) {
-			String newCallId = UUID.randomUUID().toString();
-			exchange.getIn().setHeader(CALL_ID, newCallId);
-			MDC.put(CALL_ID, newCallId);
+		final String callId = exchange.getIn().getHeader(MDC_CALL_ID, String.class);
+		if (isBlank(callId)) {
+			String newCallId = getCallId();
+			exchange.getIn().setHeader(MDC_CALL_ID, newCallId);
 		} else {
-			MDC.put(CALL_ID, callId);
+			setCallId(callId);
 		}
 	}
 
