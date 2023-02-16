@@ -4,6 +4,7 @@ import no.nav.dokdisteformidling.certificate.KeyStoreProperties;
 import no.nav.dokdisteformidling.config.alias.ServiceuserAlias;
 import no.nav.dokdisteformidling.config.props.BrokerServiceExternalProperties;
 import no.nav.dokdisteformidling.config.props.BrokerServiceExternalStreamedProperties;
+import no.nav.dokdisteformidling.config.props.DokdisteformidlingProperties;
 import no.nav.dokdisteformidling.config.props.DpoUserProperties;
 import no.nav.dokdisteformidling.config.props.MaskinportenProperties;
 import no.nav.dokdisteformidling.config.props.ServiceRegistryProperties;
@@ -13,20 +14,23 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Profile;
 
-/**
- * @author Joakim Bjørnstad, Jbit AS
- */
 @Configuration
 @Profile("itest")
-@EnableConfigurationProperties({ServiceuserAlias.class,
+@EnableConfigurationProperties({
+		ServiceuserAlias.class,
 		DpoUserProperties.class,
 		BrokerServiceExternalProperties.class,
 		BrokerServiceExternalStreamedProperties.class,
 		KeyStoreProperties.class,
 		MaskinportenProperties.class,
-		ServiceRegistryProperties.class})
-@Import({BrokerServiceExternalStreamedConfigTest.class,
-		BrokerServiceExternalTestConfig.class})
+		ServiceRegistryProperties.class,
+		DokdisteformidlingProperties.class
+})
+@Import({
+		BrokerServiceExternalStreamedConfigTest.class,
+		BrokerServiceExternalTestConfig.class,
+		LocalTestCacheConfig.class
+})
 @ComponentScan(basePackages = "no.nav.dokdisteformidling")
 public class ApplicationTestConfig {
 

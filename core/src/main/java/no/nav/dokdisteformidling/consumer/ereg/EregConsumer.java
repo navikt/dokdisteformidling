@@ -1,11 +1,5 @@
 package no.nav.dokdisteformidling.consumer.ereg;
 
-import static java.lang.String.format;
-import static no.nav.dokdisteformidling.constants.DomainConstants.APP_NAME;
-import static no.nav.dokdisteformidling.constants.MdcConstants.NAV_CALL_ID;
-import static no.nav.dokdisteformidling.constants.MdcConstants.NAV_CONSUMER_ID;
-import static no.nav.dokdisteformidling.constants.RetryConstants.DELAY_SHORT;
-
 import no.nav.dokdisteformidling.constants.MdcConstants;
 import no.nav.dokdisteformidling.exception.functional.EregHentNoekkelinfoFunctionalException;
 import no.nav.dokdisteformidling.exception.technical.EregHentNoekkelinfoTechnicalException;
@@ -25,6 +19,12 @@ import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import java.time.Duration;
+
+import static java.lang.String.format;
+import static no.nav.dokdisteformidling.constants.DomainConstants.APP_NAME;
+import static no.nav.dokdisteformidling.constants.MdcConstants.NAV_CALL_ID;
+import static no.nav.dokdisteformidling.constants.MdcConstants.NAV_CONSUMER_ID;
+import static no.nav.dokdisteformidling.constants.RetryConstants.DELAY_SHORT;
 
 /**
  * @author Sigurd Midttun, Visma Consulting.
@@ -67,7 +67,7 @@ public class EregConsumer implements Ereg {
 		HttpHeaders headers = new HttpHeaders();
 		headers.setContentType(MediaType.APPLICATION_JSON);
 		headers.add(NAV_CONSUMER_ID, APP_NAME);
-		headers.add(NAV_CALL_ID, MDC.get(MdcConstants.CALL_ID));
+		headers.add(NAV_CALL_ID, MDC.get(MdcConstants.MDC_CALL_ID));
 		return headers;
 	}
 

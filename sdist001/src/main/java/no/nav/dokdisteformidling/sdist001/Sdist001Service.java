@@ -78,6 +78,7 @@ public class Sdist001Service {
 		return forsendelse -> {
 			String forsendelseId = forsendelse.getForsendelseId();
 			log.info("sdist001 behandler forsendelse {}", forsendelse);
+
 			try {
 				kontrollerEformidlingStatus(downloadResponse.getKvitteringStatus().getStatus(), forsendelse, endringer);
 				eformidling.bekreft(downloadResponse.getFileReference());
