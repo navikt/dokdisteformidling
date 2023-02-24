@@ -8,8 +8,8 @@
 		</encoder>
 	</appender>
 
-	<root level="INFO">
-<!--		<appender-ref ref="CONSOLE"/>-->
+	<root level="WARN">
+		<appender-ref ref="CONSOLE"/>
 	</root>
 
 	<logger name="no.nav.dokdisteformidling" level="INFO" additivity="false">
