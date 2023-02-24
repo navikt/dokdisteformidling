@@ -161,7 +161,7 @@
 				<version>${resilience4j.version}</version>
 			</dependency>
 
-			<!-- overstyrer transitive avhengigheter -->
+			<!-- overstyrer transitive avhengigheter grunna snyk-rapport -->
 			<dependency>
 				<groupId>org.yaml</groupId>
 				<artifactId>snakeyaml</artifactId>
