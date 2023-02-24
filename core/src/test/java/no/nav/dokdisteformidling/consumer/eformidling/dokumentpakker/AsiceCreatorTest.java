@@ -47,7 +47,7 @@ class AsiceCreatorTest {
 						"manifest.xml",
 						"arkivmelding.xml",
 						"test1.pdf",
-						"META-INF/asicmanifest.xml",
+						"META-INF/ASiCManifest.xml",
 						"META-INF/manifest.xml"));
 		assertFileContents(zipEntries, ARKIVMELDING_NAME, AVTALTMELDING_CONTENTS);
 		assertFileContents(zipEntries, DOKUMENT_1_NAME, DOKUMENT_1_CONTENTS);

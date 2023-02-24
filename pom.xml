@@ -27,20 +27,19 @@
 	<properties>
 		<java.version>17</java.version>
 
-		<camel.version>3.20.1</camel.version>
+		<camel.version>3.20.2</camel.version>
 		<logstash-logback-encoder.version>7.2</logstash-logback-encoder.version>
 		<resilience4j.version>2.0.2</resilience4j.version>
-		<google-cloud.version>25.4.0</google-cloud.version>
-		<google-tink.version>1.7.0</google-tink.version>
-		<wmq.version>9.3.1.0</wmq.version>
+		<google-cloud.version>26.9.0</google-cloud.version>
+		<google-tink.version>1.8.0</google-tink.version>
+		<ibm.mq.allclient.version>9.3.1.0</ibm.mq.allclient.version>
 		<cxf.version>3.5.5</cxf.version>
 		<commons-io.version>2.11.0</commons-io.version>
 		<nimbus-jose-jwt.version>9.28</nimbus-jose-jwt.version>
 		<jaxws-ri.version>3.0.2</jaxws-ri.version>
-
-		<!-- TODO: Oppgrader til 0.11.0 -->
-		<!-- Difi -->
-		<commons-asic.version>0.9.3</commons-asic.version>
+		<commons-asic.version>0.11.0</commons-asic.version>
+		<snakeyaml.version>1.33</snakeyaml.version>
+		<bouncycastle-jdk15on.version>1.70</bouncycastle-jdk15on.version>
 
 		<!-- NAV -->
 		<melding-virksomhet-dokdistfordeling.version>5-7ff79fc</melding-virksomhet-dokdistfordeling.version>
@@ -122,7 +121,7 @@
 			<dependency>
 				<groupId>com.ibm.mq</groupId>
 				<artifactId>com.ibm.mq.allclient</artifactId>
-				<version>${wmq.version}</version>
+				<version>${ibm.mq.allclient.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>org.apache.camel.springboot</groupId>
@@ -160,6 +159,28 @@
 				<groupId>io.github.resilience4j</groupId>
 				<artifactId>resilience4j-spring-boot2</artifactId>
 				<version>${resilience4j.version}</version>
+			</dependency>
+
+			<!-- overstyrer transitive avhengigheter grunna snyk-rapport -->
+			<dependency>
+				<groupId>org.yaml</groupId>
+				<artifactId>snakeyaml</artifactId>
+				<version>${snakeyaml.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.bouncycastle</groupId>
+				<artifactId>bcprov-jdk15on</artifactId>
+				<version>${bouncycastle-jdk15on.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.bouncycastle</groupId>
+				<artifactId>bcpkix-jdk15on</artifactId>
+				<version>${bouncycastle-jdk15on.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.bouncycastle</groupId>
+				<artifactId>bcutil-jdk15on</artifactId>
+				<version>${bouncycastle-jdk15on.version}</version>
 			</dependency>
 
 			<!-- test -->
