@@ -212,7 +212,6 @@ class Qdist013ForAltinnIT {
 
 	@Test
 	void brokerserviceStreamedShouldUploadFileToAltinn() {
-
 		stubGetForsendelse("__files/rjoark001/getForsendelse-happy.json");
 		stubGetSecurityToken();
 		stubPostSafJournalpost("queryJournalpostId\":\"123\"", "saf/safQdist013GraphQlResponse-aktoerId.json");
@@ -236,7 +235,6 @@ class Qdist013ForAltinnIT {
 
 	@Test
 	void shouldProcessForsendelseWithFnr() {
-
 		stubGetForsendelse("__files/rjoark001/getForsendelse-happy.json");
 		stubGetSecurityToken();
 		stubPostSafJournalpost("queryJournalpostId\":\"123\"", "saf/safQdist013GraphQlResponse-fnr.json");
@@ -259,7 +257,6 @@ class Qdist013ForAltinnIT {
 
 	@Test
 	void shouldProcessForsendelseWithOrgnr() {
-
 		stubGetForsendelse("__files/rjoark001/getForsendelse-happy.json");
 		stubGetSecurityToken();
 		stubPostSafJournalpost("queryJournalpostId\":\"123\"", "saf/safQdist013GraphQlResponse-orgnr.json");
