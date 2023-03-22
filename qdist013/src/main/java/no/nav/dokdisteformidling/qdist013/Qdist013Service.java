@@ -9,7 +9,7 @@ import no.nav.dokdisteformidling.consumer.eformidling.NavDokumentpakke;
 import no.nav.dokdisteformidling.consumer.juridisklogg.JuridiskLogg;
 import no.nav.dokdisteformidling.consumer.juridisklogg.LagreJuridiskLoggMapper;
 import no.nav.dokdisteformidling.consumer.rdist001.AdministrerForsendelse;
-import no.nav.dokdisteformidling.consumer.rdist001.HentForsendelseResponseTo;
+import no.nav.dokdisteformidling.consumer.rdist001.HentForsendelseResponse;
 import no.nav.dokdisteformidling.consumer.saf.SafJournalpostQueryService;
 import no.nav.dokdisteformidling.exception.functional.IkkeSammenfallendeIderFunctionalException;
 import no.nav.dokdisteformidling.exception.technical.KunneIkkeMarshalleArkivmeldingTechnicalException;
@@ -42,9 +42,6 @@ import static no.nav.dokdisteformidling.utils.FunctionalUtils.deserializeBucketJ
 import static no.nav.dokdisteformidling.utils.FunctionalUtils.generateRandomUUID;
 import static no.nav.dokdisteformidling.utils.FunctionalUtils.validateThatForsendelseStatusIsKlarForDist;
 
-/**
- * @author Sigurd Midttun, Visma Consulting.
- */
 @Slf4j
 @Service
 public class Qdist013Service {
@@ -75,26 +72,30 @@ public class Qdist013Service {
 
     @Handler
     public void processForsendelse(DistribuerForsendelseTilTrygderetten distribuerForsendelseTilTrygderetten, Exchange exchange) {
-        final String conversationId = generateRandomUUID(); //
+        final String conversationId = generateRandomUUID();
         exchange.setProperty(PROPERTY_CONVERSATION_ID, conversationId);
+
         final String forsendelseId = distribuerForsendelseTilTrygderetten.getForsendelseId();
-        final HentForsendelseResponseTo hentForsendelseResponseTo = administrerForsendelse.hentForsendelse(forsendelseId);
-        final String bestillingsId = hentForsendelseResponseTo.getBestillingsId();
+        final HentForsendelseResponse hentForsendelseResponse = administrerForsendelse.hentForsendelse(forsendelseId);
+
+        final String bestillingsId = hentForsendelseResponse.getBestillingsId();
         exchange.setProperty(PROPERTY_BESTILLINGS_ID, bestillingsId);
-        final String journalpostId =  hentForsendelseResponseTo.getArkivInformasjon().getArkivId();
+
+        final String journalpostId =  hentForsendelseResponse.getArkivInformasjon().getArkivId();
         exchange.setProperty(PROPERTY_JOURNALPOST_ID, journalpostId);
         exchange.setProperty(PROPERTY_CONVERSATION_ID, conversationId);
-        validateThatForsendelseStatusIsKlarForDist(hentForsendelseResponseTo.getForsendelseStatus());
+        validateThatForsendelseStatusIsKlarForDist(hentForsendelseResponse.getForsendelseStatus());
 
-        final List<DokdistDokument> dokdistDokumentList = getDocumentsFromBucket(hentForsendelseResponseTo);
+        final List<DokdistDokument> dokdistDokumentList = getDocumentsFromBucket(hentForsendelseResponse);
         exchange.setProperty(PROPERTY_ANTALL_DOK, dokdistDokumentList.size());
-        final JournalpostQdist013 journalpostQdist013 = safJournalpostQueryService.hentJournalpost(hentForsendelseResponseTo.getArkivInformasjon()
+        final JournalpostQdist013 journalpostQdist013 = safJournalpostQueryService.hentJournalpost(hentForsendelseResponse.getArkivInformasjon()
                 .getArkivId());
         final JAXBElement<Arkivmelding> arkivmeldingJAXBElement = avtaltmeldingMapper.createArkivMelding(journalpostQdist013, bestillingsId);
         final String arkivmeldingXmlString = marshalArkivmeldingToXmlString(arkivmeldingJAXBElement);
 
         log.info("Sender eformidling forsendelse direkte til Altinn formidlingstjenesten. forsendelseId={}, konversasjonsId={}, bestillingsId={}",
                 forsendelseId, conversationId, bestillingsId);
+
         eformidling.send(NavDokumentpakke.builder()
                 .conversationId(conversationId)
                 .bestillingsId(bestillingsId)
@@ -104,14 +105,14 @@ public class Qdist013Service {
                                 new ByteArrayInputStream(d.getPdf())))
                         .collect(Collectors.toList()))
                 .build(), arkivmeldingXmlString);
-        juridiskLogg.lagreJuridiskLogg(lagreJuridiskLoggMapper.map(hentForsendelseResponseTo, arkivmeldingXmlString.getBytes()));
 
+        juridiskLogg.lagreJuridiskLogg(lagreJuridiskLoggMapper.map(hentForsendelseResponse, arkivmeldingXmlString.getBytes()));
     }
 
-    private List<DokdistDokument> getDocumentsFromBucket(HentForsendelseResponseTo hentForsendelseResponseTo) {
-        return hentForsendelseResponseTo.getDokumenter().stream()
+    private List<DokdistDokument> getDocumentsFromBucket(HentForsendelseResponse hentForsendelseResponse) {
+        return hentForsendelseResponse.getDokumenter().stream()
                 .map(dokumentTo -> {
-                    String jsonPayload = bucketStorage.downloadObject(dokumentTo.getDokumentObjektReferanse(), hentForsendelseResponseTo.getBestillingsId());
+                    String jsonPayload = bucketStorage.downloadObject(dokumentTo.getDokumentObjektReferanse(), hentForsendelseResponse.getBestillingsId());
                     DokdistDokument dokdistDokument = deserializeBucketJsonPayloadToDokdistDokument(jsonPayload, dokumentTo.getDokumentObjektReferanse());
                     dokdistDokument.setDokumentInfoId(dokumentTo.getArkivDokumentInfoId());
                     return dokdistDokument;
