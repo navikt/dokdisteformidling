@@ -11,7 +11,7 @@ import no.nav.dokdisteformidling.consumer.juridisklogg.LagreJuridiskLoggMapper;
 import no.nav.dokdisteformidling.consumer.juridisklogg.LoggMeldingRequest;
 import no.nav.dokdisteformidling.consumer.rdist001.AdministrerForsendelse;
 import no.nav.dokdisteformidling.consumer.rdist001.HentEformidlingforsendelserResponseTo;
-import no.nav.dokdisteformidling.consumer.rdist001.HentForsendelseResponseTo;
+import no.nav.dokdisteformidling.consumer.rdist001.HentForsendelseResponse;
 import no.nav.dokdisteformidling.exception.functional.KunneIkkeSerialisereEformidlingstatusoppdateringTilJson;
 import no.nav.dokdisteformidling.metrics.Monitor;
 import no.nav.dokdisteformidling.sdist001.domain.EformidlingStatusOppdatering;
@@ -132,13 +132,13 @@ public class Sdist001Service {
 	}
 
 	private void oppdaterTilEkspedert(String trygderettenKvitteringStatus, String forsendelseId, String konversasjonId) {
-		HentForsendelseResponseTo hentForsendelseResponseTo = administrerForsendelse.hentForsendelse(forsendelseId);
+		HentForsendelseResponse hentForsendelseResponse = administrerForsendelse.hentForsendelse(forsendelseId);
 		EformidlingStatusOppdatering eformidlingStatusOppdatering =
 				eformidlingStatusOppdateringMapper.map(konversasjonId, trygderettenKvitteringStatus);
 
 		try {
 			byte[] meldingsInnhold = juridiskLoggObjectMapper.writeValueAsBytes(eformidlingStatusOppdatering);
-			LoggMeldingRequest loggMeldingRequest = lagreJuridiskLoggMapper.map(hentForsendelseResponseTo, meldingsInnhold);
+			LoggMeldingRequest loggMeldingRequest = lagreJuridiskLoggMapper.map(hentForsendelseResponse, meldingsInnhold);
 			juridiskLogg.lagreJuridiskLogg(loggMeldingRequest);
 		} catch (JsonProcessingException e) {
 			throw new KunneIkkeSerialisereEformidlingstatusoppdateringTilJson(

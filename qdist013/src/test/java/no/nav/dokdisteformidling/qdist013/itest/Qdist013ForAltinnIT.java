@@ -1,12 +1,10 @@
 package no.nav.dokdisteformidling.qdist013.itest;
 
-import com.github.tomakehurst.wiremock.admin.model.ListStubMappingsResult;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import com.github.tomakehurst.wiremock.verification.LoggedRequest;
 import com.google.cloud.storage.StorageException;
 import no.altinn.brokerserviceexternal.InitiateBrokerService;
 import no.altinn.brokerserviceexternal.Manifest;
-import no.nav.dokdisteformidling.consumer.eformidling.EformidlingConstants;
 import no.nav.dokdisteformidling.consumer.eformidling.serviceregistry.EformidlingMottakerInfoService;
 import no.nav.dokdisteformidling.consumer.eformidling.serviceregistry.MottakerInfo;
 import no.nav.dokdisteformidling.exception.technical.BucketFailedToDownloadTechnicalException;
@@ -15,7 +13,6 @@ import no.nav.dokdisteformidling.storage.BucketStorage;
 import no.nav.dokdisteformidling.storage.DokdistDokument;
 import no.nav.dokdisteformidling.storage.JsonSerializer;
 import org.apache.activemq.command.ActiveMQTextMessage;
-import org.apache.http.HttpHeaders;
 import org.apache.http.entity.ContentType;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
@@ -26,10 +23,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.cloud.contract.wiremock.AutoConfigureWireMock;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.util.MimeTypeUtils;
 
 import javax.jms.Queue;
 import javax.jms.TextMessage;
@@ -37,12 +33,10 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.soap.MessageFactory;
-import javax.xml.soap.SOAPConstants;
 import javax.xml.soap.SOAPMessage;
 import java.io.ByteArrayInputStream;
 import java.util.List;
 import java.util.UUID;
-import java.util.concurrent.TimeUnit;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.containing;
@@ -51,7 +45,6 @@ import static com.github.tomakehurst.wiremock.client.WireMock.equalToJson;
 import static com.github.tomakehurst.wiremock.client.WireMock.findAll;
 import static com.github.tomakehurst.wiremock.client.WireMock.get;
 import static com.github.tomakehurst.wiremock.client.WireMock.getRequestedFor;
-import static com.github.tomakehurst.wiremock.client.WireMock.listAllStubMappings;
 import static com.github.tomakehurst.wiremock.client.WireMock.matchingJsonPath;
 import static com.github.tomakehurst.wiremock.client.WireMock.post;
 import static com.github.tomakehurst.wiremock.client.WireMock.postRequestedFor;
@@ -62,7 +55,9 @@ import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlMatching;
 import static com.github.tomakehurst.wiremock.client.WireMock.verify;
 import static java.util.concurrent.TimeUnit.SECONDS;
+import static javax.xml.soap.SOAPConstants.SOAP_1_2_PROTOCOL;
 import static no.nav.dokdisteformidling.constants.RetryConstants.MAX_ATTEMPTS_SHORT;
+import static no.nav.dokdisteformidling.consumer.eformidling.EformidlingConstants.AVTALTMELDING_PROCESS;
 import static no.nav.dokdisteformidling.consumer.eformidling.EformidlingConstants.TRYGDERETTEN_ORGNUMMER;
 import static no.nav.dokdisteformidling.qdist013.TestUtil.classpathToString;
 import static org.awaitility.Awaitility.await;
@@ -76,11 +71,13 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
+import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
+import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
+import static org.springframework.http.HttpStatus.NOT_FOUND;
 import static org.springframework.http.HttpStatus.OK;
-import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.http.MediaType.APPLICATION_XML_VALUE;
-import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
 import static wiremock.com.google.common.base.Strings.isNullOrEmpty;
 
 
@@ -98,7 +95,6 @@ class Qdist013ForAltinnIT {
 	private static final String VEDLEGG1_TEST_CONTENT = "VEDLEGG1_TEST_CONTENT";
 	private static final String VEDLEGG2_TEST_CONTENT = "VEDLEGG2_TEST_CONTENT";
 	private static final String PDL_PERSONNAVN_HAPPY = "pdl/personnavn_happy.json";
-	public static final String PDL_PERSONNAVN_NOT_FOUND = "pdl/pdlident_not_found.json";
 	public static final String PDL_FORNAVN_NULL = "pdl/personnavn_nullfornavn.json";
 	private static final String PDL_IDENT_NOT_FOUND = "pdl/pdlident_not_found.json";
 	private static final String PDL_IDENT_HAPPY = "pdl/pdlident_happy.json";
@@ -133,6 +129,7 @@ class Qdist013ForAltinnIT {
 		WireMock.removeAllMappings();
 		Mockito.reset(bucketStorage);
 
+		stubAzure();
 		when(bucketStorage.downloadObject(eq(DOKUMENT_OBJEKT_REFERANSE_HOVEDDOK), anyString()))
 				.thenReturn(JsonSerializer.serialize(DokdistDokument.builder().pdf(HOVEDDOK_TEST_CONTENT.getBytes()).build()));
 		when(bucketStorage.downloadObject(eq(DOKUMENT_OBJEKT_REFERANSE_VEDLEGG1), anyString()))
@@ -147,12 +144,13 @@ class Qdist013ForAltinnIT {
 		stubPostMaskinporten();
 		stubGetServiceRegistry();
 		stubPostIntiateBrokerService();
+
 		MottakerInfo mottakerInfo = eformidlingMottakerInfoService.hentMottakerInfoTrygderetten();
 
 		assertThat(mottakerInfo.getOrgnummer(), is(TRYGDERETTEN_ORGNUMMER));
 		assertThat(mottakerInfo.getServiceCode(), is("4192"));
 		assertThat(mottakerInfo.getServiceEditionCode(), is("270815"));
-		verify(1, getRequestedFor(urlEqualTo("/serviceregistry/identifier/" + TRYGDERETTEN_ORGNUMMER + "/process/" + EformidlingConstants.AVTALTMELDING_PROCESS)));
+		verify(1, getRequestedFor(urlEqualTo("/serviceregistry/identifier/" + TRYGDERETTEN_ORGNUMMER + "/process/" + AVTALTMELDING_PROCESS)));
 		verify(1, postRequestedFor(urlEqualTo("/maskinporten")));
 
 	}
@@ -167,12 +165,10 @@ class Qdist013ForAltinnIT {
 		stubPostMaskinporten();
 		stubGetServiceRegistry();
 		stubPostIntiateBrokerService();
-		ListStubMappingsResult stubs = listAllStubMappings();
+
 		sendStringMessage(qdist013, classpathToString("qdist013/qdist013-happy.xml"));
 
-		await().atMost(10, SECONDS).untilAsserted(() -> {
-			verifyIntiateBrokerServiceStubs("", "20026900817", "1000045110509", 21, 1, 2, 2);
-		});
+		await().atMost(10, SECONDS).untilAsserted(() -> verifyIntiateBrokerServiceStubs("", "20026900817", "1000045110509", 21, 1, 2, 2));
 	}
 
 	@Test
@@ -185,11 +181,10 @@ class Qdist013ForAltinnIT {
 		stubPostMaskinporten();
 		stubGetServiceRegistry();
 		stubPostIntiateBrokerService();
+
 		sendStringMessage(qdist013, classpathToString("qdist013/qdist013-happy.xml"));
 
-		await().atMost(10, SECONDS).untilAsserted(() -> {
-			verifyIntiateBrokerServiceStubs("", "20026900817", "1000045110509", 17, 1, 2, 2);
-		});
+		await().atMost(10, SECONDS).untilAsserted(() -> verifyIntiateBrokerServiceStubs("", "20026900817", "1000045110509", 17, 1, 2, 2));
 	}
 
 	@Test
@@ -201,9 +196,7 @@ class Qdist013ForAltinnIT {
 
 		sendStringMessage(qdist013, classpathToString("qdist013/qdist013-happy.xml"));
 
-		await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
-			assertMessageOnQueue(qdist013FunksjonellFeil);
-		});
+		await().atMost(10, SECONDS).untilAsserted(() -> assertMessageOnQueue(qdist013FunksjonellFeil));
 
 		verifyGetForsendelse();
 		verifyGetSecurityToken(1);
@@ -226,11 +219,7 @@ class Qdist013ForAltinnIT {
 
 		sendStringMessage(qdist013, classpathToString("qdist013/qdist013-happy.xml"));
 
-		await().atMost(10, SECONDS).untilAsserted(() -> {
-			verifyIntiateBrokerServiceStubs("", "20026900817", "1000045110509", 21, 1, 2, 2);
-		});
-
-
+		await().atMost(10, SECONDS).untilAsserted(() -> verifyIntiateBrokerServiceStubs("", "20026900817", "1000045110509", 21, 1, 2, 2));
 	}
 
 	@Test
@@ -249,10 +238,7 @@ class Qdist013ForAltinnIT {
 
 		sendStringMessage(qdist013, classpathToString("qdist013/qdist013-happy.xml"));
 
-		await().atMost(10, SECONDS).untilAsserted(() -> {
-			verifyAllStubs("", 20, 1, 1);
-		});
-
+		await().atMost(10, SECONDS).untilAsserted(() -> verifyAllStubs("", 20, 1, 1));
 	}
 
 	@Test
@@ -271,22 +257,16 @@ class Qdist013ForAltinnIT {
 
 		sendStringMessage(qdist013, classpathToString("qdist013/qdist013-happy.xml"));
 
-		await().atMost(10, SECONDS).untilAsserted(() -> {
-			verifyAllStubs("123456789", 19, 1, 2);
-		});
-
+		await().atMost(10, SECONDS).untilAsserted(() -> verifyAllStubs("123456789", 19, 1, 2));
 	}
 
 	@Test
 	void shouldThrowRdist001HentForsendelseFunctionalException() {
-		stubFor(get("/administrerforsendelse/" + FORSENDELSE_ID)
-				.willReturn(aResponse().withStatus(HttpStatus.NOT_FOUND.value())));
+		stubFor(get("/administrerforsendelse/" + FORSENDELSE_ID).willReturn(aResponse().withStatus(NOT_FOUND.value())));
 
 		sendStringMessage(qdist013, classpathToString("qdist013/qdist013-happy.xml"));
 
-		await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
-			assertMessageOnQueue(qdist013FunksjonellFeil);
-		});
+		await().atMost(10, SECONDS).untilAsserted(() -> assertMessageOnQueue(qdist013FunksjonellFeil));
 
 		verify(1, getRequestedFor(urlEqualTo("/administrerforsendelse/" + FORSENDELSE_ID)));
 	}
@@ -299,9 +279,7 @@ class Qdist013ForAltinnIT {
 
 		sendStringMessage(qdist013, classpathToString("qdist013/qdist013-happy.xml"));
 
-		await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
-			assertMessageOnQueue(backoutQueue);
-		});
+		await().atMost(10, SECONDS).untilAsserted(() -> assertMessageOnQueue(backoutQueue));
 
 		verify(1, getRequestedFor(urlEqualTo("/administrerforsendelse/" + FORSENDELSE_ID)));
 	}
@@ -314,9 +292,7 @@ class Qdist013ForAltinnIT {
 
 		sendStringMessage(qdist013, classpathToString("qdist013/qdist013-happy.xml"));
 
-		await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
-			assertMessageOnQueue(backoutQueue);
-		});
+		await().atMost(10, SECONDS).untilAsserted(() -> assertMessageOnQueue(backoutQueue));
 
 		verify(1, getRequestedFor(urlEqualTo("/administrerforsendelse/" + FORSENDELSE_ID)));
 	}
@@ -329,9 +305,7 @@ class Qdist013ForAltinnIT {
 
 		sendStringMessage(qdist013, classpathToString("qdist013/qdist013-happy.xml"));
 
-		await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
-			assertMessageOnQueue(backoutQueue);
-		});
+		await().atMost(10, SECONDS).untilAsserted(() -> assertMessageOnQueue(backoutQueue));
 
 		verify(1, getRequestedFor(urlEqualTo("/administrerforsendelse/" + FORSENDELSE_ID)));
 		verify(MAX_ATTEMPTS_SHORT, getRequestedFor(urlEqualTo("/securitytoken?grant_type=client_credentials&scope=openid")));
@@ -341,15 +315,15 @@ class Qdist013ForAltinnIT {
 	void shouldPutOnBackoutQueueWhenSafJournalpostIkkeFunnetException() {
 		stubGetForsendelse("__files/rjoark001/getForsendelse-happy.json");
 		stubGetSecurityToken();
-		stubFor(post(urlMatching("/safgraphql")).willReturn(aResponse().withStatus(OK.value())
-				.withHeader(org.springframework.http.HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_UTF8_VALUE)
-				.withBody("")));
+		stubFor(post(urlMatching("/safgraphql"))
+				.willReturn(aResponse()
+						.withStatus(OK.value())
+						.withHeader(CONTENT_TYPE, APPLICATION_JSON_VALUE)
+						.withBody("")));
 
 		sendStringMessage(qdist013, classpathToString("qdist013/qdist013-happy.xml"));
 
-		await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
-			assertMessageOnQueue(backoutQueue);
-		});
+		await().atMost(10, SECONDS).untilAsserted(() -> assertMessageOnQueue(backoutQueue));
 
 		verifyGetForsendelse();
 		verifyGetSecurityToken(MAX_ATTEMPTS_SHORT);
@@ -361,13 +335,12 @@ class Qdist013ForAltinnIT {
 		stubGetForsendelse("__files/rjoark001/getForsendelse-happy.json");
 		stubGetSecurityToken();
 		stubFor(post(urlMatching("/safgraphql"))
-				.willReturn(aResponse().withStatus(HttpStatus.NOT_FOUND.value())));
+				.willReturn(aResponse()
+						.withStatus(NOT_FOUND.value())));
 
 		sendStringMessage(qdist013, classpathToString("qdist013/qdist013-happy.xml"));
 
-		await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
-			assertMessageOnQueue(qdist013FunksjonellFeil);
-		});
+		await().atMost(10, SECONDS).untilAsserted(() -> assertMessageOnQueue(qdist013FunksjonellFeil));
 
 		verifyGetForsendelse();
 		verifyGetSecurityToken(1);
@@ -379,13 +352,12 @@ class Qdist013ForAltinnIT {
 		stubGetForsendelse("__files/rjoark001/getForsendelse-happy.json");
 		stubGetSecurityToken();
 		stubFor(post(urlMatching("/safgraphql"))
-				.willReturn(aResponse().withStatus(INTERNAL_SERVER_ERROR.value())));
+				.willReturn(aResponse()
+						.withStatus(INTERNAL_SERVER_ERROR.value())));
 
 		sendStringMessage(qdist013, classpathToString("qdist013/qdist013-happy.xml"));
 
-		await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
-			assertMessageOnQueue(backoutQueue);
-		});
+		await().atMost(10, SECONDS).untilAsserted(() -> assertMessageOnQueue(backoutQueue));
 
 		verifyGetForsendelse();
 		verify(3, getRequestedFor(urlEqualTo("/securitytoken?grant_type=client_credentials&scope=openid")));
@@ -400,9 +372,7 @@ class Qdist013ForAltinnIT {
 
 		sendStringMessage(qdist013, classpathToString("qdist013/qdist013-happy.xml"));
 
-		await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
-			assertMessageOnQueue(qdist013FunksjonellFeil);
-		});
+		await().atMost(10, SECONDS).untilAsserted(() -> assertMessageOnQueue(qdist013FunksjonellFeil));
 
 		verifyGetForsendelse();
 		verifyGetSecurityToken(1);
@@ -417,15 +387,14 @@ class Qdist013ForAltinnIT {
 		postPdlGraphql(PDL_PERSONNAVN_HAPPY, OK.value());
 		stubFor(post(urlMatching("/safgraphql"))
 				.withRequestBody(containing("queryJournalpostId\":\"448212366\""))
-				.willReturn(aResponse().withStatus(OK.value())
-						.withHeader(org.springframework.http.HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_UTF8_VALUE)
+				.willReturn(aResponse()
+						.withStatus(OK.value())
+						.withHeader(CONTENT_TYPE, APPLICATION_JSON_VALUE)
 						.withBody("")));
 
 		sendStringMessage(qdist013, classpathToString("qdist013/qdist013-happy.xml"));
 
-		await().atMost(20, TimeUnit.SECONDS).untilAsserted(() -> {
-			assertMessageOnQueue(backoutQueue);
-		});
+		await().atMost(20, SECONDS).untilAsserted(() -> assertMessageOnQueue(backoutQueue));
 
 		verifyGetForsendelse();
 		verifyGetSecurityToken(MAX_ATTEMPTS_SHORT + 3);
@@ -441,13 +410,11 @@ class Qdist013ForAltinnIT {
 		stubPostSafJournalpost("queryJournalpostId\":\"123\"", "saf/safQdist013GraphQlResponse-aktoerId.json");
 		stubFor(post(urlMatching("/safgraphql"))
 				.withRequestBody(containing("queryJournalpostId\":\"448212366\""))
-				.willReturn(aResponse().withStatus(HttpStatus.FORBIDDEN.value())));
+				.willReturn(aResponse().withStatus(FORBIDDEN.value())));
 
 		sendStringMessage(qdist013, classpathToString("qdist013/qdist013-happy.xml"));
 
-		await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
-			assertMessageOnQueue(qdist013FunksjonellFeil);
-		});
+		await().atMost(10, SECONDS).untilAsserted(() -> assertMessageOnQueue(qdist013FunksjonellFeil));
 
 		verifyGetForsendelse();
 		verifyGetSecurityToken(2);
@@ -468,9 +435,7 @@ class Qdist013ForAltinnIT {
 
 		sendStringMessage(qdist013, classpathToString("qdist013/qdist013-happy.xml"));
 
-		await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
-			assertMessageOnQueue(backoutQueue);
-		});
+		await().atMost(10, SECONDS).untilAsserted(() -> assertMessageOnQueue(backoutQueue));
 
 		verifyGetForsendelse();
 		verifyGetSecurityToken(6);
@@ -490,11 +455,10 @@ class Qdist013ForAltinnIT {
 		stubGetServiceRegistry();
 		stubPostIntiateBrokerService();
 		stubUploadBrokerServiceStreamed();
+
 		sendStringMessage(qdist013, classpathToString("qdist013/qdist013-happy.xml"));
 
-		await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
-			assertMessageOnQueue(backoutQueue);
-		});
+		await().atMost(10, SECONDS).untilAsserted(() -> assertMessageOnQueue(backoutQueue));
 
 		verifyGetForsendelse();
 		verifyGetSecurityToken(6);
@@ -509,14 +473,11 @@ class Qdist013ForAltinnIT {
 		stubGetSecurityToken();
 		stubPostSafJournalpost("queryJournalpostId\":\"123\"", "saf/safQdist013GraphQlResponse-aktoerId.json");
 		stubPostSafJournalpost("queryJournalpostId\":\"448212366\"", "saf/safLightweightGraphQlResponse-happy.json");
-		String nullStr = null;
 		postPdlGraphql(PDL_IDENT_HAPPY, INTERNAL_SERVER_ERROR.value());
 
 		sendStringMessage(qdist013, classpathToString("qdist013/qdist013-happy.xml"));
 
-		await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
-			assertMessageOnQueue(backoutQueue);
-		});
+		await().atMost(10, SECONDS).untilAsserted(() -> assertMessageOnQueue(backoutQueue));
 
 		verifyGetForsendelse();
 		verifyGetSecurityToken(6);
@@ -535,9 +496,7 @@ class Qdist013ForAltinnIT {
 
 		sendStringMessage(qdist013, classpathToString("qdist013/qdist013-happy.xml"));
 
-		await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
-			assertMessageOnQueue(qdist013FunksjonellFeil);
-		});
+		await().atMost(10, SECONDS).untilAsserted(() -> assertMessageOnQueue(qdist013FunksjonellFeil));
 
 		verifyGetForsendelse();
 		verifyGetSecurityToken(1 + 1);
@@ -556,9 +515,7 @@ class Qdist013ForAltinnIT {
 
 		sendStringMessage(qdist013, classpathToString("qdist013/qdist013-happy.xml"));
 
-		await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
-			assertMessageOnQueue(qdist013FunksjonellFeil);
-		});
+		await().atMost(10, SECONDS).untilAsserted(() -> assertMessageOnQueue(qdist013FunksjonellFeil));
 
 		verifyGetForsendelse();
 		verifyGetSecurityToken(2);
@@ -577,9 +534,7 @@ class Qdist013ForAltinnIT {
 
 		sendStringMessage(qdist013, classpathToString("qdist013/qdist013-happy.xml"));
 
-		await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
-			assertMessageOnQueue(qdist013FunksjonellFeil);
-		});
+		await().atMost(10, SECONDS).untilAsserted(() -> assertMessageOnQueue(qdist013FunksjonellFeil));
 
 		verifyGetForsendelse();
 		verifyGetSecurityToken(2);
@@ -598,9 +553,7 @@ class Qdist013ForAltinnIT {
 
 		sendStringMessage(qdist013, classpathToString("qdist013/qdist013-happy.xml"));
 
-		await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
-			assertMessageOnQueue(backoutQueue);
-		});
+		await().atMost(10, SECONDS).untilAsserted(() -> assertMessageOnQueue(backoutQueue));
 
 		verifyGetForsendelse();
 		verifyGetSecurityToken(2);
@@ -617,13 +570,11 @@ class Qdist013ForAltinnIT {
 		stubFor(get("/tps/v1/navn")
 				.withHeader("Nav-Personident", equalTo("01010012345"))
 				.withHeader(AUTHORIZATION, equalTo(BEARER_OIDC_TOKEN))
-				.willReturn(aResponse().withStatus(HttpStatus.NOT_FOUND.value())));
+				.willReturn(aResponse().withStatus(NOT_FOUND.value())));
 
 		sendStringMessage(qdist013, classpathToString("qdist013/qdist013-happy.xml"));
 
-		await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
-			assertMessageOnQueue(qdist013FunksjonellFeil);
-		});
+		await().atMost(10, SECONDS).untilAsserted(() -> assertMessageOnQueue(qdist013FunksjonellFeil));
 
 		verifyGetForsendelse();
 		verifyGetSecurityToken(1 + 1);
@@ -642,9 +593,7 @@ class Qdist013ForAltinnIT {
 
 		sendStringMessage(qdist013, classpathToString("qdist013/qdist013-happy.xml"));
 
-		await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
-			assertMessageOnQueue(backoutQueue);
-		});
+		await().atMost(10, SECONDS).untilAsserted(() -> assertMessageOnQueue(backoutQueue));
 
 		verifyGetForsendelse();
 		verifyGetSecurityToken(3 + MAX_ATTEMPTS_SHORT);
@@ -659,13 +608,11 @@ class Qdist013ForAltinnIT {
 		stubPostSafJournalpost("queryJournalpostId\":\"123\"", "saf/safQdist013GraphQlResponse-orgnr.json");
 		stubPostSafJournalpost("queryJournalpostId\":\"448212366\"", "saf/safLightweightGraphQlResponse-happy.json");
 		stubFor(get("/ereg/v1/organisasjon/" + "123456789" + "/noekkelinfo")
-				.willReturn(aResponse().withStatus(HttpStatus.FORBIDDEN.value())));
+				.willReturn(aResponse().withStatus(FORBIDDEN.value())));
 
 		sendStringMessage(qdist013, classpathToString("qdist013/qdist013-happy.xml"));
 
-		await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
-			assertMessageOnQueue(qdist013FunksjonellFeil);
-		});
+		await().atMost(10, SECONDS).untilAsserted(() -> assertMessageOnQueue(qdist013FunksjonellFeil));
 
 		verifyGetForsendelse(1);
 		verifyGetSecurityToken(1);
@@ -681,15 +628,15 @@ class Qdist013ForAltinnIT {
 		stubPostSafJournalpost("queryJournalpostId\":\"123\"", "saf/safQdist013GraphQlResponse-orgnr.json");
 		stubPostSafJournalpost("queryJournalpostId\":\"448212366\"", "saf/safLightweightGraphQlResponse-happy.json");
 		String nullStr = null;
-		stubFor(get("/ereg/v1/organisasjon/" + "123456789" + "/noekkelinfo").willReturn(aResponse().withStatus(OK.value())
-				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
-				.withBody(nullStr)));
+		stubFor(get("/ereg/v1/organisasjon/" + "123456789" + "/noekkelinfo")
+				.willReturn(aResponse()
+						.withStatus(OK.value())
+						.withHeader(CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
+						.withBody(nullStr)));
 
 		sendStringMessage(qdist013, classpathToString("qdist013/qdist013-happy.xml"));
 
-		await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
-			assertMessageOnQueue(qdist013FunksjonellFeil);
-		});
+		await().atMost(10, SECONDS).untilAsserted(() -> assertMessageOnQueue(qdist013FunksjonellFeil));
 
 		verifyGetForsendelse();
 		verifyGetSecurityToken(1);
@@ -705,14 +652,12 @@ class Qdist013ForAltinnIT {
 		stubPostSafJournalpost("queryJournalpostId\":\"123\"", "saf/safQdist013GraphQlResponse-orgnr.json");
 		stubPostSafJournalpost("queryJournalpostId\":\"448212366\"", "saf/safLightweightGraphQlResponse-happy.json");
 		stubFor(get("/ereg/v1/organisasjon/" + "123456789" + "/noekkelinfo").willReturn(aResponse().withStatus(OK.value())
-				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
+				.withHeader(CONTENT_TYPE, APPLICATION_JSON_VALUE)
 				.withBodyFile("ereg/eregHentNavn_manglerNavn.json")));
 
 		sendStringMessage(qdist013, classpathToString("qdist013/qdist013-happy.xml"));
 
-		await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
-			assertMessageOnQueue(qdist013FunksjonellFeil);
-		});
+		await().atMost(10, SECONDS).untilAsserted(() -> assertMessageOnQueue(qdist013FunksjonellFeil));
 
 		verifyGetForsendelse();
 		verifyGetSecurityToken(1);
@@ -732,9 +677,7 @@ class Qdist013ForAltinnIT {
 
 		sendStringMessage(qdist013, classpathToString("qdist013/qdist013-happy.xml"));
 
-		await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
-			assertMessageOnQueue(backoutQueue);
-		});
+		await().atMost(10, SECONDS).untilAsserted(() -> assertMessageOnQueue(backoutQueue));
 
 		verifyGetForsendelse();
 		verifyGetSecurityToken(1);
@@ -760,9 +703,7 @@ class Qdist013ForAltinnIT {
 
 		sendStringMessage(qdist013, classpathToString("qdist013/qdist013-happy.xml"));
 
-		await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
-			assertMessageOnQueue(backoutQueue);
-		});
+		await().atMost(10, SECONDS).untilAsserted(() -> assertMessageOnQueue(backoutQueue));
 
 		verifyGetForsendelse();
 		verifyGetSecurityToken(15);
@@ -772,7 +713,6 @@ class Qdist013ForAltinnIT {
 		verifyPostMaskinporten();
 		verifyGetServiceRegistry();
 		verifyPostIntiateBrokerService();
-
 	}
 
 	@Test
@@ -783,16 +723,14 @@ class Qdist013ForAltinnIT {
 		stubPostSafJournalpost("queryJournalpostId\":\"448212366\"", "saf/safLightweightGraphQlResponse-happy.json");
 		stubGetEregHentOrgNavn("123456789");
 		stubPostMaskinporten();
-		stubFor(get(urlMatching("/serviceregistry/identifier/" + TRYGDERETTEN_ORGNUMMER + "/process/" + EformidlingConstants.AVTALTMELDING_PROCESS))
+		stubFor(get(urlMatching("/serviceregistry/identifier/" + TRYGDERETTEN_ORGNUMMER + "/process/" + AVTALTMELDING_PROCESS))
 				.willReturn(aResponse().withStatus(INTERNAL_SERVER_ERROR.value())
-						.withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE)));
+						.withHeader(CONTENT_TYPE, MimeTypeUtils.APPLICATION_JSON_VALUE)));
 
 		sendStringMessage(qdist013, classpathToString("qdist013/qdist013-happy.xml"));
 
 		// Retry 3x5s i serviceregistryconsumer
-		await().atMost(20, TimeUnit.SECONDS).untilAsserted(() -> {
-			assertMessageOnQueue(backoutQueue);
-		});
+		await().atMost(20, SECONDS).untilAsserted(() -> assertMessageOnQueue(backoutQueue));
 
 		verifyGetForsendelse();
 		verifyGetSecurityToken(19);
@@ -815,13 +753,11 @@ class Qdist013ForAltinnIT {
 
 		stubFor(post(urlMatching("/brokerserviceexternal"))
 				.willReturn(aResponse().withStatus(INTERNAL_SERVER_ERROR.value())
-						.withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_XML_VALUE)));
+						.withHeader(CONTENT_TYPE, APPLICATION_XML_VALUE)));
 
 		sendStringMessage(qdist013, classpathToString("qdist013/qdist013-happy.xml"));
 
-		await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
-			assertMessageOnQueue(backoutQueue);
-		});
+		await().atMost(10, SECONDS).untilAsserted(() -> assertMessageOnQueue(backoutQueue));
 
 		verifyGetForsendelse();
 		verifyGetSecurityToken(19);
@@ -847,13 +783,11 @@ class Qdist013ForAltinnIT {
 		stubPostIntiateBrokerService();
 		stubUploadBrokerServiceStreamed();
 		stubFor(post(urlMatching("/juridisklogg.*"))
-				.willReturn(aResponse().withStatus(HttpStatus.FORBIDDEN.value())));
+				.willReturn(aResponse().withStatus(FORBIDDEN.value())));
 
 		sendStringMessage(qdist013, classpathToString("qdist013/qdist013-happy.xml"));
 
-		await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
-			assertMessageOnQueue(qdist013FunksjonellFeil);
-		});
+		await().atMost(10, SECONDS).untilAsserted(() -> assertMessageOnQueue(qdist013FunksjonellFeil));
 
 		verifyGetForsendelse();
 		verifyGetSecurityToken(15);
@@ -885,9 +819,7 @@ class Qdist013ForAltinnIT {
 
 		sendStringMessage(qdist013, classpathToString("qdist013/qdist013-happy.xml"));
 
-		await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
-			assertMessageOnQueue(backoutQueue);
-		});
+		await().atMost(10, SECONDS).untilAsserted(() -> assertMessageOnQueue(backoutQueue));
 
 		verifyGetForsendelse();
 		verifyGetSecurityToken(19);
@@ -916,13 +848,11 @@ class Qdist013ForAltinnIT {
 		stubUploadBrokerServiceStreamed();
 		stubPostJuridiskLoggLagre();
 		stubFor(put(urlMatching("/administrerforsendelse\\?forsendelseId=" + FORSENDELSE_ID + "\\&forsendelseStatus=OVERSENDT\\&konversasjonsId=.*"))
-				.willReturn(aResponse().withStatus(HttpStatus.FORBIDDEN.value())));
+				.willReturn(aResponse().withStatus(FORBIDDEN.value())));
 
 		sendStringMessage(qdist013, classpathToString("qdist013/qdist013-happy.xml"));
 
-		await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
-			assertMessageOnQueue(qdist013FunksjonellFeil);
-		});
+		await().atMost(10, SECONDS).untilAsserted(() -> assertMessageOnQueue(qdist013FunksjonellFeil));
 
 		verifyGetForsendelse();
 		verifyGetSecurityToken(19);
@@ -956,9 +886,7 @@ class Qdist013ForAltinnIT {
 
 		sendStringMessage(qdist013, classpathToString("qdist013/qdist013-happy.xml"));
 
-		await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
-			assertMessageOnQueue(backoutQueue);
-		});
+		await().atMost(10, SECONDS).untilAsserted(() -> assertMessageOnQueue(backoutQueue));
 
 		verifyGetForsendelse();
 		verifyGetSecurityToken(19);
@@ -980,9 +908,7 @@ class Qdist013ForAltinnIT {
 
 		sendStringMessage(qdist013, classpathToString("qdist013/qdist013-happy.xml"));
 
-		await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
-			assertMessageOnQueue(backoutQueue);
-		});
+		await().atMost(10, SECONDS).untilAsserted(() -> assertMessageOnQueue(backoutQueue));
 
 		verify(3, getRequestedFor(urlEqualTo("/administrerforsendelse/" + FORSENDELSE_ID)));
 	}
@@ -993,9 +919,7 @@ class Qdist013ForAltinnIT {
 
 		sendStringMessage(qdist013, classpathToString("qdist013/qdist013-happy.xml"));
 
-		await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
-			assertMessageOnQueue(qdist013FunksjonellFeil);
-		});
+		await().atMost(10, SECONDS).untilAsserted(() -> assertMessageOnQueue(qdist013FunksjonellFeil));
 
 		verify(1, getRequestedFor(urlEqualTo("/administrerforsendelse/" + FORSENDELSE_ID)));
 	}
@@ -1008,29 +932,9 @@ class Qdist013ForAltinnIT {
 
 		sendStringMessage(qdist013, classpathToString("qdist013/qdist013-happy.xml"));
 
-		await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
-			assertMessageOnQueue(qdist013FunksjonellFeil);
-		});
+		await().atMost(10, SECONDS).untilAsserted(() -> assertMessageOnQueue(qdist013FunksjonellFeil));
 
 		verify(1, getRequestedFor(urlEqualTo("/administrerforsendelse/" + FORSENDELSE_ID)));
-	}
-
-
-	private void verifyAllStubsSaf(String orgnr, String fnr, String aktoerId, int stsCount) {
-		verifyGetForsendelse();
-		verifyGetSecurityToken(stsCount);
-		verifyPostSafJournalpost();
-		verify(14, postRequestedFor(urlEqualTo("/safgraphql"))
-				.withRequestBody(equalToJson(classpathToString("__files/saf/safLightweightGraphQlRequest.json"))));
-
-		if (!isNullOrEmpty(orgnr)) {
-			verifyGetEregHentOrgNavn(orgnr);
-		} else {
-			verifyPostPDLHentPersonNavn();
-		}
-		verifyPostMaskinporten();
-		verifyGetServiceRegistry();
-		verifyPostIntiateBrokerService();
 	}
 
 	private void verifyAllStubs(String orgnr, int stsCount, int safCount, int pdlCount) {
@@ -1038,11 +942,13 @@ class Qdist013ForAltinnIT {
 		verifyGetSecurityToken(stsCount);
 		verifyPostSafJournalpost();
 		verifyPostSafJournalpostLightweight(safCount);
+
 		if (!isNullOrEmpty(orgnr)) {
 			verifyGetEregHentOrgNavn(orgnr);
 		} else {
 			verifyPostPDLHentPersonNavn(pdlCount);
 		}
+
 		verifyPostMaskinporten();
 		verifyGetServiceRegistry();
 		verifyPostIntiateBrokerService();
@@ -1051,7 +957,6 @@ class Qdist013ForAltinnIT {
 		verifyPostJuridiskLoggLagre();
 		String conversationId = findConversationId();
 		verifyPutAdministrerforsendelseOppdatertForsendelsestatusAndkonvId(conversationId);
-
 	}
 
 	private void verifyIntiateBrokerServiceStubs(String orgnr, String fnr, String aktoerId, int stsCount, int safCount, int akoterCount, int pdlCount) {
@@ -1059,6 +964,7 @@ class Qdist013ForAltinnIT {
 		verifyGetSecurityToken(stsCount);
 		verifyPostSafJournalpost();
 		verifyPostSafJournalpostLightweight(safCount);
+
 		if (!isNullOrEmpty(orgnr)) {
 			verifyGetEregHentOrgNavn(orgnr);
 		} else {
@@ -1068,7 +974,6 @@ class Qdist013ForAltinnIT {
 		verifyPostMaskinporten();
 		verifyGetServiceRegistry();
 		verifyPostIntiateBrokerService();
-
 	}
 
 	private void verifyPostPDLHentPersonNavn(int count) {
@@ -1135,11 +1040,11 @@ class Qdist013ForAltinnIT {
 	}
 
 	private void verifyGetServiceRegistry() {
-		verify(1, getRequestedFor(urlEqualTo("/serviceregistry/identifier/" + TRYGDERETTEN_ORGNUMMER + "/process/" + EformidlingConstants.AVTALTMELDING_PROCESS)));
+		verify(1, getRequestedFor(urlEqualTo("/serviceregistry/identifier/" + TRYGDERETTEN_ORGNUMMER + "/process/" + AVTALTMELDING_PROCESS)));
 	}
 
 	private void verifyGetServiceRegistry(int expectedCount) {
-		verify(expectedCount, getRequestedFor(urlEqualTo("/serviceregistry/identifier/" + TRYGDERETTEN_ORGNUMMER + "/process/" + EformidlingConstants.AVTALTMELDING_PROCESS)));
+		verify(expectedCount, getRequestedFor(urlEqualTo("/serviceregistry/identifier/" + TRYGDERETTEN_ORGNUMMER + "/process/" + AVTALTMELDING_PROCESS)));
 	}
 
 	private void assertMessageOnQueue(javax.jms.Queue queue) {
@@ -1159,76 +1064,96 @@ class Qdist013ForAltinnIT {
 
 	private void stubPostIntiateBrokerService() {
 		stubFor(post(urlMatching("/brokerserviceexternal"))
-				.willReturn(aResponse().withStatus(OK.value())
-						.withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_XML_VALUE)
+				.willReturn(aResponse()
+						.withStatus(OK.value())
+						.withHeader(CONTENT_TYPE, APPLICATION_XML_VALUE)
 						.withBody(classpathToString("__files/altinn/brokerserviceinit_happy_response.xml").replace("localurl", brokerserviceexternalUrl))));
 	}
 
 	private void stubUploadBrokerServiceStreamed() {
 		stubFor(post(urlMatching("/brokerserviceexternalstreamed/upload"))
-				.willReturn(aResponse().withStatus(OK.value())
-						.withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_XML_VALUE)
+				.willReturn(aResponse()
+						.withStatus(OK.value())
+						.withHeader(CONTENT_TYPE, APPLICATION_XML_VALUE)
 						.withBody(classpathToString("__files/altinn/brokerserviceupload_happy_response.xml"))));
 	}
 
 	private void stubPostJuridiskLoggLagre() {
 		stubFor(post(urlMatching("/juridisklogg.*"))
-				.willReturn(aResponse().withStatus(OK.value())));
+				.willReturn(aResponse()
+						.withStatus(OK.value())));
 	}
 
 	private void stubPutAdministrerforsendelseOppdatertForsendelsestatusAndkonvId() {
 		stubFor(put(urlMatching("/administrerforsendelse\\?forsendelseId=" + FORSENDELSE_ID + "\\&forsendelseStatus=OVERSENDT\\&konversasjonsId=.*"))
-				.willReturn(aResponse().withStatus(OK.value())));
+				.willReturn(aResponse()
+						.withStatus(OK.value())));
 	}
 
 	private void stubGetEregHentOrgNavn(String orgnr) {
-		stubFor(get("/ereg/v1/organisasjon/" + orgnr + "/noekkelinfo").willReturn(aResponse().withStatus(OK.value())
-				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
-				.withBodyFile("ereg/eregHentNavn_happy.json")));
+		stubFor(get("/ereg/v1/organisasjon/" + orgnr + "/noekkelinfo")
+				.willReturn(aResponse()
+						.withStatus(OK.value())
+						.withHeader(CONTENT_TYPE, APPLICATION_JSON_VALUE)
+						.withBodyFile("ereg/eregHentNavn_happy.json")));
 	}
 
 	public static void stubGetServiceRegistry() {
-		stubFor(get(urlMatching("/serviceregistry/identifier/" + TRYGDERETTEN_ORGNUMMER + "/process/" + EformidlingConstants.AVTALTMELDING_PROCESS))
-				.willReturn(aResponse().withStatus(OK.value())
-						.withHeader(org.springframework.http.HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+		stubFor(get(urlMatching("/serviceregistry/identifier/" + TRYGDERETTEN_ORGNUMMER + "/process/" + AVTALTMELDING_PROCESS))
+				.willReturn(aResponse()
+						.withStatus(OK.value())
+						.withHeader(CONTENT_TYPE, APPLICATION_JSON_VALUE)
 						.withBody(classpathToString("__files/serviceregistry/serviceregistry_happy_response.json"))));
 	}
 
 	private void stubGetSecurityToken() {
-		stubFor(get("/securitytoken?grant_type=client_credentials&scope=openid").willReturn(aResponse().withStatus(OK
-				.value())
-				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
-				.withBodyFile("securitytoken/stsResponse_happy.json")));
+		stubFor(get("/securitytoken?grant_type=client_credentials&scope=openid")
+				.willReturn(aResponse()
+						.withStatus(OK.value())
+						.withHeader(CONTENT_TYPE, APPLICATION_JSON_VALUE)
+						.withBodyFile("securitytoken/stsResponse_happy.json")));
 	}
 
 	private void stubPostMaskinporten() {
-
 		stubFor(post(urlMatching("/maskinporten"))
-				.willReturn(aResponse().withStatus(OK.value())
-						.withHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+				.willReturn(aResponse()
+						.withStatus(OK.value())
+						.withHeader(CONTENT_TYPE, APPLICATION_JSON_VALUE)
 						.withBody(classpathToString("__files/maskinporten/maskinporten_happy_response.json"))));
 
 	}
 
 	private void stubGetForsendelse(String responsebody) {
-		stubFor(get("/administrerforsendelse/" + FORSENDELSE_ID).willReturn(aResponse().withStatus(OK.value())
-				.withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE)
-				.withBody(classpathToString(responsebody).replace("insertCallIdHere", CALL_ID))));
+		stubFor(get("/administrerforsendelse/" + FORSENDELSE_ID)
+				.willReturn(aResponse()
+						.withStatus(OK.value())
+						.withHeader(CONTENT_TYPE, APPLICATION_JSON_VALUE)
+						.withBody(classpathToString(responsebody).replace("insertCallIdHere", CALL_ID))));
 	}
 
 	public static void postPdlGraphql(String filePath, int status) {
 		stubFor(post(urlMatching("/pdl"))
-				.willReturn(aResponse().withStatus(status)
-						.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
+				.willReturn(aResponse()
+						.withStatus(status)
+						.withHeader(CONTENT_TYPE, APPLICATION_JSON_VALUE)
 						.withBodyFile(filePath)));
 	}
 
 	private void stubPostSafJournalpost(String stringInRequestBody, String returnBodyFileName) {
 		stubFor(post(urlMatching("/safgraphql"))
 				.withRequestBody(containing(stringInRequestBody))
-				.willReturn(aResponse().withStatus(OK.value())
-						.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
+				.willReturn(aResponse()
+						.withStatus(OK.value())
+						.withHeader(CONTENT_TYPE, APPLICATION_JSON_VALUE)
 						.withBodyFile(returnBodyFileName)));
+	}
+
+	void stubAzure() {
+		stubFor(post("/azure_token")
+				.willReturn(aResponse()
+						.withStatus(OK.value())
+						.withHeader(CONTENT_TYPE, APPLICATION_JSON_VALUE)
+						.withBodyFile("azure/token_response.json")));
 	}
 
 	private void sendStringMessage(javax.jms.Queue queue, final String message) {
@@ -1239,7 +1164,7 @@ class Qdist013ForAltinnIT {
 		List<LoggedRequest> loggedRequests = findAll(postRequestedFor(urlEqualTo("/brokerserviceexternal")));
 		String requestStr = loggedRequests.get(0).getBodyAsString();
 		try {
-			MessageFactory factory = MessageFactory.newInstance(SOAPConstants.SOAP_1_2_PROTOCOL);
+			MessageFactory factory = MessageFactory.newInstance(SOAP_1_2_PROTOCOL);
 			SOAPMessage message = factory.createMessage(null,
 					new ByteArrayInputStream(requestStr.getBytes()));
 			Unmarshaller unmarshaller = JAXBContext.newInstance(InitiateBrokerService.class).createUnmarshaller();
