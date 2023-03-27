@@ -12,6 +12,7 @@ import java.util.Arrays;
 
 import static java.util.concurrent.TimeUnit.MINUTES;
 import static java.util.concurrent.TimeUnit.SECONDS;
+import static no.nav.dokdisteformidling.config.cache.LokalCacheConfig.AZURE_TOKEN_CACHE;
 import static no.nav.dokdisteformidling.config.cache.LokalCacheConfig.LIGHTWEIGHT_SAF_JOURNALPOST_QDIST013_CACHE;
 import static no.nav.dokdisteformidling.config.cache.LokalCacheConfig.SAF_JOURNALPOST_QDIST013_CACHE;
 import static no.nav.dokdisteformidling.config.cache.LokalCacheConfig.STS_CACHE;
@@ -34,6 +35,9 @@ public class LocalTestCacheConfig {
                         .build()),
                 new CaffeineCache(SAF_JOURNALPOST_QDIST013_CACHE, Caffeine.newBuilder()
                         .expireAfterWrite(0, SECONDS)
+                        .build()),
+                new CaffeineCache(AZURE_TOKEN_CACHE, Caffeine.newBuilder()
+                        .expireAfterWrite(0, MINUTES)
                         .build())
         ));
         return manager;

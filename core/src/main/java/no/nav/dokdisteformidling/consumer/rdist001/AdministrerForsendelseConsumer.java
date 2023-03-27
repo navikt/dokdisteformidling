@@ -6,11 +6,9 @@ import no.nav.dokdisteformidling.azure.AzureToken;
 import no.nav.dokdisteformidling.config.alias.ServiceuserAlias;
 import no.nav.dokdisteformidling.config.props.DokdisteformidlingProperties;
 import no.nav.dokdisteformidling.exception.functional.DokdistadminFunctionalException;
-import no.nav.dokdisteformidling.exception.functional.Rdist001HentForsendelseFunctionalException;
 import no.nav.dokdisteformidling.exception.functional.Rdist001OppdaterForsendelseFunctionalException;
 import no.nav.dokdisteformidling.exception.technical.AbstractDokdisteformidlingTechnicalException;
 import no.nav.dokdisteformidling.exception.technical.DokdistadminTechnicalException;
-import no.nav.dokdisteformidling.exception.technical.Rdist001HentForsendelseTechnicalException;
 import no.nav.dokdisteformidling.exception.technical.Rdist001OppdaterForsendelseTechnicalException;
 import no.nav.dokdisteformidling.metrics.Monitor;
 import no.nav.dokdisteformidling.utils.NavHeadersFilter;
@@ -74,18 +72,21 @@ public class AdministrerForsendelseConsumer implements AdministrerForsendelse {
 	@Override
 	@Retryable(include = AbstractDokdisteformidlingTechnicalException.class, backoff = @Backoff(delay = DELAY_SHORT, multiplier = MULTIPLIER_SHORT))
 	@Monitor(value = "dok_consumer", extraTags = {"process", "hentForsendelse"}, histogram = true)
-	public HentForsendelseResponseTo hentForsendelse(final String forsendelseId) {
-		try {
-			HttpEntity entity = new HttpEntity<>(createHeaders());
-			return restTemplate.exchange(this.administrerforsendelseV1Url + "/" + forsendelseId, HttpMethod.GET, entity, HentForsendelseResponseTo.class)
-					.getBody();
-		} catch (HttpClientErrorException e) {
-			throw new Rdist001HentForsendelseFunctionalException(String.format("Kall mot rdist001 - hentForsendelse feilet funksjonelt med statusKode=%s, feilmelding=%s", e
-					.getStatusCode(), e.getMessage()), e);
-		} catch (HttpServerErrorException e) {
-			throw new Rdist001HentForsendelseTechnicalException(String.format("Kall mot rdist001 - hentForsendelse feilet teknisk med statusKode=%s, feilmelding=%s", e
-					.getStatusCode(), e.getMessage()), e);
-		}
+	public HentForsendelseResponse hentForsendelse(final String forsendelseId) {
+		log.info("hentForsendelse henter forsendelse med forsendelseId={}", forsendelseId);
+
+		var response = webClient.get()
+				.uri(uriBuilder -> uriBuilder
+						.path("/{forsendelseId}")
+						.build(forsendelseId))
+				.retrieve()
+				.bodyToMono(HentForsendelseResponse.class)
+				.doOnError(this::handleError)
+				.block();
+
+		log.info("hentForsendelse har hentet forsendelse med forsendelseId={}", forsendelseId);
+
+		return response;
 	}
 
 	@Retryable(include = AbstractDokdisteformidlingTechnicalException.class, backoff = @Backoff(delay = DELAY_SHORT, multiplier = MULTIPLIER_SHORT))
