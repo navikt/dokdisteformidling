@@ -14,7 +14,7 @@ import no.nav.dokdisteformidling.consumer.juridisklogg.LoggMeldingResponse;
 import no.nav.dokdisteformidling.consumer.rdist001.AdministrerForsendelse;
 import no.nav.dokdisteformidling.consumer.rdist001.AdministrerForsendelseConsumer;
 import no.nav.dokdisteformidling.consumer.rdist001.HentEformidlingforsendelserResponseTo;
-import no.nav.dokdisteformidling.consumer.rdist001.HentForsendelseResponseTo;
+import no.nav.dokdisteformidling.consumer.rdist001.HentForsendelseResponse;
 import no.nav.dokdisteformidling.sdist001.Sdist001Service;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -87,7 +87,7 @@ class Sdist001ServiceTest {
     void navForsendelserShouldLoggWhenKvitteringStatusFraTrygdErMottatt() throws IOException {
         InputStream inputStream = new ClassPathResource("__files/rdist001/getForsendelse_forAltinnTest.json").getInputStream();
 
-        HentForsendelseResponseTo forsendelseResponseTo = deserializeToObject(inputStream, HentForsendelseResponseTo.class);
+        HentForsendelseResponse forsendelseResponseTo = deserializeToObject(inputStream, HentForsendelseResponse.class);
 
         when(administrerForsendelse.hentEformidlingForsendelser()).thenReturn(hentEformidlingforsendelserResponseTo());
         when(administrerForsendelse.hentForsendelse(anyString())).thenReturn(forsendelseResponseTo);
@@ -106,7 +106,7 @@ class Sdist001ServiceTest {
     void navForsendelserShouldSetToExpedertWhenKvitteringStatusFraTrygdErLevert() throws IOException {
         InputStream inputStream = new ClassPathResource("__files/rdist001/getForsendelse_forAltinnTest.json").getInputStream();
 
-        HentForsendelseResponseTo forsendelseResponseTo = deserializeToObject(inputStream, HentForsendelseResponseTo.class);
+        HentForsendelseResponse forsendelseResponseTo = deserializeToObject(inputStream, HentForsendelseResponse.class);
 
         when(administrerForsendelse.hentEformidlingForsendelser()).thenReturn(hentEformidlingforsendelserResponseTo());
         when(administrerForsendelse.hentForsendelse(anyString())).thenReturn(forsendelseResponseTo);
