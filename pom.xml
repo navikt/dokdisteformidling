@@ -40,7 +40,7 @@
 		<commons-asic.version>0.11.0</commons-asic.version>
 
 		<!-- Vulnerable Snyk-dependencies -->
-		<snakeyaml.version>1.33</snakeyaml.version>
+		<snakeyaml.version>2.0</snakeyaml.version>
 		<bouncycastle-jdk15on.version>1.70</bouncycastle-jdk15on.version>
 
 		<!-- NAV -->
