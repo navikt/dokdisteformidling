@@ -12,6 +12,7 @@ import no.nav.dokdisteformidling.consumer.juridisklogg.LoggMeldingRequest;
 import no.nav.dokdisteformidling.consumer.rdist001.AdministrerForsendelse;
 import no.nav.dokdisteformidling.consumer.rdist001.HentEformidlingforsendelserResponseTo;
 import no.nav.dokdisteformidling.consumer.rdist001.HentForsendelseResponse;
+import no.nav.dokdisteformidling.consumer.rdist001.OppdaterForsendelseRequest;
 import no.nav.dokdisteformidling.exception.functional.KunneIkkeSerialisereEformidlingstatusoppdateringTilJson;
 import no.nav.dokdisteformidling.metrics.Monitor;
 import no.nav.dokdisteformidling.sdist001.domain.EformidlingStatusOppdatering;
@@ -91,7 +92,7 @@ public class Sdist001Service {
 	public void kontrollerEformidlingStatus(String kvitteringStatus, HentEformidlingforsendelserResponseTo.ForsendelseTo forsendelseTo,
 											ForsendelseStatusEndringer endringer) {
 		String forsendelseStatus = forsendelseTo.getForsendelseStatus();
-		String forsendelseId = forsendelseTo.getForsendelseId();
+		Long forsendelseId = Long.valueOf(forsendelseTo.getForsendelseId());
 		String konversasjonId = forsendelseTo.getKonversasjonId();
 
 		if (!OVERSENDT.name().equals(forsendelseStatus) && !BEKREFTET.name().equals(forsendelseStatus)) {
@@ -101,12 +102,15 @@ public class Sdist001Service {
 		oppdaterEformidlingStatus(kvitteringStatus, konversasjonId, forsendelseId, forsendelseStatus, endringer);
 	}
 
-	private void oppdaterEformidlingStatus(String kvitteringStatus, String konversasjonId, String forsendelseId, String forsendelseStatus,
+	private void oppdaterEformidlingStatus(String kvitteringStatus, String konversasjonId, Long forsendelseId, String forsendelseStatus,
 										   ForsendelseStatusEndringer endringer) {
 		AltinnKvitteringStatus altinnKvitteringStatus = AltinnKvitteringStatus.valueOf(kvitteringStatus);
 		switch (altinnKvitteringStatus) {
 			case SENDT:
-				administrerForsendelse.oppdaterForsendelseStatus(forsendelseId, BEKREFTET.name());
+				administrerForsendelse.oppdaterForsendelseStatusOgKonversasjonsId(OppdaterForsendelseRequest.builder()
+						.forsendelseId(forsendelseId)
+						.forsendelseStatus(BEKREFTET.name())
+						.build());
 				endringer.getBekreftet().add(forsendelseId);
 				break;
 			case MOTTATT:
@@ -114,14 +118,19 @@ public class Sdist001Service {
 				break;
 			case LEVERT:
 			case LEST:
-				oppdaterTilEkspedert(altinnKvitteringStatus.name(), forsendelseId, konversasjonId);
+				oppdaterTilEkspedert(altinnKvitteringStatus.name(),
+						forsendelseId, konversasjonId);
 				endringer.getEkspedert().add(forsendelseId);
 				break;
 			case FAIL:
 				break;
 			case LEVETID_UTLOPT:
 				log.error("sdist001 avvik har oppstått for forsendelseId={}, konversasjonId={}. Forsendelsen settes til FEILET.", forsendelseId, konversasjonId);
-				administrerForsendelse.oppdaterForsendelseStatus(forsendelseId, FEIL.name());
+				administrerForsendelse.oppdaterForsendelseStatusOgKonversasjonsId(
+						OppdaterForsendelseRequest.builder()
+								.forsendelseId(forsendelseId)
+								.forsendelseStatus(FEIL.name())
+								.build());
 				endringer.getFeilet().add(forsendelseId);
 				break;
 			default:
@@ -131,7 +140,7 @@ public class Sdist001Service {
 		}
 	}
 
-	private void oppdaterTilEkspedert(String trygderettenKvitteringStatus, String forsendelseId, String konversasjonId) {
+	private void oppdaterTilEkspedert(String trygderettenKvitteringStatus, Long forsendelseId, String konversasjonId) {
 		HentForsendelseResponse hentForsendelseResponse = administrerForsendelse.hentForsendelse(forsendelseId);
 		EformidlingStatusOppdatering eformidlingStatusOppdatering =
 				eformidlingStatusOppdateringMapper.map(konversasjonId, trygderettenKvitteringStatus);
@@ -145,8 +154,11 @@ public class Sdist001Service {
 					"Kunne ikke serialisere eformidlingstatusoppdatering til JSON.", e);
 		}
 
-		administrerForsendelse.oppdaterForsendelseStatus(forsendelseId, EKSPEDERT.name());
+		administrerForsendelse.oppdaterForsendelseStatusOgKonversasjonsId(
+				OppdaterForsendelseRequest.builder()
+						.forsendelseId(forsendelseId)
+						.forsendelseStatus(EKSPEDERT.name())
+						.build());
 	}
-
 }
 
