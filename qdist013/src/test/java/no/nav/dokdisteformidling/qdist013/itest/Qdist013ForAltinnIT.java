@@ -865,8 +865,7 @@ class Qdist013ForAltinnIT {
 		verifyPostUploadBrokerServiceStreamed();
 		verifyPostJuridiskLoggLagre();
 		String conversationId = findConversationId();
-		verify(1, putRequestedFor(urlEqualTo("/administrerforsendelse?forsendelseId=" + FORSENDELSE_ID +
-				"&forsendelseStatus=OVERSENDT&konversasjonsId=" + conversationId)));
+		verify(1, putRequestedFor(urlEqualTo("/administrerforsendelse/oppdaterforsendelse")));
 	}
 
 	@Test
@@ -881,7 +880,7 @@ class Qdist013ForAltinnIT {
 		stubPostIntiateBrokerService();
 		stubUploadBrokerServiceStreamed();
 		stubPostJuridiskLoggLagre();
-		stubFor(put(urlMatching("/administrerforsendelse\\?forsendelseId=" + FORSENDELSE_ID + "\\&forsendelseStatus=OVERSENDT\\&konversasjonsId=.*"))
+		stubFor(put(urlMatching("/administrerforsendelse/oppdaterforsendelse"))
 				.willReturn(aResponse().withStatus(INTERNAL_SERVER_ERROR.value())));
 
 		sendStringMessage(qdist013, classpathToString("qdist013/qdist013-happy.xml"));
@@ -897,8 +896,7 @@ class Qdist013ForAltinnIT {
 
 		verifyPostJuridiskLoggLagre();
 		String conversationId = findConversationId();
-		verify(3, putRequestedFor(urlEqualTo("/administrerforsendelse?forsendelseId=" + FORSENDELSE_ID +
-				"&forsendelseStatus=OVERSENDT&konversasjonsId=" + conversationId)));
+		verify(3, putRequestedFor(urlEqualTo("/administrerforsendelse/oppdaterforsendelse")));
 	}
 
 	@Test
@@ -955,8 +953,7 @@ class Qdist013ForAltinnIT {
 		verifyPostUploadBrokerServiceStreamed();
 
 		verifyPostJuridiskLoggLagre();
-		String conversationId = findConversationId();
-		verifyPutAdministrerforsendelseOppdatertForsendelsestatusAndkonvId(conversationId);
+		verifyPutAdministrerforsendelseOppdatertForsendelsestatusAndkonvId();
 	}
 
 	private void verifyIntiateBrokerServiceStubs(String orgnr, String fnr, String aktoerId, int stsCount, int safCount, int akoterCount, int pdlCount) {
@@ -988,9 +985,8 @@ class Qdist013ForAltinnIT {
 		verify(1, getRequestedFor(urlEqualTo("/ereg/v1/organisasjon/" + orgnr + "/noekkelinfo")));
 	}
 
-	private void verifyPutAdministrerforsendelseOppdatertForsendelsestatusAndkonvId(String conversationId) {
-		verify(1, putRequestedFor(urlEqualTo("/administrerforsendelse?forsendelseId=" + FORSENDELSE_ID +
-				"&forsendelseStatus=OVERSENDT&konversasjonsId=" + conversationId)));
+	private void verifyPutAdministrerforsendelseOppdatertForsendelsestatusAndkonvId() {
+		verify(1, putRequestedFor(urlEqualTo("/administrerforsendelse/oppdaterforsendelse")));
 	}
 
 	private void verifyPostJuridiskLoggLagre() {
@@ -1085,7 +1081,7 @@ class Qdist013ForAltinnIT {
 	}
 
 	private void stubPutAdministrerforsendelseOppdatertForsendelsestatusAndkonvId() {
-		stubFor(put(urlMatching("/administrerforsendelse\\?forsendelseId=" + FORSENDELSE_ID + "\\&forsendelseStatus=OVERSENDT\\&konversasjonsId=.*"))
+		stubFor(put(urlMatching("/administrerforsendelse/oppdaterforsendelse"))
 				.willReturn(aResponse()
 						.withStatus(OK.value())));
 	}

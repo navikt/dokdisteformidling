@@ -8,9 +8,6 @@ import static no.nav.dokdisteformidling.consumer.eformidling.EformidlingConstant
 import static no.nav.dokdisteformidling.consumer.eformidling.EformidlingConstants.TRYGDERETTEN_ORGNUMMER;
 import static no.nav.dokdisteformidling.consumer.eformidling.serviceregistry.ServiceIdentifier.DPO;
 
-/**
- * @author Joakim Bjørnstad, Jbit AS
- */
 @Component
 public class EformidlingMottakerInfoService {
 	private final ServiceRegistryConsumer serviceRegistryConsumer;
