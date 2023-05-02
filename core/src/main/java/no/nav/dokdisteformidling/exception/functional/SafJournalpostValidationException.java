@@ -5,5 +5,4 @@ public class SafJournalpostValidationException extends AbstractDokdisteformidlin
 	public SafJournalpostValidationException(String message) {
 		super(message);
 	}
-
 }
