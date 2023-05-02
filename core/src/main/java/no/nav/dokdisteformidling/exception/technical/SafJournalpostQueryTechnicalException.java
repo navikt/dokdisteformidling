@@ -1,6 +1,7 @@
 package no.nav.dokdisteformidling.exception.technical;
 
 public class SafJournalpostQueryTechnicalException extends AbstractDokdisteformidlingTechnicalException {
+
 	public SafJournalpostQueryTechnicalException(String message) {
 		super(message);
 	}
