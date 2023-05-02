@@ -7,8 +7,4 @@ public class AltinnBrokerServiceWsException extends AbstractDokdisteformidlingTe
     public AltinnBrokerServiceWsException(String message, AltinnReason altinnReason, Exception e) {
         super(message + " " + altinnReason, e);
     }
-
-    public AltinnBrokerServiceWsException(String message, Exception e) {
-        super(message, e);
-    }
 }

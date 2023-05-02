@@ -1,8 +1,5 @@
 package no.nav.dokdisteformidling.exception.technical;
 
-/**
- * @author Jarl Øystein Samseth, Visma Consulting
- */
 public abstract class AbstractDokdisteformidlingTechnicalException extends RuntimeException {
 
 	public AbstractDokdisteformidlingTechnicalException(String message) {
