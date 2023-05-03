@@ -217,7 +217,7 @@ class Qdist013ForAltinnIT {
 		stubPostIntiateBrokerService();
 		stubUploadBrokerServiceStreamed();
 		stubPostJuridiskLoggLagre();
-		stubPutOppdatertForsendelse(OK);
+		stubPutOppdaterForsendelse(OK);
 
 		sendStringMessage(qdist013, classpathToString("qdist013/qdist013-happy.xml"));
 
@@ -236,7 +236,7 @@ class Qdist013ForAltinnIT {
 		stubPostIntiateBrokerService();
 		stubUploadBrokerServiceStreamed();
 		stubPostJuridiskLoggLagre();
-		stubPutOppdatertForsendelse(OK);
+		stubPutOppdaterForsendelse(OK);
 
 		sendStringMessage(qdist013, classpathToString("qdist013/qdist013-happy.xml"));
 
@@ -255,7 +255,7 @@ class Qdist013ForAltinnIT {
 		stubPostIntiateBrokerService();
 		stubUploadBrokerServiceStreamed();
 		stubPostJuridiskLoggLagre();
-		stubPutOppdatertForsendelse(OK);
+		stubPutOppdaterForsendelse(OK);
 
 		sendStringMessage(qdist013, classpathToString("qdist013/qdist013-happy.xml"));
 
@@ -849,7 +849,7 @@ class Qdist013ForAltinnIT {
 		stubPostIntiateBrokerService();
 		stubUploadBrokerServiceStreamed();
 		stubPostJuridiskLoggLagre();
-		stubPutOppdatertForsendelse(FORBIDDEN);
+		stubPutOppdaterForsendelse(FORBIDDEN);
 
 		sendStringMessage(qdist013, classpathToString("qdist013/qdist013-happy.xml"));
 
@@ -881,7 +881,7 @@ class Qdist013ForAltinnIT {
 		stubPostIntiateBrokerService();
 		stubUploadBrokerServiceStreamed();
 		stubPostJuridiskLoggLagre();
-		stubPutOppdatertForsendelse(INTERNAL_SERVER_ERROR);
+		stubPutOppdaterForsendelse(INTERNAL_SERVER_ERROR);
 
 		sendStringMessage(qdist013, classpathToString("qdist013/qdist013-happy.xml"));
 
@@ -1080,7 +1080,7 @@ class Qdist013ForAltinnIT {
 						.withStatus(OK.value())));
 	}
 
-	private void stubPutOppdatertForsendelse(HttpStatus status) {
+	private void stubPutOppdaterForsendelse(HttpStatus status) {
 		stubFor(put(urlMatching(OPPDATERFORSENDELSE_URL))
 				.willReturn(aResponse()
 						.withStatus(status.value())));
