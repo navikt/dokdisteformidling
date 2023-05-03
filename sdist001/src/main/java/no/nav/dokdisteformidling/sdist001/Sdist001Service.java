@@ -107,10 +107,8 @@ public class Sdist001Service {
 		AltinnKvitteringStatus altinnKvitteringStatus = AltinnKvitteringStatus.valueOf(kvitteringStatus);
 		switch (altinnKvitteringStatus) {
 			case SENDT:
-				administrerForsendelse.oppdaterForsendelseStatusOgKonversasjonsId(OppdaterForsendelseRequest.builder()
-						.forsendelseId(forsendelseId)
-						.forsendelseStatus(BEKREFTET.name())
-						.build());
+				administrerForsendelse.oppdaterForsendelse(
+						new OppdaterForsendelseRequest(forsendelseId, BEKREFTET.name(), null));
 				endringer.getBekreftet().add(forsendelseId);
 				break;
 			case MOTTATT:
@@ -126,11 +124,8 @@ public class Sdist001Service {
 				break;
 			case LEVETID_UTLOPT:
 				log.error("sdist001 avvik har oppstått for forsendelseId={}, konversasjonId={}. Forsendelsen settes til FEILET.", forsendelseId, konversasjonId);
-				administrerForsendelse.oppdaterForsendelseStatusOgKonversasjonsId(
-						OppdaterForsendelseRequest.builder()
-								.forsendelseId(forsendelseId)
-								.forsendelseStatus(FEIL.name())
-								.build());
+				administrerForsendelse.oppdaterForsendelse(
+						new OppdaterForsendelseRequest(forsendelseId, FEIL.name(), null));
 				endringer.getFeilet().add(forsendelseId);
 				break;
 			default:
@@ -154,11 +149,8 @@ public class Sdist001Service {
 					"Kunne ikke serialisere eformidlingstatusoppdatering til JSON.", e);
 		}
 
-		administrerForsendelse.oppdaterForsendelseStatusOgKonversasjonsId(
-				OppdaterForsendelseRequest.builder()
-						.forsendelseId(forsendelseId)
-						.forsendelseStatus(EKSPEDERT.name())
-						.build());
+		administrerForsendelse.oppdaterForsendelse(
+				new OppdaterForsendelseRequest(forsendelseId, EKSPEDERT.name(), null));
 	}
 }
 
