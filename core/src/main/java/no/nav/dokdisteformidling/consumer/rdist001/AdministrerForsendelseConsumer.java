@@ -7,7 +7,6 @@ import no.nav.dokdisteformidling.config.props.DokdisteformidlingProperties;
 import no.nav.dokdisteformidling.exception.functional.DokdistadminFunctionalException;
 import no.nav.dokdisteformidling.exception.technical.AbstractDokdisteformidlingTechnicalException;
 import no.nav.dokdisteformidling.exception.technical.DokdistadminTechnicalException;
-import no.nav.dokdisteformidling.metrics.Monitor;
 import no.nav.dokdisteformidling.utils.NavHeadersFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.retry.annotation.Backoff;
@@ -42,7 +41,6 @@ public class AdministrerForsendelseConsumer implements AdministrerForsendelse {
 
 	@Override
 	@Retryable(include = AbstractDokdisteformidlingTechnicalException.class, backoff = @Backoff(delay = DELAY_SHORT, multiplier = MULTIPLIER_SHORT))
-	@Monitor(value = "dok_consumer", extraTags = {"process", "hentForsendelse"}, histogram = true)
 	public HentForsendelseResponse hentForsendelse(final Long forsendelseId) {
 		log.info("hentForsendelse henter forsendelse med forsendelseId={}", forsendelseId);
 
@@ -62,22 +60,24 @@ public class AdministrerForsendelseConsumer implements AdministrerForsendelse {
 
 	@Override
 	@Retryable(include = AbstractDokdisteformidlingTechnicalException.class, backoff = @Backoff(delay = DELAY_SHORT, multiplier = MULTIPLIER_SHORT))
-	@Monitor(value = "dok_consumer", extraTags = {"process", "oppdaterForsendelseStatus"}, histogram = true)
-	public void oppdaterForsendelseStatusOgKonversasjonsId(OppdaterForsendelseRequest oppdaterForsendelseRequest) {
-		log.info("oppdaterForsendelseStatusOgKonversasjonsId mottatt kall til å oppdatere forsendelse med forsendelseId={}", oppdaterForsendelseRequest.getForsendelseId());
+	public void oppdaterForsendelse(OppdaterForsendelseRequest oppdaterForsendelse) {
+		log.info("oppdaterForsendelse oppdaterer forsendelse med forsendelseId={}", oppdaterForsendelse.forsendelseId());
 
 		webClient.put()
 				.uri("/oppdaterforsendelse")
-				.bodyValue(oppdaterForsendelseRequest)
+				.bodyValue(oppdaterForsendelse)
 				.retrieve()
 				.toBodilessEntity()
 				.doOnError(this::handleError)
 				.block();
+
+		log.info("oppdaterForsendelse oppdatert forsendelse med forsendelseId={} til forsendelseStatus={}",
+				oppdaterForsendelse.forsendelseId(), oppdaterForsendelse.forsendelseStatus());
+
 	}
 
 	@Override
 	@Retryable(include = DokdistadminTechnicalException.class, backoff = @Backoff(delay = DELAY_SHORT, multiplier = MULTIPLIER_SHORT))
-	@Monitor(value = "dok_consumer", extraTags = {"process", "hentEformidlingForsendelser"}, histogram = true)
 	public HentEformidlingforsendelserResponseTo hentEformidlingForsendelser() {
 		log.info("hentEformidlingForsendelser henter eformidlingsforsendelser fra rdist001 (dokdistadmin) med distribusjonskanal={}", DISTRIBUSJONSKANAL);
 

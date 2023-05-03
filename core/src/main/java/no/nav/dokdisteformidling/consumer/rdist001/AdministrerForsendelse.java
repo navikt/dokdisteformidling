@@ -4,7 +4,7 @@ public interface AdministrerForsendelse {
 
 	HentForsendelseResponse hentForsendelse(final Long forsendelseId);
 
-	void oppdaterForsendelseStatusOgKonversasjonsId(OppdaterForsendelseRequest oppdaterForsendelseRequest);
+	void oppdaterForsendelse(OppdaterForsendelseRequest oppdaterForsendelseRequest);
 
 	HentEformidlingforsendelserResponseTo hentEformidlingForsendelser();
 }

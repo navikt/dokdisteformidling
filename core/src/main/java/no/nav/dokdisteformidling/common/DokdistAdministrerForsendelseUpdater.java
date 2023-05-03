@@ -21,21 +21,15 @@ public class DokdistAdministrerForsendelseUpdater {
 
 	public void updateStatus(Exchange exchange) {
 		final String forsendelseId = exchange.getProperty(PROPERTY_FORSENDELSE_ID, String.class);
-		administrerForsendelse.oppdaterForsendelseStatusOgKonversasjonsId(OppdaterForsendelseRequest.builder()
-				.forsendelseId(Long.valueOf(forsendelseId))
-				.forsendelseStatus(FORSENDELSE_STATUS_OVERSENDT)
-				.build());
+		administrerForsendelse.oppdaterForsendelse(
+				new OppdaterForsendelseRequest(Long.valueOf(forsendelseId), FORSENDELSE_STATUS_OVERSENDT, null));
 	}
 
 	public void updateStatusAndConversationId(Exchange exchange) {
 		final String forsendelseId = exchange.getProperty(PROPERTY_FORSENDELSE_ID, String.class);
 		final String conversationId = exchange.getProperty(PROPERTY_CONVERSATION_ID, String.class);
-		administrerForsendelse.oppdaterForsendelseStatusOgKonversasjonsId(
-				OppdaterForsendelseRequest.builder()
-						.forsendelseId(Long.valueOf(forsendelseId))
-						.konversasjonId(conversationId)
-						.forsendelseStatus(FORSENDELSE_STATUS_OVERSENDT)
-						.build());
+		administrerForsendelse.oppdaterForsendelse(
+				new OppdaterForsendelseRequest(Long.valueOf(forsendelseId), FORSENDELSE_STATUS_OVERSENDT, conversationId));
 
 	}
 
