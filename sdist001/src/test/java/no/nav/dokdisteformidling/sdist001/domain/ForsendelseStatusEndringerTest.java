@@ -25,10 +25,10 @@ class ForsendelseStatusEndringerTest {
 
 	private ForsendelseStatusEndringer createForsendelseStatusEndringer() {
 		ForsendelseStatusEndringer forsendelseStatusEndringer = new ForsendelseStatusEndringer();
-		forsendelseStatusEndringer.getBekreftet().add("1");
-		forsendelseStatusEndringer.getBekreftet().add("2");
-		forsendelseStatusEndringer.getFeilet().add("3");
-		forsendelseStatusEndringer.getEkspedert().add("4");
+		forsendelseStatusEndringer.getBekreftet().add(1L);
+		forsendelseStatusEndringer.getBekreftet().add(2L);
+		forsendelseStatusEndringer.getFeilet().add(3L);
+		forsendelseStatusEndringer.getEkspedert().add(4L);
 		return forsendelseStatusEndringer;
 	}
 }

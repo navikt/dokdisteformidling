@@ -75,7 +75,7 @@ public class Qdist013Service {
         final String conversationId = generateRandomUUID();
         exchange.setProperty(PROPERTY_CONVERSATION_ID, conversationId);
 
-        final String forsendelseId = distribuerForsendelseTilTrygderetten.getForsendelseId();
+        final Long forsendelseId = Long.valueOf(distribuerForsendelseTilTrygderetten.getForsendelseId());
         final HentForsendelseResponse hentForsendelseResponse = administrerForsendelse.hentForsendelse(forsendelseId);
 
         final String bestillingsId = hentForsendelseResponse.getBestillingsId();

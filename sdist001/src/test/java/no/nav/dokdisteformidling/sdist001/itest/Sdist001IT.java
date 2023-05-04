@@ -83,7 +83,7 @@ class Sdist001IT {
         verify(1, postRequestedFor(urlEqualTo("/brokerserviceexternalstreamed")));
         verify(1, getRequestedFor(urlEqualTo("/administrerforsendelse/1")));
         verify(1, postRequestedFor(urlEqualTo("/juridiskLogg")));
-        verify(1, putRequestedFor(urlEqualTo("/administrerforsendelse?forsendelseId=1&forsendelseStatus=EKSPEDERT")));
+        verify(1, putRequestedFor(urlEqualTo("/administrerforsendelse/oppdaterforsendelse")));
     }
 
     void stubAzure() {
@@ -168,7 +168,7 @@ class Sdist001IT {
     }
 
     private void stubPutAdministrerForsendelseOppdaterForsendelseTilEKSPEDERT() {
-        stubFor(put("/administrerforsendelse?forsendelseId=" + FORSENDELSE_ID + "&forsendelseStatus=EKSPEDERT")
+        stubFor(put("/administrerforsendelse/oppdaterforsendelse")
                 .willReturn(aResponse().withStatus(OK.value())));
     }
 

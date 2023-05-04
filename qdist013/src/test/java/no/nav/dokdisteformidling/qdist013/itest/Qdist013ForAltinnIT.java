@@ -23,6 +23,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.cloud.contract.wiremock.AutoConfigureWireMock;
+import org.springframework.http.HttpStatus;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.util.MimeTypeUtils;
@@ -99,6 +100,7 @@ class Qdist013ForAltinnIT {
 	private static final String PDL_IDENT_NOT_FOUND = "pdl/pdlident_not_found.json";
 	private static final String PDL_IDENT_HAPPY = "pdl/pdlident_happy.json";
 	private static final String BEARER_OIDC_TOKEN = "Bearer eyJraWQiOiIyZDYwNjZmNi1mM2ViLTRlYzktYjRlZS0wMzM1Nzg0MDY3MTMiLCJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJzdWIiOiJzcnZqb2Fya2FkbWluIiwiYXVkIjpbInNydmpvYXJrYWRtaW4iLCJwcmVwcm9kLmxvY2FsIl0sInZlciI6IjEuMCIsIm5iZiI6MTU1NjI2Nzg0NiwiYXpwIjoic3J2am9hcmthZG1pbiIsImlkZW50VHlwZSI6IlN5c3RlbXJlc3N1cnMiLCJhdXRoX3RpbWUiOjE1NTYyNjc4NDYsImlzcyI6Imh0dHBzOlwvXC9zZWN1cml0eS10b2tlbi1zZXJ2aWNlLm5haXMucHJlcHJvZC5sb2NhbCIsImV4cCI6MTU1NjI3MTQ0NiwiaWF0IjoxNTU2MjY3ODQ2LCJqdGkiOiI5NzVmMjY4YS00ZmI3LTQ2NWMtOTIyZS0xY2Q4OTNjZDEwY2QifQ.e7e1cKmLt0wYSBdURju0pZnplheXl-T5Df7t2QKcOWpKfERKgfSnMOHPYuS80GJbwvfZXE7F_WiTyB2Klsv_shS2Iy_DqqS2qRPUit4fCDyXX4TMBVWWqBY60Wg46NuZGz4kje6z0BcT84cyrQSPKNuVEmy9xcdIXrQ2xzJy9NyOseSvEkUPX4Xj4yfCh6CoEIOsNDQ-hW6XUkbAKjF3nkM6AwSQ2cZTi9T7j12LNw4RQyBwl9PINP8d3t2jeOJ8Gq7xVkzlyL60SHH2UnblBag0UhCYLYIzuSr1lkpvZ_8q5vqg9DXk7CQZGmZNfoOOQsy1pBTyzU3JjhGmBNWZEg";
+	private static final String OPPDATERFORSENDELSE_URL = "/administrerforsendelse/oppdaterforsendelse";
 
 	@Value("${altinn.brokerserviceexternal.endpointurl}")
 	private String brokerserviceexternalUrl;
@@ -215,7 +217,7 @@ class Qdist013ForAltinnIT {
 		stubPostIntiateBrokerService();
 		stubUploadBrokerServiceStreamed();
 		stubPostJuridiskLoggLagre();
-		stubPutAdministrerforsendelseOppdatertForsendelsestatusAndkonvId();
+		stubPutOppdaterForsendelse(OK);
 
 		sendStringMessage(qdist013, classpathToString("qdist013/qdist013-happy.xml"));
 
@@ -234,7 +236,7 @@ class Qdist013ForAltinnIT {
 		stubPostIntiateBrokerService();
 		stubUploadBrokerServiceStreamed();
 		stubPostJuridiskLoggLagre();
-		stubPutAdministrerforsendelseOppdatertForsendelsestatusAndkonvId();
+		stubPutOppdaterForsendelse(OK);
 
 		sendStringMessage(qdist013, classpathToString("qdist013/qdist013-happy.xml"));
 
@@ -253,7 +255,7 @@ class Qdist013ForAltinnIT {
 		stubPostIntiateBrokerService();
 		stubUploadBrokerServiceStreamed();
 		stubPostJuridiskLoggLagre();
-		stubPutAdministrerforsendelseOppdatertForsendelsestatusAndkonvId();
+		stubPutOppdaterForsendelse(OK);
 
 		sendStringMessage(qdist013, classpathToString("qdist013/qdist013-happy.xml"));
 
@@ -847,8 +849,7 @@ class Qdist013ForAltinnIT {
 		stubPostIntiateBrokerService();
 		stubUploadBrokerServiceStreamed();
 		stubPostJuridiskLoggLagre();
-		stubFor(put(urlMatching("/administrerforsendelse\\?forsendelseId=" + FORSENDELSE_ID + "\\&forsendelseStatus=OVERSENDT\\&konversasjonsId=.*"))
-				.willReturn(aResponse().withStatus(FORBIDDEN.value())));
+		stubPutOppdaterForsendelse(FORBIDDEN);
 
 		sendStringMessage(qdist013, classpathToString("qdist013/qdist013-happy.xml"));
 
@@ -864,9 +865,8 @@ class Qdist013ForAltinnIT {
 		verifyPostIntiateBrokerService();
 		verifyPostUploadBrokerServiceStreamed();
 		verifyPostJuridiskLoggLagre();
-		String conversationId = findConversationId();
-		verify(1, putRequestedFor(urlEqualTo("/administrerforsendelse?forsendelseId=" + FORSENDELSE_ID +
-				"&forsendelseStatus=OVERSENDT&konversasjonsId=" + conversationId)));
+
+		verify(1, putRequestedFor(urlEqualTo(OPPDATERFORSENDELSE_URL)));
 	}
 
 	@Test
@@ -881,8 +881,7 @@ class Qdist013ForAltinnIT {
 		stubPostIntiateBrokerService();
 		stubUploadBrokerServiceStreamed();
 		stubPostJuridiskLoggLagre();
-		stubFor(put(urlMatching("/administrerforsendelse\\?forsendelseId=" + FORSENDELSE_ID + "\\&forsendelseStatus=OVERSENDT\\&konversasjonsId=.*"))
-				.willReturn(aResponse().withStatus(INTERNAL_SERVER_ERROR.value())));
+		stubPutOppdaterForsendelse(INTERNAL_SERVER_ERROR);
 
 		sendStringMessage(qdist013, classpathToString("qdist013/qdist013-happy.xml"));
 
@@ -897,8 +896,7 @@ class Qdist013ForAltinnIT {
 
 		verifyPostJuridiskLoggLagre();
 		String conversationId = findConversationId();
-		verify(3, putRequestedFor(urlEqualTo("/administrerforsendelse?forsendelseId=" + FORSENDELSE_ID +
-				"&forsendelseStatus=OVERSENDT&konversasjonsId=" + conversationId)));
+		verify(3, putRequestedFor(urlEqualTo(OPPDATERFORSENDELSE_URL)));
 	}
 
 	@Test
@@ -955,8 +953,7 @@ class Qdist013ForAltinnIT {
 		verifyPostUploadBrokerServiceStreamed();
 
 		verifyPostJuridiskLoggLagre();
-		String conversationId = findConversationId();
-		verifyPutAdministrerforsendelseOppdatertForsendelsestatusAndkonvId(conversationId);
+		verifyPutAdministrerforsendelseOppdatertForsendelsestatusAndkonvId();
 	}
 
 	private void verifyIntiateBrokerServiceStubs(String orgnr, String fnr, String aktoerId, int stsCount, int safCount, int akoterCount, int pdlCount) {
@@ -988,9 +985,8 @@ class Qdist013ForAltinnIT {
 		verify(1, getRequestedFor(urlEqualTo("/ereg/v1/organisasjon/" + orgnr + "/noekkelinfo")));
 	}
 
-	private void verifyPutAdministrerforsendelseOppdatertForsendelsestatusAndkonvId(String conversationId) {
-		verify(1, putRequestedFor(urlEqualTo("/administrerforsendelse?forsendelseId=" + FORSENDELSE_ID +
-				"&forsendelseStatus=OVERSENDT&konversasjonsId=" + conversationId)));
+	private void verifyPutAdministrerforsendelseOppdatertForsendelsestatusAndkonvId() {
+		verify(1, putRequestedFor(urlEqualTo(OPPDATERFORSENDELSE_URL)));
 	}
 
 	private void verifyPostJuridiskLoggLagre() {
@@ -1084,10 +1080,10 @@ class Qdist013ForAltinnIT {
 						.withStatus(OK.value())));
 	}
 
-	private void stubPutAdministrerforsendelseOppdatertForsendelsestatusAndkonvId() {
-		stubFor(put(urlMatching("/administrerforsendelse\\?forsendelseId=" + FORSENDELSE_ID + "\\&forsendelseStatus=OVERSENDT\\&konversasjonsId=.*"))
+	private void stubPutOppdaterForsendelse(HttpStatus status) {
+		stubFor(put(urlMatching(OPPDATERFORSENDELSE_URL))
 				.willReturn(aResponse()
-						.withStatus(OK.value())));
+						.withStatus(status.value())));
 	}
 
 	private void stubGetEregHentOrgNavn(String orgnr) {

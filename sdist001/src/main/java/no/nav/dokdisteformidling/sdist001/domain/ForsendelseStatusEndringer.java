@@ -9,9 +9,9 @@ import java.util.Set;
 @Value
 @NoArgsConstructor
 public class ForsendelseStatusEndringer {
-	Set<String> bekreftet = new HashSet<>();
-	Set<String> ekspedert = new HashSet<>();
-	Set<String> feilet = new HashSet<>();
+	Set<Long> bekreftet = new HashSet<>();
+	Set<Long> ekspedert = new HashSet<>();
+	Set<Long> feilet = new HashSet<>();
 
 	@Override
 	public String toString() {
