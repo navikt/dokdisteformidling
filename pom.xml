@@ -50,7 +50,7 @@
 		<melding-virksomhet-dokdistfordeling.version>5-7ff79fc</melding-virksomhet-dokdistfordeling.version>
 
 		<!-- test -->
-		<spring-cloud-contract-wiremock.version>3.1.7</spring-cloud-contract-wiremock.version>
+		<spring-cloud-contract-wiremock.version>4.0.3</spring-cloud-contract-wiremock.version>
 
 		<!-- Plugins -->
 		<maven-jaxb2-plugin.version>0.15.2</maven-jaxb2-plugin.version>
