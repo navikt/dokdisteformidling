@@ -10,6 +10,7 @@ import static no.nav.dokdisteformidling.consumer.eformidling.serviceregistry.Ser
 
 @Component
 public class EformidlingMottakerInfoService {
+
 	private final ServiceRegistryConsumer serviceRegistryConsumer;
 
 	public EformidlingMottakerInfoService(ServiceRegistryConsumer serviceRegistryConsumer) {
@@ -22,6 +23,7 @@ public class EformidlingMottakerInfoService {
 		final ServiceRecord serviceRecord = anyServiceRecord
 				.orElseThrow(() -> new MottakerInfoIkkeFunnetException("Fant ikke mottakerinfo for organisasjon=" + TRYGDERETTEN_ORGNUMMER + " og prosess=" + AVTALTMELDING_PROCESS));
 		final Service service = serviceRecord.getService();
+
 		return new MottakerInfo(serviceRecord.getOrganisationNumber(),
 				serviceRecord.getPemCertificate(),
 				service.getServiceCode(),

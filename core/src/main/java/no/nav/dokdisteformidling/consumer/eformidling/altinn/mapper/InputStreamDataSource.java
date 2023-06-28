@@ -4,7 +4,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 
 import javax.activation.DataSource;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
@@ -15,12 +14,12 @@ public class InputStreamDataSource implements DataSource {
 	private InputStream is;
 
 	@Override
-	public InputStream getInputStream() throws IOException {
+	public InputStream getInputStream() {
 		return this.is;
 	}
 
 	@Override
-	public OutputStream getOutputStream() throws IOException {
+	public OutputStream getOutputStream() {
 		throw new UnsupportedOperationException();
 	}
 

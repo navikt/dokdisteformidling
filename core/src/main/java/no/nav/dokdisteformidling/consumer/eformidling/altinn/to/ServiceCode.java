@@ -8,6 +8,6 @@ import lombok.Value;
 @Builder
 public class ServiceCode {
 
-    private String serviceCode;
-    private int serviceEditionCode;
+    String serviceCode;
+    int serviceEditionCode;
 }

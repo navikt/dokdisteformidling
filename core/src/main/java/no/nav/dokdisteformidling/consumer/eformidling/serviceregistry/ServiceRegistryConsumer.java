@@ -8,7 +8,6 @@ import no.nav.dokdisteformidling.metrics.Monitor;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
@@ -20,16 +19,18 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
 import java.time.Duration;
-import java.util.Collections;
+
+import static java.util.Collections.singletonList;
+import static org.springframework.http.HttpHeaders.AUTHORIZATION;
+import static org.springframework.http.HttpMethod.GET;
 
 /**
  * Konsument mot Difi Service Registry (SR)
- *
- * @author Joakim Bjørnstad, Jbit AS
  */
 @Slf4j
 @Component
 public class ServiceRegistryConsumer {
+
     public static final String OIDC_AUTHORIZATION_PREFIX = "Bearer ";
     public static final String TEKNISK_FEIL_ERROR_MESSAGE = "Klarte ikke hente mottakerInfo fra service registry. Teknisk feil: ";
     public static final String FUNKSJONELL_FEIL_ERROR_MESSAGE = "Klarte ikke hente mottakerInfo fra service registry. Funksjonell feil: ";
@@ -58,10 +59,11 @@ public class ServiceRegistryConsumer {
                 .build().toUri();
 
         HttpHeaders headers = new HttpHeaders();
-        headers.put(HttpHeaders.AUTHORIZATION, Collections.singletonList(OIDC_AUTHORIZATION_PREFIX + accessToken));
+        headers.put(AUTHORIZATION, singletonList(OIDC_AUTHORIZATION_PREFIX + accessToken));
         HttpEntity<Object> httpEntity = new HttpEntity<>(headers);
+
         try {
-            final ResponseEntity<IdentifierResource> exchange = restTemplate.exchange(uri, HttpMethod.GET, httpEntity, IdentifierResource.class);
+            final ResponseEntity<IdentifierResource> exchange = restTemplate.exchange(uri, GET, httpEntity, IdentifierResource.class);
             return exchange.getBody();
         } catch (HttpClientErrorException e) {
             log.warn(FUNKSJONELL_FEIL_ERROR_MESSAGE + e.getResponseBodyAsString(), e);

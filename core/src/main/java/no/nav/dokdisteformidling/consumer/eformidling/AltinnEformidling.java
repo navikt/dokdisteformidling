@@ -2,7 +2,6 @@ package no.nav.dokdisteformidling.consumer.eformidling;
 
 
 import lombok.extern.slf4j.Slf4j;
-import no.altinn.brokerserviceexternal.BrokerServiceAvailableFileStatus;
 import no.nav.dokdisteformidling.certificate.AppCertificate;
 import no.nav.dokdisteformidling.consumer.eformidling.altinn.from.AltinnDokument;
 import no.nav.dokdisteformidling.consumer.eformidling.altinn.from.DownloadResponse;
@@ -27,11 +26,13 @@ import java.io.InputStream;
 import java.util.List;
 
 import static java.util.stream.Collectors.toList;
+import static no.altinn.brokerserviceexternal.BrokerServiceAvailableFileStatus.UPLOADED;
 import static no.nav.dokdisteformidling.consumer.eformidling.EformidlingConstants.NAV_ORGNUMMER;
 
 @Component
 @Slf4j
 public class AltinnEformidling implements Eformidling {
+
     private final AppCertificate appCertificate;
     private final EformidlingMottakerInfoService eformidlingMottakerInfoService;
     private final EformidlingMessagePackager eformidlingMessagePackager;
@@ -57,11 +58,12 @@ public class AltinnEformidling implements Eformidling {
     public UploadResponse send(NavDokumentpakke navDokumentpakke, String avtaltmelding) {
         log.info("Henter mottakerInfo for Trygderetten. conversationId={}, bestillingsId={}", navDokumentpakke.getConversationId(), navDokumentpakke.getBestillingsId());
         final MottakerInfo mottakerInfo = eformidlingMottakerInfoService.hentMottakerInfoTrygderetten();
+
         log.info("Hentet mottakerInfo={} for Trygderetten. conversationId={}, bestillingsId={}", mottakerInfo, navDokumentpakke.getConversationId(), navDokumentpakke.getBestillingsId());
-        final InputStream sbdZip = eformidlingMessagePackager.packageMessage(navDokumentpakke, avtaltmelding, appCertificate,
-                mottakerInfo.getX509Certificate());
+        final InputStream sbdZip = eformidlingMessagePackager.packageMessage(navDokumentpakke, avtaltmelding, appCertificate, mottakerInfo.getX509Certificate());
 
         final UploadManifest uploadManifest = mapUploadManifest(mottakerInfo, navDokumentpakke.getConversationId());
+
         log.info("Initialiserer Altinn broker med manifest={}, conversationId={}, bestillingsId={}", uploadManifest, navDokumentpakke.getConversationId(), navDokumentpakke.getBestillingsId());
         final String fileReference = brokerServiceExternalService.intiateBrokerService(uploadManifest);
         log.info("Altinn broker Initialisert OK. fileReference={}, conversationId={}, bestillingsId={}", fileReference, navDokumentpakke.getConversationId(), navDokumentpakke.getBestillingsId());
@@ -108,7 +110,7 @@ public class AltinnEformidling implements Eformidling {
 
     private SearchCriteria getSearchCriteria() {
         return SearchCriteria.builder()
-                .availableFileStatus(BrokerServiceAvailableFileStatus.UPLOADED)
+                .availableFileStatus(UPLOADED)
                 .build();
     }
 
