@@ -1,11 +1,6 @@
 package no.nav.dokdisteformidling.consumer.eformidling.dokumentpakker;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fasterxml.jackson.datatype.jsr310.deser.InstantDeserializer;
 import org.springframework.context.annotation.Bean;
@@ -17,10 +12,17 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalAccessor;
 import java.time.temporal.TemporalQueries;
 
+import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
+import static com.fasterxml.jackson.core.JsonGenerator.Feature.AUTO_CLOSE_TARGET;
+import static com.fasterxml.jackson.core.JsonParser.Feature.ALLOW_UNQUOTED_CONTROL_CHARS;
+import static com.fasterxml.jackson.databind.MapperFeature.DEFAULT_VIEW_INCLUSION;
+import static com.fasterxml.jackson.databind.SerializationFeature.CLOSE_CLOSEABLE;
+import static com.fasterxml.jackson.databind.SerializationFeature.INDENT_OUTPUT;
+import static com.fasterxml.jackson.databind.SerializationFeature.WRITE_DATES_AS_TIMESTAMPS;
+import static java.time.format.DateTimeFormatter.ISO_DATE_TIME;
 import static no.nav.dokdisteformidling.constants.DomainConstants.DEFAULT_ZONE_ID;
 
 /**
@@ -38,15 +40,15 @@ public class JacksonConfig {
 		return new Jackson2ObjectMapperBuilder()
 				.deserializerByType(OffsetDateTime.class, new IsoDateTimeDeserializer(clock))
 				.modulesToInstall(new JavaTimeModule())
-				.serializationInclusion(JsonInclude.Include.NON_NULL)
+				.serializationInclusion(NON_NULL)
 				.featuresToEnable(
-						SerializationFeature.INDENT_OUTPUT,
-						JsonParser.Feature.ALLOW_UNQUOTED_CONTROL_CHARS,
-						MapperFeature.DEFAULT_VIEW_INCLUSION)
+						INDENT_OUTPUT,
+						ALLOW_UNQUOTED_CONTROL_CHARS,
+						DEFAULT_VIEW_INCLUSION)
 				.featuresToDisable(
-						SerializationFeature.WRITE_DATES_AS_TIMESTAMPS,
-						SerializationFeature.CLOSE_CLOSEABLE,
-						JsonGenerator.Feature.AUTO_CLOSE_TARGET).build();
+						WRITE_DATES_AS_TIMESTAMPS,
+						CLOSE_CLOSEABLE,
+						AUTO_CLOSE_TARGET).build();
 	}
 
 	private static final class IsoDateTimeDeserializer extends InstantDeserializer<OffsetDateTime> {
@@ -54,7 +56,7 @@ public class JacksonConfig {
 		IsoDateTimeDeserializer(Clock clock) {
 			super(
 					OffsetDateTime.class,
-					DateTimeFormatter.ISO_DATE_TIME,
+					ISO_DATE_TIME,
 					temporal -> getOffsetDateTime(clock, temporal),
 					a -> OffsetDateTime.ofInstant(Instant.ofEpochMilli(a.value), a.zoneId),
 					a -> OffsetDateTime.ofInstant(Instant.ofEpochSecond(a.integer, a.fraction), a.zoneId),

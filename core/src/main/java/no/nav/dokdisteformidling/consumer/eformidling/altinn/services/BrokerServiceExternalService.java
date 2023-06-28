@@ -35,6 +35,7 @@ import static no.nav.dokdisteformidling.utils.DateConverterUtil.convertLocalDate
 @Slf4j
 @Component
 public class BrokerServiceExternalService {
+
     private static final String INITIATE_BROKER_SERVICE_FEILET = "Kall til BrokerService.initiateBrokerService feilet.";
     private static final String GET_AVAILABLE_FILES_FEILET = "Kall til BrokerService.getAvailableFiles feilet.";
     private static final String CONFIRM_DOWNLOADED_FEILET = "Kall til BrokerService.confirmDownloaded feilet";

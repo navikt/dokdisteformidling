@@ -16,9 +16,6 @@ import java.security.cert.X509Certificate;
 
 import static org.apache.commons.lang3.StringUtils.isBlank;
 
-/**
- * @author Joakim Bjørnstad, Jbit AS
- */
 @Getter
 @ToString(exclude = {"pemCertificate", "x509Certificate"})
 public class MottakerInfo {
@@ -37,12 +34,13 @@ public class MottakerInfo {
 	}
 
 	private X509Certificate convertToX509(final String pemCertificate) {
-		if(isBlank(pemCertificate)) {
+		if (isBlank(pemCertificate)) {
 			throw new MottakerInfoIkkeFunnetException("Fant ikke PEM sertifikat.");
 		}
 		PEMParser pemParser = openPEMResource(pemCertificate);
 		try {
 			final Object certificate = pemParser.readObject();
+
 			if (!(certificate instanceof X509CertificateHolder)) {
 				throw new MottakerInfoIkkeFunnetException("PEM data inneholder ikke et X.509 sertifikat.");
 			} else {

@@ -1,6 +1,5 @@
 package no.nav.dokdisteformidling.consumer.eformidling.dokumentpakker;
 
-import no.nav.dokdisteformidling.consumer.eformidling.EformidlingConstants;
 import no.nav.dokdisteformidling.consumer.eformidling.dokumentpakker.sbdh.BusinessScope;
 import no.nav.dokdisteformidling.consumer.eformidling.dokumentpakker.sbdh.CorrelationInformation;
 import no.nav.dokdisteformidling.consumer.eformidling.dokumentpakker.sbdh.DocumentIdentification;
@@ -15,18 +14,19 @@ import org.springframework.stereotype.Component;
 import java.time.Clock;
 import java.time.Duration;
 import java.time.OffsetDateTime;
-import java.time.temporal.ChronoUnit;
 
 import static java.time.Duration.ofHours;
+import static java.time.temporal.ChronoUnit.SECONDS;
+import static no.nav.dokdisteformidling.consumer.eformidling.EformidlingConstants.NAV_ORGNUMMER;
+import static no.nav.dokdisteformidling.consumer.eformidling.EformidlingConstants.TRYGDERETTEN_ORGNUMMER;
 import static no.nav.dokdisteformidling.consumer.eformidling.Organisasjonsnummer.asIso6523;
 
 /**
  * Mapper til konvoluttene til eformidling meldingen.
- *
- * @author Joakim Bjørnstad, Jbit AS
  */
 @Component
 public class StandardBusinessDocumentMapper {
+
 	static final String HEADER_VERSION = "1.0";
 	static final String TYPE_VERSION = "1.0";
 	static final String IDENTIFIER_AUTHORITY = "iso6523-actorid-upis";
@@ -66,7 +66,7 @@ public class StandardBusinessDocumentMapper {
 		documentIdentification.setInstanceIdentifier(instanceIdentifier);
 		documentIdentification.setType(AVTALTMELDING_FORRETNINGSMELDING);
 		documentIdentification.setMultipleType(true);
-		documentIdentification.setCreationDateAndTime(OffsetDateTime.now(clock).minus(10, ChronoUnit.SECONDS));
+		documentIdentification.setCreationDateAndTime(OffsetDateTime.now(clock).minus(10, SECONDS));
 		return documentIdentification;
 	}
 
@@ -74,7 +74,7 @@ public class StandardBusinessDocumentMapper {
 		final Sender sender = new Sender();
 		final PartnerIdentification senderIdentification = new PartnerIdentification();
 		senderIdentification.setAuthority(IDENTIFIER_AUTHORITY);
-		senderIdentification.setValue(asIso6523(EformidlingConstants.NAV_ORGNUMMER));
+		senderIdentification.setValue(asIso6523(NAV_ORGNUMMER));
 		sender.setIdentifier(senderIdentification);
 		return sender;
 	}
@@ -83,7 +83,7 @@ public class StandardBusinessDocumentMapper {
 		final Receiver receiver = new Receiver();
 		final PartnerIdentification receiverIdentification = new PartnerIdentification();
 		receiverIdentification.setAuthority(IDENTIFIER_AUTHORITY);
-		receiverIdentification.setValue(asIso6523(EformidlingConstants.TRYGDERETTEN_ORGNUMMER));
+		receiverIdentification.setValue(asIso6523(TRYGDERETTEN_ORGNUMMER));
 		receiver.setIdentifier(receiverIdentification);
 		return receiver;
 	}
