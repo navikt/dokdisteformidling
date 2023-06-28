@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
 
+import static no.difi.asic.MimeType.XML;
 import static no.nav.dokdisteformidling.consumer.eformidling.EformidlingConstants.NAV_ORGNUMMER;
 import static no.nav.dokdisteformidling.consumer.eformidling.EformidlingConstants.TRYGDERETTEN_ORGNUMMER;
 
@@ -27,11 +28,10 @@ import static no.nav.dokdisteformidling.consumer.eformidling.EformidlingConstant
  * Endret og tilpasset for NAV sin bruk fra https://github.com/difi/move-integrasjonspunkt
  * <p>
  * Lager asic og signerer denne med virksomhetssertifikat.
- *
- * @author Joakim Bjørnstad, Jbit AS
  */
 @Slf4j
 class AsiceCreator {
+
     private final XmlManifestCreator xmlManifestCreator;
 
     public AsiceCreator() {
@@ -41,11 +41,14 @@ class AsiceCreator {
     OutputStream createAsiceStreamed(NavDokument arkivmelding,
                                      Stream<? extends NavDokument> dokumenter,
                                      AppCertificate appCertificate) throws IOException {
+
         ByteArrayOutputStream asiceArchive = new ByteArrayOutputStream();
         String xmlManifest = xmlManifestCreator.createManifest(arkivmelding, NAV_ORGNUMMER, TRYGDERETTEN_ORGNUMMER);
+
         AsicWriter asicWriter = AsicWriterFactory.newFactory()
                 .newContainer(asiceArchive)
-                .add(new BufferedInputStream(new ByteArrayInputStream(xmlManifest.getBytes())), "manifest.xml", MimeType.XML);
+                .add(new BufferedInputStream(new ByteArrayInputStream(xmlManifest.getBytes())), "manifest.xml", XML);
+
         List<InputStream> streamsToClose = new ArrayList<>();
         try {
             // Skriv arkivmelding til Asice

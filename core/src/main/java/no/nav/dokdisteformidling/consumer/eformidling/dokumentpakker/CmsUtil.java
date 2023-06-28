@@ -6,11 +6,8 @@ import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.DERNull;
 import org.bouncycastle.asn1.DEROctetString;
-import org.bouncycastle.asn1.nist.NISTObjectIdentifiers;
-import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.asn1.pkcs.RSAESOAEPparams;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
-import org.bouncycastle.cms.CMSAlgorithm;
 import org.bouncycastle.cms.CMSEnvelopedDataGenerator;
 import org.bouncycastle.cms.CMSEnvelopedDataParser;
 import org.bouncycastle.cms.CMSEnvelopedDataStreamGenerator;
@@ -33,6 +30,12 @@ import java.security.cert.X509Certificate;
 import java.util.Collection;
 import java.util.Iterator;
 
+import static org.bouncycastle.asn1.nist.NISTObjectIdentifiers.id_sha256;
+import static org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers.id_RSAES_OAEP;
+import static org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers.id_mgf1;
+import static org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers.id_pSpecified;
+import static org.bouncycastle.cms.CMSAlgorithm.AES256_CBC;
+
 /**
  * Endret og tilpasset for NAV sin bruk fra https://github.com/difi/move-integrasjonspunkt
  * <p>
@@ -50,22 +53,23 @@ class CmsUtil {
         }
 
         keyEncryptionScheme = rsaesOaepIdentifier();
-        cmsEncryptionAlgorithm = CMSAlgorithm.AES256_CBC;
+        cmsEncryptionAlgorithm = AES256_CBC;
     }
 
     private AlgorithmIdentifier rsaesOaepIdentifier() {
-        AlgorithmIdentifier hash = new AlgorithmIdentifier(NISTObjectIdentifiers.id_sha256, DERNull.INSTANCE);
-        AlgorithmIdentifier mask = new AlgorithmIdentifier(PKCSObjectIdentifiers.id_mgf1, hash);
-        AlgorithmIdentifier pSource = new AlgorithmIdentifier(PKCSObjectIdentifiers.id_pSpecified, new DEROctetString(new byte[0]));
+        AlgorithmIdentifier hash = new AlgorithmIdentifier(id_sha256, DERNull.INSTANCE);
+        AlgorithmIdentifier mask = new AlgorithmIdentifier(id_mgf1, hash);
+        AlgorithmIdentifier pSource = new AlgorithmIdentifier(id_pSpecified, new DEROctetString(new byte[0]));
 
         ASN1Encodable parameters = new RSAESOAEPparams(hash, mask, pSource);
 
-        return new AlgorithmIdentifier(PKCSObjectIdentifiers.id_RSAES_OAEP, parameters);
+        return new AlgorithmIdentifier(id_RSAES_OAEP, parameters);
     }
 
     void createCMSStreamed(InputStream inputStream, OutputStream outputStream, X509Certificate sertifikat) {
         try {
             JceKeyTransRecipientInfoGenerator recipientInfoGenerator;
+
             if (keyEncryptionScheme == null) {
                 recipientInfoGenerator = new JceKeyTransRecipientInfoGenerator(sertifikat);
             } else {

@@ -7,6 +7,7 @@ import lombok.Data;
 @Data
 @Builder
 public class KvitteringStatus {
+
     @JsonValue
     private String status;
 }

@@ -12,6 +12,7 @@ import java.util.Optional;
 @Builder
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class IdentifierResource {
+
     private InfoRecord infoRecord;
     private List<ServiceRecord> serviceRecords;
 

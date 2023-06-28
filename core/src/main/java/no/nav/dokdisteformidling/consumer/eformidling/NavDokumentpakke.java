@@ -6,16 +6,14 @@ import lombok.Value;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * @author Joakim Bjørnstad, Jbit AS
- */
 @Value
 @Builder
 public class NavDokumentpakke {
-	private final String conversationId;
-	private final String bestillingsId;
 
-	private final NavDokument arkivmelding;
+	String conversationId;
+	String bestillingsId;
+
+	NavDokument arkivmelding;
 	@Builder.Default
-	private final List<NavDokument> navDokumenter = new ArrayList<>();
+	List<NavDokument> navDokumenter = new ArrayList<>();
 }

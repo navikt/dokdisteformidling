@@ -19,16 +19,17 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public final class Organisasjonsnummer {
+
 	static final Pattern ISO6523_PATTERN = Pattern.compile("^([0-9]{4}:)([0-9]{9})$");
 	public static final String ISO6523_AUTHORITY = "iso6523-actorid-upis";
 	public static final String ISO6523_PREFIX = "0192:";
 
 	private Organisasjonsnummer() {
-        //noop
+		//noop
 	}
 
 	public static String asIso6523(final String orgNummer) {
-		if(isIso6523(orgNummer)) {
+		if (isIso6523(orgNummer)) {
 			return orgNummer;
 		}
 		return ISO6523_PREFIX + orgNummer;

@@ -8,6 +8,7 @@ import lombok.Data;
 @Data
 @Builder
 public class Service {
+
 	private ServiceIdentifier identifier;
 	private String endpointUrl;
 	private String serviceCode;

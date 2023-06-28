@@ -6,6 +6,7 @@ import no.nav.dokdisteformidling.consumer.eformidling.altinn.to.UploadResponse;
 import java.util.List;
 
 public interface Eformidling {
+
     UploadResponse send(NavDokumentpakke navDokumentpakke, String arkivmelding);
 
     List<DownloadResponse> hent();
