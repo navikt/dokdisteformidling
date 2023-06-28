@@ -2,7 +2,6 @@ package no.nav.dokdisteformidling.consumer.eformidling.maskinporten;
 
 
 import com.nimbusds.jose.JOSEException;
-import com.nimbusds.jose.JWSAlgorithm;
 import com.nimbusds.jose.JWSHeader;
 import com.nimbusds.jose.crypto.RSASSASigner;
 import com.nimbusds.jose.util.Base64;
@@ -15,8 +14,6 @@ import no.nav.dokdisteformidling.metrics.Monitor;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.FormHttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
@@ -37,7 +34,10 @@ import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
+import static com.nimbusds.jose.JWSAlgorithm.RS256;
 import static no.nav.dokdisteformidling.constants.DomainConstants.DEFAULT_ZONE_ID;
+import static org.springframework.http.HttpMethod.POST;
+import static org.springframework.http.MediaType.APPLICATION_FORM_URLENCODED;
 
 @Slf4j
 @Component
@@ -72,7 +72,7 @@ public class MaskinportenTokenConsumer {
 		attrMap.add("assertion", generateJWT());
 
 		HttpHeaders headers = new HttpHeaders();
-		headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+		headers.setContentType(APPLICATION_FORM_URLENCODED);
 		HttpEntity<MultiValueMap<String, String>> httpEntity = new HttpEntity<>(attrMap, headers);
 
 		URI accessTokenUri;
@@ -84,9 +84,10 @@ public class MaskinportenTokenConsumer {
 		}
 
 		final String maskinportenUrl = maskinportenProperties.getUrl().toString();
+
 		try {
 			log.info("Henter accessToken fra maskinporten på url={}", maskinportenUrl);
-			ResponseEntity<OidcTokenResponse> response = restTemplate.exchange(accessTokenUri, HttpMethod.POST,
+			ResponseEntity<OidcTokenResponse> response = restTemplate.exchange(accessTokenUri, POST,
 					httpEntity, OidcTokenResponse.class);
 			log.info("AccessToken hentet OK fra maskinporten på url={}", maskinportenUrl);
 			return response.getBody();
@@ -110,7 +111,7 @@ public class MaskinportenTokenConsumer {
 			throw new RuntimeException(e);
 		}
 
-		JWSHeader jwsHeader = new JWSHeader.Builder(JWSAlgorithm.RS256).x509CertChain(certChain).build();
+		JWSHeader jwsHeader = new JWSHeader.Builder(RS256).x509CertChain(certChain).build();
 
 		String clientId = maskinportenProperties.getClientid();
 		JWTClaimsSet claims = new JWTClaimsSet.Builder()

@@ -10,6 +10,7 @@ import java.util.List;
 @Data
 @Builder
 public class ServiceRecord {
+
 	private String organisationNumber;
 	private String pemCertificate;
 	private String process;

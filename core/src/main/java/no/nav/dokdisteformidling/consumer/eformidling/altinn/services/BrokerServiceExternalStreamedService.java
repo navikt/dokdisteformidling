@@ -30,10 +30,12 @@ import java.util.List;
 import static java.util.stream.Collectors.toList;
 import static no.nav.dokdisteformidling.consumer.eformidling.EformidlingConstants.NAV_ORGNUMMER;
 import static no.nav.dokdisteformidling.consumer.eformidling.altinn.to.AltinnReasonFactory.from;
+import static org.apache.cxf.headers.Header.HEADER_LIST;
 
 @Slf4j
 @Component
 public class BrokerServiceExternalStreamedService {
+
     private static final String ALTINN_OPPLASTING_FEILET = "Altinn opplasting feilet: {}";
     private static final String ALTINN_NEDLASTING_FEILET = "Altinn nedlasting feilet: {}";
     private static final String ALTINN_AVLESING_AV_MELDING_FEILET = "Altinn avlesning av melding feilet: ";
@@ -53,6 +55,7 @@ public class BrokerServiceExternalStreamedService {
         Header reportee = null;
         Header reference = null;
         Header filename = null;
+
         try {
             reportee = new Header(new QName(ALTINN_BROKERSERVICEEXTERNALSTREAMED_NAMESPACE, "Reportee"), NAV_ORGNUMMER, new JAXBDataBinding(String.class));
             reference = new Header(new QName(ALTINN_BROKERSERVICEEXTERNALSTREAMED_NAMESPACE, "Reference"), fileReference, new JAXBDataBinding(String.class));
@@ -60,13 +63,15 @@ public class BrokerServiceExternalStreamedService {
         } catch (JAXBException e) {
             log.error("Feil i uploadFileToAltinn:", e);
         }
+
         headerList.add(reportee);
         headerList.add(reference);
         headerList.add(filename);
 
-        ((BindingProvider) brokerServiceExternalStreamed).getRequestContext().put(Header.HEADER_LIST, headerList);
+        ((BindingProvider) brokerServiceExternalStreamed).getRequestContext().put(HEADER_LIST, headerList);
         StreamedPayloadExternalBE streamedPayloadExternalBE = objectFactory.createStreamedPayloadExternalBE();
         streamedPayloadExternalBE.setDataStream(dataHandler);
+
         try {
             final ReceiptExternalStreamedBE receiptExternalStreamedBE = brokerServiceExternalStreamed.uploadFileStreamed(streamedPayloadExternalBE);
             return mapReceipt(receiptExternalStreamedBE);
@@ -96,18 +101,22 @@ public class BrokerServiceExternalStreamedService {
 
     private DownloadedMessageFromAltinn mapReferenceToDownloadedFile(String filreferanse, DataHandler dataHandler) {
         InputStream inputStream;
+
         try {
             inputStream = dataHandler.getInputStream();
         } catch (IOException | IllegalStateException e) {
             log.error(ALTINN_AVLESING_AV_MELDING_FEILET, e);
             throw new DokumentpakkingException(ALTINN_AVLESING_AV_MELDING_FEILET, e);
         }
+
         return DownloadedMessageFromAltinn.builder().filreferanse(filreferanse).inputStream(inputStream).build();
     }
 
     @Monitor(value = "dok_metric", extraTags = {"process", "brokerServiceExternalStreamedServiceDownloadFile"}, histogram = true, percentiles = {0.5, 0.95})
     public DataHandler downloadFile(String filreferanse) {
+
         log.info("Laster ned fil fra Altinn med filreferanse=" + filreferanse);
+
         try {
             final DataHandler dataHandler = brokerServiceExternalStreamed.downloadFileStreamed(filreferanse, NAV_ORGNUMMER);
             log.info("Lastet ned fil fra Altinn med filreferanse=" + filreferanse);

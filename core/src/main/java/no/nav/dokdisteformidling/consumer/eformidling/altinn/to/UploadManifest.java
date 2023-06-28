@@ -8,9 +8,10 @@ import lombok.Value;
 @Builder
 @AllArgsConstructor
 public class UploadManifest {
-    private String avsender;
-    private String serviceCode;
-    private String serviceEditionCode;
-    private String fileZipName;
-    private String senderReference;
+
+    String avsender;
+    String serviceCode;
+    String serviceEditionCode;
+    String fileZipName;
+    String senderReference;
 }

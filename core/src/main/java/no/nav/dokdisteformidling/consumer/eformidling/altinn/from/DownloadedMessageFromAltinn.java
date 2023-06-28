@@ -8,6 +8,7 @@ import java.io.InputStream;
 @Value
 @Builder
 public class DownloadedMessageFromAltinn {
-    private final String filreferanse;
-    private final InputStream inputStream;
+
+    String filreferanse;
+    InputStream inputStream;
 }

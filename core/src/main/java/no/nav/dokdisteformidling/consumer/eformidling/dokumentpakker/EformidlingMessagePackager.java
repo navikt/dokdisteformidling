@@ -27,8 +27,6 @@ import java.util.zip.ZipOutputStream;
  * Innhold (Kryptert ASIC-E)
  *
  * https://difi.github.io/felleslosninger/eformidling_nm_message.html
- *
- * @author Joakim Bjørnstad, Jbit AS
  */
 @Slf4j
 @Component
@@ -65,11 +63,13 @@ public class EformidlingMessagePackager {
 
     private void writeZip(StandardBusinessDocument konvolutt, InputStream innhold, OutputStream outputStream) {
         try (ZipOutputStream zipOutputStream = new ZipOutputStream(outputStream)) {
+
             if (konvolutt.getAny() instanceof AvtaltMessage) {
                 zipOutputStream.putNextEntry(new ZipEntry(EFORMIDLING_SBD));
                 objectMapper.writeValue(zipOutputStream, konvolutt);
                 zipOutputStream.closeEntry();
             }
+
             zipOutputStream.putNextEntry(new ZipEntry(EFORMIDLING_ASIC));
             IOUtils.copy(innhold, zipOutputStream);
             zipOutputStream.closeEntry();

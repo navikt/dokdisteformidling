@@ -6,6 +6,7 @@ import lombok.Value;
 @Value
 @Builder
 public class UploadResponse {
-    private final String fileReference;
-    private final ReceiptTo receiptTo;
+
+    String fileReference;
+    ReceiptTo receiptTo;
 }
