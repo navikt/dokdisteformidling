@@ -26,17 +26,17 @@ import static no.nav.dokdisteformidling.consumer.eformidling.dokumentpakker.Stan
 import static no.nav.dokdisteformidling.consumer.eformidling.dokumentpakker.StandardBusinessDocumentMapper.TYPE_VERSION;
 import static org.assertj.core.api.Assertions.assertThat;
 
-/**
- * @author Joakim Bjørnstad, Jbit AS
- */
 class StandardBusinessDocumentMapperTest {
+
 	private static final String KONVERSASJON_ID = "konversasjonId1";
 	private static final String BESTILLINGS_ID = "bestillingsId1";
 	private static final String FIXED_TIME = "2020-01-01T12:00:00Z";
 	private static final String TEN_SECONDS_BEFORE = "2020-01-01T12:59:50+01:00";
-	private static final String TWENTY_FOUR_HOURS_LATER = "2020-01-06T13:00:00+01:00";
+	private static final String TEN_DAYS_LATER = "2020-01-11T13:00:00+01:00";
+
 	private final StandardBusinessDocumentMapper mapper = new StandardBusinessDocumentMapper(Clock.fixed(Instant.parse(FIXED_TIME), DEFAULT_ZONE_ID));
 	private static final String ARKIVEMELDING_XML = AppTestUtils.classpathToString("avtaltmelding/arkivmelding.xml");
+
 	@Test
 	void shouldMapArkivmeldingKonvolutt() {
 		final StandardBusinessDocument sbd = mapper.mapAvtaltmeldingEnvelope(KONVERSASJON_ID, BESTILLINGS_ID,ARKIVEMELDING_XML);
@@ -69,7 +69,7 @@ class StandardBusinessDocumentMapperTest {
 				.anyMatch(scope -> SCOPE_CONVERSATION_ID.equals(scope.getType()))
 				.flatExtracting(Scope::getScopeInformation)
 				.extracting(CorrelationInformation::getExpectedResponseDateTime)
-				.contains(OffsetDateTime.parse(TWENTY_FOUR_HOURS_LATER));
+				.contains(OffsetDateTime.parse(TEN_DAYS_LATER));
 		assertThat(sbd.getAny()).isInstanceOf(AvtaltMessage.class);
 	}
 }

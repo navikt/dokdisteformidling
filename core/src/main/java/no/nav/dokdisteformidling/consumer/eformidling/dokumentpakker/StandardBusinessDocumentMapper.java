@@ -15,7 +15,7 @@ import java.time.Clock;
 import java.time.Duration;
 import java.time.OffsetDateTime;
 
-import static java.time.Duration.ofHours;
+import static java.time.Duration.ofDays;
 import static java.time.temporal.ChronoUnit.SECONDS;
 import static no.nav.dokdisteformidling.consumer.eformidling.EformidlingConstants.NAV_ORGNUMMER;
 import static no.nav.dokdisteformidling.consumer.eformidling.EformidlingConstants.TRYGDERETTEN_ORGNUMMER;
@@ -36,7 +36,7 @@ public class StandardBusinessDocumentMapper {
 	static final String AVTALTMELDING_FORRETNINGSMELDING = "avtalt";
 	public static final String ARKIVMELDING_XML = "arkivmelding.xml";
 	public static final int SIKKERHETSNIVAA = 4;
-	public static final Duration EXPECTED_RESPONSE_WITHIN_HOURS = ofHours(120);
+	public static final Duration EXPECTED_RESPONSE_WITHIN_HOURS = ofDays(10); // 240 hours
 
 	private final Clock clock;
 

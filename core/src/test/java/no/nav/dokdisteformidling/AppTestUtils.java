@@ -1,28 +1,21 @@
 package no.nav.dokdisteformidling;
 
-import static java.lang.String.format;
-import static java.nio.charset.StandardCharsets.UTF_8;
-
 import lombok.Data;
 import lombok.SneakyThrows;
 import org.apache.commons.io.IOUtils;
 import org.springframework.core.io.ClassPathResource;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
 import java.util.zip.ZipInputStream;
 
-/**
- * @author Sigurd Midttun, Visma Consulting.
- */
+import static java.lang.String.format;
+import static java.nio.charset.StandardCharsets.UTF_8;
+
 public final class AppTestUtils {
 
 	private AppTestUtils() {
