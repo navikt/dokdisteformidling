@@ -23,10 +23,8 @@ import static no.nav.dokdisteformidling.consumer.eformidling.dokumentpakker.Efor
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-/**
- * @author Joakim Bjørnstad, Jbit AS
- */
 class EformidlingMessagePackagerTest {
+
 	private static final String FIXED_TIME = "2020-01-01T12:00:00Z";
 	public static final Clock FIXED_CLOCK = Clock.fixed(Instant.parse(FIXED_TIME), DEFAULT_ZONE_ID);
 	private static final String ARKIVMELDING = AppTestUtils.classpathToString("avtaltmelding/arkivmelding.xml");
