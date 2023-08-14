@@ -30,7 +30,7 @@
 		<camel.version>3.20.5</camel.version>
 		<logstash-logback-encoder.version>7.3</logstash-logback-encoder.version>
 		<resilience4j.version>2.0.2</resilience4j.version>
-		<google-cloud.version>26.15.0</google-cloud.version>
+		<google-cloud.version>26.22.0</google-cloud.version>
 		<tink.version>1.9.0</tink.version>
 		<tink-gcpkms.version>1.8.0</tink-gcpkms.version>
 		<ibm.mq.allclient.version>9.3.2.1</ibm.mq.allclient.version>
