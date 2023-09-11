@@ -36,7 +36,7 @@
 		<ibm.mq.allclient.version>9.3.3.0</ibm.mq.allclient.version>
 		<commons-io.version>2.13.0</commons-io.version>
 		<nimbus-jose-jwt.version>9.31</nimbus-jose-jwt.version>
-		<jaxws-ri.version>3.0.2</jaxws-ri.version>
+		<jaxws-ri.version>4.0.1</jaxws-ri.version>
 		<commons-asic.version>0.11.0</commons-asic.version>
 
 		<!-- 3.6.0 gjør at tester feiler i Qdist013ForAltinnIT -->
