@@ -46,7 +46,8 @@ public class PdlGraphQLConsumer {
 	private final MapHentNavnResponse mapHentNavnResponse;
 
 	public PdlGraphQLConsumer(RestTemplateBuilder restTemplateBuilder,
-							  StsRestConsumer stsConsumer, @Value("${pdl.url}") String pdlUrl) {
+							  StsRestConsumer stsConsumer,
+							  @Value("${pdl.url}") String pdlUrl) {
 		this.restTemplate = restTemplateBuilder
 				.setConnectTimeout(Duration.ofSeconds(5L))
 				.setReadTimeout(Duration.ofSeconds(15L))
@@ -94,24 +95,29 @@ public class PdlGraphQLConsumer {
 	private PDLRequest mapRequest(final String ident, String query) {
 		final HashMap<String, Object> variables = new HashMap<>();
 		variables.put("ident", ident);
-		return PDLRequest.builder().query(query).variables(variables).build();
+
+		return PDLRequest.builder()
+				.query(query)
+				.variables(variables)
+				.build();
 	}
 
-	private String hentPersonnavn = "query hentPerson($ident: ID!){\n" +
-			"  hentPerson(ident: $ident){\n" +
-			"    navn(historikk: false){\n" +
-			"      fornavn\n" +
-			"      mellomnavn\n" +
-			"      etternavn\n" +
-			"      forkortetNavn\n" +
-			"    }\n" +
-			"    folkeregisteridentifikator(historikk: false){\n" +
-			"      identifikasjonsnummer\n" +
-			"      type\n" +
-			"      status\n" +
-			"    }\n" +
-			"\n" +
-			"  }\n" +
-			"}";
+	private final String hentPersonnavn = """
+			query hentPerson($ident: ID!){
+			  hentPerson(ident: $ident){
+			    navn(historikk: false){
+			      fornavn
+			      mellomnavn
+			      etternavn
+			      forkortetNavn
+			    }
+			    folkeregisteridentifikator(historikk: false){
+			      identifikasjonsnummer
+			      type
+			      status
+			    }
+			  }
+			}
+			""";
 
 }
