@@ -264,8 +264,9 @@ class Qdist013ForAltinnIT {
 	}
 
 	@Test
-	void shouldThrowRdist001HentForsendelseFunctionalException() {
-		stubFor(get("/administrerforsendelse/" + FORSENDELSE_ID).willReturn(aResponse().withStatus(NOT_FOUND.value())));
+	void skalGiDokdistadminFunctionalExceptionHvisNotFoundForHenting() {
+		stubFor(get("/administrerforsendelse/" + FORSENDELSE_ID).willReturn(
+				aResponse().withStatus(NOT_FOUND.value())));
 
 		sendStringMessage(qdist013, classpathToString("qdist013/qdist013-happy.xml"));
 
@@ -839,7 +840,7 @@ class Qdist013ForAltinnIT {
 	}
 
 	@Test
-	void shouldThrowRdist001OppdaterForsendelseFunctionalException() {
+	void skalGiDokdistadminFunctionalExceptionHvisForbiddenForOppdatering() {
 		stubGetForsendelse("__files/rjoark001/getForsendelse-happy.json");
 		stubGetSecurityToken();
 		stubPostSafJournalpost("queryJournalpostId\":\"123\"", "saf/safQdist013GraphQlResponse-orgnr.json");
@@ -871,7 +872,7 @@ class Qdist013ForAltinnIT {
 	}
 
 	@Test
-	void shouldThrowRdist001OppdaterForsendelseTechnicalException() {
+	void skalGiDokdistadminTechnicalExceptionHvisInternalServerErrorForOppdatering() {
 		stubGetForsendelse("__files/rjoark001/getForsendelse-happy.json");
 		stubGetSecurityToken();
 		stubPostSafJournalpost("queryJournalpostId\":\"123\"", "saf/safQdist013GraphQlResponse-orgnr.json");
@@ -901,7 +902,7 @@ class Qdist013ForAltinnIT {
 	}
 
 	@Test
-	void shouldThrowRdist001HentForsendelseTechnicalException() {
+	void skalGiDokdistadminTechnicalExceptionHvisInternalServerErrorForHenting() {
 		stubFor(get("/administrerforsendelse/" + FORSENDELSE_ID)
 				.willReturn(aResponse().withStatus(INTERNAL_SERVER_ERROR.value())));
 
