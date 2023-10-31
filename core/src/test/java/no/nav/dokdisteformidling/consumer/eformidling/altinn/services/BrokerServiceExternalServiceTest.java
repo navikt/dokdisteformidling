@@ -5,14 +5,18 @@ import no.altinn.brokerserviceexternal.File;
 import no.altinn.brokerserviceexternal.IBrokerServiceExternal;
 import no.nav.dokdisteformidling.consumer.eformidling.altinn.to.UploadManifest;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
-import org.mockito.Mockito;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import static no.nav.dokdisteformidling.consumer.eformidling.EformidlingConstants.NAV_ORGNUMMER;
 import static no.nav.dokdisteformidling.consumer.eformidling.EformidlingConstants.TRYGDERETTEN_ORGNUMMER;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 
+@ExtendWith(MockitoExtension.class)
 class BrokerServiceExternalServiceTest {
 
 	private static final String FILE_ZIP_NAME = "sbd.zip";
@@ -21,9 +25,11 @@ class BrokerServiceExternalServiceTest {
 	private static final String SERVICE_EDITION_CODE = "270815";
 	private static final String FILE_REFERENCE = "1234";
 
-	private final IBrokerServiceExternal iBrokerServiceExternalMock = Mockito.mock(IBrokerServiceExternal.class);
-	private final BrokerServiceExternalService brokerServiceExternalService = new BrokerServiceExternalService(iBrokerServiceExternalMock);
-	private final ArgumentCaptor<BrokerServiceInitiation> brokerServiceInitiationArgumentCaptor = ArgumentCaptor.forClass(BrokerServiceInitiation.class);
+	@Mock
+	IBrokerServiceExternal iBrokerServiceExternalMock;
+	@InjectMocks
+	BrokerServiceExternalService brokerServiceExternalService;
+	ArgumentCaptor<BrokerServiceInitiation> brokerServiceInitiationArgumentCaptor = ArgumentCaptor.forClass(BrokerServiceInitiation.class);
 
 	@Test
 	void shouldInitiateBrokerService() throws Exception {

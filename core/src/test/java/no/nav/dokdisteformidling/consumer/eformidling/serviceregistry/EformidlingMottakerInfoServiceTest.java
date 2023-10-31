@@ -3,7 +3,10 @@ package no.nav.dokdisteformidling.consumer.eformidling.serviceregistry;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.security.Security;
 
@@ -19,13 +22,16 @@ import static org.assertj.core.api.Assertions.catchThrowable;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
-// TODO: Sjå litt meir her
+@ExtendWith(MockitoExtension.class)
 class EformidlingMottakerInfoServiceTest {
 
     public static final String DPO_SERVICE_CODE = "4192";
     public static final String DPO_SERVICE_EDITION_CODE = "270815";
-    private final ServiceRegistryConsumer serviceRegistryConsumerMock = Mockito.mock(ServiceRegistryConsumer.class);
-    private final EformidlingMottakerInfoService eformidlingMottakerInfoService = new EformidlingMottakerInfoService(serviceRegistryConsumerMock);
+
+    @Mock
+    ServiceRegistryConsumer serviceRegistryConsumerMock;
+    @InjectMocks
+    EformidlingMottakerInfoService eformidlingMottakerInfoService;
 
     @BeforeAll
     static void setUp() {
