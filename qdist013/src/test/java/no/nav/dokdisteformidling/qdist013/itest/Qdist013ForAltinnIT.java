@@ -17,6 +17,8 @@ import org.apache.http.entity.ContentType;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -449,49 +451,7 @@ class Qdist013ForAltinnIT {
 	}
 
 	@Test
-	void shouldThrowAktoerHentIdentForAktoerIdFunctionalException() {
-		stubGetForsendelse("__files/rjoark001/getForsendelse-happy.json");
-		stubGetSecurityToken();
-		stubPostSafJournalpost("queryJournalpostId\":\"123\"", "saf/safQdist013GraphQlResponse-aktoerId.json");
-		stubPostSafJournalpost("queryJournalpostId\":\"448212366\"", "saf/safLightweightGraphQlResponse-happy.json");
-		postPdlGraphql(PDL_IDENT_HAPPY, INTERNAL_SERVER_ERROR.value());
-		stubPostMaskinporten();
-		stubGetServiceRegistry();
-		stubPostIntiateBrokerService();
-		stubUploadBrokerServiceStreamed();
-
-		sendStringMessage(qdist013, classpathToString("qdist013/qdist013-happy.xml"));
-
-		await().atMost(10, SECONDS).untilAsserted(() -> assertMessageOnQueue(backoutQueue));
-
-		verifyGetForsendelse();
-		verifyGetSecurityToken(6);
-		verifyPostSafJournalpost();
-		verifyPostSafJournalpostLightweight(1);
-		verify(5, postRequestedFor(urlEqualTo("/pdl")));
-	}
-
-	@Test
-	void shouldThrowAktoerHentIdentForAktoerIdFunctionalExceptionIngenResponse() {
-		stubGetForsendelse("__files/rjoark001/getForsendelse-happy.json");
-		stubGetSecurityToken();
-		stubPostSafJournalpost("queryJournalpostId\":\"123\"", "saf/safQdist013GraphQlResponse-aktoerId.json");
-		stubPostSafJournalpost("queryJournalpostId\":\"448212366\"", "saf/safLightweightGraphQlResponse-happy.json");
-		postPdlGraphql(PDL_IDENT_HAPPY, INTERNAL_SERVER_ERROR.value());
-
-		sendStringMessage(qdist013, classpathToString("qdist013/qdist013-happy.xml"));
-
-		await().atMost(10, SECONDS).untilAsserted(() -> assertMessageOnQueue(backoutQueue));
-
-		verifyGetForsendelse();
-		verifyGetSecurityToken(6);
-		verifyPostSafJournalpost();
-		verifyPostSafJournalpostLightweight(1);
-		verify(5, postRequestedFor(urlEqualTo("/pdl")));
-	}
-
-	@Test
-	void shouldThrowAktoerHentIdentForAktoerIdFunctionalExceptionFeilmelding() {
+	void skalGiPersonIkkeFunnetExceptionForNotFoundFraPdl() {
 		stubGetForsendelse("__files/rjoark001/getForsendelse-happy.json");
 		stubGetSecurityToken();
 		stubPostSafJournalpost("queryJournalpostId\":\"123\"", "saf/safQdist013GraphQlResponse-aktoerId.json");
@@ -510,7 +470,7 @@ class Qdist013ForAltinnIT {
 	}
 
 	@Test
-	void shouldThrowAktoerHentIdentForAktoerIdFunctionalExceptionIngenIdent() {
+	void skalGiDokdistIllegalArgumentExceptionForUgyldigResponsFraPdl() {
 		stubGetForsendelse("__files/rjoark001/getForsendelse-happy.json");
 		stubGetSecurityToken();
 		stubPostSafJournalpost("queryJournalpostId\":\"123\"", "saf/safQdist013GraphQlResponse-aktoerId.json");
@@ -528,81 +488,24 @@ class Qdist013ForAltinnIT {
 		verify(1, postRequestedFor(urlEqualTo("/pdl")));
 	}
 
-	@Test
-	void shouldThrowFunctinalExceptionWhenPDLHentPersonWithNullFornavn() {
+	@ParameterizedTest
+	@ValueSource(strings = {PDL_IDENT_HAPPY, PDL_PERSONNAVN_HAPPY})
+	void skalGiPdlHentPersonTechnicalExceptionForInternalServerErrorFraPdl(String filePath) {
 		stubGetForsendelse("__files/rjoark001/getForsendelse-happy.json");
 		stubGetSecurityToken();
 		stubPostSafJournalpost("queryJournalpostId\":\"123\"", "saf/safQdist013GraphQlResponse-aktoerId.json");
 		stubPostSafJournalpost("queryJournalpostId\":\"448212366\"", "saf/safLightweightGraphQlResponse-happy.json");
-		postPdlGraphql(PDL_FORNAVN_NULL, OK.value());
-
-		sendStringMessage(qdist013, classpathToString("qdist013/qdist013-happy.xml"));
-
-		await().atMost(10, SECONDS).untilAsserted(() -> assertMessageOnQueue(qdist013FunksjonellFeil));
-
-		verifyGetForsendelse();
-		verifyGetSecurityToken(2);
-		verifyPostSafJournalpost();
-		verifyPostSafJournalpostLightweight(1);
-	}
-
-
-	@Test
-	void shouldThrowPDLHentPersonTechnicalException() {
-		stubGetForsendelse("__files/rjoark001/getForsendelse-happy.json");
-		stubGetSecurityToken();
-		stubPostSafJournalpost("queryJournalpostId\":\"123\"", "saf/safQdist013GraphQlResponse-aktoerId.json");
-		stubPostSafJournalpost("queryJournalpostId\":\"448212366\"", "saf/safLightweightGraphQlResponse-happy.json");
-		postPdlGraphql(PDL_PERSONNAVN_HAPPY, INTERNAL_SERVER_ERROR.value());
+		postPdlGraphql(filePath, INTERNAL_SERVER_ERROR.value());
 
 		sendStringMessage(qdist013, classpathToString("qdist013/qdist013-happy.xml"));
 
 		await().atMost(10, SECONDS).untilAsserted(() -> assertMessageOnQueue(backoutQueue));
 
 		verifyGetForsendelse();
-		verifyGetSecurityToken(2);
+		verifyGetSecurityToken(6);
 		verifyPostSafJournalpost();
 		verifyPostSafJournalpostLightweight(1);
-	}
-
-	@Test
-	void shouldThrowTpsHentNavnFunctionalException() {
-		stubGetForsendelse("__files/rjoark001/getForsendelse-happy.json");
-		stubGetSecurityToken();
-		stubPostSafJournalpost("queryJournalpostId\":\"123\"", "saf/safQdist013GraphQlResponse-fnr.json");
-		stubPostSafJournalpost("queryJournalpostId\":\"448212366\"", "saf/safLightweightGraphQlResponse-happy.json");
-		stubFor(get("/tps/v1/navn")
-				.withHeader("Nav-Personident", equalTo("01010012345"))
-				.withHeader(AUTHORIZATION, equalTo(BEARER_OIDC_TOKEN))
-				.willReturn(aResponse().withStatus(NOT_FOUND.value())));
-
-		sendStringMessage(qdist013, classpathToString("qdist013/qdist013-happy.xml"));
-
-		await().atMost(10, SECONDS).untilAsserted(() -> assertMessageOnQueue(qdist013FunksjonellFeil));
-
-		verifyGetForsendelse();
-		verifyGetSecurityToken(1 + 1);
-		verifyPostSafJournalpost();
-		verifyPostSafJournalpostLightweight(1);
-		verify(1, postRequestedFor(urlEqualTo("/pdl")));
-	}
-
-	@Test
-	void shouldThrowTpsHentNavnTechnicalException() {
-		stubGetForsendelse("__files/rjoark001/getForsendelse-happy.json");
-		stubGetSecurityToken();
-		stubPostSafJournalpost("queryJournalpostId\":\"123\"", "saf/safQdist013GraphQlResponse-fnr.json");
-		stubPostSafJournalpost("queryJournalpostId\":\"448212366\"", "saf/safLightweightGraphQlResponse-happy.json");
-		postPdlGraphql(PDL_PERSONNAVN_HAPPY, INTERNAL_SERVER_ERROR.value());
-
-		sendStringMessage(qdist013, classpathToString("qdist013/qdist013-happy.xml"));
-
-		await().atMost(10, SECONDS).untilAsserted(() -> assertMessageOnQueue(backoutQueue));
-
-		verifyGetForsendelse();
-		verifyGetSecurityToken(3 + MAX_ATTEMPTS_SHORT);
-		verifyPostSafJournalpost();
-		verifyPostSafJournalpostLightweight(1);
+		verify(5, postRequestedFor(urlEqualTo("/pdl")));
 	}
 
 	@Test
