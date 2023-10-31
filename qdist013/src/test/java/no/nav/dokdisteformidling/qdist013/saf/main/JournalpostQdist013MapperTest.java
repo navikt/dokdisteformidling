@@ -1,16 +1,14 @@
 package no.nav.dokdisteformidling.qdist013.saf.main;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
-
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
-/**
- * @author Erik Bråten, Visma Consulting.
- */
+import static no.nav.dokdisteformidling.qdist013.saf.main.JournalpostQdist013.Datotype.DATO_JOURNALFOERT;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+
 class JournalpostQdist013MapperTest extends SafJournalpostTest {
 
 	private final JournalpostQdist013Mapper journalpostQdist013Mapper = new JournalpostQdist013Mapper();
@@ -100,7 +98,7 @@ class JournalpostQdist013MapperTest extends SafJournalpostTest {
 	private void assertRelevantDatoJournalfoert(JournalpostQdist013.RelevantDato relevantDato) {
 		assertNotNull(relevantDato);
 		assertEquals(JOURNALFOERT_DATO, relevantDato.getDato());
-		assertEquals(JournalpostQdist013.Datotype.DATO_JOURNALFOERT, relevantDato.getDatotype());
+		assertEquals(DATO_JOURNALFOERT, relevantDato.getDatotype());
 	}
 
 

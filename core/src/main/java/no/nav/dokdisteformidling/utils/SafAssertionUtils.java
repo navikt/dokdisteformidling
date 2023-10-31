@@ -5,9 +5,6 @@ import no.nav.dokdisteformidling.exception.functional.SafJournalpostValidationEx
 import static java.lang.String.format;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 
-/**
- * @author Sigurd Midttun, Visma Consulting.
- */
 public final class SafAssertionUtils {
 
 	private SafAssertionUtils() {

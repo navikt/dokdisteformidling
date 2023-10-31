@@ -14,6 +14,7 @@ import java.util.Objects;
  * Kopiert fra https://github.com/difi/move-integrasjonspunkt
  */
 public class KeystoreProvider {
+
 	private final KeyStore keystore;
 
 	public KeystoreProvider(KeyStore keyStore) {
@@ -55,4 +56,5 @@ public class KeystoreProvider {
 	public KeyStore getKeyStore() {
 		return keystore;
 	}
+
 }

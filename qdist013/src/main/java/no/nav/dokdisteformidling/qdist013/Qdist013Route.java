@@ -21,10 +21,6 @@ import static no.nav.dokdisteformidling.constants.RouteConstants.PROPERTY_JOURNA
 import static no.nav.dokdisteformidling.constants.RouteConstants.QDIST013_SERVICE_ID;
 import static org.apache.camel.LoggingLevel.ERROR;
 
-
-/**
- * @author Sigurd Midttun, Visma Consulting.
- */
 @Component
 public class Qdist013Route extends RouteBuilder {
 

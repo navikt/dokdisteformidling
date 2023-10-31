@@ -18,9 +18,6 @@ import static no.nav.dokdisteformidling.config.cache.LokalCacheConfig.STS_CACHE;
 import static no.nav.dokdisteformidling.constants.RetryConstants.DELAY_SHORT;
 import static no.nav.dokdisteformidling.constants.RetryConstants.MULTIPLIER_SHORT;
 
-/**
- * @author Sigurd Midttun, Visma Consulting.
- */
 @Component
 public class StsRestConsumer {
 
@@ -42,8 +39,7 @@ public class StsRestConsumer {
 	@Cacheable(STS_CACHE)
 	public String getOidcToken() {
 		try {
-			return restTemplate.getForObject(stsUrl + "?grant_type=client_credentials&scope=openid", StsResponseTo.class)
-					.getAccessToken();
+			return restTemplate.getForObject(stsUrl + "?grant_type=client_credentials&scope=openid", StsResponseTo.class).getAccessToken();
 		} catch (HttpStatusCodeException e) {
 			throw new StsTechnicalException(String.format("Kall mot STS feilet med status=%s feilmelding=%s.", e.getStatusCode(), e
 					.getMessage()), e);

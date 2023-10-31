@@ -19,6 +19,7 @@ import static org.apache.commons.lang3.StringUtils.isBlank;
 @Getter
 @ToString(exclude = {"pemCertificate", "x509Certificate"})
 public class MottakerInfo {
+
 	private final String orgnummer;
 	private final String pemCertificate;
 	private X509Certificate x509Certificate;
@@ -37,6 +38,7 @@ public class MottakerInfo {
 		if (isBlank(pemCertificate)) {
 			throw new MottakerInfoIkkeFunnetException("Fant ikke PEM sertifikat.");
 		}
+
 		PEMParser pemParser = openPEMResource(pemCertificate);
 		try {
 			final Object certificate = pemParser.readObject();

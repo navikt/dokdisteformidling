@@ -1,8 +1,5 @@
 package no.nav.dokdisteformidling.constants;
 
-/**
- * @author Ugur Alpay Cenar, Visma Consulting.
- */
 public final class RetryConstants {
 
 	private RetryConstants() {

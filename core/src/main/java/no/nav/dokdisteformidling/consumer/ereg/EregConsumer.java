@@ -1,6 +1,5 @@
 package no.nav.dokdisteformidling.consumer.ereg;
 
-import no.nav.dokdisteformidling.constants.MdcConstants;
 import no.nav.dokdisteformidling.exception.functional.EregHentNoekkelinfoFunctionalException;
 import no.nav.dokdisteformidling.exception.technical.EregHentNoekkelinfoTechnicalException;
 import no.nav.dokdisteformidling.metrics.Monitor;
@@ -9,8 +8,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.MediaType;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Component;
@@ -22,13 +19,13 @@ import java.time.Duration;
 
 import static java.lang.String.format;
 import static no.nav.dokdisteformidling.constants.DomainConstants.APP_NAME;
+import static no.nav.dokdisteformidling.constants.MdcConstants.MDC_CALL_ID;
 import static no.nav.dokdisteformidling.constants.MdcConstants.NAV_CALL_ID;
 import static no.nav.dokdisteformidling.constants.MdcConstants.NAV_CONSUMER_ID;
 import static no.nav.dokdisteformidling.constants.RetryConstants.DELAY_SHORT;
+import static org.springframework.http.HttpMethod.GET;
+import static org.springframework.http.MediaType.APPLICATION_JSON;
 
-/**
- * @author Sigurd Midttun, Visma Consulting.
- */
 @Component
 public class EregConsumer implements Ereg {
 
@@ -51,7 +48,7 @@ public class EregConsumer implements Ereg {
 			final String orgnrTrimmed = orgnr.trim();
 			HttpHeaders headers = createHeaders();
 			EregHentNoekkelInfoResponse response = restTemplate.exchange(eregApiUrl + "/v1/organisasjon/" + orgnrTrimmed + "/noekkelinfo",
-					HttpMethod.GET, new HttpEntity<>(headers), EregHentNoekkelInfoResponse.class).getBody();
+					GET, new HttpEntity<>(headers), EregHentNoekkelInfoResponse.class).getBody();
 			assertResponse(response, orgnrTrimmed);
 			return getFullName(response.getNavn());
 		} catch (HttpClientErrorException e) {
@@ -65,9 +62,9 @@ public class EregConsumer implements Ereg {
 
 	private HttpHeaders createHeaders() {
 		HttpHeaders headers = new HttpHeaders();
-		headers.setContentType(MediaType.APPLICATION_JSON);
+		headers.setContentType(APPLICATION_JSON);
 		headers.add(NAV_CONSUMER_ID, APP_NAME);
-		headers.add(NAV_CALL_ID, MDC.get(MdcConstants.MDC_CALL_ID));
+		headers.add(NAV_CALL_ID, MDC.get(MDC_CALL_ID));
 		return headers;
 	}
 
