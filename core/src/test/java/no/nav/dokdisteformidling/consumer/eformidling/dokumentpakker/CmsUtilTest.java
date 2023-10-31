@@ -1,14 +1,9 @@
 package no.nav.dokdisteformidling.consumer.eformidling.dokumentpakker;
 
-import static no.nav.dokdisteformidling.CertTestUtils.itestVirksomhetssertifikatBase64Properties;
-import static org.assertj.core.api.Assertions.assertThat;
-
 import no.nav.dokdisteformidling.CertTestUtils;
 import no.nav.dokdisteformidling.certificate.AppCertificate;
-import no.nav.dokdisteformidling.certificate.KeyStoreProperties;
 import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.Test;
-import org.springframework.core.io.ClassPathResource;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -17,10 +12,11 @@ import java.security.KeyPair;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
 
-/**
- * @author Joakim Bjørnstad, Jbit AS
- */
+import static no.nav.dokdisteformidling.CertTestUtils.itestVirksomhetssertifikatBase64Properties;
+import static org.assertj.core.api.Assertions.assertThat;
+
 class CmsUtilTest {
+
 	@Test
 	void shouldEncryptAndDecryptWithCmsWhenKeysGeneratedProgramatically() throws Exception {
 		KeyPair keyPair = CertTestUtils.generateKeyPair();

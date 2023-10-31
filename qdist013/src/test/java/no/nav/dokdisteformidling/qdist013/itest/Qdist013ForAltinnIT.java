@@ -88,6 +88,7 @@ import static wiremock.com.google.common.base.Strings.isNullOrEmpty;
 @AutoConfigureWireMock(port = 0)
 @ActiveProfiles("itest")
 class Qdist013ForAltinnIT {
+
 	private static final String FORSENDELSE_ID = "33333";
 	private static final String DOKUMENT_OBJEKT_REFERANSE_HOVEDDOK = "dokumentObjektReferanseHoveddok";
 	private static final String DOKUMENT_OBJEKT_REFERANSE_VEDLEGG1 = "dokumentObjektReferanseVedlegg1";

@@ -10,6 +10,7 @@ import static no.nav.dokdisteformidling.constants.NavHeaders.NAV_CALLID;
 import static no.nav.dokdisteformidling.utils.MDCUtils.getCallId;
 
 public class NavHeadersFilter implements ExchangeFilterFunction {
+
 	@Override
 	public Mono<ClientResponse> filter(ClientRequest request, ExchangeFunction next) {
 

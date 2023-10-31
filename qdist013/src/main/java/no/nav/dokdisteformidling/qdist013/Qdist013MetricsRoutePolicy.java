@@ -16,9 +16,6 @@ import static no.nav.dokdisteformidling.metrics.MetricLabels.LABEL_PROCESS;
 import static no.nav.dokdisteformidling.metrics.MetricLabels.TYPE_FUNCTIONAL_EXCEPTION;
 import static no.nav.dokdisteformidling.metrics.MetricLabels.TYPE_TECHNICAL_EXCEPTION;
 
-/**
- * @author Ugur Alpay Cenar, Visma Consulting.
- */
 @Component
 public class Qdist013MetricsRoutePolicy extends RoutePolicySupport {
 

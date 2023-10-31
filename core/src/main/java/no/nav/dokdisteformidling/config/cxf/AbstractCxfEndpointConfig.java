@@ -10,14 +10,9 @@ import javax.xml.namespace.QName;
 import java.net.URL;
 import java.util.HashMap;
 
-/**
- * Abstract helper class for Cxf Endpoints
- *
- * @author Andreas Skomedal, Visma Consulting.
- */
 public abstract class AbstractCxfEndpointConfig {
-	private static final int DEFAULT_TIMEOUT = 30_000;
 
+	private static final int DEFAULT_TIMEOUT = 30_000;
 	private int receiveTimeout = DEFAULT_TIMEOUT;
 	private int connectTimeout = DEFAULT_TIMEOUT;
 	private final JaxWsProxyFactoryBean factoryBean;

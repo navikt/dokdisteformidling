@@ -3,10 +3,8 @@ package no.nav.dokdisteformidling.constants;
 import java.time.ZoneId;
 import java.util.TimeZone;
 
-/**
- * @author Sigurd Midttun, Visma Consulting.
- */
 public final class DomainConstants {
+
 	public static final TimeZone DEFAULT_TIME_ZONE = TimeZone.getTimeZone("Europe/Oslo");
 	public static final ZoneId DEFAULT_ZONE_ID = DEFAULT_TIME_ZONE.toZoneId();
 

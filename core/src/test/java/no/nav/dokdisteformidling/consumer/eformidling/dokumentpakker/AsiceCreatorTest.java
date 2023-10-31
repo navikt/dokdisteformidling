@@ -18,10 +18,8 @@ import static no.nav.dokdisteformidling.consumer.eformidling.NavDokument.fromAvt
 import static no.nav.dokdisteformidling.consumer.eformidling.NavDokument.fromVedlegg;
 import static org.assertj.core.api.Assertions.assertThat;
 
-/**
- * @author Joakim Bjørnstad, Jbit AS
- */
 class AsiceCreatorTest {
+
 	private static final String ARKIVMELDING_NAME = "arkivmelding.xml";
 	private static final String AVTALTMELDING_CONTENTS = "avtalt";
 	private static final String DOKUMENT_1_NAME = "test1.pdf";

@@ -14,9 +14,6 @@ import org.springframework.context.annotation.Profile;
 import javax.jms.ConnectionFactory;
 import javax.jms.Queue;
 
-/**
- * @author Joakim Bjørnstad, Jbit AS
- */
 @Configuration
 @Profile("itest")
 public class JmsItestConfig {
@@ -46,12 +43,15 @@ public class JmsItestConfig {
 	@Bean
 	public ConnectionFactory activemqConnectionFactory() {
 		ActiveMQConnectionFactory activeMQConnectionFactory = new ActiveMQConnectionFactory("vm://localhost?create=false");
+
 		RedeliveryPolicy redeliveryPolicy = new RedeliveryPolicy();
 		redeliveryPolicy.setMaximumRedeliveries(0);
 		activeMQConnectionFactory.setRedeliveryPolicy(redeliveryPolicy);
+
 		PooledConnectionFactory pooledFactory = new PooledConnectionFactory();
 		pooledFactory.setConnectionFactory(activeMQConnectionFactory);
 		pooledFactory.setMaxConnections(1);
+
 		return pooledFactory;
 	}
 }

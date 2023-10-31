@@ -36,9 +36,6 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Objects;
 
-/**
- * @author Joakim Bjørnstad, Jbit AS
- */
 public final class CertTestUtils {
 	public static final String SELF_SIGNED_PEM = "secrets/itest.pem";
 	public static final String SELF_SIGNED_RSA_PRIVATE_KEY = "secrets/itest.key";

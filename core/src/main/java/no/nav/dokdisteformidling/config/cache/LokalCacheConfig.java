@@ -10,8 +10,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.Profile;
 
-import java.util.Arrays;
-
+import static java.util.Arrays.asList;
 import static java.util.concurrent.TimeUnit.MINUTES;
 import static java.util.concurrent.TimeUnit.SECONDS;
 
@@ -29,7 +28,8 @@ public class LokalCacheConfig {
 	@Profile({"nais", "local"})
 	CacheManager cacheManager() {
 		SimpleCacheManager manager = new SimpleCacheManager();
-		manager.setCaches(Arrays.asList(
+
+		manager.setCaches(asList(
 				new CaffeineCache(AZURE_TOKEN_CACHE, Caffeine.newBuilder()
 						.expireAfterWrite(55, MINUTES)
 						.build()),
@@ -43,6 +43,7 @@ public class LokalCacheConfig {
 						.expireAfterWrite(30, SECONDS)
 						.build())
 		));
+
 		return manager;
 	}
 }

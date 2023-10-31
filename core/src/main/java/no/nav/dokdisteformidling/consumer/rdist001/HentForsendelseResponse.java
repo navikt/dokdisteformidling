@@ -8,6 +8,7 @@ import java.util.List;
 @Value
 @Builder
 public class HentForsendelseResponse {
+
 	String bestillingsId;
 	String konversasjonId;
 	String forsendelseStatus;

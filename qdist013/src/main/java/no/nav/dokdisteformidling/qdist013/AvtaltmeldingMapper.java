@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Objects;
 
 import static java.lang.String.format;
+import static java.math.BigInteger.ONE;
 import static no.nav.dokdisteformidling.constants.DomainConstants.APP_NAME;
 import static no.nav.dokdisteformidling.constants.DomainConstants.VARIANTFORMAT_ARKIV;
 import static no.nav.dokdisteformidling.constants.DomainConstants.VARIANTFORMAT_SLADDET;
@@ -51,9 +52,6 @@ import static no.nav.dokdisteformidling.utils.DateConverterUtil.convertLocalDate
 import static no.nav.dokdisteformidling.utils.DateConverterUtil.getNow;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 
-/**
- * @author Sigurd Midttun, Visma Consulting.
- */
 @Component
 public class AvtaltmeldingMapper {
 
@@ -67,7 +65,6 @@ public class AvtaltmeldingMapper {
     public static final String FILFORMAT_PNG = "PNG";
     public static final String FILFORMAT_JPEG = "JPEG";
     public static final String UKJENT = "UKJENT";
-
 
     private final PdlGraphQLConsumer pdlGraphQLConsumer;
     private final Ereg ereg;
@@ -125,7 +122,6 @@ public class AvtaltmeldingMapper {
         return saksmappe;
     }
 
-
     private Journalpost createAndPopulateJournalpost(JournalpostQdist013 journalpostQdist013, XMLGregorianCalendar datoArkivmeldingOpprettet, ObjectFactory objectFactory) {
         Journalpost journalpost = objectFactory.createJournalpost();
         journalpost.setOpprettetDato(convertLocalDateTimeToXmlGregorianCalendar(journalpostQdist013.getDatoOpprettet()));
@@ -162,6 +158,7 @@ public class AvtaltmeldingMapper {
                                                                      XMLGregorianCalendar datoArkivmeldingOpprettet,
                                                                      ObjectFactory objectFactory) {
         Dokumentbeskrivelse dokumentbeskrivelse = objectFactory.createDokumentbeskrivelse();
+
         dokumentbeskrivelse.setDokumenttype(DOKUMENTASJON);
         dokumentbeskrivelse.setDokumentstatus(DOKUMENTET_ER_FERDIGSTILT);
         dokumentbeskrivelse.setTittel(getDokumentbeskrivelseTittel(dokumentInfo, isHoveddokument(rekkefolge)));
@@ -173,6 +170,7 @@ public class AvtaltmeldingMapper {
         dokumentbeskrivelse.setTilknyttetAv(journalpostQdist013.getJournalfortAvNavn());
         dokumentbeskrivelse.getDokumentobjekt()
                 .add(createAndPopulateDokumentObjekt(journalpostQdist013, dokumentInfo, isHoveddokument(rekkefolge), objectFactory));
+
         return dokumentbeskrivelse;
     }
 
@@ -232,7 +230,6 @@ public class AvtaltmeldingMapper {
         }
     }
 
-
     private boolean isJournalfortAvNavnNull(String journalpostId) {
         return getLightweightSafJournalpost(journalpostId) == null ? Objects.isNull(getLightweightSafJournalpost(journalpostId)) : isBlank(getLightweightSafJournalpost(journalpostId).getJournalfortAvNavn());
     }
@@ -243,11 +240,13 @@ public class AvtaltmeldingMapper {
                                                            boolean isHoveddokument,
                                                            ObjectFactory objectFactory) {
         Dokumentobjekt dokumentobjekt = objectFactory.createDokumentobjekt();
-        dokumentobjekt.setVersjonsnummer(BigInteger.ONE);
+
+        dokumentobjekt.setVersjonsnummer(ONE);
         dokumentobjekt.setVariantformat(getDokumentVariant(dokumentInfo));
         dokumentobjekt.setOpprettetDato(getDokumentDatoJournalfoert(isHoveddokument, journalpostQdist013, dokumentInfo));
         dokumentobjekt.setOpprettetAv(getDokumentJournalfortAvNavn(isHoveddokument, journalpostQdist013, dokumentInfo));
         dokumentobjekt.setReferanseDokumentfil(getReferanseDokumentFil(journalpostQdist013.getJournalpostId(), dokumentInfo));
+
         return dokumentobjekt;
     }
 

@@ -5,9 +5,6 @@ import no.nav.dokdisteformidling.consumer.saf.journalpost.SafJournalpost;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 
-/**
- * @author Erik Bråten, Visma Consulting.
- */
 public abstract class SafJournalpostTest {
 
 	private final static String AVSENDER_NAVN = "avsenderNavn";

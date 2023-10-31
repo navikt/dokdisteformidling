@@ -5,9 +5,6 @@ import org.springframework.stereotype.Component;
 
 import static no.nav.dokdisteformidling.constants.DomainConstants.APP_NAME;
 
-/**
- * @author Sigurd Midttun, Visma Consulting.
- */
 @Component
 public class LagreJuridiskLoggMapper {
 

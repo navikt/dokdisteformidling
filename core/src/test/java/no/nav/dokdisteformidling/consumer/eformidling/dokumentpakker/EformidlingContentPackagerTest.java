@@ -19,15 +19,14 @@ import static no.nav.dokdisteformidling.consumer.eformidling.NavDokument.fromAvt
 import static no.nav.dokdisteformidling.consumer.eformidling.NavDokument.fromVedlegg;
 import static org.assertj.core.api.Assertions.assertThat;
 
-/**
- * @author Joakim Bjørnstad, Jbit AS
- */
 class EformidlingContentPackagerTest {
+
 	private static final String ARKIVMELDING_CONTENTS = "arkivmelding";
 	private static final String DOKUMENT_1_NAME = "test1.pdf";
 	private static final String DOKUMENT_1_CONTENTS = "test1pdf";
 	private static final String DOKUMENT_2_NAME = "test2.pdf";
 	private static final String DOKUMENT_2_CONTENTS = "test2pdf";
+
 	private final EformidlingContentPackager eformidlingContentPackager = new EformidlingContentPackager();
 	private final CmsUtil cmsUtil = new CmsUtil();
 
