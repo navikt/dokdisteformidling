@@ -47,9 +47,11 @@ public class EregConsumer implements Ereg {
 		try {
 			final String orgnrTrimmed = orgnr.trim();
 			HttpHeaders headers = createHeaders();
+
 			EregHentNoekkelInfoResponse response = restTemplate.exchange(eregApiUrl + "/v1/organisasjon/" + orgnrTrimmed + "/noekkelinfo",
 					GET, new HttpEntity<>(headers), EregHentNoekkelInfoResponse.class).getBody();
-			assertResponse(response, orgnrTrimmed);
+			validerRespons(response, orgnrTrimmed);
+
 			return getFullName(response.getNavn());
 		} catch (HttpClientErrorException e) {
 			throw new EregHentNoekkelinfoFunctionalException(format("Funksjonell feil ved kall mot ereg:hentNoekkelinfo for organisasjonsnummer=%s. feilmelding=%s",
@@ -70,11 +72,11 @@ public class EregConsumer implements Ereg {
 		return headers;
 	}
 
-	private void assertResponse(EregHentNoekkelInfoResponse eregHentNoekkelInfoResponse, String orgnr) {
+	private void validerRespons(EregHentNoekkelInfoResponse eregHentNoekkelInfoResponse, String orgnr) {
 		if (eregHentNoekkelInfoResponse == null) {
-			throw new EregHentNoekkelinfoFunctionalException(String.format("Fikk ingen respons fra ereg:hentNoekkelinfo for organisasjonsnummer=%s.", orgnr));
+			throw new EregHentNoekkelinfoFunctionalException(format("Fikk ingen respons fra ereg:hentNoekkelinfo for organisasjonsnummer=%s.", orgnr));
 		} else if (eregHentNoekkelInfoResponse.getNavn() == null) {
-			throw new EregHentNoekkelinfoFunctionalException(String.format("Respons fra ereg:hentNoekkelinfo for organisasjonsnummer=%s mangler navn", orgnr));
+			throw new EregHentNoekkelinfoFunctionalException(format("Respons fra ereg:hentNoekkelinfo for organisasjonsnummer=%s mangler navn", orgnr));
 		}
 	}
 
