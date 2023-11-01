@@ -27,7 +27,7 @@ public class Sdist001Scheduled {
 			generateNewCallId();
 
 			try {
-				sdist001Service.oppdatereDokDistEformidlingStatus();
+				sdist001Service.oppdaterDokDistEformidlingStatus();
 			} finally {
 				clearMDC();
 			}

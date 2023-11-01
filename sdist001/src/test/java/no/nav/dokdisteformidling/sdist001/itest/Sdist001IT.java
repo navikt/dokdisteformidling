@@ -75,7 +75,7 @@ class Sdist001IT {
         stubPutAdministrerForsendelseOppdaterForsendelseTilEKSPEDERT();
         stubPostBrokerserviceExternalConfirmDownloaded();
 
-        sdist001Service.oppdatereDokDistEformidlingStatus();
+        sdist001Service.oppdaterDokDistEformidlingStatus();
         verify(1, postRequestedFor(urlEqualTo("/maskinporten")));
         verify(1, getRequestedFor(urlEqualTo("/serviceregistry/identifier/" + TRYGDERETTEN_ORGNUMMER + "/process/" + EformidlingConstants.AVTALTMELDING_PROCESS)));
         verify(1, getRequestedFor(urlEqualTo("/administrerforsendelse/henteformidlingforsendelser?distribusjonKanal=TRYGDERETTEN")));

@@ -2,7 +2,8 @@ package no.nav.dokdisteformidling.sdist001.domain;
 
 import lombok.Builder;
 import lombok.Value;
-import org.joda.time.LocalDateTime;
+
+import java.time.LocalDateTime;
 
 @Value
 @Builder
