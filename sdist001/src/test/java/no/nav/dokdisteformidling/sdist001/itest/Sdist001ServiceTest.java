@@ -14,6 +14,7 @@ import no.nav.dokdisteformidling.consumer.juridisklogg.LoggMeldingResponse;
 import no.nav.dokdisteformidling.consumer.rdist001.AdministrerForsendelse;
 import no.nav.dokdisteformidling.consumer.rdist001.AdministrerForsendelseConsumer;
 import no.nav.dokdisteformidling.consumer.rdist001.HentEformidlingforsendelserResponseTo;
+import no.nav.dokdisteformidling.consumer.rdist001.HentEformidlingforsendelserResponseTo.ForsendelseTo;
 import no.nav.dokdisteformidling.consumer.rdist001.HentForsendelseResponse;
 import no.nav.dokdisteformidling.sdist001.Sdist001Service;
 import org.junit.jupiter.api.BeforeEach;
@@ -23,9 +24,9 @@ import org.springframework.core.io.ClassPathResource;
 import java.io.IOException;
 import java.io.InputStream;
 import java.time.LocalDateTime;
-import java.util.Arrays;
 import java.util.List;
 
+import static java.util.Arrays.asList;
 import static no.nav.dokdisteformidling.sdist001.domain.to.AltinnKvitteringStatus.LEST;
 import static no.nav.dokdisteformidling.sdist001.domain.to.AltinnKvitteringStatus.LEVERT;
 import static no.nav.dokdisteformidling.sdist001.domain.to.AltinnKvitteringStatus.LEVETID_UTLOPT;
@@ -60,13 +61,9 @@ class Sdist001ServiceTest {
 	private static final String FORSENDELSE_ID_4 = "1234";
 
 	private Eformidling eformidling;
-
 	private Sdist001Service sdist001Service;
-
 	private AdministrerForsendelse administrerForsendelse;
-
 	private JuridiskLogg juridiskLogg;
-
 	private final LagreJuridiskLoggMapper lagreJuridiskLoggMapper = new LagreJuridiskLoggMapper();
 
 	@BeforeEach
@@ -76,7 +73,6 @@ class Sdist001ServiceTest {
 		juridiskLogg = mock(JuridiskLoggConsumer.class);
 		sdist001Service = new Sdist001Service(administrerForsendelse, juridiskLogg, eformidling, lagreJuridiskLoggMapper);
 	}
-
 
 	@Test
 	void navForsendelserShouldLoggWhenKvitteringStatusFraTrygdErMottatt() throws IOException {
@@ -89,7 +85,7 @@ class Sdist001ServiceTest {
 		when(eformidling.hent()).thenReturn(getDownloadResponse());
 		when(juridiskLogg.lagreJuridiskLogg(getLoggMeldingRequest())).thenReturn(getloggMeldingResponse());
 
-		sdist001Service.oppdatereDokDistEformidlingStatus();
+		sdist001Service.oppdaterDokDistEformidlingStatus();
 
 		verify(administrerForsendelse, times(1)).hentEformidlingForsendelser();
 		verify(administrerForsendelse, times(1)).hentForsendelse(anyLong());
@@ -108,7 +104,7 @@ class Sdist001ServiceTest {
 		when(eformidling.hent()).thenReturn(getDownloadResponseLevert());
 		when(juridiskLogg.lagreJuridiskLogg(getLoggMeldingRequest())).thenReturn(getloggMeldingResponse());
 
-		sdist001Service.oppdatereDokDistEformidlingStatus();
+		sdist001Service.oppdaterDokDistEformidlingStatus();
 
 		verify(administrerForsendelse, times(1)).hentEformidlingForsendelser();
 		verify(administrerForsendelse, times(2)).hentForsendelse(anyLong());
@@ -124,7 +120,7 @@ class Sdist001ServiceTest {
 
 
 	private List<DownloadResponse> getDownloadResponse() {
-		return Arrays.asList(DownloadResponse.builder()
+		return asList(DownloadResponse.builder()
 						.conversationId(CONVERSATION_ID_1)
 						.kvitteringStatus(KvitteringStatus.builder()
 								.status(MOTTATT.name())
@@ -162,7 +158,7 @@ class Sdist001ServiceTest {
 	}
 
 	private List<DownloadResponse> getDownloadResponseLevert() {
-		return Arrays.asList(DownloadResponse.builder()
+		return asList(DownloadResponse.builder()
 						.conversationId(CONVERSATION_ID_1)
 						.kvitteringStatus(KvitteringStatus.builder()
 								.status(LEST.name())
@@ -202,26 +198,26 @@ class Sdist001ServiceTest {
 	private HentEformidlingforsendelserResponseTo hentEformidlingforsendelserResponseTo() {
 
 		return HentEformidlingforsendelserResponseTo.builder()
-				.forsendelser(Arrays.asList(
-						HentEformidlingforsendelserResponseTo.ForsendelseTo.builder()
+				.forsendelser(asList(
+						ForsendelseTo.builder()
 								.distribusjonKanal("TRYGDERETTEN")
 								.forsendelseStatus(OVERSENDT.name())
 								.forsendelseId(FORSENDELSE_ID_1)
 								.konversasjonId(CONVERSATION_ID_1)
 								.build(),
-						HentEformidlingforsendelserResponseTo.ForsendelseTo.builder()
+						ForsendelseTo.builder()
 								.distribusjonKanal("TRYGDERETTEN")
 								.forsendelseStatus(BEKREFTET.name())
 								.forsendelseId(FORSENDELSE_ID_2)
 								.konversasjonId(CONVERSATION_ID_2)
 								.build(),
-						HentEformidlingforsendelserResponseTo.ForsendelseTo.builder()
+						ForsendelseTo.builder()
 								.distribusjonKanal("TRYGDERETTEN")
 								.forsendelseStatus(OVERSENDT.name())
 								.forsendelseId(FORSENDELSE_ID_3)
 								.konversasjonId(CONVERSATION_ID_3)
 								.build(),
-						HentEformidlingforsendelserResponseTo.ForsendelseTo.builder()
+						ForsendelseTo.builder()
 								.distribusjonKanal("TRYGDERETTEN")
 								.forsendelseStatus(EKSPEDERT.name())
 								.forsendelseId(FORSENDELSE_ID_4)
