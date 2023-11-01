@@ -1,6 +1,5 @@
 package no.nav.dokdisteformidling.qdist013.itest;
 
-import com.github.tomakehurst.wiremock.client.WireMock;
 import com.github.tomakehurst.wiremock.verification.LoggedRequest;
 import com.google.cloud.storage.StorageException;
 import no.altinn.brokerserviceexternal.InitiateBrokerService;
@@ -127,9 +126,6 @@ class Qdist013ForAltinnIT {
 	public void setUp() {
 		CALL_ID = UUID.randomUUID().toString();
 
-		WireMock.reset();
-		WireMock.resetAllRequests();
-		WireMock.removeAllMappings();
 		Mockito.reset(bucketStorage);
 
 		stubAzure();
