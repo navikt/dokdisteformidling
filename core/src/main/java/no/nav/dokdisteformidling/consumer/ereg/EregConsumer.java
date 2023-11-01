@@ -62,9 +62,11 @@ public class EregConsumer implements Ereg {
 
 	private HttpHeaders createHeaders() {
 		HttpHeaders headers = new HttpHeaders();
+
 		headers.setContentType(APPLICATION_JSON);
 		headers.add(NAV_CONSUMER_ID, APP_NAME);
 		headers.add(NAV_CALL_ID, MDC.get(MDC_CALL_ID));
+
 		return headers;
 	}
 

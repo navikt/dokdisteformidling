@@ -27,6 +27,7 @@ import static java.util.Objects.isNull;
 import static java.util.Objects.requireNonNull;
 import static no.nav.dokdisteformidling.constants.MdcConstants.MDC_CALL_ID;
 import static no.nav.dokdisteformidling.constants.NavHeaders.NAV_CALL_ID;
+import static no.nav.dokdisteformidling.constants.NavHeaders.NAV_CONSUMER_TOKEN;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
@@ -36,7 +37,6 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 @Component
 public class PdlGraphQLConsumer {
 
-	private static final String NAV_CONSUMER_TOKEN = "Nav-Consumer-Token";
 	private static final String HEADER_PDL_TEMA = "Tema";
 	private static final String PERSON_IKKE_FUNNET_CODE = "not_found";
 
@@ -84,6 +84,7 @@ public class PdlGraphQLConsumer {
 
 	private RequestEntity.BodyBuilder createRequestEntity() {
 		final String serviceUserToken = "Bearer " + stsConsumer.getOidcToken();
+
 		return RequestEntity.post(pdlUrl)
 				.accept(APPLICATION_JSON)
 				.header(CONTENT_TYPE, APPLICATION_JSON_VALUE)
