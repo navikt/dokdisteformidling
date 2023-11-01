@@ -26,7 +26,7 @@ import java.util.HashMap;
 import static java.util.Objects.isNull;
 import static java.util.Objects.requireNonNull;
 import static no.nav.dokdisteformidling.constants.MdcConstants.MDC_CALL_ID;
-import static no.nav.dokdisteformidling.constants.MdcConstants.NAV_CALL_ID;
+import static no.nav.dokdisteformidling.constants.NavHeaders.NAV_CALL_ID;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
@@ -102,7 +102,7 @@ public class PdlGraphQLConsumer {
 				.build();
 	}
 
-	private final String hentPersonnavn = """
+	private static final String hentPersonnavn = """
 			query hentPerson($ident: ID!){
 			  hentPerson(ident: $ident){
 			    navn(historikk: false){
