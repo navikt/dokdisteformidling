@@ -9,6 +9,8 @@ import org.apache.cxf.transport.http.Cookie;
 import java.util.List;
 import java.util.Map;
 
+import static org.apache.cxf.message.Message.PROTOCOL_HEADERS;
+
 /**
  * Kopiert fra https://github.com/Altinn/ec-client-java-cxf
  *
@@ -23,7 +25,7 @@ public class CookiesInInterceptor extends AbstractPhaseInterceptor {
 
 	@Override
 	public void handleMessage(Message message) {
-		Map<String, List> headers = (Map<String, List>) message.get(Message.PROTOCOL_HEADERS);
+		Map<String, List> headers = (Map<String, List>) message.get(PROTOCOL_HEADERS);
 		List<Cookie> cookies = headers.get("Set-Cookie");
 		if (cookies != null) {
 			CookieStore.setCookie(cookies.get(0));

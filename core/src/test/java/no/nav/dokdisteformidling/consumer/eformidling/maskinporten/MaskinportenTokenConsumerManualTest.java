@@ -14,6 +14,7 @@ import java.net.URL;
 
 @Disabled("Manuell test")
 class MaskinportenTokenConsumerManualTest {
+
     private KeyStoreProperties keyStoreProperties = new KeyStoreProperties();
     private MaskinportenProperties maskinportenProperties = new MaskinportenProperties();
 

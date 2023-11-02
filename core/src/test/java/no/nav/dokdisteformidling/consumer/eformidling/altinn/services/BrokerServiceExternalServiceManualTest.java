@@ -10,12 +10,9 @@ import org.junit.jupiter.api.Test;
 
 import java.net.MalformedURLException;
 
-/**
- * @author Joakim Bjørnstad, Jbit AS
- */
 @Disabled("Manuell test")
 class BrokerServiceExternalServiceManualTest {
-	private DpoUserProperties dpoUserProperties = new DpoUserProperties();
+	private final DpoUserProperties dpoUserProperties = new DpoUserProperties();
 
 	@BeforeEach
 	public void setup() throws MalformedURLException {
@@ -28,6 +25,7 @@ class BrokerServiceExternalServiceManualTest {
 		System.setProperty("https.proxyHost", "webproxy-utvikler.nav.no");
 		System.setProperty("https.proxyPort", "8088");
 		System.setProperty("https.nonProxyHosts", "*.155.55.|*.192.168.|*.10.|*.local|*.rtv.gov|*.adeo.no|*.nav.no|*.aetat.no|*.devillo.no|*.oera.no");
+
 		dpoUserProperties.setUsername(System.getProperty("dpo.username"));
 		dpoUserProperties.setPassword(System.getProperty("dpo.password"));
 	}

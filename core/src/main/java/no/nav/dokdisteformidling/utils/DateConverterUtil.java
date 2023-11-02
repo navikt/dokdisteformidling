@@ -7,10 +7,10 @@ import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.GregorianCalendar;
 
 import static java.lang.String.format;
+import static java.time.format.DateTimeFormatter.ISO_LOCAL_DATE_TIME;
 
 public class DateConverterUtil {
 
@@ -30,7 +30,7 @@ public class DateConverterUtil {
     public static XMLGregorianCalendar convertLocalDateTimeToXmlGregorianCalendar(LocalDateTime localDateTime) {
         try {
             return DatatypeFactory.newInstance()
-                    .newXMLGregorianCalendar(localDateTime.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
+                    .newXMLGregorianCalendar(localDateTime.format(ISO_LOCAL_DATE_TIME));
         } catch (DatatypeConfigurationException e) {
             throw new KunneIkkeKonvertereTilXmlGregorianCalendarTechnicalException(format("Kunne ikke konvertere fra localDateTime til XmlGregorianCalendar. Forsøkte å konvertere localDateTime=%s", localDateTime == null ? null : localDateTime
                     .toString()), e);

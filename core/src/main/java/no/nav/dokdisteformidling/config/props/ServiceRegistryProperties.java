@@ -8,9 +8,6 @@ import org.springframework.validation.annotation.Validated;
 import javax.validation.constraints.NotNull;
 import java.net.URL;
 
-/**
- * @author Joakim Bjørnstad, Jbit AS
- */
 @ToString
 @Data
 @ConfigurationProperties("serviceregistry")

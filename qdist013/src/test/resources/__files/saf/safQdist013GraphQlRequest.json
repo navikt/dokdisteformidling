@@ -1,7 +1,7 @@
 {
-  "query": "query journalpost($queryJournalpostId: String!) {\njournalpost(journalpostId: $queryJournalpostId) {\njournalpostId\nsak {\narkivsaksnummer\ndatoOpprettet\n}\nopprettetAvNavn\njournalposttype\nbruker{\nid\ntype\n}\ndatoOpprettet\ntittel\njournalfortAvNavn\ntemanavn\ntema\njournalfoerendeEnhet\nrelevanteDatoer {\ndato\ndatotype\n}\ndokumenter {\ndokumentInfoId\ndokumentstatus\ntittel\noriginalJournalpostId\ndokumentvarianter {\nvariantformat\nfiltype\n}\n}\n}\n}",
+  "query" : "query journalpost($queryJournalpostId: String!) {\n  journalpost(journalpostId: $queryJournalpostId) {\n    journalpostId\n    sak {\n      arkivsaksnummer\n      datoOpprettet\n    }\n    opprettetAvNavn\n    journalposttype\n    bruker {\n      id\n      type\n    }\n    datoOpprettet\n    tittel\n    journalfortAvNavn\n    temanavn\n    tema\n    journalfoerendeEnhet\n    relevanteDatoer {\n      dato\n      datotype\n    }\n    dokumenter {\n      dokumentInfoId\n      dokumentstatus\n      tittel\n      originalJournalpostId\n      dokumentvarianter {\n        variantformat\n        filtype\n      }\n    }\n  }\n}\n",
   "operationName":"journalpost",
   "variables": {
-    "queryJournalpostId":"123"
+    "queryJournalpostId": "123"
   }
 }

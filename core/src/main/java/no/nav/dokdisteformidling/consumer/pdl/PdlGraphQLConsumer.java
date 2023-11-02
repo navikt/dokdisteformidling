@@ -26,7 +26,8 @@ import java.util.HashMap;
 import static java.util.Objects.isNull;
 import static java.util.Objects.requireNonNull;
 import static no.nav.dokdisteformidling.constants.MdcConstants.MDC_CALL_ID;
-import static no.nav.dokdisteformidling.constants.MdcConstants.NAV_CALL_ID;
+import static no.nav.dokdisteformidling.constants.NavHeaders.NAV_CALL_ID;
+import static no.nav.dokdisteformidling.constants.NavHeaders.NAV_CONSUMER_TOKEN;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
@@ -36,7 +37,6 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 @Component
 public class PdlGraphQLConsumer {
 
-	private static final String NAV_CONSUMER_TOKEN = "Nav-Consumer-Token";
 	private static final String HEADER_PDL_TEMA = "Tema";
 	private static final String PERSON_IKKE_FUNNET_CODE = "not_found";
 
@@ -46,7 +46,8 @@ public class PdlGraphQLConsumer {
 	private final MapHentNavnResponse mapHentNavnResponse;
 
 	public PdlGraphQLConsumer(RestTemplateBuilder restTemplateBuilder,
-							  StsRestConsumer stsConsumer, @Value("${pdl.url}") String pdlUrl) {
+							  StsRestConsumer stsConsumer,
+							  @Value("${pdl.url}") String pdlUrl) {
 		this.restTemplate = restTemplateBuilder
 				.setConnectTimeout(Duration.ofSeconds(5L))
 				.setReadTimeout(Duration.ofSeconds(15L))
@@ -83,6 +84,7 @@ public class PdlGraphQLConsumer {
 
 	private RequestEntity.BodyBuilder createRequestEntity() {
 		final String serviceUserToken = "Bearer " + stsConsumer.getOidcToken();
+
 		return RequestEntity.post(pdlUrl)
 				.accept(APPLICATION_JSON)
 				.header(CONTENT_TYPE, APPLICATION_JSON_VALUE)
@@ -94,24 +96,29 @@ public class PdlGraphQLConsumer {
 	private PDLRequest mapRequest(final String ident, String query) {
 		final HashMap<String, Object> variables = new HashMap<>();
 		variables.put("ident", ident);
-		return PDLRequest.builder().query(query).variables(variables).build();
+
+		return PDLRequest.builder()
+				.query(query)
+				.variables(variables)
+				.build();
 	}
 
-	private String hentPersonnavn = "query hentPerson($ident: ID!){\n" +
-			"  hentPerson(ident: $ident){\n" +
-			"    navn(historikk: false){\n" +
-			"      fornavn\n" +
-			"      mellomnavn\n" +
-			"      etternavn\n" +
-			"      forkortetNavn\n" +
-			"    }\n" +
-			"    folkeregisteridentifikator(historikk: false){\n" +
-			"      identifikasjonsnummer\n" +
-			"      type\n" +
-			"      status\n" +
-			"    }\n" +
-			"\n" +
-			"  }\n" +
-			"}";
+	private static final String hentPersonnavn = """
+			query hentPerson($ident: ID!){
+			  hentPerson(ident: $ident){
+			    navn(historikk: false){
+			      fornavn
+			      mellomnavn
+			      etternavn
+			      forkortetNavn
+			    }
+			    folkeregisteridentifikator(historikk: false){
+			      identifikasjonsnummer
+			      type
+			      status
+			    }
+			  }
+			}
+			""";
 
 }

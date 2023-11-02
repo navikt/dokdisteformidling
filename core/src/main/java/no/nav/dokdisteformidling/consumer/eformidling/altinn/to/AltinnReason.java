@@ -3,6 +3,8 @@ package no.nav.dokdisteformidling.consumer.eformidling.altinn.to;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
+import static java.lang.String.format;
+
 @Getter
 @RequiredArgsConstructor
 public class AltinnReason {
@@ -15,6 +17,6 @@ public class AltinnReason {
 
     @Override
     public String toString() {
-        return String.format("Reason: %s. LocalizedErrorMessage: %s. ErrorId: %d. UserId: %s", message, localized, id, userId);
+        return format("Reason: %s. LocalizedErrorMessage: %s. ErrorId: %d. UserId: %s", message, localized, id, userId);
     }
 }

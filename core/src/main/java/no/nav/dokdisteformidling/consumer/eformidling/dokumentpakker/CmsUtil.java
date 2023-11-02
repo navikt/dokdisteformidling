@@ -4,7 +4,6 @@ import no.nav.dokdisteformidling.consumer.eformidling.dokumentpakker.exceptions.
 import org.apache.commons.io.IOUtils;
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
-import org.bouncycastle.asn1.DERNull;
 import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.pkcs.RSAESOAEPparams;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
@@ -30,6 +29,7 @@ import java.security.cert.X509Certificate;
 import java.util.Collection;
 import java.util.Iterator;
 
+import static org.bouncycastle.asn1.DERNull.INSTANCE;
 import static org.bouncycastle.asn1.nist.NISTObjectIdentifiers.id_sha256;
 import static org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers.id_RSAES_OAEP;
 import static org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers.id_mgf1;
@@ -57,7 +57,7 @@ class CmsUtil {
     }
 
     private AlgorithmIdentifier rsaesOaepIdentifier() {
-        AlgorithmIdentifier hash = new AlgorithmIdentifier(id_sha256, DERNull.INSTANCE);
+        AlgorithmIdentifier hash = new AlgorithmIdentifier(id_sha256, INSTANCE);
         AlgorithmIdentifier mask = new AlgorithmIdentifier(id_mgf1, hash);
         AlgorithmIdentifier pSource = new AlgorithmIdentifier(id_pSpecified, new DEROctetString(new byte[0]));
 

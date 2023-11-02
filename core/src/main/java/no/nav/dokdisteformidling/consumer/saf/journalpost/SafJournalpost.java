@@ -11,67 +11,67 @@ import java.util.List;
 @Builder
 public class SafJournalpost {
 
-	private final String journalpostId;
-	private final Sak sak;
-	private final String opprettetAvNavn;
-	private final Bruker bruker;
-	private final LocalDateTime datoOpprettet;
-	private final String tittel;
-	private final String journalfortAvNavn;
-	private final String temanavn;
-	private final String tema;
-	private final String journalposttype;
-	private final String journalfoerendeEnhet;
-	private final AvsenderMottaker avsenderMottaker;
+	String journalpostId;
+	Sak sak;
+	String opprettetAvNavn;
+	Bruker bruker;
+	LocalDateTime datoOpprettet;
+	String tittel;
+	String journalfortAvNavn;
+	String temanavn;
+	String tema;
+	String journalposttype;
+	String journalfoerendeEnhet;
+	AvsenderMottaker avsenderMottaker;
 
 	@Builder.Default
-	private final List<RelevantDato> relevanteDatoer = new ArrayList<>();
+	List<RelevantDato> relevanteDatoer = new ArrayList<>();
 
 	@Builder.Default
-	private final List<DokumentInfo> dokumenter = new ArrayList<>();
+	List<DokumentInfo> dokumenter = new ArrayList<>();
 
 	@Value
 	@Builder
 	public static class AvsenderMottaker {
-		private final String navn;
+		String navn;
 	}
 
 	@Value
 	@Builder
 	public static class Sak {
-		private final String arkivsaksnummer;
-		private final LocalDateTime datoOpprettet;
+		String arkivsaksnummer;
+		LocalDateTime datoOpprettet;
 	}
 
 	@Value
 	@Builder
 	public static class RelevantDato {
-		private final LocalDateTime dato;
-		private final String datotype;
+		LocalDateTime dato;
+		String datotype;
 	}
 
 	@Value
 	@Builder
 	public static class Bruker {
-		private final String id;
-		private final String type;
+		String id;
+		String type;
 	}
 
 	@Value
 	@Builder
 	public static class DokumentInfo {
-		private final String dokumentInfoId;
-		private final String dokumentstatus;
-		private final String tittel;
-		private final String originalJournalpostId;
+		String dokumentInfoId;
+		String dokumentstatus;
+		String tittel;
+		String originalJournalpostId;
 		@Builder.Default
-		private final List<Dokumentvariant> dokumentvarianter = new ArrayList<>();
+		List<Dokumentvariant> dokumentvarianter = new ArrayList<>();
 
 		@Value
 		@Builder
 		public static class Dokumentvariant {
-			private final String variantformat;
-			private final String filtype;
+			String variantformat;
+			String filtype;
 		}
 	}
 

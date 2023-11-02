@@ -2,9 +2,6 @@ package no.nav.dokdisteformidling.qdist013.util;
 
 import no.nav.dokdisteformidling.qdist013.saf.main.JournalpostQdist013;
 
-/**
- * @author Sigurd Midttun, Visma Consulting.
- */
 public final class ArkivMapperUtil {
 
 	private static final String AKTOERID = "AKTOERID";

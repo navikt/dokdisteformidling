@@ -11,15 +11,13 @@ import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 
-/**
- * @author Joakim Bjørnstad, Jbit AS
- */
 @Getter
 @Setter
 @ToString
 @ConfigurationProperties("mqgateway01")
 @Validated
 public class MqGatewayAlias {
+
 	@NotEmpty
 	private String hostname;
 	@NotEmpty

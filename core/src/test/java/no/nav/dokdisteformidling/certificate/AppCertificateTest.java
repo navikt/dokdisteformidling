@@ -1,15 +1,13 @@
 package no.nav.dokdisteformidling.certificate;
 
-import static no.nav.dokdisteformidling.CertTestUtils.itestVirksomhetssertifikatBase64Properties;
-import static no.nav.dokdisteformidling.CertTestUtils.itestVirksomhetssertifikatProperties;
-import static org.junit.jupiter.api.Assertions.*;
-
 import org.junit.jupiter.api.Test;
 
-/**
- * @author Joakim Bjørnstad, Jbit AS
- */
+import static no.nav.dokdisteformidling.CertTestUtils.itestVirksomhetssertifikatBase64Properties;
+import static no.nav.dokdisteformidling.CertTestUtils.itestVirksomhetssertifikatProperties;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+
 class AppCertificateTest {
+
 	@Test
 	void shouldLoadPKCS12KeyStore() {
 		AppCertificate appCertificate = new AppCertificate(itestVirksomhetssertifikatProperties());

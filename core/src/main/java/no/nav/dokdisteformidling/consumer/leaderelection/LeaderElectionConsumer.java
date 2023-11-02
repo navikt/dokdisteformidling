@@ -9,9 +9,6 @@ import org.springframework.web.client.RestTemplate;
 import java.net.InetAddress;
 import java.time.Duration;
 
-/**
- * @author Erik Bråten, Visma Consulting
- */
 @Slf4j
 @Component
 public class LeaderElectionConsumer implements LeaderElection {
