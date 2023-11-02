@@ -37,6 +37,7 @@ import java.util.Date;
 import java.util.Objects;
 
 public final class CertTestUtils {
+
 	public static final String SELF_SIGNED_PEM = "secrets/itest.pem";
 	public static final String SELF_SIGNED_RSA_PRIVATE_KEY = "secrets/itest.key";
 	public static final String SELF_SIGNED_PKCS12 = "secrets/itest.p12";

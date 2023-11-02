@@ -12,6 +12,7 @@ import static java.lang.String.format;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 public final class testUtils {
+
     private testUtils() {
     }
 

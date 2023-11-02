@@ -12,7 +12,7 @@ import java.net.MalformedURLException;
 
 @Disabled("Manuell test")
 class BrokerServiceExternalServiceManualTest {
-	private DpoUserProperties dpoUserProperties = new DpoUserProperties();
+	private final DpoUserProperties dpoUserProperties = new DpoUserProperties();
 
 	@BeforeEach
 	public void setup() throws MalformedURLException {

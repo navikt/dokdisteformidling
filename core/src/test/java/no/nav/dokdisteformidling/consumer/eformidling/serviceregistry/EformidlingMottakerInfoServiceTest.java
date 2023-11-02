@@ -18,7 +18,7 @@ import static no.nav.dokdisteformidling.consumer.eformidling.EformidlingConstant
 import static no.nav.dokdisteformidling.consumer.eformidling.serviceregistry.ServiceIdentifier.DPO;
 import static no.nav.dokdisteformidling.consumer.eformidling.serviceregistry.ServiceIdentifier.DPV;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.catchThrowable;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
@@ -46,12 +46,12 @@ class EformidlingMottakerInfoServiceTest {
                         .build());
 
         final MottakerInfo mottakerInfo = eformidlingMottakerInfoService.hentMottakerInfoTrygderetten();
+
         assertThat(mottakerInfo.getOrgnummer()).isEqualTo(TRYGDERETTEN_ORGNUMMER);
         assertThat(mottakerInfo.getServiceCode()).isEqualTo(DPO_SERVICE_CODE);
         assertThat(mottakerInfo.getServiceEditionCode()).isEqualTo(DPO_SERVICE_EDITION_CODE);
         assertThat(mottakerInfo.getPemCertificate()).isEqualTo(classpathToString("secrets/itest.pem"));
         assertThat(mottakerInfo.getX509Certificate()).isNotNull();
-
     }
 
     @Test
@@ -62,6 +62,7 @@ class EformidlingMottakerInfoServiceTest {
                         .build());
 
         final MottakerInfo mottakerInfo = eformidlingMottakerInfoService.hentMottakerInfoTrygderetten();
+
         assertThat(mottakerInfo.getOrgnummer()).isEqualTo(TRYGDERETTEN_ORGNUMMER);
         assertThat(mottakerInfo.getServiceCode()).isEqualTo(DPO_SERVICE_CODE);
         assertThat(mottakerInfo.getServiceEditionCode()).isEqualTo(DPO_SERVICE_EDITION_CODE);
@@ -76,10 +77,8 @@ class EformidlingMottakerInfoServiceTest {
                         .serviceRecords(singletonList(createServiceRecord(createDpvService())))
                         .build());
 
-        final Throwable thrown = catchThrowable(eformidlingMottakerInfoService::hentMottakerInfoTrygderetten);
-        assertThat(thrown)
-                .isInstanceOf(MottakerInfoIkkeFunnetException.class)
-                .hasMessageContaining("Fant ikke mottakerinfo for organisasjon");
+        var exception = assertThrows(MottakerInfoIkkeFunnetException.class, () -> eformidlingMottakerInfoService.hentMottakerInfoTrygderetten());
+        assertThat(exception.getMessage()).contains("Fant ikke mottakerinfo for organisasjon");
     }
 
     @Test
@@ -91,10 +90,8 @@ class EformidlingMottakerInfoServiceTest {
                         .serviceRecords(singletonList(serviceRecord))
                         .build());
 
-        final Throwable thrown = catchThrowable(eformidlingMottakerInfoService::hentMottakerInfoTrygderetten);
-        assertThat(thrown)
-                .isInstanceOf(MottakerInfoIkkeFunnetException.class)
-                .hasMessageContaining("Fant ikke PEM sertifikat.");
+        var exception = assertThrows(MottakerInfoIkkeFunnetException.class, () -> eformidlingMottakerInfoService.hentMottakerInfoTrygderetten());
+        assertThat(exception.getMessage()).contains("Fant ikke PEM sertifikat.");
     }
 
     private ServiceRecord createServiceRecord(Service service) {
