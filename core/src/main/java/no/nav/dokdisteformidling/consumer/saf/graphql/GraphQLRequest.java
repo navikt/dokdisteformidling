@@ -7,12 +7,10 @@ import lombok.Getter;
 
 import java.util.Map;
 
-/**
- * @author Ugur Alpay Cenar, Visma Consulting.
- */
 @Builder
 @Getter
 public class GraphQLRequest {
+
 	private final String query;
 	private final String operationName;
 	private final Map<String, Object> variables;

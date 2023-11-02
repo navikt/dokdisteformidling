@@ -1,21 +1,19 @@
 package no.nav.dokdisteformidling.storage;
 
-import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 
-/**
- * @author Ugur Alpay Cenar, Visma Consulting.
- */
+import static com.fasterxml.jackson.core.JsonParser.Feature.ALLOW_COMMENTS;
+import static com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES;
+
 public class JsonSerializer {
 
 	private static final ObjectMapper objectMapper = new ObjectMapper();
 
 	static {
-		objectMapper.configure(JsonParser.Feature.ALLOW_COMMENTS, true);
-		objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+		objectMapper.configure(ALLOW_COMMENTS, true);
+		objectMapper.configure(FAIL_ON_UNKNOWN_PROPERTIES, false);
 	}
 
 	private static final ObjectWriter writer = objectMapper.writer();

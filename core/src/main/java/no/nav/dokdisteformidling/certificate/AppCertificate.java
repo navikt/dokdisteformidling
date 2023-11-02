@@ -15,12 +15,11 @@ import java.security.cert.X509Certificate;
  * Class responsible for accessing the keystore for the Integrasjonspunkt.
  * <p>
  * Kopiert fra https://github.com/difi/move-integrasjonspunkt
- *
- * @author Glebnn Bech
  */
 @Getter
 @Component
 public class AppCertificate {
+
 	private static final String ERR_MISSING_PRIVATE_KEY_OR_PASS = "Problem accessing PrivateKey with alias \"%s\" inadequate access or Password is wrong";
 	private static final String ERR_MISSING_PRIVATE_KEY = "No PrivateKey with alias \"%s\" found in the KeyStore";
 	private static final String ERR_MISSING_CERTIFICATE = "No AppCertificate with alias \"%s\" found in the KeyStore";

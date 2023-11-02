@@ -25,16 +25,14 @@ import java.util.Collections;
 
 import static no.nav.dokdisteformidling.constants.DomainConstants.DEFAULT_ZONE_ID;
 
-/**
- * @author Joakim Bjørnstad, Jbit AS
- */
 @Disabled("Manuell test")
 class AltinnEformidlingManualTest {
+
 	private static final Clock SYSTEM_CLOCK = Clock.system(DEFAULT_ZONE_ID);
 
-	private KeyStoreProperties keyStoreProperties = new KeyStoreProperties();
-	private MaskinportenProperties maskinportenProperties = new MaskinportenProperties();
-	private ServiceRegistryProperties serviceRegistryProperties = new ServiceRegistryProperties();
+	private final KeyStoreProperties keyStoreProperties = new KeyStoreProperties();
+	private final MaskinportenProperties maskinportenProperties = new MaskinportenProperties();
+	private final ServiceRegistryProperties serviceRegistryProperties = new ServiceRegistryProperties();
 	private AppCertificate appCertificate;
 
 	@BeforeEach

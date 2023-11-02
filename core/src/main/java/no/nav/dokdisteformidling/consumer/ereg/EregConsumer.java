@@ -1,6 +1,5 @@
 package no.nav.dokdisteformidling.consumer.ereg;
 
-import no.nav.dokdisteformidling.constants.MdcConstants;
 import no.nav.dokdisteformidling.exception.functional.EregHentNoekkelinfoFunctionalException;
 import no.nav.dokdisteformidling.exception.technical.EregHentNoekkelinfoTechnicalException;
 import no.nav.dokdisteformidling.metrics.Monitor;
@@ -9,8 +8,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.MediaType;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Component;
@@ -22,13 +19,13 @@ import java.time.Duration;
 
 import static java.lang.String.format;
 import static no.nav.dokdisteformidling.constants.DomainConstants.APP_NAME;
-import static no.nav.dokdisteformidling.constants.MdcConstants.NAV_CALL_ID;
-import static no.nav.dokdisteformidling.constants.MdcConstants.NAV_CONSUMER_ID;
+import static no.nav.dokdisteformidling.constants.MdcConstants.MDC_CALL_ID;
+import static no.nav.dokdisteformidling.constants.NavHeaders.NAV_CALL_ID;
+import static no.nav.dokdisteformidling.constants.NavHeaders.NAV_CONSUMER_ID;
 import static no.nav.dokdisteformidling.constants.RetryConstants.DELAY_SHORT;
+import static org.springframework.http.HttpMethod.GET;
+import static org.springframework.http.MediaType.APPLICATION_JSON;
 
-/**
- * @author Sigurd Midttun, Visma Consulting.
- */
 @Component
 public class EregConsumer implements Ereg {
 
@@ -50,9 +47,11 @@ public class EregConsumer implements Ereg {
 		try {
 			final String orgnrTrimmed = orgnr.trim();
 			HttpHeaders headers = createHeaders();
+
 			EregHentNoekkelInfoResponse response = restTemplate.exchange(eregApiUrl + "/v1/organisasjon/" + orgnrTrimmed + "/noekkelinfo",
-					HttpMethod.GET, new HttpEntity<>(headers), EregHentNoekkelInfoResponse.class).getBody();
-			assertResponse(response, orgnrTrimmed);
+					GET, new HttpEntity<>(headers), EregHentNoekkelInfoResponse.class).getBody();
+			validerRespons(response, orgnrTrimmed);
+
 			return getFullName(response.getNavn());
 		} catch (HttpClientErrorException e) {
 			throw new EregHentNoekkelinfoFunctionalException(format("Funksjonell feil ved kall mot ereg:hentNoekkelinfo for organisasjonsnummer=%s. feilmelding=%s",
@@ -65,17 +64,19 @@ public class EregConsumer implements Ereg {
 
 	private HttpHeaders createHeaders() {
 		HttpHeaders headers = new HttpHeaders();
-		headers.setContentType(MediaType.APPLICATION_JSON);
+
+		headers.setContentType(APPLICATION_JSON);
 		headers.add(NAV_CONSUMER_ID, APP_NAME);
-		headers.add(NAV_CALL_ID, MDC.get(MdcConstants.MDC_CALL_ID));
+		headers.add(NAV_CALL_ID, MDC.get(MDC_CALL_ID));
+
 		return headers;
 	}
 
-	private void assertResponse(EregHentNoekkelInfoResponse eregHentNoekkelInfoResponse, String orgnr) {
+	private void validerRespons(EregHentNoekkelInfoResponse eregHentNoekkelInfoResponse, String orgnr) {
 		if (eregHentNoekkelInfoResponse == null) {
-			throw new EregHentNoekkelinfoFunctionalException(String.format("Fikk ingen respons fra ereg:hentNoekkelinfo for organisasjonsnummer=%s.", orgnr));
+			throw new EregHentNoekkelinfoFunctionalException(format("Fikk ingen respons fra ereg:hentNoekkelinfo for organisasjonsnummer=%s.", orgnr));
 		} else if (eregHentNoekkelInfoResponse.getNavn() == null) {
-			throw new EregHentNoekkelinfoFunctionalException(String.format("Respons fra ereg:hentNoekkelinfo for organisasjonsnummer=%s mangler navn", orgnr));
+			throw new EregHentNoekkelinfoFunctionalException(format("Respons fra ereg:hentNoekkelinfo for organisasjonsnummer=%s mangler navn", orgnr));
 		}
 	}
 

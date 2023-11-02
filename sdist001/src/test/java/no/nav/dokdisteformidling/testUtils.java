@@ -11,10 +11,8 @@ import java.io.InputStream;
 import static java.lang.String.format;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
-/**
- * @author Sigurd Midttun, Visma Consulting.
- */
 public final class testUtils {
+
     private testUtils() {
     }
 

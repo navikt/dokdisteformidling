@@ -17,14 +17,12 @@ import java.net.URL;
 import static no.nav.dokdisteformidling.consumer.eformidling.EformidlingConstants.AVTALTMELDING_PROCESS;
 import static no.nav.dokdisteformidling.consumer.eformidling.EformidlingConstants.TRYGDERETTEN_ORGNUMMER;
 
-/**
- * @author Joakim Bjørnstad, Jbit AS
- */
 @Disabled("Manuell test")
 class ServiceRegistryConsumerManualTest {
-	private KeyStoreProperties keyStoreProperties = new KeyStoreProperties();
-	private MaskinportenProperties maskinportenProperties = new MaskinportenProperties();
-	private ServiceRegistryProperties serviceRegistryProperties = new ServiceRegistryProperties();
+
+	private final KeyStoreProperties keyStoreProperties = new KeyStoreProperties();
+	private final MaskinportenProperties maskinportenProperties = new MaskinportenProperties();
+	private final ServiceRegistryProperties serviceRegistryProperties = new ServiceRegistryProperties();
 
 	@BeforeEach
 	public void setup() throws MalformedURLException {

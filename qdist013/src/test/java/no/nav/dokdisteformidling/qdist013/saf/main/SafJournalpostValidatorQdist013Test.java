@@ -1,17 +1,13 @@
 package no.nav.dokdisteformidling.qdist013.saf.main;
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
-
 import no.nav.dokdisteformidling.consumer.saf.journalpost.SafJournalpost;
 import no.nav.dokdisteformidling.exception.functional.SafJournalpostValidationException;
 import org.junit.jupiter.api.Test;
 
-import java.util.Arrays;
 import java.util.Collections;
 
-/**
- * @author Erik Bråten, Visma Consulting.
- */
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 class SafJournalpostValidatorQdist013Test extends SafJournalpostTest {
 
 	private static final String JOURNALPOST_ID = "123456";

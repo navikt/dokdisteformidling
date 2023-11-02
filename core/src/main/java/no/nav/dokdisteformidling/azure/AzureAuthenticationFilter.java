@@ -20,9 +20,7 @@ public class AzureAuthenticationFilter implements ExchangeFilterFunction {
 	@Override
 	public Mono<ClientResponse> filter(ClientRequest request, ExchangeFunction next) {
 		return next.exchange(ClientRequest.from(request)
-				.headers(httpHeaders -> {
-					httpHeaders.setBearerAuth(azureToken.accessToken(endpoint.getScope()));
-				})
+				.headers(httpHeaders -> httpHeaders.setBearerAuth(azureToken.accessToken(endpoint.getScope())))
 				.build());
 	}
 }

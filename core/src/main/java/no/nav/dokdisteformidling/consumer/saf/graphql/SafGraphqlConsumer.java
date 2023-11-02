@@ -15,8 +15,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
@@ -29,7 +27,9 @@ import java.time.Duration;
 
 import static no.nav.dokdisteformidling.constants.DomainConstants.BEARER_PREFIX;
 import static no.nav.dokdisteformidling.constants.RetryConstants.DELAY_SHORT;
-import static no.nav.dokdisteformidling.constants.RetryConstants.MAX_ATTEMPTS_SHORT;
+import static org.springframework.http.HttpHeaders.AUTHORIZATION;
+import static org.springframework.http.HttpMethod.POST;
+import static org.springframework.http.MediaType.APPLICATION_JSON;
 
 @Component
 @Slf4j
@@ -51,13 +51,13 @@ public class SafGraphqlConsumer {
 	}
 
 	@Monitor(value = "dok_metric", extraTags = {"process", "safJournalpostquery"}, histogram = true)
-	@Retryable(include = SafJournalpostQueryTechnicalException.class, maxAttempts = MAX_ATTEMPTS_SHORT, backoff = @Backoff(delay = DELAY_SHORT))
+	@Retryable(include = SafJournalpostQueryTechnicalException.class, backoff = @Backoff(delay = DELAY_SHORT))
 	public SafJournalpost performQuery(GraphQLRequest graphQLRequest) {
 		try {
-			ResponseEntity<SafJsonJournalpost> responseEntity = restTemplate.exchange(graphQLurl, HttpMethod.POST, new HttpEntity<>(requestToJson(graphQLRequest), createAuthorizationHeader()), SafJsonJournalpost.class);
+			ResponseEntity<SafJsonJournalpost> responseEntity = restTemplate.exchange(graphQLurl, POST, new HttpEntity<>(requestToJson(graphQLRequest), createAuthorizationHeader()), SafJsonJournalpost.class);
 
-			if (responseEntity.getBody() == null || responseEntity.getBody().getData() == null || responseEntity.getBody()
-					.getData().getJournalpost() == null) {
+			if (responseEntity.getBody() == null || responseEntity.getBody().getData() == null ||
+				responseEntity.getBody().getData().getJournalpost() == null) {
 				// Forsøk på nytt. GraphQL endepunktet gir kun httpstatus 200. Verdikjeden forventer at man finner journalpost her.
 				// Hvis ikke er dette en teknisk feil, ikke funksjonell feil.
 				throw new SafJournalpostIkkeFunnetException("Ingen journalpost ble funnet i saf.");
@@ -74,8 +74,8 @@ public class SafGraphqlConsumer {
 
 	private HttpHeaders createAuthorizationHeader() {
 		HttpHeaders headers = new HttpHeaders();
-		headers.setContentType(MediaType.APPLICATION_JSON);
-		headers.set(HttpHeaders.AUTHORIZATION, BEARER_PREFIX + stsRestConsumer.getOidcToken());
+		headers.setContentType(APPLICATION_JSON);
+		headers.set(AUTHORIZATION, BEARER_PREFIX + stsRestConsumer.getOidcToken());
 		return headers;
 	}
 

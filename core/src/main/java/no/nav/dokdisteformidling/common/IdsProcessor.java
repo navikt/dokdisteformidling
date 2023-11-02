@@ -11,9 +11,6 @@ import static no.nav.dokdisteformidling.utils.MDCUtils.getCallId;
 import static no.nav.dokdisteformidling.utils.MDCUtils.setCallId;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 
-/**
- * @author Heidi Elisabeth Sando, Visma Consulting.
- */
 public class IdsProcessor implements Processor {
 
 	@Override

@@ -1,7 +1,6 @@
 package no.nav.dokdisteformidling.config.cxf;
 
 
-import no.altinn.brokerserviceexternal.BrokerServiceExternalSF;
 import no.altinn.brokerserviceexternal.IBrokerServiceExternal;
 import no.nav.dokdisteformidling.config.interceptor.ClientCallBackHandler;
 import no.nav.dokdisteformidling.config.interceptor.CookiesInInterceptor;
@@ -16,6 +15,10 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 
+import static java.lang.Boolean.TRUE;
+import static no.altinn.brokerserviceexternal.BrokerServiceExternalSF.CustomBindingIBrokerServiceExternal;
+import static no.altinn.brokerserviceexternal.BrokerServiceExternalSF.SERVICE;
+
 @Configuration
 @Profile("nais")
 public class BrokerServiceExternalConfig extends AbstractCxfEndpointConfig {
@@ -29,8 +32,8 @@ public class BrokerServiceExternalConfig extends AbstractCxfEndpointConfig {
     public IBrokerServiceExternal iBrokerServiceExternal(BrokerServiceExternalProperties brokerServiceExternalProperties,
                                                          DpoUserProperties dpoUserProperties) {
         setWsdlUrl("wsdl/BrokerServiceExternal.wsdl");
-        setServiceName(BrokerServiceExternalSF.SERVICE);
-        setEndpointName(BrokerServiceExternalSF.CustomBindingIBrokerServiceExternal);
+        setServiceName(SERVICE);
+        setEndpointName(CustomBindingIBrokerServiceExternal);
         setAddress(brokerServiceExternalProperties.getEndpointurl());
         setReceiveTimeout(brokerServiceExternalProperties.getReadtimeoutms());
         setConnectTimeout(brokerServiceExternalProperties.getConnecttimeoutms());
@@ -46,10 +49,10 @@ public class BrokerServiceExternalConfig extends AbstractCxfEndpointConfig {
     }
 
     private void setRequestContext(final Client client, DpoUserProperties dpoUserProperties) {
-        client.getRequestContext().put("ws-security.must-understand", Boolean.TRUE);
+        client.getRequestContext().put("ws-security.must-understand", TRUE);
         client.getRequestContext().put("ws-security.username", dpoUserProperties.getUsername());
         client.getRequestContext().put("ws-security.callback-handler", new ClientCallBackHandler(dpoUserProperties));
-        client.getRequestContext().put("org.apache.cxf.message.Message.MAINTAIN_SESSION", Boolean.TRUE);
-        client.getRequestContext().put("javax.xml.ws.session.maintain", Boolean.TRUE);
+        client.getRequestContext().put("org.apache.cxf.message.Message.MAINTAIN_SESSION", TRUE);
+        client.getRequestContext().put("javax.xml.ws.session.maintain", TRUE);
     }
 }

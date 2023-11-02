@@ -1,7 +1,6 @@
 package no.nav.dokdisteformidling.consumer.juridisklogg;
 
 import no.nav.dokdisteformidling.config.alias.ServiceuserAlias;
-import no.nav.dokdisteformidling.constants.RetryConstants;
 import no.nav.dokdisteformidling.exception.functional.LagreJuridiskLoggFunctionalException;
 import no.nav.dokdisteformidling.exception.technical.AbstractDokdisteformidlingTechnicalException;
 import no.nav.dokdisteformidling.exception.technical.LagreJuridiskLoggTechnicalException;
@@ -18,10 +17,9 @@ import org.springframework.web.client.RestTemplate;
 import java.time.Duration;
 
 import static java.lang.String.format;
+import static no.nav.dokdisteformidling.constants.RetryConstants.DELAY_SHORT;
+import static no.nav.dokdisteformidling.constants.RetryConstants.MULTIPLIER_SHORT;
 
-/**
- * @author Sigurd Midttun, Visma Consulting.
- */
 @Component
 public class JuridiskLoggConsumer implements JuridiskLogg {
 
@@ -40,7 +38,7 @@ public class JuridiskLoggConsumer implements JuridiskLogg {
 	}
 
 	@Override
-	@Retryable(include = AbstractDokdisteformidlingTechnicalException.class, backoff = @Backoff(delay = RetryConstants.DELAY_SHORT, multiplier = RetryConstants.MULTIPLIER_SHORT))
+	@Retryable(include = AbstractDokdisteformidlingTechnicalException.class, backoff = @Backoff(delay = DELAY_SHORT, multiplier = MULTIPLIER_SHORT))
 	@Monitor(value = "dok_consumer", extraTags = {"process", "lagreJuridiskLogg"}, histogram = true)
 	public LoggMeldingResponse lagreJuridiskLogg(final LoggMeldingRequest loggMeldingRequest) {
 		try {

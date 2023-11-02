@@ -4,11 +4,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.cxf.binding.soap.saaj.SAAJOutInterceptor;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
-import org.apache.cxf.phase.Phase;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+
+import static java.util.Collections.singletonList;
+import static org.apache.cxf.message.Message.PROTOCOL_HEADERS;
+import static org.apache.cxf.phase.Phase.PRE_PROTOCOL_ENDING;
 
 /**
  * Kopiert fra https://github.com/Altinn/ec-client-java-cxf
@@ -19,15 +21,15 @@ import java.util.Map;
 @Slf4j
 public class HeaderOutInterceptor extends AbstractPhaseInterceptor {
     public HeaderOutInterceptor() {
-        super(Phase.PRE_PROTOCOL_ENDING);
+        super(PRE_PROTOCOL_ENDING);
         getAfter().add(SAAJOutInterceptor.SAAJOutEndingInterceptor.class.getName());
     }
 
     @Override
     public void handleMessage(Message message) {
         log.info("Adding Keep-Alive header");
-        Map<String, List> headers = (Map<String, List>) message.get(Message.PROTOCOL_HEADERS);
-        headers.put("Connection", Collections.singletonList("Keep-Alive"));
+        Map<String, List> headers = (Map<String, List>) message.get(PROTOCOL_HEADERS);
+        headers.put("Connection", singletonList("Keep-Alive"));
     }
 
 }

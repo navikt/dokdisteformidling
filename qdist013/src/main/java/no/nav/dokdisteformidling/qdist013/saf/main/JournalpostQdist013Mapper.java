@@ -1,12 +1,11 @@
 package no.nav.dokdisteformidling.qdist013.saf.main;
 
-import static no.nav.dokdisteformidling.qdist013.saf.main.JournalpostQdist013.Datotype.DATO_JOURNALFOERT;
-
 import no.nav.dokdisteformidling.consumer.saf.journalpost.SafJournalpost;
 import org.springframework.stereotype.Component;
 
-import java.util.Arrays;
-import java.util.stream.Collectors;
+import java.util.List;
+
+import static no.nav.dokdisteformidling.qdist013.saf.main.JournalpostQdist013.Datotype.DATO_JOURNALFOERT;
 
 @Component
 public class JournalpostQdist013Mapper {
@@ -29,7 +28,7 @@ public class JournalpostQdist013Mapper {
 				.journalfortAvNavn(safJournalpost.getJournalfortAvNavn())
 				.temanavn(safJournalpost.getTemanavn())
 				.tema(safJournalpost.getTema())
-				.relevanteDatoer(Arrays.asList(safJournalpost.getRelevanteDatoer().stream()
+				.relevanteDatoer(List.of(safJournalpost.getRelevanteDatoer().stream()
 						.filter(relevantDato -> DATO_JOURNALFOERT.name().equals(relevantDato.getDatotype()))
 						.map(relevantDato ->
 								JournalpostQdist013.RelevantDato.builder()
@@ -52,9 +51,9 @@ public class JournalpostQdist013Mapper {
 												.filtype(dokumentvariant.getFiltype())
 												.variantformat(dokumentvariant.getVariantformat())
 												.build())
-										.collect(Collectors.toList()))
+										.toList())
 								.build())
-						.collect(Collectors.toList()))
+						.toList())
 				.build();
 	}
 }

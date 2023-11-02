@@ -27,7 +27,6 @@ public class AdministrerForsendelseConsumer implements AdministrerForsendelse {
 
 	private final WebClient webClient;
 
-	@Autowired
 	public AdministrerForsendelseConsumer(WebClient webClient,
 										  DokdisteformidlingProperties dokdisteformidlingProperties,
 										  AzureToken azureToken) {

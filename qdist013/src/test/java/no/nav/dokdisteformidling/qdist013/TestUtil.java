@@ -12,9 +12,6 @@ import java.time.LocalDateTime;
 import static java.lang.String.format;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
-/**
- * @author Sigurd Midttun, Visma Consulting.
- */
 public final class TestUtil {
 
     private TestUtil() {
@@ -35,6 +32,5 @@ public final class TestUtil {
             throw new IOException(format("Kunne ikke åpne classpath-ressurs %s", classpathResource), e);
         }
     }
-
 
 }

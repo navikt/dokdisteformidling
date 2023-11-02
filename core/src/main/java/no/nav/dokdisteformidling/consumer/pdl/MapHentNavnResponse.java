@@ -1,5 +1,7 @@
 package no.nav.dokdisteformidling.consumer.pdl;
 
+import no.nav.dokdisteformidling.consumer.pdl.PdlHentPerson.Folkeregisteridentifikator;
+import no.nav.dokdisteformidling.consumer.pdl.PdlHentPerson.HentPerson;
 import no.nav.dokdisteformidling.exception.functional.DokdistIllegalArgumentException;
 
 import java.util.Objects;
@@ -16,19 +18,20 @@ public class MapHentNavnResponse {
 		if (isNull(response) || isNull(response.getData()) || isNull(response.getData().getHentPerson())) {
 			throw new DokdistIllegalArgumentException("Personnavn kan ikke være null");
 		}
-		PdlHentPerson.HentPerson hentPerson = response.getData().getHentPerson();
+
+		HentPerson hentPerson = response.getData().getHentPerson();
 
 		return HentPersonInfo.builder()
 				.ident(hentPerson.getFolkeregisteridentifikator().stream()
 						.filter(Objects::nonNull)
-						.map(PdlHentPerson.Folkeregisteridentifikator::getIdentifikasjonsnummer)
+						.map(Folkeregisteridentifikator::getIdentifikasjonsnummer)
 						.findFirst()
 						.orElseThrow(() -> new DokdistIllegalArgumentException("Folkeregisteridentifikator ikke funnet")))
 				.fulltnavn(getFulltnavn(hentPerson))
 				.build();
 	}
 
-	private String getFulltnavn(PdlHentPerson.HentPerson hentPerson) {
+	private String getFulltnavn(HentPerson hentPerson) {
 		if (isNull(hentPerson.getNavn()) || hentPerson.getNavn().isEmpty()) {
 			throw new DokdistIllegalArgumentException("Personnavn kan ikke være null");
 		}

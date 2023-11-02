@@ -1,6 +1,5 @@
 package no.nav.dokdisteformidling.sdist001.itest.config;
 
-import no.altinn.brokerserviceexternalstreamed.BrokerServiceExternalStreamedSF;
 import no.altinn.brokerserviceexternalstreamed.IBrokerServiceExternalStreamed;
 import no.nav.dokdisteformidling.config.cxf.AbstractCxfEndpointConfig;
 import no.nav.dokdisteformidling.config.interceptor.ClientCallBackHandler;
@@ -16,7 +15,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 
-import java.io.IOException;
+import static java.lang.Boolean.TRUE;
+import static no.altinn.brokerserviceexternalstreamed.BrokerServiceExternalStreamedSF.CustomBindingIBrokerServiceExternalStreamed;
+import static no.altinn.brokerserviceexternalstreamed.BrokerServiceExternalStreamedSF.SERVICE;
 
 @Configuration
 @Profile("itest")
@@ -27,10 +28,10 @@ public class BrokerServiceExternalStreamedConfigTest extends AbstractCxfEndpoint
     }
 
     @Bean
-    public IBrokerServiceExternalStreamed iBrokerServiceExternalStreamed(BrokerServiceExternalStreamedProperties brokerServiceExternalStreamedProperties, DpoUserProperties dpoUserProperties) throws IOException {
+    public IBrokerServiceExternalStreamed iBrokerServiceExternalStreamed(BrokerServiceExternalStreamedProperties brokerServiceExternalStreamedProperties, DpoUserProperties dpoUserProperties) {
         setWsdlUrl("wsdl/BrokerServiceExternalStreamedTest.wsdl");
-        setServiceName(BrokerServiceExternalStreamedSF.SERVICE);
-        setEndpointName(BrokerServiceExternalStreamedSF.CustomBindingIBrokerServiceExternalStreamed);
+        setServiceName(SERVICE);
+        setEndpointName(CustomBindingIBrokerServiceExternalStreamed);
         setAddress(brokerServiceExternalStreamedProperties.getEndpointurl());
         setReceiveTimeout(brokerServiceExternalStreamedProperties.getReadtimeoutms());
         setConnectTimeout(brokerServiceExternalStreamedProperties.getConnecttimeoutms());
@@ -47,11 +48,11 @@ public class BrokerServiceExternalStreamedConfigTest extends AbstractCxfEndpoint
 
 
     private void setRequestContext(final Client client, DpoUserProperties dpoUserProperties) {
-        client.getRequestContext().put("ws-security.must-understand", Boolean.TRUE);
+        client.getRequestContext().put("ws-security.must-understand", TRUE);
         client.getRequestContext().put("ws-security.username", dpoUserProperties.getUsername());
         client.getRequestContext().put("ws-security.callback-handler", new ClientCallBackHandler(dpoUserProperties));
-        client.getRequestContext().put("org.apache.cxf.message.Message.MAINTAIN_SESSION", Boolean.TRUE);
-        client.getRequestContext().put("javax.xml.ws.session.maintain", Boolean.TRUE);
+        client.getRequestContext().put("org.apache.cxf.message.Message.MAINTAIN_SESSION", TRUE);
+        client.getRequestContext().put("javax.xml.ws.session.maintain", TRUE);
     }
 
 }
