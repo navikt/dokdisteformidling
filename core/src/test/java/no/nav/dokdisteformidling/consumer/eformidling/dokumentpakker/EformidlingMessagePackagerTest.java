@@ -62,11 +62,13 @@ class EformidlingMessagePackagerTest {
 				.navDokumenter(Collections.singletonList(NavDokument.fromVedlegg("test1.pdf", new ByteArrayInputStream("test1pdf".getBytes()))))
 				.build();
 
-		final DokumentpakkingException dokumentpakkingException = assertThrows(DokumentpakkingException.class, () -> {
-			eformidlingMessagePackager.packageMessage(navDokumentpakke, ARKIVMELDING,
-					new AppCertificate(itestVirksomhetssertifikatProperties()),
-					itestPemCertificate());
-		});
+		var dokumentpakkingException = assertThrows(DokumentpakkingException.class, () ->
+				eformidlingMessagePackager.packageMessage(navDokumentpakke,
+						ARKIVMELDING,
+						new AppCertificate(itestVirksomhetssertifikatProperties()),
+						itestPemCertificate()
+				)
+		);
 		assertThat(dokumentpakkingException.getMessage()).isEqualTo("Klarte ikke lage asic eller kryptere dokumentpakke.");
 	}
 }

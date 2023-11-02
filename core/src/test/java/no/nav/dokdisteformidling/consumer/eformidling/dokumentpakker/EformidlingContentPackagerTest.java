@@ -8,9 +8,9 @@ import org.junit.jupiter.api.Test;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
-import java.util.Arrays;
 import java.util.List;
 
+import static java.util.Arrays.asList;
 import static no.nav.dokdisteformidling.AppTestUtils.zipEntries;
 import static no.nav.dokdisteformidling.CertTestUtils.itestPemCertificate;
 import static no.nav.dokdisteformidling.CertTestUtils.itestPrivateKey;
@@ -36,7 +36,7 @@ class EformidlingContentPackagerTest {
 				.conversationId("1")
 				.bestillingsId("2")
 				.arkivmelding(fromAvtaltmelding(new ByteArrayInputStream(ARKIVMELDING_CONTENTS.getBytes())))
-				.navDokumenter(Arrays.asList(fromVedlegg(DOKUMENT_1_NAME, new ByteArrayInputStream(DOKUMENT_1_CONTENTS.getBytes())),
+				.navDokumenter(asList(fromVedlegg(DOKUMENT_1_NAME, new ByteArrayInputStream(DOKUMENT_1_CONTENTS.getBytes())),
 						fromVedlegg(DOKUMENT_2_NAME, new ByteArrayInputStream(DOKUMENT_2_CONTENTS.getBytes()))))
 				.build();
 

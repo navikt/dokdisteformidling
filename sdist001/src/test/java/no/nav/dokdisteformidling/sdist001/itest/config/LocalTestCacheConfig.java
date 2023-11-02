@@ -16,15 +16,17 @@ import static no.nav.dokdisteformidling.config.cache.LokalCacheConfig.AZURE_TOKE
 @Profile({"itest"})
 public class LocalTestCacheConfig {
 
-    @Bean
-    CacheManager cacheManager() {
-        SimpleCacheManager manager = new SimpleCacheManager();
-        manager.setCaches(singletonList(
-                new CaffeineCache(AZURE_TOKEN_CACHE, Caffeine.newBuilder()
-                        .expireAfterWrite(0, MINUTES)
-                        .build())
-        ));
-        return manager;
-    }
+	@Bean
+	CacheManager cacheManager() {
+		SimpleCacheManager manager = new SimpleCacheManager();
+
+		manager.setCaches(singletonList(
+				new CaffeineCache(AZURE_TOKEN_CACHE, Caffeine.newBuilder()
+						.expireAfterWrite(0, MINUTES)
+						.build())
+		));
+
+		return manager;
+	}
 }
 

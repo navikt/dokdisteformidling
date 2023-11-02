@@ -112,12 +112,10 @@ class Sdist001ServiceTest {
 		verify(juridiskLogg, times(2)).lagreJuridiskLogg(getLoggMeldingRequest());
 	}
 
-
 	public <T> T deserializeToObject(InputStream inputStream, Class<T> tClass) throws IOException {
 		ObjectMapper objectMapper = new ObjectMapper();
 		return objectMapper.readValue(inputStream, tClass);
 	}
-
 
 	private List<DownloadResponse> getDownloadResponse() {
 		return asList(DownloadResponse.builder()
