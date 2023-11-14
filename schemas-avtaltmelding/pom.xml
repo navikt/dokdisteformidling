@@ -22,8 +22,8 @@
 	<build>
 		<plugins>
 			<plugin>
-				<groupId>org.jvnet.jaxb2.maven2</groupId>
-				<artifactId>maven-jaxb2-plugin</artifactId>
+				<groupId>org.patrodyne.jvnet</groupId>
+				<artifactId>hisrc-higherjaxb-maven-plugin</artifactId>
 				<version>${maven-jaxb2-plugin.version}</version>
 				<dependencies>
 					<dependency>
@@ -56,29 +56,24 @@
 					<verbose>true</verbose>
 					<removeOldOutput>true</removeOldOutput>
 					<args>
-						<arg>-Xfluent-builder</arg>
+						<arg>-XfluentAPI</arg>
 						<arg>-Xannotate</arg>
 						<arg>-Xsimplify</arg>
 					</args>
 					<plugins>
 						<plugin>
-							<groupId>net.codesup.util</groupId>
-							<artifactId>jaxb2-rich-contract-plugin</artifactId>
-							<version>${jaxb2-rich-contract-plugin.version}</version>
-						</plugin>
-						<plugin>
-							<groupId>org.jvnet.jaxb2_commons</groupId>
-							<artifactId>jaxb2-basics-annotate</artifactId>
+							<groupId>org.patrodyne.jvnet</groupId>
+							<artifactId>hisrc-hyperjaxb-annox-plugin</artifactId>
 							<version>${jaxb2-basics-annotate.version}</version>
 						</plugin>
 						<plugin>
-							<groupId>org.jvnet.jaxb2_commons</groupId>
-							<artifactId>jaxb2-basics</artifactId>
+							<groupId>org.patrodyne.jvnet</groupId>
+							<artifactId>hisrc-basicjaxb-plugins</artifactId>
 							<version>${jaxb2-basics.version}</version>
 						</plugin>
 						<plugin>
-							<groupId>org.jvnet.jaxb2_commons</groupId>
-							<artifactId>jaxb2-basics-tools</artifactId>
+							<groupId>org.patrodyne.jvnet</groupId>
+							<artifactId>hisrc-basicjaxb-tools</artifactId>
 							<version>${jaxb2-basics-tools.version}</version>
 						</plugin>
 					</plugins>
