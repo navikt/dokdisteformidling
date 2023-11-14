@@ -8,7 +8,7 @@
 
 package no.nav.dokdisteformidling.consumer.eformidling.dokumentpakker.trygderetten.xml;
 
-import javax.xml.bind.annotation.XmlRegistry;
+import jakarta.xml.bind.annotation.XmlRegistry;
 
 
 /**

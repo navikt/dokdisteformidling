@@ -22,36 +22,36 @@ import java.io.IOException;
 @Profile("itest")
 public class BrokerServiceExternalStreamedConfigTest extends AbstractCxfEndpointConfig {
 
-    public BrokerServiceExternalStreamedConfigTest(Bus bus) {
-        super(bus);
-    }
+	public BrokerServiceExternalStreamedConfigTest(Bus bus) {
+		super(bus);
+	}
 
-    @Bean
-    public IBrokerServiceExternalStreamed iBrokerServiceExternalStreamed(BrokerServiceExternalStreamedProperties brokerServiceExternalStreamedProperties, DpoUserProperties dpoUserProperties) throws IOException {
-        setWsdlUrl("wsdl/BrokerServiceExternalStreamedTest.wsdl");
-        setServiceName(BrokerServiceExternalStreamedSF.SERVICE);
-        setEndpointName(BrokerServiceExternalStreamedSF.CustomBindingIBrokerServiceExternalStreamed);
-        setAddress(brokerServiceExternalStreamedProperties.getEndpointurl());
-        setReceiveTimeout(brokerServiceExternalStreamedProperties.getReadtimeoutms());
-        setConnectTimeout(brokerServiceExternalStreamedProperties.getConnecttimeoutms());
+	@Bean
+	public IBrokerServiceExternalStreamed iBrokerServiceExternalStreamed(BrokerServiceExternalStreamedProperties brokerServiceExternalStreamedProperties, DpoUserProperties dpoUserProperties) throws IOException {
+		setWsdlUrl("wsdl/BrokerServiceExternalStreamedTest.wsdl");
+		setServiceName(BrokerServiceExternalStreamedSF.SERVICE);
+		setEndpointName(BrokerServiceExternalStreamedSF.CustomBindingIBrokerServiceExternalStreamed);
+		setAddress(brokerServiceExternalStreamedProperties.getEndpointurl());
+		setReceiveTimeout(brokerServiceExternalStreamedProperties.getReadtimeoutms());
+		setConnectTimeout(brokerServiceExternalStreamedProperties.getConnecttimeoutms());
 
-        addInInterceptor(new CookiesInInterceptor());
-        addOutInterceptor(new HeaderOutInterceptor());
-        addOutInterceptor(new CookiesOutInterceptor());
+		addInInterceptor(new CookiesInInterceptor());
+		addOutInterceptor(new HeaderOutInterceptor());
+		addOutInterceptor(new CookiesOutInterceptor());
 
-        IBrokerServiceExternalStreamed iBrokerServiceExternalStreamed = createPort(IBrokerServiceExternalStreamed.class);
-        final Client client = ClientProxy.getClient(iBrokerServiceExternalStreamed);
-        setRequestContext(client, dpoUserProperties);
-        return iBrokerServiceExternalStreamed;
-    }
+		IBrokerServiceExternalStreamed iBrokerServiceExternalStreamed = createPort(IBrokerServiceExternalStreamed.class);
+		final Client client = ClientProxy.getClient(iBrokerServiceExternalStreamed);
+		setRequestContext(client, dpoUserProperties);
+		return iBrokerServiceExternalStreamed;
+	}
 
 
-    private void setRequestContext(final Client client, DpoUserProperties dpoUserProperties) {
-        client.getRequestContext().put("ws-security.must-understand", Boolean.TRUE);
-        client.getRequestContext().put("ws-security.username", dpoUserProperties.getUsername());
-        client.getRequestContext().put("ws-security.callback-handler", new ClientCallBackHandler(dpoUserProperties));
-        client.getRequestContext().put("org.apache.cxf.message.Message.MAINTAIN_SESSION", Boolean.TRUE);
-        client.getRequestContext().put("javax.xml.ws.session.maintain", Boolean.TRUE);
-    }
+	private void setRequestContext(final Client client, DpoUserProperties dpoUserProperties) {
+		client.getRequestContext().put("ws-security.must-understand", Boolean.TRUE);
+		client.getRequestContext().put("ws-security.username", dpoUserProperties.getUsername());
+		client.getRequestContext().put("ws-security.callback-handler", new ClientCallBackHandler(dpoUserProperties));
+		client.getRequestContext().put("org.apache.cxf.message.Message.MAINTAIN_SESSION", Boolean.TRUE);
+		client.getRequestContext().put("jakarta.xml.ws.session.maintain", Boolean.TRUE);
+	}
 
 }

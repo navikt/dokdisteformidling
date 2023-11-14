@@ -21,43 +21,42 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>2.7.15</version>
+		<version>3.1.5</version>
 	</parent>
 
 	<properties>
 		<java.version>17</java.version>
 
-		<camel.version>3.20.5</camel.version>
-		<logstash-logback-encoder.version>7.3</logstash-logback-encoder.version>
+		<camel.version>4.1.0</camel.version>
+		<logstash-logback-encoder.version>7.4</logstash-logback-encoder.version>
 		<resilience4j.version>2.1.0</resilience4j.version>
-		<google-cloud.version>26.22.0</google-cloud.version>
-		<tink.version>1.10.0</tink.version>
-		<tink-gcpkms.version>1.8.0</tink-gcpkms.version>
-		<ibm.mq.allclient.version>9.3.3.0</ibm.mq.allclient.version>
-		<commons-io.version>2.13.0</commons-io.version>
-		<nimbus-jose-jwt.version>9.31</nimbus-jose-jwt.version>
-		<jaxws-ri.version>3.0.2</jaxws-ri.version>
-		<commons-asic.version>0.11.0</commons-asic.version>
+		<google-cloud.version>26.26.0</google-cloud.version>
+		<tink.version>1.11.0</tink.version>
+		<tink-gcpkms.version>1.9.0</tink-gcpkms.version>
+		<ibm.mq.version>9.3.3.1</ibm.mq.version>
+		<commons-io.version>2.14.0</commons-io.version>
+		<nimbus-jose-jwt.version>9.37.1</nimbus-jose-jwt.version>
+		<jaxws-ri.version>4.0.2</jaxws-ri.version>
+		<commons-asic.version>1.0.1</commons-asic.version>
+		<httpclient4.version>4.5.14</httpclient4.version>
 
-		<!-- 3.6.0 gjør at tester feiler i Qdist013ForAltinnIT -->
-		<cxf.version>3.5.6</cxf.version>
+		<cxf.version>4.0.3</cxf.version>
 
-		<!-- Vulnerable Snyk-dependencies -->
 		<snakeyaml.version>2.2</snakeyaml.version>
-		<bouncycastle-jdk15on.version>1.70</bouncycastle-jdk15on.version>
+		<bouncycastle-jdk18on.version>1.76</bouncycastle-jdk18on.version>
 
 		<!-- NAV -->
-		<melding-virksomhet-dokdistfordeling.version>5-7ff79fc</melding-virksomhet-dokdistfordeling.version>
+		<melding-virksomhet-dokdistfordeling.version>7-18c61bf</melding-virksomhet-dokdistfordeling.version>
 
 		<!-- test -->
-		<spring-cloud-contract-wiremock.version>3.1.8</spring-cloud-contract-wiremock.version>
+		<spring-cloud-contract-wiremock.version>4.0.4</spring-cloud-contract-wiremock.version>
 
 		<!-- Plugins -->
-		<maven-jaxb2-plugin.version>0.15.2</maven-jaxb2-plugin.version>
-		<jaxb2-rich-contract-plugin.version>2.1.0</jaxb2-rich-contract-plugin.version>
-		<jaxb2-basics-annotate.version>1.1.0</jaxb2-basics-annotate.version>
-		<jaxb2-basics.version>0.13.1</jaxb2-basics.version>
-		<jaxb2-basics-tools.version>0.13.1</jaxb2-basics-tools.version>
+		<maven-jaxb2-plugin.version>2.1.1</maven-jaxb2-plugin.version>
+		<!-- <jaxb2-rich-contract-plugin.version>2.1.0</jaxb2-rich-contract-plugin.version> -->
+		<jaxb2-basics-annotate.version>2.1.1</jaxb2-basics-annotate.version>
+		<jaxb2-basics.version>2.1.1</jaxb2-basics.version>
+		<jaxb2-basics-tools.version>2.1.1</jaxb2-basics-tools.version>
 		<maven-toolchains-plugin.version>3.1.0</maven-toolchains-plugin.version>
 	</properties>
 
@@ -96,6 +95,11 @@
 			</dependency>
 
 			<dependency>
+				<groupId>org.apache.httpcomponents</groupId>
+				<artifactId>httpclient</artifactId>
+				<version>${httpclient4.version}</version>
+			</dependency>
+			<dependency>
 				<groupId>net.logstash.logback</groupId>
 				<artifactId>logstash-logback-encoder</artifactId>
 				<version>${logstash-logback-encoder.version}</version>
@@ -125,8 +129,8 @@
 			</dependency>
 			<dependency>
 				<groupId>com.ibm.mq</groupId>
-				<artifactId>com.ibm.mq.allclient</artifactId>
-				<version>${ibm.mq.allclient.version}</version>
+				<artifactId>com.ibm.mq.jakarta.client</artifactId>
+				<version>${ibm.mq.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>org.apache.camel.springboot</groupId>
@@ -146,7 +150,7 @@
 			</dependency>
 
 			<dependency>
-				<groupId>no.difi.commons</groupId>
+				<groupId>no.ks.fiks</groupId>
 				<artifactId>commons-asic</artifactId>
 				<version>${commons-asic.version}</version>
 			</dependency>
@@ -162,7 +166,7 @@
 			</dependency>
 			<dependency>
 				<groupId>io.github.resilience4j</groupId>
-				<artifactId>resilience4j-spring-boot2</artifactId>
+				<artifactId>resilience4j-spring-boot3</artifactId>
 				<version>${resilience4j.version}</version>
 			</dependency>
 
@@ -174,18 +178,18 @@
 			</dependency>
 			<dependency>
 				<groupId>org.bouncycastle</groupId>
-				<artifactId>bcprov-jdk15on</artifactId>
-				<version>${bouncycastle-jdk15on.version}</version>
+				<artifactId>bcprov-jdk18on</artifactId>
+				<version>${bouncycastle-jdk18on.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>org.bouncycastle</groupId>
-				<artifactId>bcpkix-jdk15on</artifactId>
-				<version>${bouncycastle-jdk15on.version}</version>
+				<artifactId>bcpkix-jdk18on</artifactId>
+				<version>${bouncycastle-jdk18on.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>org.bouncycastle</groupId>
-				<artifactId>bcutil-jdk15on</artifactId>
-				<version>${bouncycastle-jdk15on.version}</version>
+				<artifactId>bcutil-jdk18on</artifactId>
+				<version>${bouncycastle-jdk18on.version}</version>
 			</dependency>
 
 			<!-- test -->

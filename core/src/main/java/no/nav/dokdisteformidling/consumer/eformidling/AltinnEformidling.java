@@ -21,7 +21,7 @@ import no.nav.dokdisteformidling.consumer.eformidling.serviceregistry.Eformidlin
 import no.nav.dokdisteformidling.consumer.eformidling.serviceregistry.MottakerInfo;
 import org.springframework.stereotype.Component;
 
-import javax.activation.DataHandler;
+import jakarta.activation.DataHandler;
 import java.io.InputStream;
 import java.util.List;
 

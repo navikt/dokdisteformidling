@@ -11,8 +11,8 @@ import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.converter.jaxb.JaxbDataFormat;
 import org.springframework.stereotype.Component;
 
-import javax.jms.Queue;
-import javax.xml.bind.JAXBContext;
+import jakarta.jms.Queue;
+import jakarta.xml.bind.JAXBContext;
 
 import static no.nav.dokdisteformidling.constants.RouteConstants.PROPERTY_BESTILLINGS_ID;
 import static no.nav.dokdisteformidling.constants.RouteConstants.PROPERTY_CONVERSATION_ID;

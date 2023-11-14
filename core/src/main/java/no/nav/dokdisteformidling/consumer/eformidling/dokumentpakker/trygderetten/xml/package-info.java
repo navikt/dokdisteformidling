@@ -5,5 +5,5 @@
 // Generated on: 2020.02.12 at 03:14:19 PM CET 
 //
 
-@javax.xml.bind.annotation.XmlSchema(namespace = "http://schema.altinn.no/services/ServiceEngine/Broker/2015/06", elementFormDefault = javax.xml.bind.annotation.XmlNsForm.QUALIFIED)
+@jakarta.xml.bind.annotation.XmlSchema(namespace = "http://schema.altinn.no/services/ServiceEngine/Broker/2015/06", elementFormDefault = jakarta.xml.bind.annotation.XmlNsForm.QUALIFIED)
 package no.nav.dokdisteformidling.consumer.eformidling.dokumentpakker.trygderetten.xml;
