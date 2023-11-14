@@ -3,6 +3,7 @@ package no.nav.dokdisteformidling.qdist013.itest.config;
 import no.altinn.brokerserviceexternalstreamed.BrokerServiceExternalStreamedSF;
 import no.altinn.brokerserviceexternalstreamed.IBrokerServiceExternalStreamed;
 import no.nav.dokdisteformidling.config.cxf.AbstractCxfEndpointConfig;
+import no.nav.dokdisteformidling.config.cxf.Http11OnlyFeature;
 import no.nav.dokdisteformidling.config.interceptor.ClientCallBackHandler;
 import no.nav.dokdisteformidling.config.interceptor.CookiesInInterceptor;
 import no.nav.dokdisteformidling.config.interceptor.CookiesOutInterceptor;
@@ -34,6 +35,9 @@ public class BrokerServiceExternalStreamedConfigTest extends AbstractCxfEndpoint
 		setAddress(brokerServiceExternalStreamedProperties.getEndpointurl());
 		setReceiveTimeout(brokerServiceExternalStreamedProperties.getReadtimeoutms());
 		setConnectTimeout(brokerServiceExternalStreamedProperties.getConnecttimeoutms());
+
+		// en bug i wiremock gjør at streams og http2 ikke funker - derfor må vi tvinge frem kun http 1.1 i tester
+		addFeature(new Http11OnlyFeature());
 
 		addInInterceptor(new CookiesInInterceptor());
 		addOutInterceptor(new HeaderOutInterceptor());
