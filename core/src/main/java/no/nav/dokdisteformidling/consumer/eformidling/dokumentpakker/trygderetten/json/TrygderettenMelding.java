@@ -21,10 +21,10 @@ public class TrygderettenMelding {
 				.getInstanceIdentifier();
 	}
 
-	public String getMessageChannel() {
+	public String getMessageChannelName() {
 		return standardBusinessDocumentHeader.getBusinessScope().getScope().stream()
 				.filter(MESSAGE_CHANNEL)
-				.map(Scope::getInstanceIdentifier)
+				.map(Scope::getIdentifier)
 				.findAny().orElse("[ikke satt]");
 	}
 
