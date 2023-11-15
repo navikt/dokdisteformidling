@@ -52,7 +52,7 @@ public class BrokerServiceExternalStreamedConfigTest extends AbstractCxfEndpoint
         client.getRequestContext().put("ws-security.username", dpoUserProperties.getUsername());
         client.getRequestContext().put("ws-security.callback-handler", new ClientCallBackHandler(dpoUserProperties));
         client.getRequestContext().put("org.apache.cxf.message.Message.MAINTAIN_SESSION", TRUE);
-        client.getRequestContext().put("javax.xml.ws.session.maintain", TRUE);
+        client.getRequestContext().put("jakarta.xml.ws.session.maintain", TRUE);
     }
 
 }

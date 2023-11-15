@@ -18,10 +18,10 @@ import org.apache.cxf.headers.Header;
 import org.apache.cxf.jaxb.JAXBDataBinding;
 import org.springframework.stereotype.Component;
 
-import javax.activation.DataHandler;
-import javax.xml.bind.JAXBException;
+import jakarta.activation.DataHandler;
+import jakarta.xml.bind.JAXBException;
 import javax.xml.namespace.QName;
-import javax.xml.ws.BindingProvider;
+import jakarta.xml.ws.BindingProvider;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;

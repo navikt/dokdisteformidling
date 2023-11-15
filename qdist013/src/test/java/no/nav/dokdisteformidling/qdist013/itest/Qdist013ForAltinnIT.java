@@ -11,7 +11,6 @@ import no.nav.dokdisteformidling.qdist013.itest.config.ApplicationTestConfig;
 import no.nav.dokdisteformidling.storage.BucketStorage;
 import no.nav.dokdisteformidling.storage.DokdistDokument;
 import no.nav.dokdisteformidling.storage.JsonSerializer;
-import org.apache.activemq.command.ActiveMQTextMessage;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -28,13 +27,13 @@ import org.springframework.jms.core.JmsTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.util.MimeTypeUtils;
 
-import javax.jms.Queue;
-import javax.jms.TextMessage;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBElement;
-import javax.xml.bind.Unmarshaller;
-import javax.xml.soap.MessageFactory;
-import javax.xml.soap.SOAPMessage;
+import jakarta.jms.Queue;
+import jakarta.jms.TextMessage;
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.JAXBElement;
+import jakarta.xml.bind.Unmarshaller;
+import jakarta.xml.soap.MessageFactory;
+import jakarta.xml.soap.SOAPMessage;
 import java.io.ByteArrayInputStream;
 import java.util.List;
 import java.util.UUID;
@@ -55,7 +54,7 @@ import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlMatching;
 import static com.github.tomakehurst.wiremock.client.WireMock.verify;
 import static java.util.concurrent.TimeUnit.SECONDS;
-import static javax.xml.soap.SOAPConstants.SOAP_1_2_PROTOCOL;
+import static jakarta.xml.soap.SOAPConstants.SOAP_1_2_PROTOCOL;
 import static no.nav.dokdisteformidling.constants.RetryConstants.MAX_ATTEMPTS_SHORT;
 import static no.nav.dokdisteformidling.consumer.eformidling.EformidlingConstants.AVTALTMELDING_PROCESS;
 import static no.nav.dokdisteformidling.consumer.eformidling.EformidlingConstants.TRYGDERETTEN_ORGNUMMER;
@@ -939,14 +938,14 @@ class Qdist013ForAltinnIT {
 		verify(expectedCount, getRequestedFor(urlEqualTo("/serviceregistry/identifier/" + TRYGDERETTEN_ORGNUMMER + "/process/" + AVTALTMELDING_PROCESS)));
 	}
 
-	private void assertMessageOnQueue(javax.jms.Queue queue) {
+	private void assertMessageOnQueue(Queue queue) {
 		String message = receive(queue);
 		assertNotNull(message);
 		assertEquals(message, classpathToString("qdist013/qdist013-happy.xml"));
 	}
 
 	@SuppressWarnings("unchecked")
-	private <T> T receive(javax.jms.Queue queue) {
+	private <T> T receive(Queue queue) {
 		Object response = jmsTemplate.receiveAndConvert(queue);
 		if (response instanceof JAXBElement) {
 			response = ((JAXBElement) response).getValue();
@@ -1048,7 +1047,7 @@ class Qdist013ForAltinnIT {
 						.withBodyFile("azure/token_response.json")));
 	}
 
-	private void sendStringMessage(javax.jms.Queue queue, final String message) {
+	private void sendStringMessage(Queue queue, final String message) {
 		sendStringMessage(queue, message, CALL_ID);
 	}
 
@@ -1069,9 +1068,9 @@ class Qdist013ForAltinnIT {
 		}
 	}
 
-	private void sendStringMessage(javax.jms.Queue queue, final String message, final String callId) {
+	private void sendStringMessage(Queue queue, final String message, final String callId) {
 		jmsTemplate.send(queue, session -> {
-			TextMessage msg = new ActiveMQTextMessage();
+			TextMessage msg = session.createTextMessage();
 			msg.setText(message);
 			if (callId != null) {
 				msg.setStringProperty("callId", callId);

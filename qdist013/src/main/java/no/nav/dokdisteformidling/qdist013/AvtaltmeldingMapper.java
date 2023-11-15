@@ -19,7 +19,7 @@ import no.nav.dokdisteformidling.qdist013.saf.main.JournalpostQdist013;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
-import javax.xml.bind.JAXBElement;
+import jakarta.xml.bind.JAXBElement;
 import javax.xml.datatype.XMLGregorianCalendar;
 import java.math.BigInteger;
 import java.util.List;
@@ -300,9 +300,8 @@ public class AvtaltmeldingMapper {
         Korrespondansepart korrespondansepartAvsender = objectFactory.createKorrespondansepart();
         korrespondansepartAvsender.setKorrespondanseparttype(AVSENDER);
         korrespondansepartAvsender.setKorrespondansepartNavn(NAV_KLAGEINSTANS);
-        korrespondansepartAvsender.setOrganisasjonsnummer(EnhetsidentifikatorType.builder()
-                .withOrganisasjonsnummer(TRYGDERETTEN_ORGNUMMER)
-                .build());
+        korrespondansepartAvsender.setOrganisasjonsnummer(new EnhetsidentifikatorType()
+                .useOrganisasjonsnummer(TRYGDERETTEN_ORGNUMMER));
         return korrespondansepartAvsender;
     }
 
@@ -310,9 +309,9 @@ public class AvtaltmeldingMapper {
         Korrespondansepart korrespondansepartMottaker = objectFactory.createKorrespondansepart();
         korrespondansepartMottaker.setKorrespondanseparttype(MOTTAKER);
         korrespondansepartMottaker.setKorrespondansepartNavn(TRYGDERETTEN);
-        korrespondansepartMottaker.setOrganisasjonsnummer(EnhetsidentifikatorType.builder()
-                .withOrganisasjonsnummer(TRYGDERETTEN_ORGNUMMER)
-                .build());
+        korrespondansepartMottaker.setOrganisasjonsnummer(new EnhetsidentifikatorType()
+                .useOrganisasjonsnummer(TRYGDERETTEN_ORGNUMMER)
+                );
         return korrespondansepartMottaker;
     }
 
@@ -320,12 +319,10 @@ public class AvtaltmeldingMapper {
         Part partDAP = objectFactory.createPart();
         partDAP.setPartNavn(getSakspartNavnDAP(journalpostQdist013));
         partDAP.setPartRolle(SAKSPART_ROLLE_DAP);
-        partDAP.setOrganisasjonsnummer(EnhetsidentifikatorType.builder()
-                .withOrganisasjonsnummer(hentOrgNummerDAP(journalpostQdist013))
-                .build());
-        partDAP.setFoedselsnummer(FoedselsnummerType.builder()
-                .withFoedselsnummer(getFoedselsnummer(journalpostQdist013))
-                .build());
+        partDAP.setOrganisasjonsnummer(new EnhetsidentifikatorType()
+                .useOrganisasjonsnummer(hentOrgNummerDAP(journalpostQdist013)));
+        partDAP.setFoedselsnummer(new FoedselsnummerType()
+                .useFoedselsnummer(getFoedselsnummer(journalpostQdist013)));
         return partDAP;
     }
 
@@ -333,9 +330,8 @@ public class AvtaltmeldingMapper {
         Part partAMP = objectFactory.createPart();
         partAMP.setPartNavn(NAV_KLAGEINSTANS);
         partAMP.setPartRolle(SAKSPART_ROLLE_AMP);
-        partAMP.setOrganisasjonsnummer(EnhetsidentifikatorType.builder()
-                .withOrganisasjonsnummer(NAV_ORGNUMMER)
-                .build());
+        partAMP.setOrganisasjonsnummer(new EnhetsidentifikatorType()
+                .useOrganisasjonsnummer(NAV_ORGNUMMER));
         partAMP.setKontaktperson(journalpostQdist013.getOpprettetAvNavn());
         return partAMP;
     }

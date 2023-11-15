@@ -1,5 +1,6 @@
 package no.nav.dokdisteformidling.consumer.eformidling.altinn.mapper;
 
+import jakarta.xml.bind.JAXBElement;
 import no.altinn.brokerserviceexternal.ArrayOfFile;
 import no.altinn.brokerserviceexternal.File;
 import no.altinn.brokerserviceexternal.ObjectFactory;
@@ -13,7 +14,7 @@ public class FileListBuilder {
         return this;
     }
 
-    public javax.xml.bind.JAXBElement<ArrayOfFile> build() {
+    public JAXBElement<ArrayOfFile> build() {
         ObjectFactory objectFactory = new ObjectFactory();
         ArrayOfFile arrayOfFile = new ArrayOfFile();
         no.altinn.brokerserviceexternal.File file = new File();
