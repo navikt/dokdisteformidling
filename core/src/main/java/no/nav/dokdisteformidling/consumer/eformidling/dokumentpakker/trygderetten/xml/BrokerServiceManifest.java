@@ -220,7 +220,7 @@ public class BrokerServiceManifest {
                 "fileName",
                 "checkSum"
         })
-		@Data
+        @Data
         public static class File {
 
             @XmlElement(name = "FileName", required = true)
@@ -327,7 +327,7 @@ public class BrokerServiceManifest {
                 "propertyKey",
                 "propertyValue"
         })
-		@Data
+        @Data
         public static class Property {
 
             @XmlElement(name = "PropertyKey", required = true)
@@ -335,6 +335,6 @@ public class BrokerServiceManifest {
             @XmlElement(name = "PropertyValue", required = true)
             protected String propertyValue;
 
-		}
+        }
     }
 }
