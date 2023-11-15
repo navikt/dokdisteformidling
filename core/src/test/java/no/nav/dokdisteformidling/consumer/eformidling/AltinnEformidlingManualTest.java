@@ -22,6 +22,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.time.Clock;
 import java.util.Collections;
+import java.util.UUID;
 
 import static no.nav.dokdisteformidling.constants.DomainConstants.DEFAULT_ZONE_ID;
 
@@ -72,6 +73,7 @@ class AltinnEformidlingManualTest {
 		final NavDokumentpakke navDokumentpakke = NavDokumentpakke.builder()
 				.conversationId("1")
 				.bestillingsId("2")
+				.messageChannelInstanceIdentifier(UUID.randomUUID())
 				.arkivmelding(NavDokument.fromAvtaltmelding(new ByteArrayInputStream("arkivmelding".getBytes())))
 				.navDokumenter(Collections.singletonList(NavDokument.fromVedlegg("test1.pdf", new ByteArrayInputStream("test1pdf".getBytes()))))
 				.build();

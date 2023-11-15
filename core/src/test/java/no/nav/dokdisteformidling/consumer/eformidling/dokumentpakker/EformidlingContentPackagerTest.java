@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.util.List;
+import java.util.UUID;
 
 import static java.util.Arrays.asList;
 import static no.nav.dokdisteformidling.AppTestUtils.zipEntries;
@@ -35,6 +36,7 @@ class EformidlingContentPackagerTest {
 		final NavDokumentpakke navDokumentpakke = NavDokumentpakke.builder()
 				.conversationId("1")
 				.bestillingsId("2")
+				.messageChannelInstanceIdentifier(UUID.randomUUID())
 				.arkivmelding(fromAvtaltmelding(new ByteArrayInputStream(ARKIVMELDING_CONTENTS.getBytes())))
 				.navDokumenter(asList(fromVedlegg(DOKUMENT_1_NAME, new ByteArrayInputStream(DOKUMENT_1_CONTENTS.getBytes())),
 						fromVedlegg(DOKUMENT_2_NAME, new ByteArrayInputStream(DOKUMENT_2_CONTENTS.getBytes()))))

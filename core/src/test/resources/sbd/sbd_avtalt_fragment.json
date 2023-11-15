@@ -1,48 +1,6 @@
-{
-  "standardBusinessDocumentHeader" : {
-    "headerVersion" : "1.0",
-    "sender" : [ {
-      "identifier" : {
-        "value" : "0192:991078045",
-        "authority" : "iso6523-actorid-upis"
-      },
-      "contactInformation" : [ ]
-    } ],
-    "receiver" : [ {
-      "identifier" : {
-        "value" : "0192:974761084",
-        "authority" : "iso6523-actorid-upis"
-      },
-      "contactInformation" : [ ]
-    } ],
-    "documentIdentification" : {
-      "standard" : "urn:no:difi:avtalt:xsd::avtalt",
-      "typeVersion" : "1.0",
-      "instanceIdentifier" : "2",
-      "type" : "avtalt",
-      "multipleType" : true,
-      "creationDateAndTime" : "2020-01-01T12:59:50+01:00"
-    },
-    "businessScope" : {
-      "scope" : [ {
-        "type" : "MessageChannel",
-        "instanceIdentifier" : "504d328a-4e0e-4b6d-8912-d3af10df7d59",
-        "identifier" : "dokdisteformidling",
-        "scopeInformation" : [ ]
-      }, {
-        "type" : "ConversationId",
-        "instanceIdentifier" : "1",
-        "identifier" : "urn:no:difi:profile:avtalt:avtalt:ver1.0",
-        "scopeInformation" : [ {
-          "expectedResponseDateTime" : "2020-01-11T13:00:00+01:00"
-        } ]
-      } ]
-    }
-  },
   "avtalt" : {
     "sikkerhetsnivaa" : 4,
     "hoveddokument" : "arkivmelding.xml",
     "identifier" : "urn:no:difi:profile:avtalt:avtalt:ver1.0",
     "content" : "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?><arkivmelding xmlns=\"http://www.arkivverket.no/standarder/noark5/arkivmelding\"><system>dokdisteformidling</system><meldingId>845b9935-071f-46e2-b92f-9d25ff5fd757</meldingId><tidspunkt>2020-05-20T12:08:26.567+02:00</tidspunkt><antallFiler>3</antallFiler><mappe xsi:type=\"saksmappe\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"><tittel>Foreldre- og svangerskapspenger</tittel><opprettetDato>2018-12-12T06:45:06</opprettetDato><opprettetAv>qmot002</opprettetAv><virksomhetsspesifikkeMetadata xsi:type=\"xs:string\" xmlns:xs=\"http://www.w3.org/2001/XMLSchema\">12345678</virksomhetsspesifikkeMetadata><part><partNavn>NAV Klageinstans</partNavn><partRolle>AMP</partRolle><organisasjonsnummer><organisasjonsnummer>991078045</organisasjonsnummer></organisasjonsnummer><kontaktperson>qmot002</kontaktperson></part><part><partNavn>Fornavn Etternavn</partNavn><partRolle>DAP</partRolle><organisasjonsnummer/><foedselsnummer><foedselsnummer>20026900817</foedselsnummer></foedselsnummer></part><registrering xsi:type=\"journalpost\"><opprettetDato>2019-04-01T08:44:21</opprettetDato><opprettetAv>qmot002</opprettetAv><dokumentbeskrivelse><dokumenttype>Dokumentasjon</dokumenttype><dokumentstatus>Dokumentet er ferdigstilt</dokumentstatus><tittel>Tittel</tittel><opprettetDato>2019-04-03T10:24:59</opprettetDato><opprettetAv>qmot002</opprettetAv><tilknyttetRegistreringSom>Hoveddokument</tilknyttetRegistreringSom><dokumentnummer>1</dokumentnummer><tilknyttetDato>2020-05-20T12:08:26.567+02:00</tilknyttetDato><tilknyttetAv>qmot002</tilknyttetAv><dokumentobjekt><versjonsnummer>1</versjonsnummer><variantformat>Produksjonsformat</variantformat><opprettetDato>2019-04-03T10:24:59</opprettetDato><opprettetAv>qmot002</opprettetAv><referanseDokumentfil>448212366-463791441-Produksjonsformat-PDF</referanseDokumentfil></dokumentobjekt></dokumentbeskrivelse><dokumentbeskrivelse><dokumenttype>Dokumentasjon</dokumenttype><dokumentstatus>Dokumentet er ferdigstilt</dokumentstatus><tittel>Tittel Vedlegg 1</tittel><opprettetDato>2019-04-03T10:24:59</opprettetDato><opprettetAv>qmot002</opprettetAv><tilknyttetRegistreringSom>Vedlegg</tilknyttetRegistreringSom><dokumentnummer>2</dokumentnummer><tilknyttetDato>2020-05-20T12:08:26.567+02:00</tilknyttetDato><tilknyttetAv>qmot002</tilknyttetAv><dokumentobjekt><versjonsnummer>1</versjonsnummer><variantformat>Dokument hvor deler av innholdet er skjermet</variantformat><opprettetDato>2019-04-03T10:24:59</opprettetDato><opprettetAv>qmot002</opprettetAv><referanseDokumentfil>448212366-463791442-Dokument hvor deler av innholdet er skjermet-PDF</referanseDokumentfil></dokumentobjekt></dokumentbeskrivelse><dokumentbeskrivelse><dokumenttype>Dokumentasjon</dokumenttype><dokumentstatus>Dokumentet er ferdigstilt</dokumentstatus><tittel>Tittel Vedlegg 2, Fra FORNAVN ETTERNAVN</tittel><opprettetDato>2019-04-03T10:24:59</opprettetDato><opprettetAv>qmot002</opprettetAv><tilknyttetRegistreringSom>Vedlegg</tilknyttetRegistreringSom><dokumentnummer>3</dokumentnummer><tilknyttetDato>2020-05-20T12:08:26.567+02:00</tilknyttetDato><tilknyttetAv>qmot002</tilknyttetAv><dokumentobjekt><versjonsnummer>1</versjonsnummer><variantformat>Arkivformat</variantformat><opprettetDato>2019-04-03T10:24:59</opprettetDato><opprettetAv>qmot002</opprettetAv><referanseDokumentfil>448212366-463791443-Arkivformat-PNG</referanseDokumentfil></dokumentobjekt></dokumentbeskrivelse><tittel>MASKERT_FELT</tittel><korrespondansepart><korrespondanseparttype>Mottaker</korrespondanseparttype><korrespondansepartNavn>TRYGDERETTEN</korrespondansepartNavn><organisasjonsnummer><organisasjonsnummer>974761084</organisasjonsnummer></organisasjonsnummer></korrespondansepart><korrespondansepart><korrespondanseparttype>Avsender</korrespondanseparttype><korrespondansepartNavn>NAV Klageinstans</korrespondansepartNavn><organisasjonsnummer><organisasjonsnummer>974761084</organisasjonsnummer></organisasjonsnummer></korrespondansepart><journalposttype>Utgående dokument</journalposttype><journalstatus>Ekspedert</journalstatus><journaldato>2019-04-03</journaldato></registrering><saksdato>2018-12-12</saksdato><administrativEnhet>NAV Klageinstans</administrativEnhet><saksansvarlig>qmot002</saksansvarlig><journalenhet>4806</journalenhet><saksstatus>Under behandling</saksstatus></mappe></arkivmelding>"
   }
-}
