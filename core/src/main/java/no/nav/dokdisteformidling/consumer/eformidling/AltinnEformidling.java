@@ -100,10 +100,10 @@ public class AltinnEformidling implements Eformidling {
 
         log.info("Pakker ut meldinger fra Altinn");
         List<AltinnDokument> altinnDokuments = eformidlingMessageUnpackager.unpackageMessages(messagesFromAltinn);
-        log.info("Pakket ut {} meldinger fra Altinn, referanser={}", altinnDokuments.size(), altinnDokuments.stream().map(AltinnDokument::getFileReference).toList());
+        log.info("Pakket ut {} meldinger fra Altinn, utvalgte headers={}", altinnDokuments.size(), altinnDokuments.stream().map(altinndokument ->
+                    String.format("referanse=%s:MessageChannel=%s", altinndokument.getFileReference(), altinndokument.getTrygderettenMelding().getMessageChannel()))
+                .toList());
 
-        altinnDokuments.forEach(altinndokument ->
-                log.info("meldinger fra Altinn: referanse={} scope MessageChannel={}", altinndokument.getFileReference(), altinndokument.getTrygderettenMelding().getMessageChannel()));
 
         List<DownloadResponse> downloadResponses = getDownloadResponses(altinnDokuments);
         log.info("Meldinger fra Altinn={}", downloadResponses);
