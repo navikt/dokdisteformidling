@@ -34,7 +34,7 @@
 		<tink.version>1.11.0</tink.version>
 		<tink-gcpkms.version>1.9.0</tink-gcpkms.version>
 		<ibm.mq.version>9.3.3.1</ibm.mq.version>
-		<commons-io.version>2.14.0</commons-io.version>
+		<commons-io.version>2.15.0</commons-io.version>
 		<nimbus-jose-jwt.version>9.37.1</nimbus-jose-jwt.version>
 		<jaxws-ri.version>4.0.2</jaxws-ri.version>
 		<commons-asic.version>1.0.1</commons-asic.version>
@@ -42,7 +42,6 @@
 
 		<cxf.version>4.0.3</cxf.version>
 
-		<snakeyaml.version>2.2</snakeyaml.version>
 		<bouncycastle-jdk18on.version>1.76</bouncycastle-jdk18on.version>
 
 		<!-- NAV -->
@@ -53,7 +52,6 @@
 
 		<!-- Plugins -->
 		<maven-jaxb2-plugin.version>2.1.1</maven-jaxb2-plugin.version>
-		<!-- <jaxb2-rich-contract-plugin.version>2.1.0</jaxb2-rich-contract-plugin.version> -->
 		<jaxb2-basics-annotate.version>2.1.1</jaxb2-basics-annotate.version>
 		<jaxb2-basics.version>2.1.1</jaxb2-basics.version>
 		<jaxb2-basics-tools.version>2.1.1</jaxb2-basics-tools.version>
@@ -170,12 +168,6 @@
 				<version>${resilience4j.version}</version>
 			</dependency>
 
-			<!-- overstyrer transitive avhengigheter grunna snyk-rapport -->
-			<dependency>
-				<groupId>org.yaml</groupId>
-				<artifactId>snakeyaml</artifactId>
-				<version>${snakeyaml.version}</version>
-			</dependency>
 			<dependency>
 				<groupId>org.bouncycastle</groupId>
 				<artifactId>bcprov-jdk18on</artifactId>
