@@ -3,7 +3,7 @@ package no.nav.dokdisteformidling.consumer.eformidling.altinn.mapper;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
-import javax.activation.DataSource;
+import jakarta.activation.DataSource;
 import java.io.InputStream;
 import java.io.OutputStream;
 
