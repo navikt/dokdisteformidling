@@ -29,6 +29,7 @@ import java.io.ByteArrayInputStream;
 import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import static java.lang.String.format;
@@ -99,6 +100,7 @@ public class Qdist013Service {
         eformidling.send(NavDokumentpakke.builder()
                 .conversationId(conversationId)
                 .bestillingsId(bestillingsId)
+                .messageChannelInstanceIdentifier(UUID.randomUUID())
                 .arkivmelding(fromAvtaltmelding(new ByteArrayInputStream(arkivmeldingXmlString.getBytes(StandardCharsets.UTF_8))))
                 .navDokumenter(dokdistDokumentList.stream()
                         .map(d -> fromVedlegg(getDocumentFilename(arkivmeldingJAXBElement.getValue(), journalpostQdist013.getJournalpostId(), d.getDokumentInfoId()),
