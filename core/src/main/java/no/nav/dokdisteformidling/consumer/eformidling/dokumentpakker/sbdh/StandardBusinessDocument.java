@@ -121,7 +121,7 @@ public class StandardBusinessDocument {
 	public Optional<Scope> findScope(ScopeType scopeType) {
 		return getScopes()
 				.stream()
-				.filter(scope -> scopeType.toString().equals(scope.getType()) || scopeType.name().equals(scope.getType()))
+				.filter(scopeType)
 				.findAny();
 	}
 
