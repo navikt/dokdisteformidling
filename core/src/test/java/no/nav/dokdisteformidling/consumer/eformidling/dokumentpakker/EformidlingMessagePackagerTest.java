@@ -52,12 +52,7 @@ class EformidlingMessagePackagerTest {
 
 		final List<AppTestUtils.ZipFile> zipEntries = zipEntries(inputStream);
 		final AppTestUtils.ZipFile sbdZip = zipEntries.stream().filter(z -> EFORMIDLING_SBD.equals(z.getName())).findFirst().orElseThrow(IllegalStateException::new);
-		assertThat(sbdZip.getContentsAsString()).containsIgnoringWhitespaces(
-				AppTestUtils.classpathToString("sbd/sbd_header_fragment.json"),
-				AppTestUtils.classpathToString("sbd/conversation_id_scope_fragment.json"),
-				AppTestUtils.classpathToString("sbd/message_channel_scope_fragment.json"),
-				AppTestUtils.classpathToString("sbd/sbd_avtalt_fragment.json")
-				);
+		assertThat(sbdZip.getContentsAsString()).isEqualToIgnoringWhitespace(AppTestUtils.classpathToString("sbd/sbd.json"));
 		zipEntries.stream().filter(z -> EFORMIDLING_ASIC.equals(z.getName())).findFirst().orElseThrow(IllegalStateException::new);
 	}
 
