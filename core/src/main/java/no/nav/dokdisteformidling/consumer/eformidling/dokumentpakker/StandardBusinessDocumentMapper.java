@@ -6,6 +6,7 @@ import no.nav.dokdisteformidling.consumer.eformidling.dokumentpakker.sbdh.Docume
 import no.nav.dokdisteformidling.consumer.eformidling.dokumentpakker.sbdh.PartnerIdentification;
 import no.nav.dokdisteformidling.consumer.eformidling.dokumentpakker.sbdh.Receiver;
 import no.nav.dokdisteformidling.consumer.eformidling.dokumentpakker.sbdh.Scope;
+import no.nav.dokdisteformidling.consumer.eformidling.dokumentpakker.sbdh.ScopeType;
 import no.nav.dokdisteformidling.consumer.eformidling.dokumentpakker.sbdh.Sender;
 import no.nav.dokdisteformidling.consumer.eformidling.dokumentpakker.sbdh.StandardBusinessDocument;
 import no.nav.dokdisteformidling.consumer.eformidling.dokumentpakker.sbdh.StandardBusinessDocumentHeader;
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Component;
 import java.time.Clock;
 import java.time.Duration;
 import java.time.OffsetDateTime;
+import java.util.UUID;
 
 import static java.time.Duration.ofDays;
 import static java.time.temporal.ChronoUnit.SECONDS;
@@ -31,8 +33,10 @@ public class StandardBusinessDocumentMapper {
 	static final String TYPE_VERSION = "1.0";
 	static final String IDENTIFIER_AUTHORITY = "iso6523-actorid-upis";
 	static final String DOCUMENT_IDENTIFICATOR_STANDARD = "urn:no:difi:avtalt:xsd::avtalt";
-	static final String SCOPE_CONVERSATION_ID = "ConversationId";
+	static final String SCOPE_CONVERSATION_ID = ScopeType.CONVERSATION_ID.toString();
 	static final String SCOPE_CONVERSATION_ID_IDENTIFIER = "urn:no:difi:profile:avtalt:avtalt:ver1.0";
+	static final String SCOPE_MESSAGE_CHANNEL = ScopeType.MESSAGE_CHANNEL.toString();
+	static final String SCOPE_MESSAGE_CHANNEL_IDENTIFIER_DOKDISTEFORMIDLING = "dokdisteformidling";
 	static final String AVTALTMELDING_FORRETNINGSMELDING = "avtalt";
 	public static final String ARKIVMELDING_XML = "arkivmelding.xml";
 	public static final int SIKKERHETSNIVAA = 4;
@@ -44,7 +48,7 @@ public class StandardBusinessDocumentMapper {
 		this.clock = clock;
 	}
 
-	StandardBusinessDocument mapAvtaltmeldingEnvelope(final String conversationId, final String bestillingsId, String avtaltmelding) {
+	StandardBusinessDocument mapAvtaltmeldingEnvelope(String conversationId, String bestillingsId, String avtaltmelding, UUID messageChannelId) {
 		StandardBusinessDocumentHeader standardBusinessDocumentHeader = new StandardBusinessDocumentHeader();
 		standardBusinessDocumentHeader.setHeaderVersion(HEADER_VERSION);
 		standardBusinessDocumentHeader.addSender(createSender());
@@ -52,6 +56,7 @@ public class StandardBusinessDocumentMapper {
 		standardBusinessDocumentHeader.setDocumentIdentification(createDocumentIdentification(bestillingsId));
 		BusinessScope businessScope = new BusinessScope();
 		businessScope.addScope(createConversationIdScope(conversationId));
+		businessScope.addScope(createMessageChannelScope(messageChannelId));
 		standardBusinessDocumentHeader.setBusinessScope(businessScope);
 		StandardBusinessDocument standardBusinessDocument = new StandardBusinessDocument();
 		standardBusinessDocument.setStandardBusinessDocumentHeader(standardBusinessDocumentHeader);
@@ -97,6 +102,14 @@ public class StandardBusinessDocumentMapper {
 		correlationInformation.setExpectedResponseDateTime(OffsetDateTime.now(clock).plus(EXPECTED_RESPONSE_WITHIN_HOURS));
 		conversationIdScope.addScopeInformation(correlationInformation);
 		return conversationIdScope;
+	}
+
+	private Scope createMessageChannelScope(UUID instanceIdentifier) {
+		Scope messageChannelScope = new Scope();
+		messageChannelScope.setType(SCOPE_MESSAGE_CHANNEL);
+		messageChannelScope.setInstanceIdentifier(instanceIdentifier.toString());
+		messageChannelScope.setIdentifier(SCOPE_MESSAGE_CHANNEL_IDENTIFIER_DOKDISTEFORMIDLING);
+		return messageChannelScope;
 	}
 
 	private AvtaltMessage createAvtaltMessage(String avtaltmelding){

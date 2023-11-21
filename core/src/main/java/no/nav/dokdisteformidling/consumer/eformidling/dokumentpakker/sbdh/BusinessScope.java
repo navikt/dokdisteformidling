@@ -16,7 +16,7 @@ import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlType;
 import java.io.Serializable;
 import java.util.Arrays;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 
@@ -69,7 +69,8 @@ public class BusinessScope implements Serializable {
 	 */
 	public Set<Scope> getScope() {
 		if (scope == null) {
-			scope = new HashSet<>();
+			// vi bruker LinkedHashSet her for å få deterministisk rekkefølge på scopes i tester
+			scope = new LinkedHashSet<>();
 		}
 		return this.scope;
 	}
