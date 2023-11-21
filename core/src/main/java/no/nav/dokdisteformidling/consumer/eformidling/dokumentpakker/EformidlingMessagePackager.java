@@ -51,7 +51,7 @@ public class EformidlingMessagePackager {
                                       AppCertificate appCertificate,
                                       X509Certificate mottakerCertificate) {
         final StandardBusinessDocument envelope = standardBusinessDocumentMapper.mapAvtaltmeldingEnvelope(navDokumentpakke.getConversationId(),
-                navDokumentpakke.getBestillingsId(), avtaltmelding);
+                navDokumentpakke.getBestillingsId(), avtaltmelding, navDokumentpakke.getMessageChannelInstanceIdentifier());
         final InputStream content = eformidlingContentPackager.packageContent(navDokumentpakke, appCertificate, mottakerCertificate);
         final ByteArrayOutputStream zipfile = new ByteArrayOutputStream();
         writeZip(envelope, content, zipfile);

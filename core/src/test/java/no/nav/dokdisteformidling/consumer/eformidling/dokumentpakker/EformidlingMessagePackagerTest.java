@@ -13,6 +13,7 @@ import java.time.Clock;
 import java.time.Instant;
 import java.util.Collections;
 import java.util.List;
+import java.util.UUID;
 
 import static no.nav.dokdisteformidling.AppTestUtils.zipEntries;
 import static no.nav.dokdisteformidling.CertTestUtils.itestPemCertificate;
@@ -26,6 +27,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 class EformidlingMessagePackagerTest {
 
 	private static final String FIXED_TIME = "2020-01-01T12:00:00Z";
+	private static final UUID MESSAGE_CHANNEL_UUID = UUID.fromString("504d328a-4e0e-4b6d-8912-d3af10df7d59");
 	public static final Clock FIXED_CLOCK = Clock.fixed(Instant.parse(FIXED_TIME), DEFAULT_ZONE_ID);
 	private static final String ARKIVMELDING = AppTestUtils.classpathToString("avtaltmelding/arkivmelding.xml");
 
@@ -39,6 +41,7 @@ class EformidlingMessagePackagerTest {
 		final NavDokumentpakke navDokumentpakke = NavDokumentpakke.builder()
 				.conversationId("1")
 				.bestillingsId("2")
+				.messageChannelInstanceIdentifier(MESSAGE_CHANNEL_UUID)
 				.arkivmelding(NavDokument.fromAvtaltmelding(new ByteArrayInputStream("avtalt".getBytes())))
 				.navDokumenter(Collections.singletonList(NavDokument.fromVedlegg("test1.pdf", new ByteArrayInputStream("test1pdf".getBytes()))))
 				.build();
@@ -58,6 +61,7 @@ class EformidlingMessagePackagerTest {
 		final NavDokumentpakke navDokumentpakke = NavDokumentpakke.builder()
 				.conversationId("1")
 				.bestillingsId("2")
+				.messageChannelInstanceIdentifier(MESSAGE_CHANNEL_UUID)
 				.arkivmelding(NavDokument.fromAvtaltmelding(null))
 				.navDokumenter(Collections.singletonList(NavDokument.fromVedlegg("test1.pdf", new ByteArrayInputStream("test1pdf".getBytes()))))
 				.build();
