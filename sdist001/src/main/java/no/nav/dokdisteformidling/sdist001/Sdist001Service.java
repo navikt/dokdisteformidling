@@ -73,7 +73,7 @@ public class Sdist001Service {
 							.filter(forsendelse -> validateForsendelse(forsendelse, downloadResponse))
 							.forEach(behandleForsendelse(downloadResponse, endringer));
 					if (validateForsendelse(FORTAPT_FORSENDELSE, downloadResponse)) {
-						behandleForsendelse(downloadResponse, endringer).accept(FORTAPT_FORSENDELSE);
+						eformidling.bekreft(downloadResponse.getFileReference());
 					}
 				});
 
