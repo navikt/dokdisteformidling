@@ -23,7 +23,6 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.function.Consumer;
 
-import static no.nav.dokdisteformidling.constants.DomainConstants.DISTRIBUSJONSKANAL;
 import static no.nav.dokdisteformidling.sdist001.domain.to.ForsendelseStatus.BEKREFTET;
 import static no.nav.dokdisteformidling.sdist001.domain.to.ForsendelseStatus.EKSPEDERT;
 import static no.nav.dokdisteformidling.sdist001.domain.to.ForsendelseStatus.FEIL;
@@ -32,13 +31,6 @@ import static no.nav.dokdisteformidling.sdist001.domain.to.ForsendelseStatus.OVE
 @Slf4j
 @Service
 public class Sdist001Service {
-
-	private static final ForsendelseTo FORTAPT_FORSENDELSE = ForsendelseTo.builder()
-			.forsendelseId("160391030")
-			.forsendelseStatus(BEKREFTET.name())
-			.distribusjonKanal(DISTRIBUSJONSKANAL)
-			.konversasjonId("48f043e6-70d8-4ce3-9882-110a89a14e53")
-			.build();
 
 	private final AdministrerForsendelse administrerForsendelse;
 	private final Eformidling eformidling;
@@ -72,9 +64,6 @@ public class Sdist001Service {
 					forsendelserTo.stream()
 							.filter(forsendelse -> validateForsendelse(forsendelse, downloadResponse))
 							.forEach(behandleForsendelse(downloadResponse, endringer));
-					if (validateForsendelse(FORTAPT_FORSENDELSE, downloadResponse)) {
-						eformidling.bekreft(downloadResponse.getFileReference());
-					}
 				});
 
 		log.info("sdist001 har oppdatert status for eFormidlingforsendelser: {}", endringer);
