@@ -39,7 +39,7 @@ public class PdlGraphQLConsumer {
 
 	private static final String HEADER_PDL_TEMA = "Tema";
 	private static final String PERSON_IKKE_FUNNET_CODE = "not_found";
-	// https://pdldocs-navno.msappproxy.net/ekstern/index.html#_dokumenter_hjemmel_vha_tema
+	// https://pdldocs-navno.msappproxy.net/ekstern/index.html#_dokumenter_hjemmel
 	private static final String HEADER_PDL_BEHANDLINGSNUMMER = "behandlingsnummer";
 	// https://behandlingskatalog.nais.adeo.no/process/purpose/ARKIVPLEIE/756fd557-b95e-4b20-9de9-6179fb8317e6
 	private static final String ARKIVPLEIE_BEHANDLINGSNUMMER = "B315";
