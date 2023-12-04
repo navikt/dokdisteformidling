@@ -37,7 +37,6 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 @Component
 public class PdlGraphQLConsumer {
 
-	private static final String HEADER_PDL_TEMA = "Tema";
 	private static final String PERSON_IKKE_FUNNET_CODE = "not_found";
 	// https://pdldocs-navno.msappproxy.net/ekstern/index.html#_dokumenter_hjemmel
 	private static final String HEADER_PDL_BEHANDLINGSNUMMER = "behandlingsnummer";
@@ -63,10 +62,9 @@ public class PdlGraphQLConsumer {
 
 	@Retryable(include = AbstractDokdisteformidlingTechnicalException.class, maxAttempts = 5, backoff = @Backoff(delay = 200))
 	@Monitor(value = "dok_metric", extraTags = {"process", "hentNavn"}, percentiles = {0.5, 0.95}, histogram = true)
-	public HentPersonInfo hentNavn(final String ident, final String tema) {
+	public HentPersonInfo hentNavn(final String ident) {
 		try {
 			RequestEntity<PDLRequest> requestEntity = createRequestEntity()
-					.header(HEADER_PDL_TEMA, tema)
 					.body(mapRequest(ident, hentPersonnavn));
 
 			final PdlHentPerson response = requireNonNull(restTemplate.exchange(requestEntity, PdlHentPerson.class).getBody());
