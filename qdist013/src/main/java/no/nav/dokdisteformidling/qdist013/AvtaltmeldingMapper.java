@@ -336,29 +336,29 @@ public class AvtaltmeldingMapper {
         return partAMP;
     }
 
-    private String getFoedselsnummer(JournalpostQdist013 journalpostQdist013) {
-        if (brukerTypeIsAktoerId(journalpostQdist013)) {
-            return pdlGraphQLConsumer.hentNavn(journalpostQdist013.getBruker().getId(), journalpostQdist013.getTema()).getIdent();
-        } else if (isBrukerTypeFnr(journalpostQdist013)) {
-            return journalpostQdist013.getBruker().getId();
-        } else {
-            return null;
-        }
-    }
+	private String getFoedselsnummer(JournalpostQdist013 journalpostQdist013) {
+		if (brukerTypeIsAktoerId(journalpostQdist013)) {
+			return pdlGraphQLConsumer.hentNavn(journalpostQdist013.getBruker().getId()).getIdent();
+		} else if (isBrukerTypeFnr(journalpostQdist013)) {
+			return journalpostQdist013.getBruker().getId();
+		} else {
+			return null;
+		}
+	}
 
     private String hentOrgNummerDAP(JournalpostQdist013 journalpostQdist013) {
         return brukerTypeIsOrgnr(journalpostQdist013) ? journalpostQdist013.getBruker().getId() : null;
     }
 
-    private String getSakspartNavnDAP(JournalpostQdist013 journalpostQdist013) {
-        if (brukerTypeIsOrgnr(journalpostQdist013)) {
-            return ereg.hentNavn(journalpostQdist013.getBruker().getId());
-        } else {
-            return getHentPersonInfo(journalpostQdist013.getBruker().getId(), journalpostQdist013.getTema()).getFulltnavn();
-        }
-    }
+	private String getSakspartNavnDAP(JournalpostQdist013 journalpostQdist013) {
+		if (brukerTypeIsOrgnr(journalpostQdist013)) {
+			return ereg.hentNavn(journalpostQdist013.getBruker().getId());
+		} else {
+			return getHentPersonInfo(journalpostQdist013.getBruker().getId()).getFulltnavn();
+		}
+	}
 
-    private HentPersonInfo getHentPersonInfo(String ident, String tema) {
-        return pdlGraphQLConsumer.hentNavn(ident, tema);
-    }
+	private HentPersonInfo getHentPersonInfo(String ident) {
+		return pdlGraphQLConsumer.hentNavn(ident);
+	}
 }
