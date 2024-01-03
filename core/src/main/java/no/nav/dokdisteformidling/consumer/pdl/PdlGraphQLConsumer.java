@@ -48,7 +48,7 @@ public class PdlGraphQLConsumer {
 	public HentPersonInfo hentNavn(final String ident) {
 		return webClient.post()
 				.attributes(clientRegistrationId(CLIENT_REGISTRATION_PDL))
-				.bodyValue(mapRequest(ident, hentPersonnavn))
+				.bodyValue(mapRequest(ident))
 				.retrieve()
 				.bodyToMono(PdlHentPerson.class)
 				.mapNotNull(this::mapPersonInfo)
@@ -68,12 +68,12 @@ public class PdlGraphQLConsumer {
 		}
 	}
 
-	private PDLRequest mapRequest(final String ident, String query) {
+	private PDLRequest mapRequest(final String ident) {
 		final HashMap<String, Object> variables = new HashMap<>();
 		variables.put("ident", ident);
 
 		return PDLRequest.builder()
-				.query(query)
+				.query(hentPersonnavn)
 				.variables(variables)
 				.build();
 	}

@@ -56,7 +56,7 @@ public class AdministrerForsendelseConsumer implements AdministrerForsendelse {
 	}
 
 	@Override
-	@Retryable(include = AbstractDokdisteformidlingTechnicalException.class, backoff = @Backoff(delay = DELAY_SHORT, multiplier = MULTIPLIER_SHORT))
+	@Retryable(retryFor = AbstractDokdisteformidlingTechnicalException.class, backoff = @Backoff(delay = DELAY_SHORT, multiplier = MULTIPLIER_SHORT))
 	public void oppdaterForsendelse(OppdaterForsendelseRequest oppdaterForsendelse) {
 		log.info("oppdaterForsendelse oppdaterer forsendelse med forsendelseId={}", oppdaterForsendelse.forsendelseId());
 
@@ -105,7 +105,7 @@ public class AdministrerForsendelseConsumer implements AdministrerForsendelse {
 		if (error instanceof WebClientResponseException response && ((WebClientResponseException) error).getStatusCode().is4xxClientError()) {
 			throw new DokdistadminFunctionalException(
 					String.format("Kall mot rdist001 feilet funksjonelt med status=%s, feilmelding=%s",
-							response.getRawStatusCode(),
+							response.getStatusCode(),
 							response.getMessage()),
 					error);
 		} else {
