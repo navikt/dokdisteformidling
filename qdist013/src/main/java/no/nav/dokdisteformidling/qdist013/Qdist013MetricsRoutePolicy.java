@@ -10,11 +10,6 @@ import org.apache.camel.support.RoutePolicySupport;
 import org.springframework.stereotype.Component;
 
 import static no.nav.dokdisteformidling.constants.RouteConstants.QDIST013_SERVICE_ID;
-import static no.nav.dokdisteformidling.metrics.MetricLabels.LABEL_ERROR_TYPE;
-import static no.nav.dokdisteformidling.metrics.MetricLabels.LABEL_EXCEPTION_NAME;
-import static no.nav.dokdisteformidling.metrics.MetricLabels.LABEL_PROCESS;
-import static no.nav.dokdisteformidling.metrics.MetricLabels.TYPE_FUNCTIONAL_EXCEPTION;
-import static no.nav.dokdisteformidling.metrics.MetricLabels.TYPE_TECHNICAL_EXCEPTION;
 
 @Component
 public class Qdist013MetricsRoutePolicy extends RoutePolicySupport {
@@ -25,6 +20,12 @@ public class Qdist013MetricsRoutePolicy extends RoutePolicySupport {
 	private static final String QDIST013_PROCESS_TIMER = "dok_request_latency";
 	private static final String QDIST013_PROCESS_TIMER_DESCRIPTION = "prosesseringstid for kall inn til qdist013";
 	private static final String QDIST013_EXCEPTION = "dok_request_exception_total";
+
+	private static final String TYPE_TECHNICAL_EXCEPTION = "technical";
+	private static final String TYPE_FUNCTIONAL_EXCEPTION = "functional";
+	private static final String LABEL_PROCESS = "process";
+	private static final String LABEL_ERROR_TYPE = "error_type";
+	private static final String LABEL_EXCEPTION_NAME = "exception_name";
 
 	public Qdist013MetricsRoutePolicy(MeterRegistry registry) {
 		this.registry = registry;

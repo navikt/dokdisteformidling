@@ -4,12 +4,10 @@ import lombok.extern.slf4j.Slf4j;
 import no.nav.dokdisteformidling.config.props.ServiceRegistryProperties;
 import no.nav.dokdisteformidling.consumer.eformidling.maskinporten.MaskinportenTechnicalException;
 import no.nav.dokdisteformidling.consumer.eformidling.maskinporten.MaskinportenTokenConsumer;
-import no.nav.dokdisteformidling.metrics.Monitor;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
-import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpClientErrorException;
@@ -49,8 +47,7 @@ public class ServiceRegistryConsumer {
         this.baseUrl = serviceRegistryProperties.getUrl().toString();
     }
 
-    @Retryable(value = {MaskinportenTechnicalException.class, ServiceRegistryTechnicalException.class}, maxAttempts = 3, backoff = @Backoff(delay = 5000))
-    @Monitor(value = "dok_consumer", extraTags = {"process", "serviceregistry"}, percentiles = {0.5, 0.95}, histogram = true)
+    @Retryable(retryFor = {MaskinportenTechnicalException.class, ServiceRegistryTechnicalException.class})
     public IdentifierResource getIdentifierResource(final String orgnummer, final String serviceProcess) {
         final String accessToken = maskinportenTokenConsumer.fetchToken().getAccessToken();
 

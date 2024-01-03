@@ -10,7 +10,6 @@ import com.nimbusds.jwt.SignedJWT;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.dokdisteformidling.certificate.AppCertificate;
 import no.nav.dokdisteformidling.config.props.MaskinportenProperties;
-import no.nav.dokdisteformidling.metrics.Monitor;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -65,7 +64,6 @@ public class MaskinportenTokenConsumer {
 				.build();
 	}
 
-	@Monitor(value = "dok_consumer", extraTags = {"process", "maskinporten_fetchtoken"}, percentiles = {0.5, 0.95}, histogram = true)
 	public OidcTokenResponse fetchToken() {
 		LinkedMultiValueMap<String, String> attrMap = new LinkedMultiValueMap<>();
 		attrMap.add("grant_type", "urn:ietf:params:oauth:grant-type:jwt-bearer");
@@ -91,11 +89,11 @@ public class MaskinportenTokenConsumer {
 					httpEntity, OidcTokenResponse.class);
 			log.info("AccessToken hentet OK fra maskinporten på url={}", maskinportenUrl);
 			return response.getBody();
-		} catch(HttpClientErrorException e) {
+		} catch (HttpClientErrorException e) {
 			final String errorMessage = FUNKSJONELL_FEIL_ERROR_MESSAGE + e.getResponseBodyAsString();
 			log.warn(errorMessage, e);
 			throw new MaskinportenFunctionalException(errorMessage, e);
-		} catch(HttpServerErrorException e) {
+		} catch (HttpServerErrorException e) {
 			final String errorMessage = TEKNISK_FEIL_ERROR_MESSAGE + e.getResponseBodyAsString();
 			log.error(errorMessage, e);
 			throw new MaskinportenTechnicalException(errorMessage, e);

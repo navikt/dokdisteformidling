@@ -1,37 +1,24 @@
 package no.nav.dokdisteformidling.consumer.pdl;
 
 import lombok.extern.slf4j.Slf4j;
-import no.nav.dokdisteformidling.consumer.sts.StsRestConsumer;
+import no.nav.dokdisteformidling.config.props.DokdisteformidlingProperties;
 import no.nav.dokdisteformidling.exception.functional.PdlFunctionalException;
 import no.nav.dokdisteformidling.exception.functional.PersonIkkeFunnetException;
 import no.nav.dokdisteformidling.exception.technical.AbstractDokdisteformidlingTechnicalException;
 import no.nav.dokdisteformidling.exception.technical.PdlHentPersonTechnicalException;
-import no.nav.dokdisteformidling.metrics.Monitor;
-import org.slf4j.MDC;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.web.client.RestTemplateBuilder;
-import org.springframework.http.RequestEntity;
-import org.springframework.retry.annotation.Backoff;
+import org.springframework.http.ProblemDetail;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Component;
-import org.springframework.web.client.HttpClientErrorException;
-import org.springframework.web.client.HttpServerErrorException;
-import org.springframework.web.client.RestTemplate;
-import org.springframework.web.util.UriComponentsBuilder;
+import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 
-import java.net.URI;
-import java.time.Duration;
 import java.util.HashMap;
+import java.util.function.Consumer;
 
 import static java.util.Objects.isNull;
-import static java.util.Objects.requireNonNull;
-import static no.nav.dokdisteformidling.constants.MdcConstants.MDC_CALL_ID;
-import static no.nav.dokdisteformidling.constants.NavHeaders.NAV_CALL_ID;
-import static no.nav.dokdisteformidling.constants.NavHeaders.NAV_CONSUMER_TOKEN;
-import static org.springframework.http.HttpHeaders.AUTHORIZATION;
-import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
+import static no.nav.dokdisteformidling.azure.OAuthEnabledWebClientConfig.CLIENT_REGISTRATION_PDL;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.springframework.security.oauth2.client.web.reactive.function.client.ServletOAuth2AuthorizedClientExchangeFilterFunction.clientRegistrationId;
 
 @Slf4j
 @Component
@@ -42,58 +29,43 @@ public class PdlGraphQLConsumer {
 	private static final String HEADER_PDL_BEHANDLINGSNUMMER = "behandlingsnummer";
 	// https://behandlingskatalog.nais.adeo.no/process/purpose/ARKIVPLEIE/756fd557-b95e-4b20-9de9-6179fb8317e6
 	private static final String ARKIVPLEIE_BEHANDLINGSNUMMER = "B315";
-
-	private final RestTemplate restTemplate;
-	private final StsRestConsumer stsConsumer;
-	private final URI pdlUrl;
 	private final MapHentNavnResponse mapHentNavnResponse;
+	private final WebClient webClient;
 
-	public PdlGraphQLConsumer(RestTemplateBuilder restTemplateBuilder,
-							  StsRestConsumer stsConsumer,
-							  @Value("${pdl.url}") String pdlUrl) {
-		this.restTemplate = restTemplateBuilder
-				.setConnectTimeout(Duration.ofSeconds(5L))
-				.setReadTimeout(Duration.ofSeconds(15L))
+	public PdlGraphQLConsumer(DokdisteformidlingProperties dokdisteformidlingProperties,
+							  WebClient webClient) {
+		this.webClient = webClient.mutate()
+				.baseUrl(dokdisteformidlingProperties.getEndpoints().getPdl().getUrl())
+				.defaultHeaders(httpHeaders -> {
+					httpHeaders.set(HEADER_PDL_BEHANDLINGSNUMMER, ARKIVPLEIE_BEHANDLINGSNUMMER);
+					httpHeaders.setContentType(APPLICATION_JSON);
+				})
 				.build();
-		this.stsConsumer = stsConsumer;
-		this.pdlUrl = UriComponentsBuilder.fromHttpUrl(pdlUrl).build().toUri();
 		this.mapHentNavnResponse = new MapHentNavnResponse();
 	}
 
-	@Retryable(include = AbstractDokdisteformidlingTechnicalException.class, maxAttempts = 5, backoff = @Backoff(delay = 200))
-	@Monitor(value = "dok_metric", extraTags = {"process", "hentNavn"}, percentiles = {0.5, 0.95}, histogram = true)
+	@Retryable(retryFor = AbstractDokdisteformidlingTechnicalException.class)
 	public HentPersonInfo hentNavn(final String ident) {
-		try {
-			RequestEntity<PDLRequest> requestEntity = createRequestEntity()
-					.body(mapRequest(ident, hentPersonnavn));
+		return webClient.post()
+				.attributes(clientRegistrationId(CLIENT_REGISTRATION_PDL))
+				.bodyValue(mapRequest(ident, hentPersonnavn))
+				.retrieve()
+				.bodyToMono(PdlHentPerson.class)
+				.mapNotNull(this::mapPersonInfo)
+				.doOnError(handlePdlErrors())
+				.block();
 
-			final PdlHentPerson response = requireNonNull(restTemplate.exchange(requestEntity, PdlHentPerson.class).getBody());
-			if (isNull(response.getErrors()) || response.getErrors().isEmpty()) {
-				return mapHentNavnResponse.mapNavn(response);
-			} else {
-				if (PERSON_IKKE_FUNNET_CODE.equals(response.getErrors().get(0).getExtensions().getCode())) {
-					throw new PersonIkkeFunnetException("Fant ikke personnavn for person i pdl.");
-				}
-				throw new PdlFunctionalException("Kunne ikke hente personnavn for person i pdl. " + response.getErrors());
-			}
-
-		} catch (HttpClientErrorException e) {
-			throw new PdlFunctionalException("Kunne ikke hente person fra pdl.", e);
-		} catch (HttpServerErrorException e) {
-			throw new PdlHentPersonTechnicalException("Teknisk feil ved kall mot PDL.", e);
-		}
 	}
 
-	private RequestEntity.BodyBuilder createRequestEntity() {
-		final String serviceUserToken = "Bearer " + stsConsumer.getOidcToken();
-
-		return RequestEntity.post(pdlUrl)
-				.accept(APPLICATION_JSON)
-				.header(CONTENT_TYPE, APPLICATION_JSON_VALUE)
-				.header(AUTHORIZATION, serviceUserToken)
-				.header(NAV_CONSUMER_TOKEN, serviceUserToken)
-				.header(NAV_CALL_ID, MDC.get(MDC_CALL_ID))
-				.header(HEADER_PDL_BEHANDLINGSNUMMER, ARKIVPLEIE_BEHANDLINGSNUMMER);
+	private HentPersonInfo mapPersonInfo(PdlHentPerson response) {
+		if (isNull(response.getErrors()) || response.getErrors().isEmpty()) {
+			return mapHentNavnResponse.mapNavn(response);
+		} else {
+			if (PERSON_IKKE_FUNNET_CODE.equals(response.getErrors().get(0).getExtensions().getCode())) {
+				throw new PersonIkkeFunnetException("Fant ikke personnavn for person i pdl.");
+			}
+			throw new PdlFunctionalException("Kunne ikke hente personnavn for person i pdl. " + response.getErrors());
+		}
 	}
 
 	private PDLRequest mapRequest(final String ident, String query) {
@@ -123,5 +95,16 @@ public class PdlGraphQLConsumer {
 			  }
 			}
 			""";
+
+	private Consumer<Throwable> handlePdlErrors() {
+		return error -> {
+			if (error instanceof WebClientResponseException webException && ((WebClientResponseException) error).getStatusCode().is4xxClientError()) {
+				ProblemDetail problemDetail = webException.getResponseBodyAs(ProblemDetail.class);
+				throw new PdlFunctionalException("Kunne ikke hente person fra pdl. problem=" + problemDetail);
+			} else {
+				throw new PdlHentPersonTechnicalException("Teknisk feil ved kall mot PDL. Se stacktrace", error);
+			}
+		};
+	}
 
 }
