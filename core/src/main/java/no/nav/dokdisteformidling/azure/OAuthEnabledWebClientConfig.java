@@ -28,7 +28,7 @@ import static org.springframework.security.oauth2.core.ClientAuthenticationMetho
 @Configuration
 public class OAuthEnabledWebClientConfig {
 
-	public static final String CLIENT_REGISTRATION_DOKDISTADMIN = "azure-dokdistadim";
+	public static final String CLIENT_REGISTRATION_DOKDISTADMIN = "azure-dokdistadmin";
 	public static final String CLIENT_REGISTRATION_PDL = "azure-pdl";
 
 	@Bean
