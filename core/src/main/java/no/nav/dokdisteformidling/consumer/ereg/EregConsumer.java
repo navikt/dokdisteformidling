@@ -2,13 +2,11 @@ package no.nav.dokdisteformidling.consumer.ereg;
 
 import no.nav.dokdisteformidling.exception.functional.EregHentNoekkelinfoFunctionalException;
 import no.nav.dokdisteformidling.exception.technical.EregHentNoekkelinfoTechnicalException;
-import no.nav.dokdisteformidling.metrics.Monitor;
 import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
-import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpClientErrorException;
@@ -22,7 +20,6 @@ import static no.nav.dokdisteformidling.constants.DomainConstants.APP_NAME;
 import static no.nav.dokdisteformidling.constants.MdcConstants.MDC_CALL_ID;
 import static no.nav.dokdisteformidling.constants.NavHeaders.NAV_CALL_ID;
 import static no.nav.dokdisteformidling.constants.NavHeaders.NAV_CONSUMER_ID;
-import static no.nav.dokdisteformidling.constants.RetryConstants.DELAY_SHORT;
 import static org.springframework.http.HttpMethod.GET;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 
@@ -41,8 +38,7 @@ public class EregConsumer implements Ereg {
 		this.eregApiUrl = eregApiUrl;
 	}
 
-	@Monitor(value = "dok_metric", extraTags = {"process", "hentNavn"}, percentiles = {0.5, 0.95}, histogram = true)
-	@Retryable(include = EregHentNoekkelinfoTechnicalException.class, backoff = @Backoff(delay = DELAY_SHORT))
+	@Retryable(retryFor = EregHentNoekkelinfoTechnicalException.class)
 	public String hentNavn(String orgnr) {
 		try {
 			final String orgnrTrimmed = orgnr.trim();

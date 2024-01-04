@@ -27,20 +27,17 @@ public class Qdist013Route extends RouteBuilder {
 	private final Qdist013Service qdist013Service;
 	private final Queue qdist013;
 	private final Queue qdist013FunksjonellFeil;
-	private final Qdist013MetricsRoutePolicy qdist0013MetricsRoutePolicy;
 	private final DistribuerForsendelseTilTrygderettenMapper distribuerForsendelseTilTrygderettenMapper;
 	private final DokdistAdministrerForsendelseUpdater dokdistAdministrerforsendelseUpdater;
 
 	public Qdist013Route(Qdist013Service qdist013Service,
 						 Queue qdist013,
 						 Queue qdist013FunksjonellFeil,
-						 Qdist013MetricsRoutePolicy qdist0013MetricsRoutePolicy,
 						 DistribuerForsendelseTilTrygderettenMapper distribuerForsendelseTilTrygderettenMapper,
 						 DokdistAdministrerForsendelseUpdater dokdistAdministrerforsendelseUpdater) {
 		this.qdist013Service = qdist013Service;
 		this.qdist013 = qdist013;
 		this.qdist013FunksjonellFeil = qdist013FunksjonellFeil;
-		this.qdist0013MetricsRoutePolicy = qdist0013MetricsRoutePolicy;
 		this.distribuerForsendelseTilTrygderettenMapper = distribuerForsendelseTilTrygderettenMapper;
 		this.dokdistAdministrerforsendelseUpdater = dokdistAdministrerforsendelseUpdater;
 	}
@@ -62,7 +59,6 @@ public class Qdist013Route extends RouteBuilder {
 		from("jms:" + qdist013.getQueueName() +
 				"?transacted=true")
 				.routeId(QDIST013_SERVICE_ID)
-				.routePolicy(qdist0013MetricsRoutePolicy)
 				.setExchangePattern(ExchangePattern.InOnly)
 				.process(new IdsProcessor())
 				.log(LoggingLevel.INFO, log, "qdist013 har mottatt forsendelse med forsendelseId=${exchangeProperty." + PROPERTY_FORSENDELSE_ID + "}")

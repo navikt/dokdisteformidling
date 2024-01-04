@@ -1,5 +1,8 @@
 package no.nav.dokdisteformidling.consumer.eformidling.altinn.services;
 
+import jakarta.activation.DataHandler;
+import jakarta.xml.bind.JAXBException;
+import jakarta.xml.ws.BindingProvider;
 import lombok.extern.slf4j.Slf4j;
 import no.altinn.brokerserviceexternalstreamed.BrokerServiceExternalStreamedSF;
 import no.altinn.brokerserviceexternalstreamed.IBrokerServiceExternalStreamed;
@@ -13,15 +16,11 @@ import no.nav.dokdisteformidling.consumer.eformidling.altinn.to.AltinnReasonFact
 import no.nav.dokdisteformidling.consumer.eformidling.altinn.to.ReceiptTo;
 import no.nav.dokdisteformidling.consumer.eformidling.dokumentpakker.exceptions.DokumentpakkingException;
 import no.nav.dokdisteformidling.exception.technical.AltinnBrokerServiceWsException;
-import no.nav.dokdisteformidling.metrics.Monitor;
 import org.apache.cxf.headers.Header;
 import org.apache.cxf.jaxb.JAXBDataBinding;
 import org.springframework.stereotype.Component;
 
-import jakarta.activation.DataHandler;
-import jakarta.xml.bind.JAXBException;
 import javax.xml.namespace.QName;
-import jakarta.xml.ws.BindingProvider;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -49,7 +48,6 @@ public class BrokerServiceExternalStreamedService {
         this.objectFactory = new ObjectFactory();
     }
 
-    @Monitor(value = "dok_metric", extraTags = {"process", "brokerServiceExternalStreamedServiceUploadFileToAltinn"}, histogram = true, percentiles = {0.5, 0.95})
     public ReceiptTo uploadFileToAltinn(String fileReference, String fileName, DataHandler dataHandler) {
         List<Header> headerList = new ArrayList<>();
         Header reportee = null;
@@ -112,7 +110,6 @@ public class BrokerServiceExternalStreamedService {
         return DownloadedMessageFromAltinn.builder().filreferanse(filreferanse).inputStream(inputStream).build();
     }
 
-    @Monitor(value = "dok_metric", extraTags = {"process", "brokerServiceExternalStreamedServiceDownloadFile"}, histogram = true, percentiles = {0.5, 0.95})
     public DataHandler downloadFile(String filreferanse) {
 
         log.info("Laster ned fil fra Altinn med filreferanse=" + filreferanse);

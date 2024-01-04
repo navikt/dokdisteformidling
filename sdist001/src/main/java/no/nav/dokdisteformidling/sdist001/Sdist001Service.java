@@ -14,7 +14,6 @@ import no.nav.dokdisteformidling.consumer.rdist001.HentEformidlingforsendelserRe
 import no.nav.dokdisteformidling.consumer.rdist001.HentForsendelseResponse;
 import no.nav.dokdisteformidling.consumer.rdist001.OppdaterForsendelseRequest;
 import no.nav.dokdisteformidling.exception.functional.KunneIkkeSerialisereEformidlingstatusoppdateringTilJson;
-import no.nav.dokdisteformidling.metrics.Monitor;
 import no.nav.dokdisteformidling.sdist001.domain.EformidlingStatusOppdatering;
 import no.nav.dokdisteformidling.sdist001.domain.ForsendelseStatusEndringer;
 import no.nav.dokdisteformidling.sdist001.domain.to.AltinnKvitteringStatus;
@@ -51,7 +50,6 @@ public class Sdist001Service {
 		this.juridiskLoggObjectMapper = new ObjectMapper().registerModule(new JavaTimeModule());
 	}
 
-	@Monitor(value = "dok_metric", extraTags = {"process", "oppdatertDokDistEformidlingStatus"}, histogram = true)
 	public void oppdaterDokDistEformidlingStatus() {
 		var endringer = new ForsendelseStatusEndringer();
 		List<ForsendelseTo> forsendelserTo = administrerForsendelse.hentEformidlingForsendelser().getForsendelser();

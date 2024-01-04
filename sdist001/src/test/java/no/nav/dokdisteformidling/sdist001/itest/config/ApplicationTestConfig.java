@@ -1,5 +1,7 @@
 package no.nav.dokdisteformidling.sdist001.itest.config;
 
+import no.nav.dokdisteformidling.azure.AzureProperties;
+import no.nav.dokdisteformidling.azure.OAuthEnabledWebClientConfig;
 import no.nav.dokdisteformidling.certificate.KeyStoreProperties;
 import no.nav.dokdisteformidling.config.alias.ServiceuserAlias;
 import no.nav.dokdisteformidling.config.props.BrokerServiceExternalProperties;
@@ -17,6 +19,7 @@ import org.springframework.context.annotation.Profile;
 @Configuration
 @Profile("itest")
 @EnableConfigurationProperties({
+		AzureProperties.class,
 		ServiceuserAlias.class,
 		DpoUserProperties.class,
 		BrokerServiceExternalProperties.class,
@@ -27,9 +30,9 @@ import org.springframework.context.annotation.Profile;
 		DokdisteformidlingProperties.class
 })
 @Import({
-		BrokerServiceExternalStreamedConfigTest.class,
 		BrokerServiceExternalTestConfig.class,
-		LocalTestCacheConfig.class
+		LocalTestCacheConfig.class,
+		OAuthEnabledWebClientConfig.class
 })
 @ComponentScan(basePackages = "no.nav.dokdisteformidling")
 public class ApplicationTestConfig {
