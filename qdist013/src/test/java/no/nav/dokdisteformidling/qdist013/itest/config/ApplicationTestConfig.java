@@ -1,5 +1,7 @@
 package no.nav.dokdisteformidling.qdist013.itest.config;
 
+import no.nav.dokdisteformidling.azure.AzureProperties;
+import no.nav.dokdisteformidling.azure.OAuthEnabledWebClientConfig;
 import no.nav.dokdisteformidling.certificate.KeyStoreProperties;
 import no.nav.dokdisteformidling.config.alias.MqGatewayAlias;
 import no.nav.dokdisteformidling.config.alias.ServiceuserAlias;
@@ -10,7 +12,6 @@ import no.nav.dokdisteformidling.config.props.DokdisteformidlingProperties;
 import no.nav.dokdisteformidling.config.props.DpoUserProperties;
 import no.nav.dokdisteformidling.config.props.MaskinportenProperties;
 import no.nav.dokdisteformidling.config.props.ServiceRegistryProperties;
-import no.nav.dokdisteformidling.config.webclient.WebClientConfig;
 import no.nav.dokdisteformidling.storage.BucketStorage;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -26,6 +27,7 @@ import static org.mockito.Mockito.mock;
 @Profile("itest")
 @EnableRetry
 @EnableConfigurationProperties({ServiceuserAlias.class,
+		AzureProperties.class,
 		DpoUserProperties.class,
 		BrokerServiceExternalProperties.class,
 		BrokerServiceExternalStreamedProperties.class,
@@ -34,7 +36,8 @@ import static org.mockito.Mockito.mock;
 		MaskinportenProperties.class,
 		ServiceRegistryProperties.class,
 		DokdisteformidlingProperties.class})
-@Import({WebClientConfig.class,
+@Import({
+		OAuthEnabledWebClientConfig.class,
 		JmsItestConfig.class,
 		LokalCacheConfig.class,
 		BrokerServiceExternalTestConfig.class,

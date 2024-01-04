@@ -2,6 +2,13 @@ package no.nav.dokdisteformidling.qdist013.itest;
 
 import com.github.tomakehurst.wiremock.verification.LoggedRequest;
 import com.google.cloud.storage.StorageException;
+import jakarta.jms.Queue;
+import jakarta.jms.TextMessage;
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.JAXBElement;
+import jakarta.xml.bind.Unmarshaller;
+import jakarta.xml.soap.MessageFactory;
+import jakarta.xml.soap.SOAPMessage;
 import no.altinn.brokerserviceexternal.InitiateBrokerService;
 import no.altinn.brokerserviceexternal.Manifest;
 import no.nav.dokdisteformidling.consumer.eformidling.serviceregistry.EformidlingMottakerInfoService;
@@ -27,13 +34,6 @@ import org.springframework.jms.core.JmsTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.util.MimeTypeUtils;
 
-import jakarta.jms.Queue;
-import jakarta.jms.TextMessage;
-import jakarta.xml.bind.JAXBContext;
-import jakarta.xml.bind.JAXBElement;
-import jakarta.xml.bind.Unmarshaller;
-import jakarta.xml.soap.MessageFactory;
-import jakarta.xml.soap.SOAPMessage;
 import java.io.ByteArrayInputStream;
 import java.util.List;
 import java.util.UUID;
@@ -53,8 +53,8 @@ import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlMatching;
 import static com.github.tomakehurst.wiremock.client.WireMock.verify;
-import static java.util.concurrent.TimeUnit.SECONDS;
 import static jakarta.xml.soap.SOAPConstants.SOAP_1_2_PROTOCOL;
+import static java.util.concurrent.TimeUnit.SECONDS;
 import static no.nav.dokdisteformidling.constants.RetryConstants.MAX_ATTEMPTS_SHORT;
 import static no.nav.dokdisteformidling.consumer.eformidling.EformidlingConstants.AVTALTMELDING_PROCESS;
 import static no.nav.dokdisteformidling.consumer.eformidling.EformidlingConstants.TRYGDERETTEN_ORGNUMMER;
@@ -166,7 +166,7 @@ class Qdist013ForAltinnIT {
 
 		sendStringMessage(qdist013, classpathToString("qdist013/qdist013-happy.xml"));
 
-		await().atMost(10, SECONDS).untilAsserted(() -> verifyIntiateBrokerServiceStubs("", "20026900817", "1000045110509", 21, 1, 2, 2));
+		await().atMost(10, SECONDS).untilAsserted(() -> verifyIntiateBrokerServiceStubs("", 19, 1, 2, 1));
 	}
 
 	@Test
@@ -182,7 +182,10 @@ class Qdist013ForAltinnIT {
 
 		sendStringMessage(qdist013, classpathToString("qdist013/qdist013-happy.xml"));
 
-		await().atMost(10, SECONDS).untilAsserted(() -> verifyIntiateBrokerServiceStubs("", "20026900817", "1000045110509", 17, 1, 2, 2));
+		await().atMost(10, SECONDS).untilAsserted(() -> {
+			verifyIntiateBrokerServiceStubs("", 15, 1, 2, 1);
+
+		});
 	}
 
 	@Test
@@ -196,7 +199,7 @@ class Qdist013ForAltinnIT {
 
 		await().atMost(10, SECONDS).untilAsserted(() -> assertMessageOnQueue(qdist013FunksjonellFeil));
 
-		verifyGetForsendelse();
+		verifyGetForsendelse(1);
 		verifyGetSecurityToken(1);
 		verifyPostSafJournalpost();
 	}
@@ -217,7 +220,7 @@ class Qdist013ForAltinnIT {
 
 		sendStringMessage(qdist013, classpathToString("qdist013/qdist013-happy.xml"));
 
-		await().atMost(10, SECONDS).untilAsserted(() -> verifyIntiateBrokerServiceStubs("", "20026900817", "1000045110509", 21, 1, 2, 2));
+		await().atMost(10, SECONDS).untilAsserted(() -> verifyIntiateBrokerServiceStubs("", 19, 1, 2, 1));
 	}
 
 	@Test
@@ -236,7 +239,7 @@ class Qdist013ForAltinnIT {
 
 		sendStringMessage(qdist013, classpathToString("qdist013/qdist013-happy.xml"));
 
-		await().atMost(10, SECONDS).untilAsserted(() -> verifyAllStubs("", 20, 1, 1));
+		await().atMost(10, SECONDS).untilAsserted(() -> verifyAllStubs("", 19, 1, 1));
 	}
 
 	@Test
@@ -396,7 +399,7 @@ class Qdist013ForAltinnIT {
 		await().atMost(20, SECONDS).untilAsserted(() -> assertMessageOnQueue(backoutQueue));
 
 		verifyGetForsendelse();
-		verifyGetSecurityToken(MAX_ATTEMPTS_SHORT + 3);
+		verifyGetSecurityToken(MAX_ATTEMPTS_SHORT + 1);
 		verifyPostSafJournalpost();
 		verify(1, postRequestedFor(urlEqualTo("/safgraphql"))
 				.withRequestBody(equalToJson(classpathToString("__files/saf/safLightweightGraphQlRequest.json"))));
@@ -406,6 +409,7 @@ class Qdist013ForAltinnIT {
 	void shouldThrowSafJournalpostQueryUnauthorizedExceptionLightweight() {
 		stubGetForsendelse("__files/rjoark001/getForsendelse-happy.json");
 		stubGetSecurityToken();
+		postPdlGraphql(PDL_PERSONNAVN_HAPPY, OK.value());
 		stubPostSafJournalpost("queryJournalpostId\":\"123\"", "saf/safQdist013GraphQlResponse-aktoerId.json");
 		stubFor(post(urlMatching("/safgraphql"))
 				.withRequestBody(containing("queryJournalpostId\":\"448212366\""))
@@ -437,7 +441,7 @@ class Qdist013ForAltinnIT {
 		await().atMost(10, SECONDS).untilAsserted(() -> assertMessageOnQueue(backoutQueue));
 
 		verifyGetForsendelse();
-		verifyGetSecurityToken(6);
+		verifyGetSecurityToken(4);
 		verifyPostSafJournalpost();
 		verify(1, postRequestedFor(urlEqualTo("/safgraphql"))
 				.withRequestBody(equalToJson(classpathToString("__files/saf/safLightweightGraphQlRequest.json"))));
@@ -456,10 +460,10 @@ class Qdist013ForAltinnIT {
 		await().atMost(10, SECONDS).untilAsserted(() -> assertMessageOnQueue(qdist013FunksjonellFeil));
 
 		verifyGetForsendelse();
-		verifyGetSecurityToken(1 + 1);
+		verifyGetSecurityToken(1);
 		verifyPostSafJournalpost();
 		verifyPostSafJournalpostLightweight(1);
-		verify(1, postRequestedFor(urlEqualTo("/pdl")));
+		verify(3, postRequestedFor(urlEqualTo("/pdl")));
 	}
 
 	@Test
@@ -474,11 +478,10 @@ class Qdist013ForAltinnIT {
 
 		await().atMost(10, SECONDS).untilAsserted(() -> assertMessageOnQueue(qdist013FunksjonellFeil));
 
-		verifyGetForsendelse();
-		verifyGetSecurityToken(2);
+		verifyGetSecurityToken(1);
 		verifyPostSafJournalpost();
 		verifyPostSafJournalpostLightweight(1);
-		verify(1, postRequestedFor(urlEqualTo("/pdl")));
+		verify(3, postRequestedFor(urlEqualTo("/pdl")));
 	}
 
 	@ParameterizedTest
@@ -495,10 +498,10 @@ class Qdist013ForAltinnIT {
 		await().atMost(10, SECONDS).untilAsserted(() -> assertMessageOnQueue(backoutQueue));
 
 		verifyGetForsendelse();
-		verifyGetSecurityToken(6);
+		verifyGetSecurityToken(1);
 		verifyPostSafJournalpost();
 		verifyPostSafJournalpostLightweight(1);
-		verify(5, postRequestedFor(urlEqualTo("/pdl")));
+		verify(3, postRequestedFor(urlEqualTo("/pdl")));
 	}
 
 	@Test
@@ -855,7 +858,7 @@ class Qdist013ForAltinnIT {
 		verifyPutAdministrerforsendelseOppdatertForsendelsestatusAndkonvId();
 	}
 
-	private void verifyIntiateBrokerServiceStubs(String orgnr, String fnr, String aktoerId, int stsCount, int safCount, int akoterCount, int pdlCount) {
+	private void verifyIntiateBrokerServiceStubs(String orgnr, int stsCount, int safCount, int pdlCount, int serviceRegistryCount) {
 		verifyGetForsendelse();
 		verifyGetSecurityToken(stsCount);
 		verifyPostSafJournalpost();
@@ -866,9 +869,8 @@ class Qdist013ForAltinnIT {
 		} else {
 			verifyPostPDLHentPersonNavn(pdlCount);
 		}
-
 		verifyPostMaskinporten();
-		verifyGetServiceRegistry();
+		verifyGetServiceRegistry(serviceRegistryCount);
 		verifyPostIntiateBrokerService();
 	}
 
@@ -923,7 +925,7 @@ class Qdist013ForAltinnIT {
 	}
 
 	private void verifyPostIntiateBrokerService() {
-		verify(1, postRequestedFor(urlEqualTo("/brokerserviceexternal")));
+		verify(1, postRequestedFor(urlMatching("/brokerserviceexternal")));
 	}
 
 	private void verifyPostUploadBrokerServiceStreamed() {

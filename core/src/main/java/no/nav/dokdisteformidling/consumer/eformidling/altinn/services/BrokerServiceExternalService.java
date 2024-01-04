@@ -20,7 +20,6 @@ import no.nav.dokdisteformidling.consumer.eformidling.altinn.to.SearchCriteria;
 import no.nav.dokdisteformidling.consumer.eformidling.altinn.to.ServiceCode;
 import no.nav.dokdisteformidling.consumer.eformidling.altinn.to.UploadManifest;
 import no.nav.dokdisteformidling.exception.technical.AltinnBrokerServiceWsException;
-import no.nav.dokdisteformidling.metrics.Monitor;
 import org.springframework.stereotype.Component;
 
 import java.util.Collections;
@@ -49,7 +48,6 @@ public class BrokerServiceExternalService {
         this.objectFactory = new ObjectFactory();
     }
 
-    @Monitor(value = "dok_metric", extraTags = {"process", "brokerServiceExternalServiceInitiateBrokerService"}, histogram = true, percentiles = {0.5, 0.95})
     public String intiateBrokerService(UploadManifest uploadManifest) {
         try {
             return brokerServiceExternal.initiateBrokerService(getBrokerServiceInitiation(uploadManifest));
@@ -58,7 +56,6 @@ public class BrokerServiceExternalService {
         }
     }
 
-    @Monitor(value = "dok_metric", extraTags = {"process", "brokerServiceExternalServiceGetFileReferences"}, histogram = true, percentiles = {0.5, 0.95})
     public Optional<BrokerServiceAvailableFileList> getFileReferences(SearchCriteria criteria, ServiceCode serviceCode) {
         try {
             return Optional.of(brokerServiceExternal.getAvailableFiles(getBrokerServiceSearch(NAV_ORGNUMMER, serviceCode, criteria)));
@@ -67,7 +64,6 @@ public class BrokerServiceExternalService {
         }
     }
 
-    @Monitor(value = "dok_metric", extraTags = {"process", "brokerServiceExternalServiceConfirmDownloaded"}, histogram = true, percentiles = {0.5, 0.95})
     public void confirmDownloaded(String fileReference) {
         try {
             brokerServiceExternal.confirmDownloaded(fileReference, NAV_ORGNUMMER);

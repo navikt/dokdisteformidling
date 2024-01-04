@@ -18,6 +18,9 @@ public class DokdisteformidlingProperties {
 	public static class Endpoints {
 		@NotNull
 		private AzureEndpoint dokdistadmin;
+
+		@NotNull
+		private AzureEndpoint pdl;
 	}
 
 	@Data

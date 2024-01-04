@@ -4,10 +4,8 @@ import no.nav.dokdisteformidling.config.alias.ServiceuserAlias;
 import no.nav.dokdisteformidling.exception.functional.LagreJuridiskLoggFunctionalException;
 import no.nav.dokdisteformidling.exception.technical.AbstractDokdisteformidlingTechnicalException;
 import no.nav.dokdisteformidling.exception.technical.LagreJuridiskLoggTechnicalException;
-import no.nav.dokdisteformidling.metrics.Monitor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
-import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpClientErrorException;
@@ -17,8 +15,6 @@ import org.springframework.web.client.RestTemplate;
 import java.time.Duration;
 
 import static java.lang.String.format;
-import static no.nav.dokdisteformidling.constants.RetryConstants.DELAY_SHORT;
-import static no.nav.dokdisteformidling.constants.RetryConstants.MULTIPLIER_SHORT;
 
 @Component
 public class JuridiskLoggConsumer implements JuridiskLogg {
@@ -38,8 +34,7 @@ public class JuridiskLoggConsumer implements JuridiskLogg {
 	}
 
 	@Override
-	@Retryable(include = AbstractDokdisteformidlingTechnicalException.class, backoff = @Backoff(delay = DELAY_SHORT, multiplier = MULTIPLIER_SHORT))
-	@Monitor(value = "dok_consumer", extraTags = {"process", "lagreJuridiskLogg"}, histogram = true)
+	@Retryable(retryFor = AbstractDokdisteformidlingTechnicalException.class)
 	public LoggMeldingResponse lagreJuridiskLogg(final LoggMeldingRequest loggMeldingRequest) {
 		try {
 			return restTemplate.postForObject(this.juridiskLoggUrl, loggMeldingRequest, LoggMeldingResponse.class);
