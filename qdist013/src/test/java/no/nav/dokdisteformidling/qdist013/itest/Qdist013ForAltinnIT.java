@@ -1,6 +1,5 @@
 package no.nav.dokdisteformidling.qdist013.itest;
 
-import com.github.tomakehurst.wiremock.client.WireMock;
 import com.github.tomakehurst.wiremock.verification.LoggedRequest;
 import com.google.cloud.storage.StorageException;
 import jakarta.jms.Queue;
@@ -19,7 +18,6 @@ import no.nav.dokdisteformidling.qdist013.itest.config.ApplicationTestConfig;
 import no.nav.dokdisteformidling.storage.BucketStorage;
 import no.nav.dokdisteformidling.storage.DokdistDokument;
 import no.nav.dokdisteformidling.storage.JsonSerializer;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -137,13 +135,6 @@ class Qdist013ForAltinnIT {
 		when(bucketStorage.downloadObject(eq(DOKUMENT_OBJEKT_REFERANSE_VEDLEGG2), anyString()))
 				.thenReturn(JsonSerializer.serialize(DokdistDokument.builder().pdf(VEDLEGG2_TEST_CONTENT.getBytes()).build()));
 	}
-
-	@AfterEach
-	public void tearDown() {
-		WireMock.resetAllRequests();
-		WireMock.removeAllMappings();
-	}
-
 
 	@Test
 	void shouldHenteMottakerInfoFraServiceRegistery() {

@@ -98,7 +98,7 @@ public class PdlGraphQLConsumer {
 
 	private Consumer<Throwable> handlePdlErrors() {
 		return error -> {
-			if (error instanceof WebClientResponseException webException && ((WebClientResponseException) error).getStatusCode().is4xxClientError()) {
+			if (error instanceof WebClientResponseException webException && webException.getStatusCode().is4xxClientError()) {
 				ProblemDetail problemDetail = webException.getResponseBodyAs(ProblemDetail.class);
 				throw new PdlFunctionalException("Kunne ikke hente person fra pdl. problem=" + problemDetail);
 			} else {
