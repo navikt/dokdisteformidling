@@ -13,6 +13,7 @@ import no.nav.dokdisteformidling.config.props.MaskinportenProperties;
 import no.nav.dokdisteformidling.config.props.ServiceRegistryProperties;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.security.reactive.ReactiveUserDetailsServiceAutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.retry.annotation.EnableRetry;
 import org.springframework.scheduling.annotation.EnableScheduling;
@@ -20,7 +21,6 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 import static java.lang.System.getenv;
 import static java.lang.System.setProperty;
 
-@SpringBootApplication
 @EnableRetry
 @EnableScheduling
 @EnableConfigurationProperties({ServiceuserAlias.class,
@@ -35,6 +35,7 @@ import static java.lang.System.setProperty;
 		DokdisteformidlingProperties.class,
 		AzureProperties.class
 })
+@SpringBootApplication(exclude = {ReactiveUserDetailsServiceAutoConfiguration.class})
 public class Application {
 
 	public static void main(String[] args) {
