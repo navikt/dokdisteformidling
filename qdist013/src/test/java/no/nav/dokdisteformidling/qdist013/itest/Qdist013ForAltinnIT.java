@@ -1,17 +1,9 @@
 package no.nav.dokdisteformidling.qdist013.itest;
 
-import com.github.tomakehurst.wiremock.client.WireMock;
-import com.github.tomakehurst.wiremock.verification.LoggedRequest;
 import com.google.cloud.storage.StorageException;
 import jakarta.jms.Queue;
 import jakarta.jms.TextMessage;
-import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.JAXBElement;
-import jakarta.xml.bind.Unmarshaller;
-import jakarta.xml.soap.MessageFactory;
-import jakarta.xml.soap.SOAPMessage;
-import no.altinn.brokerserviceexternal.InitiateBrokerService;
-import no.altinn.brokerserviceexternal.Manifest;
 import no.nav.dokdisteformidling.consumer.eformidling.serviceregistry.EformidlingMottakerInfoService;
 import no.nav.dokdisteformidling.consumer.eformidling.serviceregistry.MottakerInfo;
 import no.nav.dokdisteformidling.exception.technical.BucketFailedToDownloadTechnicalException;
@@ -19,7 +11,6 @@ import no.nav.dokdisteformidling.qdist013.itest.config.ApplicationTestConfig;
 import no.nav.dokdisteformidling.storage.BucketStorage;
 import no.nav.dokdisteformidling.storage.DokdistDokument;
 import no.nav.dokdisteformidling.storage.JsonSerializer;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -36,14 +27,11 @@ import org.springframework.jms.core.JmsTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.util.MimeTypeUtils;
 
-import java.io.ByteArrayInputStream;
-import java.util.List;
 import java.util.UUID;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.containing;
 import static com.github.tomakehurst.wiremock.client.WireMock.equalToJson;
-import static com.github.tomakehurst.wiremock.client.WireMock.findAll;
 import static com.github.tomakehurst.wiremock.client.WireMock.get;
 import static com.github.tomakehurst.wiremock.client.WireMock.getRequestedFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.matchingJsonPath;
@@ -55,7 +43,6 @@ import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlMatching;
 import static com.github.tomakehurst.wiremock.client.WireMock.verify;
-import static jakarta.xml.soap.SOAPConstants.SOAP_1_2_PROTOCOL;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static no.nav.dokdisteformidling.constants.RetryConstants.MAX_ATTEMPTS_SHORT;
 import static no.nav.dokdisteformidling.consumer.eformidling.EformidlingConstants.AVTALTMELDING_PROCESS;
@@ -67,7 +54,6 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
@@ -80,7 +66,6 @@ import static org.springframework.http.HttpStatus.OK;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.http.MediaType.APPLICATION_XML_VALUE;
 import static wiremock.com.google.common.base.Strings.isNullOrEmpty;
-
 
 @EnableAutoConfiguration
 @SpringBootTest(classes = {ApplicationTestConfig.class},
@@ -100,7 +85,6 @@ class Qdist013ForAltinnIT {
 	public static final String PDL_FORNAVN_NULL = "pdl/personnavn_nullfornavn.json";
 	private static final String PDL_IDENT_NOT_FOUND = "pdl/pdlident_not_found.json";
 	private static final String PDL_IDENT_HAPPY = "pdl/pdlident_happy.json";
-	private static final String BEARER_OIDC_TOKEN = "Bearer eyJraWQiOiIyZDYwNjZmNi1mM2ViLTRlYzktYjRlZS0wMzM1Nzg0MDY3MTMiLCJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJzdWIiOiJzcnZqb2Fya2FkbWluIiwiYXVkIjpbInNydmpvYXJrYWRtaW4iLCJwcmVwcm9kLmxvY2FsIl0sInZlciI6IjEuMCIsIm5iZiI6MTU1NjI2Nzg0NiwiYXpwIjoic3J2am9hcmthZG1pbiIsImlkZW50VHlwZSI6IlN5c3RlbXJlc3N1cnMiLCJhdXRoX3RpbWUiOjE1NTYyNjc4NDYsImlzcyI6Imh0dHBzOlwvXC9zZWN1cml0eS10b2tlbi1zZXJ2aWNlLm5haXMucHJlcHJvZC5sb2NhbCIsImV4cCI6MTU1NjI3MTQ0NiwiaWF0IjoxNTU2MjY3ODQ2LCJqdGkiOiI5NzVmMjY4YS00ZmI3LTQ2NWMtOTIyZS0xY2Q4OTNjZDEwY2QifQ.e7e1cKmLt0wYSBdURju0pZnplheXl-T5Df7t2QKcOWpKfERKgfSnMOHPYuS80GJbwvfZXE7F_WiTyB2Klsv_shS2Iy_DqqS2qRPUit4fCDyXX4TMBVWWqBY60Wg46NuZGz4kje6z0BcT84cyrQSPKNuVEmy9xcdIXrQ2xzJy9NyOseSvEkUPX4Xj4yfCh6CoEIOsNDQ-hW6XUkbAKjF3nkM6AwSQ2cZTi9T7j12LNw4RQyBwl9PINP8d3t2jeOJ8Gq7xVkzlyL60SHH2UnblBag0UhCYLYIzuSr1lkpvZ_8q5vqg9DXk7CQZGmZNfoOOQsy1pBTyzU3JjhGmBNWZEg";
 	private static final String OPPDATERFORSENDELSE_URL = "/administrerforsendelse/oppdaterforsendelse";
 
 	@Value("${altinn.brokerserviceexternal.endpointurl}")
@@ -184,10 +168,9 @@ class Qdist013ForAltinnIT {
 
 		sendStringMessage(qdist013, classpathToString("qdist013/qdist013-happy.xml"));
 
-		await().atMost(10, SECONDS).untilAsserted(() -> {
-			verifyIntiateBrokerServiceStubs("", 15, 1, 2, 1);
-
-		});
+		await().atMost(10, SECONDS).untilAsserted(() ->
+				verifyIntiateBrokerServiceStubs("", 15, 1, 2, 1)
+		);
 	}
 
 	@Test
@@ -799,7 +782,6 @@ class Qdist013ForAltinnIT {
 		stubPostIntiateBrokerService();
 
 		verifyPostJuridiskLoggLagre();
-		String conversationId = findConversationId();
 		verify(3, putRequestedFor(urlEqualTo(OPPDATERFORSENDELSE_URL)));
 	}
 
@@ -951,8 +933,8 @@ class Qdist013ForAltinnIT {
 	@SuppressWarnings("unchecked")
 	private <T> T receive(Queue queue) {
 		Object response = jmsTemplate.receiveAndConvert(queue);
-		if (response instanceof JAXBElement) {
-			response = ((JAXBElement) response).getValue();
+		if (response instanceof JAXBElement jabx) {
+			response = jabx.getValue();
 		}
 		return (T) response;
 	}
@@ -1053,23 +1035,6 @@ class Qdist013ForAltinnIT {
 
 	private void sendStringMessage(Queue queue, final String message) {
 		sendStringMessage(queue, message, CALL_ID);
-	}
-
-	private String findConversationId() {
-		List<LoggedRequest> loggedRequests = findAll(postRequestedFor(urlEqualTo("/brokerserviceexternal")));
-		String requestStr = loggedRequests.get(0).getBodyAsString();
-		try {
-			MessageFactory factory = MessageFactory.newInstance(SOAP_1_2_PROTOCOL);
-			SOAPMessage message = factory.createMessage(null,
-					new ByteArrayInputStream(requestStr.getBytes()));
-			Unmarshaller unmarshaller = JAXBContext.newInstance(InitiateBrokerService.class).createUnmarshaller();
-			Manifest uploadManifest = ((InitiateBrokerService) unmarshaller.unmarshal(message.getSOAPBody().extractContentAsDocument())).getBrokerServiceInitiation().getManifest();
-
-			return uploadManifest.getSendersReference();
-		} catch (Exception e) {
-			fail("Fant ikke konversasjonsId. Feil: " + e.getMessage(), e.getCause());
-			return null;
-		}
 	}
 
 	private void sendStringMessage(Queue queue, final String message, final String callId) {
