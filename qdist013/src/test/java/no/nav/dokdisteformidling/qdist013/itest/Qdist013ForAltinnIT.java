@@ -138,13 +138,6 @@ class Qdist013ForAltinnIT {
 				.thenReturn(JsonSerializer.serialize(DokdistDokument.builder().pdf(VEDLEGG2_TEST_CONTENT.getBytes()).build()));
 	}
 
-	@AfterEach
-	public void tearDown() {
-		WireMock.resetAllRequests();
-		WireMock.removeAllMappings();
-	}
-
-
 	@Test
 	void shouldHenteMottakerInfoFraServiceRegistery() {
 		stubGetSecurityToken();
