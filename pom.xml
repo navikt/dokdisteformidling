@@ -21,7 +21,7 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>3.1.5</version>
+		<version>3.2.2</version>
 	</parent>
 
 	<properties>
@@ -29,9 +29,9 @@
 
 		<camel.version>4.2.0</camel.version>
 		<logstash-logback-encoder.version>7.4</logstash-logback-encoder.version>
-		<resilience4j.version>2.1.0</resilience4j.version>
-		<google-cloud.version>26.27.0</google-cloud.version>
-		<tink.version>1.11.0</tink.version>
+		<resilience4j.version>2.2.0</resilience4j.version>
+		<google-cloud.version>26.31.0</google-cloud.version>
+		<tink.version>1.12.0</tink.version>
 		<tink-gcpkms.version>1.9.0</tink-gcpkms.version>
 		<ibm.mq.version>9.3.3.1</ibm.mq.version>
 		<commons-io.version>2.15.0</commons-io.version>
@@ -48,7 +48,7 @@
 		<melding-virksomhet-dokdistfordeling.version>7-18c61bf</melding-virksomhet-dokdistfordeling.version>
 
 		<!-- test -->
-		<spring-cloud-contract-wiremock.version>4.0.4</spring-cloud-contract-wiremock.version>
+		<spring-cloud-contract-wiremock.version>4.1.1</spring-cloud-contract-wiremock.version>
 
 		<!-- Plugins -->
 		<maven-jaxb2-plugin.version>2.1.1</maven-jaxb2-plugin.version>
