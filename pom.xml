@@ -52,7 +52,7 @@
 
 		<!-- Plugins -->
 		<maven-jaxb2-plugin.version>2.1.1</maven-jaxb2-plugin.version>
-		<jaxb2-basics-annotate.version>2.1.1</jaxb2-basics-annotate.version>
+		<jaxb2-basics-annotate.version>2.2.0</jaxb2-basics-annotate.version>
 		<jaxb2-basics.version>2.1.1</jaxb2-basics.version>
 		<jaxb2-basics-tools.version>2.1.1</jaxb2-basics-tools.version>
 		<maven-toolchains-plugin.version>3.1.0</maven-toolchains-plugin.version>
