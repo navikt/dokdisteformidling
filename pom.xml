@@ -51,7 +51,7 @@
 		<spring-cloud-contract-wiremock.version>4.0.4</spring-cloud-contract-wiremock.version>
 
 		<!-- Plugins -->
-		<maven-jaxb2-plugin.version>2.1.1</maven-jaxb2-plugin.version>
+		<maven-jaxb2-plugin.version>2.2.0</maven-jaxb2-plugin.version>
 		<jaxb2-basics-annotate.version>2.1.1</jaxb2-basics-annotate.version>
 		<jaxb2-basics.version>2.1.1</jaxb2-basics.version>
 		<jaxb2-basics-tools.version>2.1.1</jaxb2-basics-tools.version>
