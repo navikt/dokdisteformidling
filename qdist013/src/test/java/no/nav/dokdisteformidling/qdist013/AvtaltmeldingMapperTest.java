@@ -638,22 +638,6 @@ class AvtaltmeldingMapperTest {
 		assertEquals(dokumentobjektVedlegg.getReferanseDokumentfil(), JOURNALPOST_ID + "-" + DOKUMENT_INFO_ID_VEDLEGG + "-" + ARKIVFORMAT + "-" + FILTYPE_JPEG);
 	}
 
-	private void assertCommonAttributesDokumentbeskrivelse(Dokumentbeskrivelse dokumentbeskrivelse) {
-		assertEquals(DOKUMENTASJON, dokumentbeskrivelse.getDokumenttype());
-		assertEquals(DOKUMENTET_ER_FERDIGSTILT, dokumentbeskrivelse.getDokumentstatus());
-		assertEquals(JOURNALFOERT_AV_NAVN, dokumentbeskrivelse.getOpprettetAv());
-		assertNotNull(dokumentbeskrivelse.getTilknyttetDato());
-		assertEquals(JOURNALFOERT_AV_NAVN, dokumentbeskrivelse.getTilknyttetAv());
-	}
-
-	private void assertCommonAttributesVedleggDokumentbeskrivelse(Dokumentbeskrivelse dokumentbeskrivelse) {
-		assertEquals(DOKUMENTASJON, dokumentbeskrivelse.getDokumenttype());
-		assertEquals(DOKUMENTET_ER_FERDIGSTILT, dokumentbeskrivelse.getDokumentstatus());
-		assertEquals(AVSENDER_MOTTAKER_NAVN_ORIG_JP, dokumentbeskrivelse.getOpprettetAv());
-		assertNotNull(dokumentbeskrivelse.getTilknyttetDato());
-		assertEquals(JOURNALFOERT_AV_NAVN, dokumentbeskrivelse.getTilknyttetAv());
-	}
-
 	private void assertCommonAttributesVedleggDokumentbeskrivelseOpprettetAv(Dokumentbeskrivelse dokumentbeskrivelse) {
 		assertEquals(DOKUMENTASJON, dokumentbeskrivelse.getDokumenttype());
 		assertEquals(DOKUMENTET_ER_FERDIGSTILT, dokumentbeskrivelse.getDokumentstatus());
