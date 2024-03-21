@@ -22,12 +22,4 @@ public class Mottaker {
 		super();
 	}
 
-	public Organisasjon getOrganisasjon() {
-		return organisasjon;
-	}
-
-	public void setOrganisasjon(Organisasjon organisasjon) {
-		this.organisasjon = organisasjon;
-	}
-
 }

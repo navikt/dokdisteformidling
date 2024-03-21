@@ -13,10 +13,6 @@ public class AutoCloseableTempFile implements AutoCloseable {
         tempFile = Files.createTempFile(prefix, suffix);
     }
 
-    public Path getTempFile() {
-        return tempFile;
-    }
-
     @Override
     public void close() throws IOException {
         Files.deleteIfExists(tempFile);

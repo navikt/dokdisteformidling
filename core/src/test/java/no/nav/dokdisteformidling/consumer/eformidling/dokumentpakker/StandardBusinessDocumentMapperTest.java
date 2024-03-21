@@ -23,7 +23,6 @@ import static no.nav.dokdisteformidling.consumer.eformidling.dokumentpakker.Stan
 import static no.nav.dokdisteformidling.consumer.eformidling.dokumentpakker.StandardBusinessDocumentMapper.DOCUMENT_IDENTIFICATOR_STANDARD;
 import static no.nav.dokdisteformidling.consumer.eformidling.dokumentpakker.StandardBusinessDocumentMapper.HEADER_VERSION;
 import static no.nav.dokdisteformidling.consumer.eformidling.dokumentpakker.StandardBusinessDocumentMapper.IDENTIFIER_AUTHORITY;
-import static no.nav.dokdisteformidling.consumer.eformidling.dokumentpakker.StandardBusinessDocumentMapper.SCOPE_CONVERSATION_ID;
 import static no.nav.dokdisteformidling.consumer.eformidling.dokumentpakker.StandardBusinessDocumentMapper.SCOPE_CONVERSATION_ID_IDENTIFIER;
 import static no.nav.dokdisteformidling.consumer.eformidling.dokumentpakker.StandardBusinessDocumentMapper.TYPE_VERSION;
 import static org.assertj.core.api.Assertions.assertThat;
