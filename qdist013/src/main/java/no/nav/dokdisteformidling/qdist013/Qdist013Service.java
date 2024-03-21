@@ -135,11 +135,6 @@ public class Qdist013Service {
         }
     }
 
-    private String getDocumentTitle(Arkivmelding arkivmelding, String journalpostId, String dokumentInfoId) {
-        Dokumentbeskrivelse dokumentbeskrivelse = getDokumentbeskrivelseByJpIdAndDokInfoId(arkivmelding, journalpostId, dokumentInfoId);
-        return dokumentbeskrivelse.getTittel();
-    }
-
     private String getDocumentFilename(Arkivmelding arkivmelding, String journalpostId, String dokumentInfoId) {
         Dokumentbeskrivelse dokumentbeskrivelse = getDokumentbeskrivelseByJpIdAndDokInfoId(arkivmelding, journalpostId, dokumentInfoId);
         return dokumentbeskrivelse.getDokumentobjekt().get(0).getReferanseDokumentfil();

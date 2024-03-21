@@ -59,8 +59,4 @@ public final class AppTestUtils {
 			return new String(contents, UTF_8);
 		}
 	}
-
-	public static List<String> zipFilenames(InputStream inputStream) {
-		return zipEntries(inputStream).stream().map(ZipFile::getName).collect(Collectors.toList());
-	}
 }

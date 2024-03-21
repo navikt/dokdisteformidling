@@ -21,13 +21,4 @@ public class Avsender {
 	public Avsender() {
 		super();
 	}
-
-	public Organisasjon getOrganisasjon() {
-		return organisasjon;
-	}
-
-	public void setOrganisasjon(Organisasjon organisasjon) {
-		this.organisasjon = organisasjon;
-	}
-
 }

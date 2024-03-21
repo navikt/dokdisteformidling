@@ -9,7 +9,7 @@ public enum ScopeType implements Predicate<Scope> {
 	SENDER_REF("SenderRef"),
 	RECEIVER_REF("ReceiverRef");
 
-	private String fullname;
+	private final String fullname;
 
 	ScopeType(String fullname) {
 		this.fullname = fullname;

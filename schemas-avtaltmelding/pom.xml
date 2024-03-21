@@ -64,17 +64,17 @@
 						<plugin>
 							<groupId>org.patrodyne.jvnet</groupId>
 							<artifactId>hisrc-hyperjaxb-annox-plugin</artifactId>
-							<version>${jaxb2-basics-annotate.version}</version>
+							<version>${hisrc-basicjaxb.version}</version>
 						</plugin>
 						<plugin>
 							<groupId>org.patrodyne.jvnet</groupId>
 							<artifactId>hisrc-basicjaxb-plugins</artifactId>
-							<version>${jaxb2-basics.version}</version>
+							<version>${hisrc-basicjaxb.version}</version>
 						</plugin>
 						<plugin>
 							<groupId>org.patrodyne.jvnet</groupId>
 							<artifactId>hisrc-basicjaxb-tools</artifactId>
-							<version>${jaxb2-basics-tools.version}</version>
+							<version>${hisrc-basicjaxb.version}</version>
 						</plugin>
 					</plugins>
 				</configuration>

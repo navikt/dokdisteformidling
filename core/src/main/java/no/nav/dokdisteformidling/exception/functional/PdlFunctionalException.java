@@ -5,8 +5,4 @@ public class PdlFunctionalException extends AbstractDokdisteformidlingFunctional
 	public PdlFunctionalException(String message) {
 		super(message);
 	}
-
-	public PdlFunctionalException(String message, Throwable cause) {
-		super(message, cause);
-	}
 }

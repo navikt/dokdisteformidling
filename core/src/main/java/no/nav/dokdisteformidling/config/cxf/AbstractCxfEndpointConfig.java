@@ -1,6 +1,5 @@
 package no.nav.dokdisteformidling.config.cxf;
 
-import jakarta.xml.ws.handler.Handler;
 import org.apache.cxf.Bus;
 import org.apache.cxf.feature.Feature;
 import org.apache.cxf.interceptor.Interceptor;
@@ -50,18 +49,6 @@ public abstract class AbstractCxfEndpointConfig {
 
 	protected void addInInterceptor(Interceptor<? extends Message> interceptor) {
 		factoryBean.getInInterceptors().add(interceptor);
-	}
-
-	protected void addInFaultInterceptor(Interceptor<? extends Message> interceptor) {
-		factoryBean.getInFaultInterceptors().add(interceptor);
-	}
-
-	protected void addHandler(Handler handler) {
-		factoryBean.getHandlers().add(handler);
-	}
-
-	protected void addProperty(String propertyKey, String propertyValue) {
-		factoryBean.getProperties().put(propertyKey, propertyValue);
 	}
 
 	protected <T> T createPort(Class<T> portType) {

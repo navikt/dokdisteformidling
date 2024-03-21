@@ -18,18 +18,6 @@ public class OidcTokenResponse {
         return accessToken;
     }
 
-    public void setAccessToken(String accessToken) {
-        this.accessToken = accessToken;
-    }
-
-    public int getExpiresIn() {
-        return expiresIn;
-    }
-
-    public void setExpiresIn(Integer expiresIn) {
-        this.expiresIn = expiresIn;
-    }
-
     public String getScope() {
         return scope;
     }
