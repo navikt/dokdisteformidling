@@ -1,0 +1,40 @@
+name: Dependabot auto-merge if build succeeds
+on:
+  pull_request:
+
+permissions:
+  contents: write
+  packages: write
+
+jobs:
+  dependabot:
+    runs-on: ubuntu-latest
+    if: github.actor == 'dependabot[bot]'
+    outputs:
+      update-type: ${{ steps.metadata.outputs.update-type }}
+    steps:
+      - name: Dependabot metadata
+        id: metadata
+        uses: dependabot/fetch-metadata@v1
+        with:
+          github-token: "${{ secrets.GITHUB_TOKEN }}"
+
+  handle-minor-or-patch-version:
+    needs: dependabot
+    permissions:
+      contents: read
+      id-token: write
+    if: needs.dependabot.outputs.update-type != 'version-update:semver-major'
+    uses: navikt/dok-workflows/.github/workflows/build-app-gar.yml@main
+    secrets: inherit
+
+  merge-dependabot-branch:
+    needs: handle-minor-or-patch-version
+    runs-on: ubuntu-latest
+    if: needs.dependabot.outputs.update-type != 'version-update:semver-major'
+    steps:
+      - name: Merge PR
+        run: gh pr merge --auto --merge "$PR_URL"
+        env:
+          PR_URL: ${{ github.event.pull_request.html_url }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
