@@ -1,0 +1,16 @@
+name: Handle Dependabot PR
+on:
+  push:
+    branches:
+      - 'dependabot/**'
+
+permissions:
+  contents: read
+  packages: write
+  id-token: write
+
+jobs:
+  handle-pr-from-dependabot:
+    if: github.actor == 'dependabot[bot]'
+    uses: navikt/dok-workflows/.github/workflows/dependabot.yml@main
+    secrets: inherit
