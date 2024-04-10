@@ -42,7 +42,7 @@
 
 		<cxf.version>4.0.3</cxf.version>
 
-		<bouncycastle-jdk18on.version>1.77</bouncycastle-jdk18on.version>
+		<bouncycastle-jdk18on.version>1.78</bouncycastle-jdk18on.version>
 
 		<!-- NAV -->
 		<melding-virksomhet-dokdistfordeling.version>7-18c61bf</melding-virksomhet-dokdistfordeling.version>
