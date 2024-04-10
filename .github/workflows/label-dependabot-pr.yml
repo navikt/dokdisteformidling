@@ -1,0 +1,11 @@
+name: label-dependabot-pr
+on:
+  pull_request:
+    types: [opened, reopened]
+
+jobs:
+  label-dependabot-pr:
+    permissions:
+      repository-projects: read
+      pull-requests: write
+    uses: navikt/dok-workflows/.github/workflows/label-dependabot-pr.yml@main
