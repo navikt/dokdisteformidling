@@ -2,7 +2,7 @@ name: Merge Dependabot PR
 on:
   workflow_dispatch:
   schedule:
-    - cron: '0,10,20,30 7 * * 1,2,3,4,5' # UTC time
+    - cron: '0 7 * * 1,2,3,4,5' # UTC time
 
 jobs:
   merge-dependabot-pr:
