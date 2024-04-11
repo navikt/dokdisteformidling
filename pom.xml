@@ -48,7 +48,7 @@
 		<melding-virksomhet-dokdistfordeling.version>7-18c61bf</melding-virksomhet-dokdistfordeling.version>
 
 		<!-- test -->
-		<spring-cloud-contract-wiremock.version>4.0.4</spring-cloud-contract-wiremock.version>
+		<spring-cloud-contract-wiremock.version>4.1.2</spring-cloud-contract-wiremock.version>
 
 		<!-- Plugins -->
 		<maven-jaxb2-plugin.version>2.1.1</maven-jaxb2-plugin.version>
