@@ -32,7 +32,7 @@
 		<resilience4j.version>2.1.0</resilience4j.version>
 		<google-cloud.version>26.34.0</google-cloud.version>
 		<tink.version>1.11.0</tink.version>
-		<tink-gcpkms.version>1.9.0</tink-gcpkms.version>
+		<tink-gcpkms.version>1.10.0</tink-gcpkms.version>
 		<ibm.mq.version>9.3.3.1</ibm.mq.version>
 		<commons-io.version>2.15.0</commons-io.version>
 		<nimbus-jose-jwt.version>9.37.2</nimbus-jose-jwt.version>
