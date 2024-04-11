@@ -40,7 +40,7 @@
 		<commons-asic.version>1.0.1</commons-asic.version>
 		<httpclient4.version>4.5.14</httpclient4.version>
 
-		<cxf.version>4.0.3</cxf.version>
+		<cxf.version>4.0.4</cxf.version>
 
 		<bouncycastle-jdk18on.version>1.78</bouncycastle-jdk18on.version>
 
