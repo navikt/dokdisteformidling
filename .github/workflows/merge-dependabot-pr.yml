@@ -1,4 +1,4 @@
-name: merge-dependabot-pr
+name: Merge Dependabot PR
 on:
   workflow_dispatch:
   schedule:
