@@ -13,3 +13,5 @@ jobs:
       pull-requests: write
       statuses: read
     uses: navikt/dok-workflows/.github/workflows/merge-dependabot-pr.yml@main
+    with:
+      name-of-main-branch: master
