@@ -12,3 +12,4 @@ jobs:
       id-token: write
       packages: write
     uses: navikt/dok-workflows/.github/workflows/label-dependabot-pr.yml@main
+    secrets: inherit
