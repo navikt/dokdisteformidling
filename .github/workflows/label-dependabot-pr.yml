@@ -8,4 +8,6 @@ jobs:
     permissions:
       repository-projects: read
       pull-requests: write
+      contents: read
+      id-token: write
     uses: navikt/dok-workflows/.github/workflows/label-dependabot-pr.yml@main
