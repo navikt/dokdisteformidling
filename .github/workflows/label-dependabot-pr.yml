@@ -1,7 +1,7 @@
 name: Label Dependabot PR on successful build
 on:
   pull_request:
-    types: [opened]
+    types: [opened, reopened]
 
 jobs:
   label-dependabot-pr:
@@ -14,3 +14,5 @@ jobs:
     if: ${{ github.actor == 'dependabot[bot]' }}
     uses: navikt/dok-workflows/.github/workflows/label-dependabot-pr.yml@main
     secrets: inherit
+    with:
+      java-version: '21'
