@@ -5,21 +5,23 @@ import jakarta.xml.bind.annotation.XmlAccessorType;
 import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlRootElement;
 import jakarta.xml.bind.annotation.XmlType;
+import lombok.Getter;
 
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "mottaker")
 @XmlRootElement(name = "mottaker")
+@Getter
 public class Mottaker {
+
 	@XmlElement
 	private Organisasjon organisasjon;
 
 	public Mottaker(Organisasjon organisasjon) {
-		super();
 		this.organisasjon = organisasjon;
 	}
 
 	public Mottaker() {
-		super();
+		throw new UnsupportedOperationException("Unexpected invocation: Mottaker object is not intended to be used for unmarshalling, only marshalling");
 	}
 
 }

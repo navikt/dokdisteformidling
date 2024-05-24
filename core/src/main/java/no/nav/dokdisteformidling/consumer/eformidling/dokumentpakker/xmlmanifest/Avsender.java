@@ -5,20 +5,23 @@ import jakarta.xml.bind.annotation.XmlAccessorType;
 import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlRootElement;
 import jakarta.xml.bind.annotation.XmlType;
+import lombok.Getter;
 
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "avsender")
 @XmlRootElement(name = "avsender")
+@Getter
 public class Avsender {
-  @XmlElement
-	private Organisasjon organisasjon;
+
+	@XmlElement
+	private final Organisasjon organisasjon;
 
 	public Avsender(Organisasjon organisasjon) {
-		super();
 		this.organisasjon = organisasjon;
 	}
 
 	public Avsender() {
-		super();
+		throw new UnsupportedOperationException("Unexpected invocation: Avsender object is not intended to be used for unmarshalling, only marshalling");
 	}
+
 }
