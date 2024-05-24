@@ -10,16 +10,16 @@ import jakarta.xml.bind.annotation.XmlType;
 @XmlType(name = "mottaker")
 @XmlRootElement(name = "mottaker")
 public class Mottaker {
+
 	@XmlElement
 	private Organisasjon organisasjon;
 
 	public Mottaker(Organisasjon organisasjon) {
-		super();
 		this.organisasjon = organisasjon;
 	}
 
 	public Mottaker() {
-		super();
+		throw new UnsupportedOperationException("Unexpected invocation: Mottaker object is not intended to be used for unmarshalling, only marshalling");
 	}
 
 }

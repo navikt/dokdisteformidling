@@ -3,10 +3,11 @@ package no.nav.dokdisteformidling.consumer.eformidling.dokumentpakker.xmlmanifes
 import no.nav.dokdisteformidling.consumer.eformidling.NavDokument;
 
 import java.io.ByteArrayOutputStream;
-import java.nio.charset.StandardCharsets;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
 
 public class XmlManifestCreator {
+
     private static final String HOVEDDOKUMENT = "Hoveddokument";
     private static final String HOVEDDOKUMENT_LANG = "no";
 
@@ -15,8 +16,10 @@ public class XmlManifestCreator {
         Mottaker mottaker = new Mottaker(new Organisasjon(receiverIdentifier));
         HovedDokument hoveddokumentXml = new HovedDokument(arkivmelding.getFilnavn(), arkivmelding.getMimeType(), HOVEDDOKUMENT, HOVEDDOKUMENT_LANG);
         Manifest xmlManifest = new Manifest(mottaker, avsender, hoveddokumentXml);
+
         ByteArrayOutputStream os = new ByteArrayOutputStream();
         MarshalManifest.marshal(xmlManifest, os);
-        return new String(os.toByteArray(), StandardCharsets.UTF_8);
+
+        return os.toString(UTF_8);
     }
 }

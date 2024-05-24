@@ -13,45 +13,22 @@ import jakarta.xml.bind.annotation.XmlType;
 public class Manifest {
 
 	@XmlElement(required = true)
-	private Mottaker mottaker;
+	private final Mottaker mottaker;
+
 	@XmlElement(required = true)
-	private Avsender avsender;
+	private final Avsender avsender;
+
 	@XmlElement(required = true)
-	private HovedDokument hoveddokument;
-
-	public Mottaker getMottaker() {
-		return mottaker;
-	}
-
-	public void setMottaker(Mottaker value) {
-		this.mottaker = value;
-	}
-
-	public Avsender getAvsender() {
-		return avsender;
-	}
-
-	public void setAvsender(Avsender value) {
-		this.avsender = value;
-	}
-
-	public HovedDokument getHoveddokument() {
-		return hoveddokument;
-	}
-
-	public void setHoveddokument(HovedDokument value) {
-		this.hoveddokument = value;
-	}
+	private final HovedDokument hoveddokument;
 
 	public Manifest(Mottaker mottaker, Avsender avsender, HovedDokument hoveddokument) {
-		super();
 		this.mottaker = mottaker;
 		this.avsender = avsender;
 		this.hoveddokument = hoveddokument;
 	}
 
 	public Manifest() {
-		super();
+		throw new UnsupportedOperationException("Unexpected invocation: Manifest object is not intended to be used for unmarshalling, only marshalling");
 	}
 
 }
