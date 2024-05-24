@@ -6,6 +6,7 @@ import jakarta.xml.bind.annotation.XmlAttribute;
 import jakarta.xml.bind.annotation.XmlRootElement;
 import jakarta.xml.bind.annotation.XmlType;
 import jakarta.xml.bind.annotation.XmlValue;
+import lombok.Getter;
 
 import static no.nav.dokdisteformidling.consumer.eformidling.Organisasjonsnummer.ISO6523_AUTHORITY;
 import static no.nav.dokdisteformidling.consumer.eformidling.Organisasjonsnummer.ISO6523_PREFIX;
@@ -13,6 +14,7 @@ import static no.nav.dokdisteformidling.consumer.eformidling.Organisasjonsnummer
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "organisasjon")
 @XmlRootElement(name = "organiasjon")
+@Getter
 public class Organisasjon {
 
 	@XmlAttribute
