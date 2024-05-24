@@ -7,10 +7,12 @@ import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlRootElement;
 import jakarta.xml.bind.annotation.XmlType;
 import jakarta.xml.bind.annotation.XmlValue;
+import lombok.Getter;
 
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "hoveddokument")
 @XmlRootElement(name = "hoveddokument")
+@Getter
 public class HovedDokument {
 
 	@XmlAttribute
@@ -35,6 +37,7 @@ public class HovedDokument {
 	@XmlAccessorType(XmlAccessType.FIELD)
 	@XmlType(name = "tittel")
 	@XmlRootElement(name = "tittel")
+	@Getter
 	public static class Tittel {
 
 		@XmlValue

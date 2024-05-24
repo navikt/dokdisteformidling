@@ -1,15 +1,16 @@
 package no.nav.dokdisteformidling.consumer.eformidling.dokumentpakker.xmlmanifest;
 
 import jakarta.xml.bind.annotation.XmlAccessType;
-
 import jakarta.xml.bind.annotation.XmlAccessorType;
 import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlRootElement;
 import jakarta.xml.bind.annotation.XmlType;
+import lombok.Getter;
 
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "Manifest", propOrder = { "mottaker", "avsender", "hoveddokument", })
 @XmlRootElement(name = "manifest")
+@Getter
 public class Manifest {
 
 	@XmlElement(required = true)
