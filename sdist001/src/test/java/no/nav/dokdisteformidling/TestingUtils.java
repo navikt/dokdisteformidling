@@ -11,9 +11,9 @@ import java.io.InputStream;
 import static java.lang.String.format;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
-public final class testUtils {
+public final class TestingUtils {
 
-    private testUtils() {
+    private TestingUtils() {
     }
 
     @SneakyThrows
