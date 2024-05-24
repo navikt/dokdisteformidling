@@ -14,14 +14,20 @@ import static no.nav.dokdisteformidling.consumer.eformidling.Organisasjonsnummer
 @XmlType(name = "organisasjon")
 @XmlRootElement(name = "organiasjon")
 public class Organisasjon {
+
 	@XmlAttribute
-	private String authority;
+	private final String authority;
+
 	@XmlValue
-	private String orgNummer;
+	private final String orgNummer;
 
 	public Organisasjon(final String orgNummer) {
-		super();
 		this.authority = ISO6523_AUTHORITY;
 		this.orgNummer = ISO6523_PREFIX + orgNummer;
 	}
+
+	public Organisasjon() {
+		throw new UnsupportedOperationException("Unexpected invocation: Organisasjon object is not intended to be used for unmarshalling, only marshalling");
+	}
+
 }
