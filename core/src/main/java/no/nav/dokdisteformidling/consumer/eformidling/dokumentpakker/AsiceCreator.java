@@ -32,6 +32,7 @@ import static no.nav.dokdisteformidling.consumer.eformidling.EformidlingConstant
 @Slf4j
 class AsiceCreator {
 
+    static final String MANIFEST_XML = "manifest.xml";
     private final XmlManifestCreator xmlManifestCreator;
 
     public AsiceCreator() {
@@ -47,7 +48,7 @@ class AsiceCreator {
 
         AsicWriter asicWriter = AsicWriterFactory.newFactory()
                 .newContainer(asiceArchive)
-                .add(new BufferedInputStream(new ByteArrayInputStream(xmlManifest.getBytes())), "manifest.xml", XML);
+                .add(new BufferedInputStream(new ByteArrayInputStream(xmlManifest.getBytes())), MANIFEST_XML, XML);
 
         List<InputStream> streamsToClose = new ArrayList<>();
         try {

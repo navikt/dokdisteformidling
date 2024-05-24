@@ -13,9 +13,11 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Stream;
 
+import static no.nav.dokdisteformidling.AppTestUtils.classpathToString;
 import static no.nav.dokdisteformidling.AppTestUtils.zipEntries;
 import static no.nav.dokdisteformidling.consumer.eformidling.NavDokument.fromAvtaltmelding;
 import static no.nav.dokdisteformidling.consumer.eformidling.NavDokument.fromVedlegg;
+import static no.nav.dokdisteformidling.consumer.eformidling.dokumentpakker.AsiceCreator.MANIFEST_XML;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class AsiceCreatorTest {
@@ -50,6 +52,7 @@ class AsiceCreatorTest {
 						"META-INF/ASiCManifest.xml",
 						"META-INF/manifest.xml"));
 		assertFileContents(zipEntries, ARKIVMELDING_NAME, AVTALTMELDING_CONTENTS);
+		assertFileContents(zipEntries, MANIFEST_XML, classpathToString("asice/manifest.xml"));
 		assertFileContents(zipEntries, DOKUMENT_1_NAME, DOKUMENT_1_CONTENTS);
 		assertFileContents(zipEntries, DOKUMENT_2_NAME, DOKUMENT_2_CONTENTS);
 	}
@@ -59,6 +62,6 @@ class AsiceCreatorTest {
 				.filter(z -> filename.equals(z.getName()))
 				.findFirst()
 				.orElseThrow(IllegalStateException::new);
-		assertThat(arkivmeldingXml.getContentsAsString()).isEqualTo(expectedFileContents);
+		assertThat(arkivmeldingXml.getContentsAsString()).isEqualToIgnoringWhitespace(expectedFileContents);
 	}
 }
