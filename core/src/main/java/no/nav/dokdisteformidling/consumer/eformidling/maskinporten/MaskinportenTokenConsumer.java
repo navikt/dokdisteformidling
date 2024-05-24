@@ -1,6 +1,5 @@
 package no.nav.dokdisteformidling.consumer.eformidling.maskinporten;
 
-
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.JWSHeader;
 import com.nimbusds.jose.crypto.RSASSASigner;
@@ -41,10 +40,11 @@ import static org.springframework.http.MediaType.APPLICATION_FORM_URLENCODED;
 @Slf4j
 @Component
 public class MaskinportenTokenConsumer {
+
 	// TODO nytt scope når virksomhetssertifikat er klart.
 	private static final String SCOPE_DPO = "move/dpo.read";
-	public static final String FUNKSJONELL_FEIL_ERROR_MESSAGE = "Klarte ikke hente AccessToken fra maskinporten. Funksjonell feil: ";
-	public static final String TEKNISK_FEIL_ERROR_MESSAGE = "Klarte ikke hente AccessToken fra maskinporten. Teknisk feil: ";
+	private static final String FUNKSJONELL_FEIL_ERROR_MESSAGE = "Klarte ikke hente AccessToken fra maskinporten. Funksjonell feil: ";
+	private static final String TEKNISK_FEIL_ERROR_MESSAGE = "Klarte ikke hente AccessToken fra maskinporten. Teknisk feil: ";
 
 	private final AppCertificate appCertificate;
 	private final MaskinportenProperties maskinportenProperties;
@@ -56,8 +56,7 @@ public class MaskinportenTokenConsumer {
 		this.appCertificate = appCertificate;
 		this.maskinportenProperties = maskinportenProperties;
 		this.restTemplate = restTemplateBuilder
-				.messageConverters(new FormHttpMessageConverter(),
-						new MappingJackson2HttpMessageConverter())
+				.messageConverters(new FormHttpMessageConverter(), new MappingJackson2HttpMessageConverter())
 				.errorHandler(new OidcErrorHandler())
 				.setReadTimeout(Duration.ofSeconds(30))
 				.setConnectTimeout(Duration.ofSeconds(5))
@@ -85,9 +84,10 @@ public class MaskinportenTokenConsumer {
 
 		try {
 			log.info("Henter accessToken fra maskinporten på url={}", maskinportenUrl);
-			ResponseEntity<OidcTokenResponse> response = restTemplate.exchange(accessTokenUri, POST,
-					httpEntity, OidcTokenResponse.class);
+
+			ResponseEntity<OidcTokenResponse> response = restTemplate.exchange(accessTokenUri, POST, httpEntity, OidcTokenResponse.class);
 			log.info("AccessToken hentet OK fra maskinporten på url={}", maskinportenUrl);
+
 			return response.getBody();
 		} catch (HttpClientErrorException e) {
 			final String errorMessage = FUNKSJONELL_FEIL_ERROR_MESSAGE + e.getResponseBodyAsString();
