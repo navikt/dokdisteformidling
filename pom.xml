@@ -31,7 +31,7 @@
 		<cxf.version>4.0.4</cxf.version>
 		<logstash-logback-encoder.version>7.4</logstash-logback-encoder.version>
 		<resilience4j.version>2.2.0</resilience4j.version>
-		<google-cloud.version>26.42.0</google-cloud.version>
+		<google-cloud.version>26.43.0</google-cloud.version>
 		<tink.version>1.13.0</tink.version>
 		<tink-gcpkms.version>1.10.0</tink-gcpkms.version>
 		<ibm.mq.version>9.4.0.0</ibm.mq.version>
