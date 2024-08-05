@@ -37,7 +37,7 @@
 		<ibm.mq.version>9.4.0.0</ibm.mq.version>
 		<commons-io.version>2.16.1</commons-io.version>
 		<nimbus-jose-jwt.version>9.40</nimbus-jose-jwt.version>
-		<jaxws-ri.version>4.0.2</jaxws-ri.version>
+		<jaxws-ri.version>4.0.3</jaxws-ri.version>
 		<commons-asic.version>1.0.2</commons-asic.version>
 		<httpclient4.version>4.5.14</httpclient4.version>
 		<bouncycastle-jdk18on.version>1.78.1</bouncycastle-jdk18on.version>
