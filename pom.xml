@@ -29,7 +29,7 @@
 
 		<camel.version>4.7.0</camel.version>
 		<cxf.version>4.0.5</cxf.version>
-		<logstash-logback-encoder.version>7.4</logstash-logback-encoder.version>
+		<logstash-logback-encoder.version>8.0</logstash-logback-encoder.version>
 		<resilience4j.version>2.2.0</resilience4j.version>
 		<google-cloud.version>26.43.0</google-cloud.version>
 		<tink.version>1.13.0</tink.version>
