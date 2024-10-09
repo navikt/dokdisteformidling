@@ -1,4 +1,4 @@
-  #!/usr/bin/env sh
+#!/usr/bin/env sh
 
 JAVA_OPTS="${JAVA_OPTS} -Djavax.net.ssl.keyStore=${DOKDISTEFORMIDLING_KEYSTORE}"
 JAVA_OPTS="${JAVA_OPTS} -Djavax.net.ssl.keyStoreType=jks"
