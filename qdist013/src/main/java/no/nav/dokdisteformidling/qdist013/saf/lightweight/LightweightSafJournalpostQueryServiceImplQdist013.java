@@ -44,6 +44,7 @@ public class LightweightSafJournalpostQueryServiceImplQdist013 implements SafJou
 		this.safGraphqlConsumer = safGraphqlConsumer;
 	}
 
+	@Override
 	@Cacheable(LIGHTWEIGHT_SAF_JOURNALPOST_QDIST013_CACHE)
 	public LightweightSafJournalpostQdist013 hentJournalpost(String journalpostId) {
 		var request = GraphQLRequest.builder()

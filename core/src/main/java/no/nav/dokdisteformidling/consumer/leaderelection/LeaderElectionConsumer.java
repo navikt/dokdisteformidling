@@ -24,6 +24,7 @@ public class LeaderElectionConsumer implements LeaderElection {
 		this.mapper = mapper;
 	}
 
+	@Override
 	public boolean isLeader() {
 		String electorPath = System.getenv("ELECTOR_PATH");
 		if (electorPath == null) {
