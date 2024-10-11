@@ -63,6 +63,7 @@ public class SafJournalpostQueryServiceImplQdist013 implements SafJournalpostQue
 		this.journalpostQdist013Mapper = journalpostQdist013Mapper;
 	}
 
+	@Override
 	@Cacheable(SAF_JOURNALPOST_QDIST013_CACHE)
 	public JournalpostQdist013 hentJournalpost(String journalpostid) {
 		var request = GraphQLRequest.builder()
