@@ -3,6 +3,9 @@ package no.nav.dokdisteformidling.config.jms;
 
 import com.ibm.mq.jakarta.jms.MQConnectionFactory;
 import com.ibm.mq.jakarta.jms.MQQueue;
+import jakarta.jms.ConnectionFactory;
+import jakarta.jms.JMSException;
+import jakarta.jms.Queue;
 import no.nav.dokdisteformidling.config.alias.MqGatewayAlias;
 import no.nav.dokdisteformidling.config.alias.ServiceuserAlias;
 import org.messaginghub.pooled.jms.JmsPoolConnectionFactory;
@@ -12,9 +15,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.jms.connection.UserCredentialsConnectionFactoryAdapter;
 
-import jakarta.jms.ConnectionFactory;
-import jakarta.jms.JMSException;
-import jakarta.jms.Queue;
 import javax.net.ssl.SSLSocketFactory;
 
 import static com.ibm.mq.constants.CMQC.MQENC_NATIVE;
@@ -56,14 +56,10 @@ public class JmsConfig {
 		connectionFactory.setIntProperty(JMS_IBM_ENCODING, MQENC_NATIVE);
 		connectionFactory.setIntProperty(JMS_IBM_CHARACTER_SET, UTF_8_WITH_PUA);
 
-		if (mqGatewayAlias.getChannel().isEnabletls()) {
-			connectionFactory.setSSLCipherSuite(ANY_TLS13_OR_HIGHER);
-			SSLSocketFactory factory = (SSLSocketFactory) SSLSocketFactory.getDefault();
-			connectionFactory.setSSLSocketFactory(factory);
-			connectionFactory.setChannel(mqGatewayAlias.getChannel().getSecurename());
-		} else {
-			connectionFactory.setChannel(mqGatewayAlias.getChannel().getName());
-		}
+		connectionFactory.setSSLCipherSuite(ANY_TLS13_OR_HIGHER);
+		SSLSocketFactory factory = (SSLSocketFactory) SSLSocketFactory.getDefault();
+		connectionFactory.setSSLSocketFactory(factory);
+		connectionFactory.setChannel(mqGatewayAlias.getChannel().getSecurename());
 
 		UserCredentialsConnectionFactoryAdapter adapter = new UserCredentialsConnectionFactoryAdapter();
 		adapter.setTargetConnectionFactory(connectionFactory);
