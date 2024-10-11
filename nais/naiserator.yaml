@@ -90,8 +90,6 @@ spec:
         mountPath: "/var/run/secrets/nais.io/vault"
       - kvPath: {{ KLAGEINSTANS_VAULT }}
         mountPath: "/secrets/virksomhetssertifikat"
-      - kvPath: {{ DOKDISTEFORMIDLING_CERT }}
-        mountPath: /var/run/secrets/nais.io/certificate
   azure:
     application:
       enabled: true

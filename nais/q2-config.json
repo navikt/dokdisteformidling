@@ -22,7 +22,6 @@
   "INGRESSES": "https://dokdisteformidling.dev.intern.nav.no",
   "SRVDOKDISTEFORMIDLING": "/serviceuser/data/dev/srvdokdisteformidling",
   "DOKDISTEFORMIDLING_VAULT": "/kv/preprod/fss/dokdisteformidling/teamdokumenthandtering",
-  "DOKDISTEFORMIDLING_CERT": "/kv/preprod/fss/dokdisteformidling/certificate",
   "KLAGEINSTANS_VAULT": "/secret/virksomhetssertifikat/preprod/klageinstans/",
   "NAMESPACE": "teamdokumenthandtering",
   "DOKDISTMELLOMLAGER_PROJECTID": "teamdokumenthandteri-dev-2c5a",
