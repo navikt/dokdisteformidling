@@ -1,16 +1,9 @@
 package no.nav.dokdisteformidling.qdist013.itest;
 
-import com.github.tomakehurst.wiremock.verification.LoggedRequest;
 import com.google.cloud.storage.StorageException;
 import jakarta.jms.Queue;
 import jakarta.jms.TextMessage;
-import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.JAXBElement;
-import jakarta.xml.bind.Unmarshaller;
-import jakarta.xml.soap.MessageFactory;
-import jakarta.xml.soap.SOAPMessage;
-import no.altinn.brokerserviceexternal.InitiateBrokerService;
-import no.altinn.brokerserviceexternal.Manifest;
 import no.nav.dokdisteformidling.consumer.eformidling.serviceregistry.EformidlingMottakerInfoService;
 import no.nav.dokdisteformidling.consumer.eformidling.serviceregistry.MottakerInfo;
 import no.nav.dokdisteformidling.exception.technical.BucketFailedToDownloadTechnicalException;
@@ -19,7 +12,6 @@ import no.nav.dokdisteformidling.storage.BucketStorage;
 import no.nav.dokdisteformidling.storage.DokdistDokument;
 import no.nav.dokdisteformidling.storage.JsonSerializer;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -34,14 +26,11 @@ import org.springframework.jms.core.JmsTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.util.MimeTypeUtils;
 
-import java.io.ByteArrayInputStream;
-import java.util.List;
 import java.util.UUID;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.containing;
 import static com.github.tomakehurst.wiremock.client.WireMock.equalToJson;
-import static com.github.tomakehurst.wiremock.client.WireMock.findAll;
 import static com.github.tomakehurst.wiremock.client.WireMock.get;
 import static com.github.tomakehurst.wiremock.client.WireMock.getRequestedFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.matchingJsonPath;
@@ -53,7 +42,6 @@ import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlMatching;
 import static com.github.tomakehurst.wiremock.client.WireMock.verify;
-import static jakarta.xml.soap.SOAPConstants.SOAP_1_2_PROTOCOL;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static no.nav.dokdisteformidling.constants.RetryConstants.MAX_ATTEMPTS_SHORT;
 import static no.nav.dokdisteformidling.consumer.eformidling.EformidlingConstants.AVTALTMELDING_PROCESS;
@@ -65,7 +53,6 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
@@ -95,7 +82,7 @@ class Qdist013ForAltinnIT {
 	private static final String VEDLEGG1_TEST_CONTENT = "VEDLEGG1_TEST_CONTENT";
 	private static final String VEDLEGG2_TEST_CONTENT = "VEDLEGG2_TEST_CONTENT";
 	private static final String PDL_PERSONNAVN_HAPPY = "pdl/personnavn_happy.json";
-	public static final String PDL_FORNAVN_NULL = "pdl/personnavn_nullfornavn.json";
+	private static final String PDL_FORNAVN_NULL = "pdl/personnavn_nullfornavn.json";
 	private static final String PDL_IDENT_NOT_FOUND = "pdl/pdlident_not_found.json";
 	private static final String PDL_IDENT_HAPPY = "pdl/pdlident_happy.json";
 	private static final String OPPDATERFORSENDELSE_URL = "/administrerforsendelse/oppdaterforsendelse";
@@ -477,7 +464,6 @@ class Qdist013ForAltinnIT {
 
 		await().atMost(10, SECONDS).untilAsserted(() -> assertMessageOnQueue(qdist013FunksjonellFeil));
 
-		verifyGetSecurityToken(1);
 		verifyPostSafJournalpost();
 		verifyPostSafJournalpostLightweight(1);
 		verify(3, postRequestedFor(urlEqualTo("/pdl")));
@@ -566,7 +552,7 @@ class Qdist013ForAltinnIT {
 		verifyGetSecurityToken(1);
 		verifyPostSafJournalpost();
 		verifyPostSafJournalpostLightweight(1);
-		verify(1, getRequestedFor(urlEqualTo("/ereg/v1/organisasjon/" + "123456789" + "/noekkelinfo")));
+		verify(1, getRequestedFor(urlEqualTo("/ereg/v1/organisasjon/123456789/noekkelinfo")));
 	}
 
 	@Test
@@ -588,34 +574,6 @@ class Qdist013ForAltinnIT {
 		verifyPostSafJournalpost();
 		verifyPostSafJournalpostLightweight(1);
 		verify(MAX_ATTEMPTS_SHORT, getRequestedFor(urlEqualTo("/ereg/v1/organisasjon/" + "123456789" + "/noekkelinfo")));
-	}
-
-	@Test
-	@Disabled
-	void altinnUploadFileshouldThrowTechnicalExceptionLast() {
-		stubGetForsendelse("__files/rjoark001/getForsendelse-happy.json");
-		stubGetSecurityToken();
-		stubPostSafJournalpost("queryJournalpostId\":\"123\"", "saf/safQdist013GraphQlResponse-orgnr.json");
-		stubPostSafJournalpost("queryJournalpostId\":\"448212366\"", "saf/safLightweightGraphQlResponse-happy.json");
-		stubGetEregHentOrgNavn("123456789");
-		stubPostMaskinporten();
-		stubGetServiceRegistry();
-		stubPostIntiateBrokerService();
-		stubFor(post(urlMatching("brokerserviceexternalstreamed/upload"))
-				.willReturn(aResponse().withStatus(INTERNAL_SERVER_ERROR.value())));
-
-		sendStringMessage(qdist013, classpathToString("qdist013/qdist013-happy.xml"));
-
-		await().atMost(10, SECONDS).untilAsserted(() -> assertMessageOnQueue(backoutQueue));
-
-		verifyGetForsendelse();
-		verifyGetSecurityToken(15);
-		verifyPostSafJournalpost();
-		verifyPostSafJournalpostLightweight(1);
-		verifyGetEregHentOrgNavn("123456789");
-		verifyPostMaskinporten();
-		verifyGetServiceRegistry();
-		verifyPostIntiateBrokerService();
 	}
 
 	@Test
@@ -674,39 +632,6 @@ class Qdist013ForAltinnIT {
 	}
 
 	@Test
-	@Disabled
-	void shouldThrowLagreJuridiskLoggFunctionalException() {
-		stubGetForsendelse("__files/rjoark001/getForsendelse-happy.json");
-		stubGetSecurityToken();
-		stubPostSafJournalpost("queryJournalpostId\":\"123\"", "saf/safQdist013GraphQlResponse-orgnr.json");
-		stubPostSafJournalpost("queryJournalpostId\":\"448212366\"", "saf/safLightweightGraphQlResponse-happy.json");
-		stubGetEregHentOrgNavn("123456789");
-		stubPostMaskinporten();
-		stubGetServiceRegistry();
-		stubPostIntiateBrokerService();
-		stubUploadBrokerServiceStreamed();
-		stubFor(post(urlMatching("/juridisklogg.*"))
-				.willReturn(aResponse().withStatus(FORBIDDEN.value())));
-
-		sendStringMessage(qdist013, classpathToString("qdist013/qdist013-happy.xml"));
-
-		await().atMost(10, SECONDS).untilAsserted(() -> assertMessageOnQueue(qdist013FunksjonellFeil));
-
-		verifyGetForsendelse();
-		verifyGetSecurityToken(15);
-		verifyPostSafJournalpost();
-		verifyPostSafJournalpostLightweight(1);
-		verifyGetEregHentOrgNavn("123456789");
-		verifyPostIntiateBrokerService();
-		verifyPostMaskinporten();
-		verifyGetServiceRegistry();
-		verifyPostUploadBrokerServiceStreamed();
-
-		verify(1, postRequestedFor(urlEqualTo("/juridisklogg"))
-				.withRequestBody(equalToJson(classpathToString("__files/juridisklogg/juridiskloggRequest.json"), true, true)));
-	}
-
-	@Test
 	void shouldThrowLagreJuridiskLoggTechnicalException() {
 		stubGetForsendelse("__files/rjoark001/getForsendelse-happy.json");
 		stubGetSecurityToken();
@@ -725,7 +650,6 @@ class Qdist013ForAltinnIT {
 		await().atMost(10, SECONDS).untilAsserted(() -> assertMessageOnQueue(backoutQueue));
 
 		verifyGetForsendelse();
-		verifyGetSecurityToken(19);
 		verifyPostSafJournalpost();
 		verifyPostSafJournalpostLightweight(1);
 		verifyGetEregHentOrgNavn("123456789");
@@ -757,7 +681,6 @@ class Qdist013ForAltinnIT {
 		await().atMost(10, SECONDS).untilAsserted(() -> assertMessageOnQueue(qdist013FunksjonellFeil));
 
 		verifyGetForsendelse();
-		verifyGetSecurityToken(19);
 		verifyPostSafJournalpost();
 		verifyPostSafJournalpostLightweight(1);
 		verifyGetEregHentOrgNavn("123456789");
@@ -796,7 +719,6 @@ class Qdist013ForAltinnIT {
 		stubPostIntiateBrokerService();
 
 		verifyPostJuridiskLoggLagre();
-		String conversationId = findConversationId();
 		verify(3, putRequestedFor(urlEqualTo(OPPDATERFORSENDELSE_URL)));
 	}
 
@@ -1050,23 +972,6 @@ class Qdist013ForAltinnIT {
 
 	private void sendStringMessage(Queue queue, final String message) {
 		sendStringMessage(queue, message, CALL_ID);
-	}
-
-	private String findConversationId() {
-		List<LoggedRequest> loggedRequests = findAll(postRequestedFor(urlEqualTo("/brokerserviceexternal")));
-		String requestStr = loggedRequests.get(0).getBodyAsString();
-		try {
-			MessageFactory factory = MessageFactory.newInstance(SOAP_1_2_PROTOCOL);
-			SOAPMessage message = factory.createMessage(null,
-					new ByteArrayInputStream(requestStr.getBytes()));
-			Unmarshaller unmarshaller = JAXBContext.newInstance(InitiateBrokerService.class).createUnmarshaller();
-			Manifest uploadManifest = ((InitiateBrokerService) unmarshaller.unmarshal(message.getSOAPBody().extractContentAsDocument())).getBrokerServiceInitiation().getManifest();
-
-			return uploadManifest.getSendersReference();
-		} catch (Exception e) {
-			fail("Fant ikke konversasjonsId. Feil: " + e.getMessage(), e.getCause());
-			return null;
-		}
 	}
 
 	private void sendStringMessage(Queue queue, final String message, final String callId) {

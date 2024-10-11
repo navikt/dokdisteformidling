@@ -46,9 +46,10 @@ class AsiceCreatorTest {
 		assertThat(zipEntries).size().isEqualTo(8);
 		assertThat(zipEntries).extracting(ZipFile::getName).containsAll(
 				Arrays.asList("mimetype",
-						"manifest.xml",
-						"arkivmelding.xml",
-						"test1.pdf",
+						MANIFEST_XML,
+						ARKIVMELDING_NAME,
+						DOKUMENT_1_NAME,
+						DOKUMENT_2_NAME,
 						"META-INF/ASiCManifest.xml",
 						"META-INF/manifest.xml"));
 		assertFileContents(zipEntries, ARKIVMELDING_NAME, AVTALTMELDING_CONTENTS);
