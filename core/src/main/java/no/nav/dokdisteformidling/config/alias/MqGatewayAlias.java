@@ -1,15 +1,14 @@
 package no.nav.dokdisteformidling.config.alias;
 
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.validation.annotation.Validated;
-
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotEmpty;
 
 @Getter
 @Setter
@@ -29,10 +28,7 @@ public class MqGatewayAlias {
 	@Data
 	@Validated
 	public static class MqChannel {
-		@NotEmpty
-		private String name;
 		@NotBlank
 		private String securename;
-		private boolean enabletls;
 	}
 }
