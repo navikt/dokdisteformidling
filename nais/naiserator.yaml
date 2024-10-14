@@ -13,12 +13,8 @@ spec:
       value: {{ DOKDISTEFORMIDLING_ENDPOINTS_DOKDISTADMIN_SCOPE }}
     - name: SECURITY_TOKEN_SERVICE_TOKEN_URL
       value: {{ SECURITY_TOKEN_SERVICE_TOKEN_URL }}
-    - name: MQGATEWAY01_CHANNEL_NAME
-      value: {{ MQGATEWAY01_CHANNEL_NAME }}
     - name: MQGATEWAY01_CHANNEL_SECURENAME
       value: {{ MQGATEWAY01_CHANNEL_SECURENAME }}
-    - name: MQGATEWAY01_CHANNEL_ENABLETLS
-      value: "{{ MQGATEWAY01_CHANNEL_ENABLETLS }}"
     - name: MQGATEWAY01_NAME
       value: {{ MQGATEWAY01_NAME }}
     - name: MQGATEWAY01_HOSTNAME
@@ -94,8 +90,6 @@ spec:
         mountPath: "/var/run/secrets/nais.io/vault"
       - kvPath: {{ KLAGEINSTANS_VAULT }}
         mountPath: "/secrets/virksomhetssertifikat"
-      - kvPath: {{ DOKDISTEFORMIDLING_CERT }}
-        mountPath: /var/run/secrets/nais.io/certificate
   azure:
     application:
       enabled: true
