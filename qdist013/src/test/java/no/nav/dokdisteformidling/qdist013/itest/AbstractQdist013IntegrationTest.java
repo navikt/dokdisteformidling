@@ -90,7 +90,7 @@ public abstract class AbstractQdist013IntegrationTest {
 						.withBody(classpathToString("__files/serviceregistry/serviceregistry_happy_response.json"))));
 	}
 
-	protected static void stubGetSecurityToken() {
+	public static void stubGetSecurityToken() {
 		stubFor(get("/securitytoken?grant_type=client_credentials&scope=openid")
 				.willReturn(aResponse()
 						.withStatus(OK.value())
@@ -98,7 +98,7 @@ public abstract class AbstractQdist013IntegrationTest {
 						.withBodyFile("securitytoken/stsResponse_happy.json")));
 	}
 
-	protected static void stubPostMaskinporten() {
+	public static void stubPostMaskinporten() {
 		stubFor(post(urlMatching("/maskinporten"))
 				.willReturn(aResponse()
 						.withStatus(OK.value())
