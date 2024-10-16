@@ -32,7 +32,7 @@ import static org.springframework.http.MediaType.APPLICATION_XML_VALUE;
 		webEnvironment = RANDOM_PORT)
 @AutoConfigureWireMock(port = 0)
 @ActiveProfiles("itest")
-abstract class AbstractQdist013IntegrationTest {
+public abstract class AbstractQdist013IntegrationTest {
 
 	protected static final String FORSENDELSE_ID = "33333";
 	protected static final String OPPDATERFORSENDELSE_URL = "/administrerforsendelse/oppdaterforsendelse";
@@ -104,7 +104,6 @@ abstract class AbstractQdist013IntegrationTest {
 						.withStatus(OK.value())
 						.withHeader(CONTENT_TYPE, APPLICATION_JSON_VALUE)
 						.withBody(classpathToString("__files/maskinporten/maskinporten_happy_response.json"))));
-
 	}
 
 	protected static void stubGetForsendelse(String responsebody) {
