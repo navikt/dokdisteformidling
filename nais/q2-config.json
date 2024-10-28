@@ -1,5 +1,5 @@
 {
-  "APP_NAME":  "dokdisteformidling",
+  "APP_NAME": "dokdisteformidling",
   "DOKDISTEFORMIDLING_ENDPOINTS_DOKDISTADMIN_URL": "https://dokdistadmin.dev.intern.nav.no/rest/v1/administrerforsendelse",
   "DOKDISTEFORMIDLING_ENDPOINTS_DOKDISTADMIN_SCOPE": "api://dev-fss.teamdokumenthandtering.dokdistadmin/.default",
   "SECURITY_TOKEN_SERVICE_TOKEN_URL": "https://security-token-service.nais.preprod.local/rest/v1/sts/token",
@@ -23,7 +23,8 @@
   "SRVDOKDISTEFORMIDLING": "/serviceuser/data/dev/srvdokdisteformidling",
   "DOKDISTEFORMIDLING_VAULT": "/kv/preprod/fss/dokdisteformidling/teamdokumenthandtering",
   "KLAGEINSTANS_VAULT": "/secret/virksomhetssertifikat/preprod/klageinstans/",
-  "NAMESPACE": "teamdokumenthandtering",
+  "KLAGEINSTANS_VIRKSOMHETSSERTIFIKAT_KEY": "/secrets/virksomhetssertifikat/key.p12.b64",
+  "KLAGEINSTANS_VIRKSOMHETSSERTIFIKAT_CREDENTIALS": "/secrets/virksomhetssertifikat/credentials.json",
   "DOKDISTMELLOMLAGER_PROJECTID": "teamdokumenthandteri-dev-2c5a",
   "DOKDISTMELLOMLAGER_BUCKET": "dokdistmellomlager-dev",
   "DOKDISTMELLOMLAGER_KEYRING": "dokdistmellomlager-keyring-dev",
