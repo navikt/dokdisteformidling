@@ -25,7 +25,6 @@
   "KLAGEINSTANS_VAULT": "/secret/virksomhetssertifikat/preprod/klageinstans/",
   "KLAGEINSTANS_VIRKSOMHETSSERTIFIKAT_KEY": "/secrets/virksomhetssertifikat/key.p12.b64",
   "KLAGEINSTANS_VIRKSOMHETSSERTIFIKAT_CREDENTIALS": "/secrets/virksomhetssertifikat/credentials.json",
-  "NAMESPACE": "teamdokumenthandtering",
   "DOKDISTMELLOMLAGER_PROJECTID": "teamdokumenthandteri-dev-2c5a",
   "DOKDISTMELLOMLAGER_BUCKET": "dokdistmellomlager-dev",
   "DOKDISTMELLOMLAGER_KEYRING": "dokdistmellomlager-keyring-dev",
