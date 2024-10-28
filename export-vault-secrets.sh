@@ -17,19 +17,21 @@ then
     echo "Setting dpo_password"
     export dpo_password="$(cat /var/run/secrets/nais.io/vault/dpo.json | jq -r '.password')"
 fi
-if test -f /secrets/virksomhetssertifikat/credentials.json
+
+if test -f "$KLAGEINSTANS_VIRKSOMHETSSERTIFIKAT_CREDENTIALS"
 then
     echo "Setting virksomhetssertifikat_alias"
-    export virksomhetssertifikat_alias="$(cat /secrets/virksomhetssertifikat/credentials.json | jq -r '.alias')"
+    export virksomhetssertifikat_alias="$(cat $KLAGEINSTANS_VIRKSOMHETSSERTIFIKAT_CREDENTIALS | jq -r '.alias')"
     echo "Setting virksomhetssertifikat_password"
-    export virksomhetssertifikat_password="$(cat /secrets/virksomhetssertifikat/credentials.json | jq -r '.password')"
+    export virksomhetssertifikat_password="$(cat $KLAGEINSTANS_VIRKSOMHETSSERTIFIKAT_CREDENTIALS | jq -r '.password')"
     echo "Setting virksomhetssertifikat_type"
-    export virksomhetssertifikat_type="$(cat /secrets/virksomhetssertifikat/credentials.json | jq -r '.type')"
+    export virksomhetssertifikat_type="$(cat $KLAGEINSTANS_VIRKSOMHETSSERTIFIKAT_CREDENTIALS | jq -r '.type')"
 fi
-if test -f /secrets/virksomhetssertifikat/key.p12.b64
+
+if test -f "$KLAGEINSTANS_VIRKSOMHETSSERTIFIKAT_KEY"
 then
     echo "Setting virksomhetssertifikat_path"
-    export virksomhetssertifikat_path="file:///secrets/virksomhetssertifikat/key.p12.b64"
+    export virksomhetssertifikat_path="file://$KLAGEINSTANS_VIRKSOMHETSSERTIFIKAT_KEY"
 fi
 
 if test -f /var/run/secrets/nais.io/vault/gcloud_serviceaccount
