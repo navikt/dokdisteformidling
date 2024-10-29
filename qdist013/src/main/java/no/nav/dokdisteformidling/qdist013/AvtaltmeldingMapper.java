@@ -105,8 +105,8 @@ public class AvtaltmeldingMapper {
     private Saksmappe createAndPopulateSaksmappe(JournalpostQdist013 journalpostQdist013,
                                                  XMLGregorianCalendar datoArkivmeldingOpprettet,
                                                  ObjectFactory objectFactory) {
-        Journalpost journalpost = createAndPopulateJournalpost(journalpostQdist013, datoArkivmeldingOpprettet, objectFactory);
-        XMLGregorianCalendar datoOpprettet = createAndPopulateOpprettetDato(journalpostQdist013, journalpost);
+        Journalpost journalpost = mapJournalpost(journalpostQdist013, datoArkivmeldingOpprettet, objectFactory);
+        XMLGregorianCalendar datoOpprettet = mapOpprettetDato(journalpostQdist013, journalpost);
 
         Saksmappe saksmappe = objectFactory.createSaksmappe();
         saksmappe.setTittel(journalpostQdist013.getTemanavn());
@@ -127,7 +127,7 @@ public class AvtaltmeldingMapper {
         return saksmappe;
     }
 
-    private static XMLGregorianCalendar createAndPopulateOpprettetDato(JournalpostQdist013 journalpostQdist013, Journalpost journalpost) {
+    private static XMLGregorianCalendar mapOpprettetDato(JournalpostQdist013 journalpostQdist013, Journalpost journalpost) {
         LocalDateTime opprettetDato = journalpostQdist013.getSak().getDatoOpprettet();
         if (opprettetDato == null) {
             return finnEldsteVedleggSortertEtterDokumentbeskrivelseOpprettetDato(journalpost);
@@ -146,7 +146,8 @@ public class AvtaltmeldingMapper {
         }
         return eldstedato;
     }
-    private Journalpost createAndPopulateJournalpost(JournalpostQdist013 journalpostQdist013, XMLGregorianCalendar datoArkivmeldingOpprettet, ObjectFactory objectFactory) {
+
+    private Journalpost mapJournalpost(JournalpostQdist013 journalpostQdist013, XMLGregorianCalendar datoArkivmeldingOpprettet, ObjectFactory objectFactory) {
         Journalpost journalpost = objectFactory.createJournalpost();
         journalpost.setOpprettetDato(convertLocalDateTimeToXmlGregorianCalendar(journalpostQdist013.getDatoOpprettet()));
         journalpost.setOpprettetAv(journalpostQdist013.getOpprettetAvNavn());

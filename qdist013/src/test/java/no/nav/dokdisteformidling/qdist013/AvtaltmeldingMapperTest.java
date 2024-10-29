@@ -524,7 +524,7 @@ class AvtaltmeldingMapperTest {
 	}
 
 	@Test
-	@DisplayName("When sak mangler opprettetDato, sett opprettetDato fra eldste vedlegg sortert etter journalpostens dokumentbeskrivelse.opprettetDato")
+	@DisplayName("Når sak mangler opprettetDato, sett opprettetDato fra eldste vedlegg sortert etter journalpostens dokumentbeskrivelse.opprettetDato")
 	void shouldSetteOpprettetDatoPaaSakFraJournalpostTilhorendeTilEldsteVedlegg() {
 		LocalDateTime femDagerSiden = LocalDateTime.now().minusDays(5);
 		LocalDateTime treDagerSiden = LocalDateTime.now().minusDays(3);
