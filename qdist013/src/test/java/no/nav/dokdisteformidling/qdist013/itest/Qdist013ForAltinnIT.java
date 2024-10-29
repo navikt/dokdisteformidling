@@ -164,6 +164,25 @@ class Qdist013ForAltinnIT extends AbstractQdist013IntegrationTest {
 	}
 
 	@Test
+	void shouldUploadFileToAltinnWhenLightweightSafSakDatoOpprettetErNull() {
+		stubGetForsendelse("__files/dokdistadmin/getForsendelse-happy.json");
+		stubGetSecurityToken();
+		stubPostSafJournalpost("queryJournalpostId\":\"123\"", "saf/safQdist013GraphQlResponse-sak-datoopprettet-null.json");
+		stubPostSafJournalpost("queryJournalpostId\":\"448212366\"", "saf/safLightweightGraphQlResponse-happy.json");
+		postPdlGraphql(PDL_PERSONNAVN_HAPPY, OK.value());
+		stubPostMaskinporten();
+		stubGetServiceRegistry();
+		stubPostIntiateBrokerService();
+		stubUploadBrokerServiceStreamed();
+		stubPostJuridiskLoggLagre();
+		stubPutOppdaterForsendelse(OK);
+
+		sendStringMessage(qdist013, classpathToString("qdist013/qdist013-happy.xml"));
+
+		await().atMost(10, SECONDS).untilAsserted(this::verifyAltinnUploadWithPostProcessing);
+	}
+
+	@Test
 	void shouldThrowExceptionWhenDatoJournalfoertErNullInJpQdist013() {
 		stubGetForsendelse("__files/dokdistadmin/getForsendelse-happy.json");
 		stubGetSecurityToken();
