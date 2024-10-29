@@ -523,6 +523,42 @@ class AvtaltmeldingMapperTest {
 		assertEquals(UKJENT, dokumentVedlegg.getOpprettetAv());
 	}
 
+	@Test
+	@DisplayName("Når sak mangler opprettetDato, sett opprettetDato fra eldste vedlegg sortert etter journalpostens dokumentbeskrivelse.opprettetDato")
+	void shouldSetteOpprettetDatoPaaSakFraJournalpostTilhorendeTilEldsteVedlegg() {
+		LocalDateTime femDagerSiden = LocalDateTime.now().minusDays(5);
+		LocalDateTime treDagerSiden = LocalDateTime.now().minusDays(3);
+		when(pdlGraphQLConsumer.hentNavn(anyString())).thenReturn(creatHentPersonInfo());
+		when(safJournalpostQueryServiceMock
+				.hentJournalpost(DOKUMENT_INFO_ID_VEDLEGG))
+				.thenReturn(createLightweightSafJournalpostQdist013Builder()
+						.datoJournalfoert(treDagerSiden)
+						.build()
+		);
+		when(safJournalpostQueryServiceMock
+				.hentJournalpost(DOKUMENT_INFO_ID_VEDLEGG_2))
+				.thenReturn(createLightweightSafJournalpostQdist013Builder()
+						.datoJournalfoert(femDagerSiden)
+						.build()
+		);
+
+		JournalpostQdist013.Sak sakUtenOpprettetDato = JournalpostQdist013.Sak.builder()
+				.arkivsaksnummer(ARKIV_SAKNUMMER)
+				.build();
+		JAXBElement<Arkivmelding> arkivmeldingJAXBElement = avtaltmeldingMapper.createArkivMelding(createJournalpostQdist013Builder()
+				.sak(sakUtenOpprettetDato)
+				.dokumenter(Arrays.asList(createHoveddokumentBuilder().build(),
+						createVedleggBuilder().originalJournalpostId(DOKUMENT_INFO_ID_VEDLEGG).build(),
+						createVedleggBuilder().originalJournalpostId(DOKUMENT_INFO_ID_VEDLEGG_2).build()))
+				.build(), BESTILLINGS_ID);
+
+		assertThat(arkivmeldingJAXBElement, notNullValue());
+		Arkivmelding arkivmelding = arkivmeldingJAXBElement.getValue();
+
+		assertEquals(femDagerSiden.format(dateTimeFormatter),
+				convertFromXmlGregorianCalendarToLocalDateTime(arkivmelding.getMappe().getFirst().getOpprettetDato()).toString());
+	}
+
 	private void assertArkivmelding(Arkivmelding arkivmelding) {
 		assertNotNull(arkivmelding);
 		assertEquals(APP_NAME, arkivmelding.getSystem());
@@ -764,6 +800,14 @@ class AvtaltmeldingMapperTest {
 				.avsenderMottakerNavn(AVSENDER_MOTTAKER_NAVN_ORIG_JP)
 				.datoJournalfoert(DATO_JOURNALFOERT_ORIG_JP)
 				.build();
+	}
+
+	private LightweightSafJournalpostQdist013.LightweightSafJournalpostQdist013Builder createLightweightSafJournalpostQdist013Builder() {
+		return LightweightSafJournalpostQdist013.builder()
+				.avsenderMottakerNavn(AVSENDER_MOTTAKER_NAVN_ORIG_JP)
+				.journalposttype(UTGAAENDE)
+				.journalfortAvNavn(JOURNALFOERT_AV_NAVN_ORIG_JP)
+				.datoJournalfoert(DATO_JOURNALFOERT_ORIG_JP);
 	}
 
 }

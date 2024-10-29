@@ -20,8 +20,11 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 import jakarta.xml.bind.JAXBElement;
+
+import javax.xml.datatype.DatatypeConstants;
 import javax.xml.datatype.XMLGregorianCalendar;
 import java.math.BigInteger;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 
@@ -102,18 +105,20 @@ public class AvtaltmeldingMapper {
     private Saksmappe createAndPopulateSaksmappe(JournalpostQdist013 journalpostQdist013,
                                                  XMLGregorianCalendar datoArkivmeldingOpprettet,
                                                  ObjectFactory objectFactory) {
+        Journalpost journalpost = mapJournalpost(journalpostQdist013, datoArkivmeldingOpprettet, objectFactory);
+        XMLGregorianCalendar datoOpprettet = mapOpprettetDato(journalpostQdist013, journalpost);
+
         Saksmappe saksmappe = objectFactory.createSaksmappe();
         saksmappe.setTittel(journalpostQdist013.getTemanavn());
-        saksmappe.setOpprettetDato(convertLocalDateTimeToXmlGregorianCalendar(journalpostQdist013.getSak().getDatoOpprettet()));
+        saksmappe.setOpprettetDato(datoOpprettet);
         saksmappe.setOpprettetAv(journalpostQdist013.getOpprettetAvNavn());
         saksmappe.setVirksomhetsspesifikkeMetadata(journalpostQdist013.getSak().getArkivsaksnummer());
         saksmappe.getPart()
                 .add(createAndPopulatePartAMP(journalpostQdist013, objectFactory));
         saksmappe.getPart()
                 .add(createAndPopulatePartDAP(journalpostQdist013, objectFactory));
-        saksmappe.getRegistrering()
-                .add(createAndPopulateJournalpost(journalpostQdist013, datoArkivmeldingOpprettet, objectFactory));
-        saksmappe.setSaksdato(convertLocalDateTimeToXmlGregorianCalendar(journalpostQdist013.getSak().getDatoOpprettet()));
+        saksmappe.getRegistrering().add(journalpost);
+        saksmappe.setSaksdato(datoOpprettet);
         saksmappe.setAdministrativEnhet(NAV_KLAGEINSTANS);
         saksmappe.setSaksansvarlig(journalpostQdist013.getOpprettetAvNavn());
         saksmappe.setJournalenhet(journalpostQdist013.getJournalfoerendeEnhet());
@@ -122,7 +127,27 @@ public class AvtaltmeldingMapper {
         return saksmappe;
     }
 
-    private Journalpost createAndPopulateJournalpost(JournalpostQdist013 journalpostQdist013, XMLGregorianCalendar datoArkivmeldingOpprettet, ObjectFactory objectFactory) {
+    private static XMLGregorianCalendar mapOpprettetDato(JournalpostQdist013 journalpostQdist013, Journalpost journalpost) {
+        LocalDateTime opprettetDato = journalpostQdist013.getSak().getDatoOpprettet();
+        if (opprettetDato == null) {
+            return finnEldsteVedleggSortertEtterDokumentbeskrivelseOpprettetDato(journalpost);
+        }
+        return convertLocalDateTimeToXmlGregorianCalendar(opprettetDato);
+    }
+
+    private static XMLGregorianCalendar finnEldsteVedleggSortertEtterDokumentbeskrivelseOpprettetDato(Journalpost journalpost) {
+        XMLGregorianCalendar eldstedato = null;
+        for (Dokumentbeskrivelse dokumentbeskrivelse : journalpost.getDokumentbeskrivelse()) {
+            if (dokumentbeskrivelse.getTilknyttetRegistreringSom().equals(VEDLEGG)) {
+                if (eldstedato == null || dokumentbeskrivelse.getOpprettetDato().compare(eldstedato) == DatatypeConstants.LESSER) {
+                    eldstedato = dokumentbeskrivelse.getOpprettetDato();
+                }
+            }
+        }
+        return eldstedato;
+    }
+
+    private Journalpost mapJournalpost(JournalpostQdist013 journalpostQdist013, XMLGregorianCalendar datoArkivmeldingOpprettet, ObjectFactory objectFactory) {
         Journalpost journalpost = objectFactory.createJournalpost();
         journalpost.setOpprettetDato(convertLocalDateTimeToXmlGregorianCalendar(journalpostQdist013.getDatoOpprettet()));
         journalpost.setOpprettetAv(journalpostQdist013.getOpprettetAvNavn());
