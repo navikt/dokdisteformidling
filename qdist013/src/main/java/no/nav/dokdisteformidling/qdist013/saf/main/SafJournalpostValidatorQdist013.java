@@ -50,7 +50,6 @@ public class SafJournalpostValidatorQdist013 {
 	private void assertSak(SafJournalpost safJournalpost, String journalpostId) {
 		assertObjectOnSafJournalpostBodyNotNull("journalpost.sak", safJournalpost.getSak(), journalpostId);
 		assertObjectOnSafJournalpostBodyNotNull("journalpost.sak.arkivsaksnummer", safJournalpost.getSak().getArkivsaksnummer(), journalpostId);
-		assertObjectOnSafJournalpostBodyNotNull("journalpost.sak.datoOpprettet", safJournalpost.getSak().getDatoOpprettet(), journalpostId);
 	}
 
 	private void assertThatRelevanteDatoerContainsDatoJournalfoert(SafJournalpost safJournalpost, String journalpostId) {
@@ -83,7 +82,7 @@ public class SafJournalpostValidatorQdist013 {
 		return dokumentInfo.getDokumentvarianter()
 				.stream()
 				.anyMatch(dokumentvariant -> (VARIANTFORMAT_SLADDET.equals(dokumentvariant.getVariantformat())
-						|| VARIANTFORMAT_ARKIV.equals(dokumentvariant.getVariantformat())));
+											  || VARIANTFORMAT_ARKIV.equals(dokumentvariant.getVariantformat())));
 	}
 
 }

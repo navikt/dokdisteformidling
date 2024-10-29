@@ -134,16 +134,6 @@ class SafJournalpostValidatorQdist013Test extends SafJournalpostTest {
 	}
 
 	@Test
-	void shouldThrowWhenMissingSakDatoOpprettet() {
-		SafJournalpost.SafJournalpostBuilder safJournalpostBuilder = createSafJournalpost();
-		SafJournalpost safJournalpost = safJournalpostBuilder
-				.sak(SafJournalpost.Sak.builder().datoOpprettet(null).build())
-				.build();
-		assertThrows(SafJournalpostValidationException.class, () ->
-				validator.validate(safJournalpost, JOURNALPOST_ID));
-	}
-
-	@Test
 	void shouldThrowWhenMissingTema() {
 		SafJournalpost.SafJournalpostBuilder safJournalpostBuilder = createSafJournalpost();
 		SafJournalpost safJournalpost = safJournalpostBuilder.tema(null).build();
