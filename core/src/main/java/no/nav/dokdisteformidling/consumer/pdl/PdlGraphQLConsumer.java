@@ -61,7 +61,7 @@ public class PdlGraphQLConsumer {
 		if (isNull(response.getErrors()) || response.getErrors().isEmpty()) {
 			return mapHentNavnResponse.mapNavn(response);
 		} else {
-			if (PERSON_IKKE_FUNNET_CODE.equals(response.getErrors().get(0).getExtensions().getCode())) {
+			if (PERSON_IKKE_FUNNET_CODE.equals(response.getErrors().getFirst().getExtensions().getCode())) {
 				throw new PersonIkkeFunnetException("Fant ikke personnavn for person i pdl.");
 			}
 			throw new PdlFunctionalException("Kunne ikke hente personnavn for person i pdl. " + response.getErrors());

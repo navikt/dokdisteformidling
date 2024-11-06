@@ -8,14 +8,12 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
-import java.net.MalformedURLException;
-
 @Disabled("Manuell test")
 class BrokerServiceExternalServiceManualTest {
 	private final DpoUserProperties dpoUserProperties = new DpoUserProperties();
 
 	@BeforeEach
-	public void setup() throws MalformedURLException {
+	public void setup() {
 		// Sett system properties VM options for testen. Ikke putt det i koden.
 		//
 		// javax.net.ssl.trustStore
@@ -31,7 +29,7 @@ class BrokerServiceExternalServiceManualTest {
 	}
 
 	@Test
-	void shouldTest() throws Exception {
+	void shouldTest() {
 		BrokerServiceExternalProperties brokerServiceExternalProperties = new BrokerServiceExternalProperties();
 		brokerServiceExternalProperties.setEndpointurl("https://www.altinn.no/ServiceEngineExternal/BrokerServiceExternal.svc");
 //		brokerServiceExternalProperties.setEndpointurl("https://tt02.altinn.no/ServiceEngineExternal/BrokerServiceExternal.svc");

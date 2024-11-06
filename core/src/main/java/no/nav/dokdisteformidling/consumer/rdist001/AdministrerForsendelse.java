@@ -6,5 +6,5 @@ public interface AdministrerForsendelse {
 
 	void oppdaterForsendelse(OppdaterForsendelseRequest oppdaterForsendelseRequest);
 
-	HentEformidlingforsendelserResponseTo hentEformidlingForsendelser();
+	HentEformidlingforsendelserResponse hentEformidlingForsendelser();
 }

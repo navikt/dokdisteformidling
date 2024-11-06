@@ -1,5 +1,6 @@
 package no.nav.dokdisteformidling.qdist013;
 
+import jakarta.xml.bind.JAXBElement;
 import no.arkivverket.standarder.noark5.arkivmelding.Arkivmelding;
 import no.arkivverket.standarder.noark5.arkivmelding.Dokumentbeskrivelse;
 import no.arkivverket.standarder.noark5.arkivmelding.Dokumentobjekt;
@@ -18,8 +19,6 @@ import no.nav.dokdisteformidling.qdist013.saf.lightweight.LightweightSafJournalp
 import no.nav.dokdisteformidling.qdist013.saf.main.JournalpostQdist013;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
-
-import jakarta.xml.bind.JAXBElement;
 
 import javax.xml.datatype.DatatypeConstants;
 import javax.xml.datatype.XMLGregorianCalendar;
@@ -54,6 +53,7 @@ import static no.nav.dokdisteformidling.qdist013.util.AvtaltmeldingConstant.VEDL
 import static no.nav.dokdisteformidling.utils.DateConverterUtil.convertLocalDateTimeToXmlGregorianCalendar;
 import static no.nav.dokdisteformidling.utils.DateConverterUtil.getNow;
 import static org.apache.commons.lang3.StringUtils.isBlank;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 @Component
 public class AvtaltmeldingMapper {
@@ -74,7 +74,8 @@ public class AvtaltmeldingMapper {
     private final SafJournalpostQueryService<LightweightSafJournalpostQdist013> safJournalpostQueryService;
 
     public AvtaltmeldingMapper(@Qualifier("LightweightSafJournalpostQueryServiceQdist013") SafJournalpostQueryService<LightweightSafJournalpostQdist013> safJournalpostQueryService,
-                               Ereg ereg, PdlGraphQLConsumer pdlGraphQLConsumer) {
+                               Ereg ereg,
+                               PdlGraphQLConsumer pdlGraphQLConsumer) {
         this.safJournalpostQueryService = safJournalpostQueryService;
         this.ereg = ereg;
         this.pdlGraphQLConsumer = pdlGraphQLConsumer;
@@ -200,7 +201,7 @@ public class AvtaltmeldingMapper {
     }
 
     private String getDokumentbeskrivelseTittel(JournalpostQdist013.DokumentInfo dokumentInfo, boolean isHoveddok) {
-        if (!isHoveddok && !isBlank(dokumentInfo.getOriginalJournalpostId())) {
+        if (!isHoveddok && isNotBlank(dokumentInfo.getOriginalJournalpostId())) {
             if (INNGAAENDE.equals(getJournalpostType(dokumentInfo.getOriginalJournalpostId()))) {
                 return format("%s, Fra %s", dokumentInfo.getTittel(), getAvsenderMottakerNavn(dokumentInfo.getOriginalJournalpostId()));
             } else if (UTGAAENDE.equals(getJournalpostType(dokumentInfo.getOriginalJournalpostId()))) {
@@ -228,7 +229,7 @@ public class AvtaltmeldingMapper {
     }
 
     private XMLGregorianCalendar getDokumentDatoJournalfoert(boolean isHoveddok, JournalpostQdist013 journalpostQdist013, JournalpostQdist013.DokumentInfo dokumentInfo) {
-        if (!isHoveddok && !isBlank(dokumentInfo.getOriginalJournalpostId()) && !isJournalDatoNull(dokumentInfo.getOriginalJournalpostId())) {
+        if (!isHoveddok && isNotBlank(dokumentInfo.getOriginalJournalpostId()) && !isJournalDatoNull(dokumentInfo.getOriginalJournalpostId())) {
             LightweightSafJournalpostQdist013 lightweightSafJournalpostQdist013 = safJournalpostQueryService.hentJournalpost(dokumentInfo
                     .getOriginalJournalpostId());
             return convertLocalDateTimeToXmlGregorianCalendar(lightweightSafJournalpostQdist013.getDatoJournalfoert());
@@ -243,7 +244,7 @@ public class AvtaltmeldingMapper {
 
 
     private String getDokumentJournalfortAvNavn(boolean isHoveddok, JournalpostQdist013 journalpostQdist013, JournalpostQdist013.DokumentInfo dokumentInfo) {
-        if (!isHoveddok && !isBlank(dokumentInfo.getOriginalJournalpostId())) {
+        if (!isHoveddok && isNotBlank(dokumentInfo.getOriginalJournalpostId())) {
             LightweightSafJournalpostQdist013 lightweightSafJournalpostQdist013 = getLightweightSafJournalpost(dokumentInfo.getOriginalJournalpostId());
             if (!isJournalfortAvNavnNull(dokumentInfo.getOriginalJournalpostId())) {
                 return lightweightSafJournalpostQdist013.getJournalfortAvNavn();

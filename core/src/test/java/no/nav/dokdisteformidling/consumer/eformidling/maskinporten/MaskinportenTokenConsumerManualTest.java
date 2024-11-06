@@ -15,8 +15,8 @@ import java.net.URL;
 @Disabled("Manuell test")
 class MaskinportenTokenConsumerManualTest {
 
-    private KeyStoreProperties keyStoreProperties = new KeyStoreProperties();
-    private MaskinportenProperties maskinportenProperties = new MaskinportenProperties();
+    private final KeyStoreProperties keyStoreProperties = new KeyStoreProperties();
+    private final MaskinportenProperties maskinportenProperties = new MaskinportenProperties();
 
     @BeforeEach
     public void setup() throws MalformedURLException {

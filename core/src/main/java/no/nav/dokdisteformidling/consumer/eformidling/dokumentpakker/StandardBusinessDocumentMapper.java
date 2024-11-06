@@ -18,7 +18,6 @@ import java.time.OffsetDateTime;
 import java.util.UUID;
 
 import static java.time.Duration.ofDays;
-import static java.time.temporal.ChronoUnit.SECONDS;
 import static no.nav.dokdisteformidling.consumer.eformidling.EformidlingConstants.NAV_ORGNUMMER;
 import static no.nav.dokdisteformidling.consumer.eformidling.EformidlingConstants.TRYGDERETTEN_ORGNUMMER;
 import static no.nav.dokdisteformidling.consumer.eformidling.Organisasjonsnummer.asIso6523;
@@ -71,7 +70,7 @@ public class StandardBusinessDocumentMapper {
 		documentIdentification.setInstanceIdentifier(instanceIdentifier);
 		documentIdentification.setType(AVTALTMELDING_FORRETNINGSMELDING);
 		documentIdentification.setMultipleType(true);
-		documentIdentification.setCreationDateAndTime(OffsetDateTime.now(clock).minus(10, SECONDS));
+		documentIdentification.setCreationDateAndTime(OffsetDateTime.now(clock).minusSeconds(10));
 		return documentIdentification;
 	}
 

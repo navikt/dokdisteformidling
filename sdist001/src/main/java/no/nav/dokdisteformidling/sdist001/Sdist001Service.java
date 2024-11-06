@@ -10,7 +10,7 @@ import no.nav.dokdisteformidling.consumer.juridisklogg.JuridiskLogg;
 import no.nav.dokdisteformidling.consumer.juridisklogg.LagreJuridiskLoggMapper;
 import no.nav.dokdisteformidling.consumer.juridisklogg.LoggMeldingRequest;
 import no.nav.dokdisteformidling.consumer.rdist001.AdministrerForsendelse;
-import no.nav.dokdisteformidling.consumer.rdist001.HentEformidlingforsendelserResponseTo.ForsendelseTo;
+import no.nav.dokdisteformidling.consumer.rdist001.HentEformidlingforsendelserResponse.Forsendelse;
 import no.nav.dokdisteformidling.consumer.rdist001.HentForsendelseResponse;
 import no.nav.dokdisteformidling.consumer.rdist001.OppdaterForsendelseRequest;
 import no.nav.dokdisteformidling.exception.functional.KunneIkkeSerialisereEformidlingstatusoppdateringTilJson;
@@ -22,6 +22,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.function.Consumer;
 
+import static java.time.LocalDateTime.now;
 import static no.nav.dokdisteformidling.sdist001.domain.to.ForsendelseStatus.BEKREFTET;
 import static no.nav.dokdisteformidling.sdist001.domain.to.ForsendelseStatus.EKSPEDERT;
 import static no.nav.dokdisteformidling.sdist001.domain.to.ForsendelseStatus.FEIL;
@@ -35,7 +36,6 @@ public class Sdist001Service {
 	private final Eformidling eformidling;
 	private final JuridiskLogg juridiskLogg;
 	private final LagreJuridiskLoggMapper lagreJuridiskLoggMapper;
-	private final EformidlingStatusOppdateringMapper eformidlingStatusOppdateringMapper;
 	private final ObjectMapper juridiskLoggObjectMapper;
 
 	public Sdist001Service(AdministrerForsendelse administrerForsendelse,
@@ -45,14 +45,13 @@ public class Sdist001Service {
 		this.administrerForsendelse = administrerForsendelse;
 		this.juridiskLogg = juridiskLogg;
 		this.lagreJuridiskLoggMapper = lagreJuridiskLoggMapper;
-		this.eformidlingStatusOppdateringMapper = new EformidlingStatusOppdateringMapper();
 		this.eformidling = eformidling;
 		this.juridiskLoggObjectMapper = new ObjectMapper().registerModule(new JavaTimeModule());
 	}
 
 	public void oppdaterDokDistEformidlingStatus() {
 		var endringer = new ForsendelseStatusEndringer();
-		List<ForsendelseTo> forsendelserTo = administrerForsendelse.hentEformidlingForsendelser().getForsendelser();
+		List<Forsendelse> forsendelserTo = administrerForsendelse.hentEformidlingForsendelser().getForsendelser();
 		log.info("Hentet eformidlingforsendelser fra rdist001 {} ", forsendelserTo);
 
 		eformidling.hent()
@@ -67,12 +66,12 @@ public class Sdist001Service {
 		log.info("sdist001 har oppdatert status for eFormidlingforsendelser: {}", endringer);
 	}
 
-	private boolean validateForsendelse(ForsendelseTo forsendelse, DownloadResponse downloadResponse) {
+	private boolean validateForsendelse(Forsendelse forsendelse, DownloadResponse downloadResponse) {
 		return downloadResponse.getConversationId().equals(forsendelse.getKonversasjonId()) &&
 			   !EKSPEDERT.name().equals(forsendelse.getForsendelseStatus());
 	}
 
-	private Consumer<ForsendelseTo> behandleForsendelse(DownloadResponse downloadResponse, ForsendelseStatusEndringer endringer) {
+	private Consumer<Forsendelse> behandleForsendelse(DownloadResponse downloadResponse, ForsendelseStatusEndringer endringer) {
 		return forsendelse -> {
 			String forsendelseId = forsendelse.getForsendelseId();
 			log.info("sdist001 behandler forsendelse {}", forsendelse);
@@ -86,7 +85,7 @@ public class Sdist001Service {
 		};
 	}
 
-	public void kontrollerEformidlingStatus(String kvitteringStatus, ForsendelseTo forsendelseTo, ForsendelseStatusEndringer endringer) {
+	public void kontrollerEformidlingStatus(String kvitteringStatus, Forsendelse forsendelseTo, ForsendelseStatusEndringer endringer) {
 		String forsendelseStatus = forsendelseTo.getForsendelseStatus();
 		Long forsendelseId = Long.valueOf(forsendelseTo.getForsendelseId());
 		String konversasjonId = forsendelseTo.getKonversasjonId();
@@ -136,7 +135,7 @@ public class Sdist001Service {
 
 	private void oppdaterTilEkspedert(String trygderettenKvitteringStatus, Long forsendelseId, String konversasjonId) {
 		HentForsendelseResponse hentForsendelseResponse = administrerForsendelse.hentForsendelse(forsendelseId);
-		EformidlingStatusOppdatering eformidlingStatusOppdatering = eformidlingStatusOppdateringMapper.map(konversasjonId, trygderettenKvitteringStatus);
+		EformidlingStatusOppdatering eformidlingStatusOppdatering = new EformidlingStatusOppdatering(konversasjonId, trygderettenKvitteringStatus, now());
 
 		try {
 			byte[] meldingsInnhold = juridiskLoggObjectMapper.writeValueAsBytes(eformidlingStatusOppdatering);

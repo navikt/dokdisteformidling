@@ -16,8 +16,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 
-import java.io.IOException;
-
 
 @Configuration
 @Profile("itest")
@@ -28,7 +26,7 @@ public class BrokerServiceExternalTestConfig extends AbstractCxfEndpointConfig {
     }
 
     @Bean
-    public IBrokerServiceExternal iBrokerServiceExternal(BrokerServiceExternalProperties brokerServiceExternalProperties, DpoUserProperties dpoUserProperties) throws IOException {
+    public IBrokerServiceExternal iBrokerServiceExternal(BrokerServiceExternalProperties brokerServiceExternalProperties, DpoUserProperties dpoUserProperties) {
         setWsdlUrl("wsdl/BrokerServiceExternalTest.wsdl");
         setServiceName(BrokerServiceExternalSF.SERVICE);
         setEndpointName(BrokerServiceExternalSF.CustomBindingIBrokerServiceExternal);
