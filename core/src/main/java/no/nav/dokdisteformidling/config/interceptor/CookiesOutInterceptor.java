@@ -4,10 +4,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import static java.util.Collections.singletonList;
 import static org.apache.cxf.message.Message.PROTOCOL_HEADERS;
 import static org.apache.cxf.phase.Phase.PRE_PROTOCOL;
 
@@ -26,7 +26,7 @@ public class CookiesOutInterceptor extends AbstractPhaseInterceptor {
     public void handleMessage(Message message) {
         Map<String, List> headers = (Map<String, List>) message.get(PROTOCOL_HEADERS);
         if (CookieStore.getCookie() != null) {
-            headers.put("Cookie", Collections.singletonList(CookieStore.getCookie()));
+            headers.put("Cookie", singletonList(CookieStore.getCookie()));
         }
     }
 

@@ -1,6 +1,7 @@
 package no.nav.dokdisteformidling.consumer.eformidling;
 
 
+import jakarta.activation.DataHandler;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.dokdisteformidling.certificate.AppCertificate;
 import no.nav.dokdisteformidling.consumer.eformidling.altinn.from.AltinnDokument;
@@ -14,14 +15,12 @@ import no.nav.dokdisteformidling.consumer.eformidling.altinn.to.ReceiptTo;
 import no.nav.dokdisteformidling.consumer.eformidling.altinn.to.SearchCriteria;
 import no.nav.dokdisteformidling.consumer.eformidling.altinn.to.ServiceCode;
 import no.nav.dokdisteformidling.consumer.eformidling.altinn.to.UploadManifest;
-import no.nav.dokdisteformidling.consumer.eformidling.altinn.to.UploadResponse;
 import no.nav.dokdisteformidling.consumer.eformidling.dokumentpakker.EformidlingMessagePackager;
 import no.nav.dokdisteformidling.consumer.eformidling.dokumentpakker.EformidlingMessageUnpackager;
 import no.nav.dokdisteformidling.consumer.eformidling.serviceregistry.EformidlingMottakerInfoService;
 import no.nav.dokdisteformidling.consumer.eformidling.serviceregistry.MottakerInfo;
 import org.springframework.stereotype.Component;
 
-import jakarta.activation.DataHandler;
 import java.io.InputStream;
 import java.util.List;
 
@@ -55,7 +54,7 @@ public class AltinnEformidling implements Eformidling {
     }
 
     @Override
-    public UploadResponse send(NavDokumentpakke navDokumentpakke, String avtaltmelding) {
+    public void send(NavDokumentpakke navDokumentpakke, String avtaltmelding) {
         log.info("Henter mottakerInfo for Trygderetten. conversationId={}, bestillingsId={}", navDokumentpakke.getConversationId(), navDokumentpakke.getBestillingsId());
         final MottakerInfo mottakerInfo = eformidlingMottakerInfoService.hentMottakerInfoTrygderetten();
 
@@ -71,11 +70,6 @@ public class AltinnEformidling implements Eformidling {
         log.info("Laster opp til Altinn fileReference={}, conversationId={}, bestillingsId={}", fileReference, navDokumentpakke.getConversationId(), navDokumentpakke.getBestillingsId());
         ReceiptTo receiptTo = brokerServiceExternalStreamedService.uploadFileToAltinn(fileReference, FILE_NAME, new DataHandler(InputStreamDataSource.of(sbdZip)));
         log.info("Lastet opp OK. receipt={}, conversationId={}, bestillingsId={}", receiptTo, navDokumentpakke.getConversationId(), navDokumentpakke.getBestillingsId());
-
-        return UploadResponse.builder()
-                .fileReference(fileReference)
-                .receiptTo(receiptTo)
-                .build();
     }
 
     UploadManifest mapUploadManifest(final MottakerInfo mottakerInfo, final String senderReference) {

@@ -21,9 +21,9 @@ import java.io.ByteArrayInputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.time.Clock;
-import java.util.Collections;
 import java.util.UUID;
 
+import static java.util.Collections.singletonList;
 import static no.nav.dokdisteformidling.constants.DomainConstants.DEFAULT_ZONE_ID;
 
 @Disabled("Manuell test")
@@ -75,7 +75,7 @@ class AltinnEformidlingManualTest {
 				.bestillingsId("2")
 				.messageChannelInstanceIdentifier(UUID.randomUUID())
 				.arkivmelding(NavDokument.fromAvtaltmelding(new ByteArrayInputStream("arkivmelding".getBytes())))
-				.navDokumenter(Collections.singletonList(NavDokument.fromVedlegg("test1.pdf", new ByteArrayInputStream("test1pdf".getBytes()))))
+				.navDokumenter(singletonList(NavDokument.fromVedlegg("test1.pdf", new ByteArrayInputStream("test1pdf".getBytes()))))
 				.build();
 
 	}

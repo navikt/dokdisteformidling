@@ -11,10 +11,10 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.time.Clock;
 import java.time.Instant;
-import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
+import static java.util.Collections.singletonList;
 import static no.nav.dokdisteformidling.AppTestUtils.zipEntries;
 import static no.nav.dokdisteformidling.CertTestUtils.itestPemCertificate;
 import static no.nav.dokdisteformidling.CertTestUtils.itestVirksomhetssertifikatProperties;
@@ -43,7 +43,7 @@ class EformidlingMessagePackagerTest {
 				.bestillingsId("2")
 				.messageChannelInstanceIdentifier(MESSAGE_CHANNEL_UUID)
 				.arkivmelding(NavDokument.fromAvtaltmelding(new ByteArrayInputStream("avtalt".getBytes())))
-				.navDokumenter(Collections.singletonList(NavDokument.fromVedlegg("test1.pdf", new ByteArrayInputStream("test1pdf".getBytes()))))
+				.navDokumenter(singletonList(NavDokument.fromVedlegg("test1.pdf", new ByteArrayInputStream("test1pdf".getBytes()))))
 				.build();
 
 		final InputStream inputStream = eformidlingMessagePackager.packageMessage(navDokumentpakke, ARKIVMELDING,
@@ -63,7 +63,7 @@ class EformidlingMessagePackagerTest {
 				.bestillingsId("2")
 				.messageChannelInstanceIdentifier(MESSAGE_CHANNEL_UUID)
 				.arkivmelding(NavDokument.fromAvtaltmelding(null))
-				.navDokumenter(Collections.singletonList(NavDokument.fromVedlegg("test1.pdf", new ByteArrayInputStream("test1pdf".getBytes()))))
+				.navDokumenter(singletonList(NavDokument.fromVedlegg("test1.pdf", new ByteArrayInputStream("test1pdf".getBytes()))))
 				.build();
 
 		var dokumentpakkingException = assertThrows(DokumentpakkingException.class, () ->

@@ -1,5 +1,9 @@
 package no.nav.dokdisteformidling.qdist013;
 
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.JAXBElement;
+import jakarta.xml.bind.JAXBException;
+import jakarta.xml.bind.Marshaller;
 import lombok.extern.slf4j.Slf4j;
 import no.arkivverket.standarder.noark5.arkivmelding.Arkivmelding;
 import no.arkivverket.standarder.noark5.arkivmelding.Dokumentbeskrivelse;
@@ -12,19 +16,18 @@ import no.nav.dokdisteformidling.consumer.rdist001.AdministrerForsendelse;
 import no.nav.dokdisteformidling.consumer.rdist001.HentForsendelseResponse;
 import no.nav.dokdisteformidling.consumer.saf.SafJournalpostQueryService;
 import no.nav.dokdisteformidling.exception.functional.IkkeSammenfallendeIderFunctionalException;
+import no.nav.dokdisteformidling.exception.functional.InvalidForsendelseStatusFunctionalException;
+import no.nav.dokdisteformidling.exception.functional.KunneIkkeDeserialisereBucketJsonPayloadFunctionalException;
 import no.nav.dokdisteformidling.exception.technical.KunneIkkeMarshalleArkivmeldingTechnicalException;
 import no.nav.dokdisteformidling.qdist013.saf.main.JournalpostQdist013;
 import no.nav.dokdisteformidling.storage.BucketStorage;
 import no.nav.dokdisteformidling.storage.DokdistDokument;
+import no.nav.dokdisteformidling.storage.JsonSerializer;
 import org.apache.camel.Exchange;
 import org.apache.camel.Handler;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
-import jakarta.xml.bind.JAXBContext;
-import jakarta.xml.bind.JAXBElement;
-import jakarta.xml.bind.JAXBException;
-import jakarta.xml.bind.Marshaller;
 import java.io.ByteArrayInputStream;
 import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
@@ -33,15 +36,13 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 import static java.lang.String.format;
+import static no.nav.dokdisteformidling.constants.DomainConstants.FORSENDELSE_STATUS_KLAR_FOR_DIST;
 import static no.nav.dokdisteformidling.constants.RouteConstants.PROPERTY_ANTALL_DOK;
 import static no.nav.dokdisteformidling.constants.RouteConstants.PROPERTY_BESTILLINGS_ID;
 import static no.nav.dokdisteformidling.constants.RouteConstants.PROPERTY_CONVERSATION_ID;
 import static no.nav.dokdisteformidling.constants.RouteConstants.PROPERTY_JOURNALPOST_ID;
 import static no.nav.dokdisteformidling.consumer.eformidling.NavDokument.fromAvtaltmelding;
 import static no.nav.dokdisteformidling.consumer.eformidling.NavDokument.fromVedlegg;
-import static no.nav.dokdisteformidling.utils.FunctionalUtils.deserializeBucketJsonPayloadToDokdistDokument;
-import static no.nav.dokdisteformidling.utils.FunctionalUtils.generateRandomUUID;
-import static no.nav.dokdisteformidling.utils.FunctionalUtils.validateThatForsendelseStatusIsKlarForDist;
 
 @Slf4j
 @Service
@@ -73,10 +74,10 @@ public class Qdist013Service {
 
     @Handler
     public void processForsendelse(DistribuerForsendelseTilTrygderetten distribuerForsendelseTilTrygderetten, Exchange exchange) {
-        final String conversationId = generateRandomUUID();
+        final String conversationId = UUID.randomUUID().toString();
         exchange.setProperty(PROPERTY_CONVERSATION_ID, conversationId);
 
-        final Long forsendelseId = Long.valueOf(distribuerForsendelseTilTrygderetten.getForsendelseId());
+        final Long forsendelseId = Long.valueOf(distribuerForsendelseTilTrygderetten.forsendelseId());
         final HentForsendelseResponse hentForsendelseResponse = administrerForsendelse.hentForsendelse(forsendelseId);
 
         final String bestillingsId = hentForsendelseResponse.getBestillingsId();
@@ -137,17 +138,35 @@ public class Qdist013Service {
 
     private String getDocumentFilename(Arkivmelding arkivmelding, String journalpostId, String dokumentInfoId) {
         Dokumentbeskrivelse dokumentbeskrivelse = getDokumentbeskrivelseByJpIdAndDokInfoId(arkivmelding, journalpostId, dokumentInfoId);
-        return dokumentbeskrivelse.getDokumentobjekt().get(0).getReferanseDokumentfil();
+        return dokumentbeskrivelse.getDokumentobjekt().getFirst().getReferanseDokumentfil();
 
     }
 
     private Dokumentbeskrivelse getDokumentbeskrivelseByJpIdAndDokInfoId(Arkivmelding arkivmelding, String journalpostId, String dokumentInfoId) {
-        Journalpost journalpost = (Journalpost) arkivmelding.getMappe().get(0).getRegistrering().get(0);
+        Journalpost journalpost = (Journalpost) arkivmelding.getMappe().getFirst().getRegistrering().getFirst();
         return journalpost.getDokumentbeskrivelse()
                 .stream()
                 .filter(dokumentbeskrivelse -> (dokumentbeskrivelse).getDokumentobjekt()
-                        .get(0).getReferanseDokumentfil().startsWith(format("%s-%s", journalpostId, dokumentInfoId)))
+                        .getFirst().getReferanseDokumentfil().startsWith(format("%s-%s", journalpostId, dokumentInfoId)))
                 .findAny()
                 .orElseThrow(() -> new IkkeSammenfallendeIderFunctionalException(format("DokumentInfoId=%s finnes på foresendelsen i dokdistDb, men ikke i respons fra SAF på journalpostId=%s.", dokumentInfoId, journalpostId)));
+    }
+
+    private static void validateThatForsendelseStatusIsKlarForDist(String forsendelseStatus) {
+        if (!FORSENDELSE_STATUS_KLAR_FOR_DIST.equals(forsendelseStatus)) {
+            throw new InvalidForsendelseStatusFunctionalException(
+                    format("ForsendelseStatus må være %s. Fant forsendelseStatus=%s", FORSENDELSE_STATUS_KLAR_FOR_DIST, forsendelseStatus)
+            );
+        }
+    }
+
+    private static DokdistDokument deserializeBucketJsonPayloadToDokdistDokument(String jsonPayload, String objektReferanse) {
+        try {
+            DokdistDokument dokdistDokument = JsonSerializer.deserialize(jsonPayload, DokdistDokument.class);
+            dokdistDokument.setDokumentObjektReferanse(objektReferanse);
+            return dokdistDokument;
+        } catch (IllegalStateException e) {
+            throw new KunneIkkeDeserialisereBucketJsonPayloadFunctionalException(format("Kunne ikke deserialisere jsonPayload fra bucket for dokument med dokumentobjektreferanse=%s. Dokumentet er ikke persistert til bucket med korrekt format!", objektReferanse));
+        }
     }
 }

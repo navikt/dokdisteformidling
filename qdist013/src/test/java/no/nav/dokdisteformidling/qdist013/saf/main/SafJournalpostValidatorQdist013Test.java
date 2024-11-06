@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.Collections;
 
+import static java.util.Collections.singletonList;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class SafJournalpostValidatorQdist013Test extends SafJournalpostTest {
@@ -153,7 +154,7 @@ class SafJournalpostValidatorQdist013Test extends SafJournalpostTest {
 	void shouldThrowWhenRelevanteDatoerMissingDatoJournalfoert() {
 		SafJournalpost.SafJournalpostBuilder safJournalpostBuilder = createSafJournalpost();
 		SafJournalpost safJournalpost = safJournalpostBuilder
-				.relevanteDatoer(Collections.singletonList(createRelevantDatoRegistrert()))
+				.relevanteDatoer(singletonList(createRelevantDatoRegistrert()))
 				.build();
 		assertThrows(SafJournalpostValidationException.class, () ->
 				validator.validate(safJournalpost, JOURNALPOST_ID));
@@ -165,7 +166,7 @@ class SafJournalpostValidatorQdist013Test extends SafJournalpostTest {
 		SafJournalpost.DokumentInfo.DokumentInfoBuilder dokumentInfoBuilder = createHovedDokumentInfo();
 		SafJournalpost.DokumentInfo dokumentInfo = dokumentInfoBuilder.dokumentInfoId(null).build();
 		SafJournalpost safJournalpost = safJournalpostBuilder
-				.dokumenter(Collections.singletonList(dokumentInfo))
+				.dokumenter(singletonList(dokumentInfo))
 				.build();
 		assertThrows(SafJournalpostValidationException.class, () ->
 				validator.validate(safJournalpost, JOURNALPOST_ID));
@@ -177,7 +178,7 @@ class SafJournalpostValidatorQdist013Test extends SafJournalpostTest {
 		SafJournalpost.DokumentInfo.DokumentInfoBuilder dokumentInfoBuilder = createHovedDokumentInfo();
 		SafJournalpost.DokumentInfo dokumentInfo = dokumentInfoBuilder.tittel("").build();
 		SafJournalpost safJournalpost = safJournalpostBuilder
-				.dokumenter(Collections.singletonList(dokumentInfo))
+				.dokumenter(singletonList(dokumentInfo))
 				.build();
 		assertThrows(SafJournalpostValidationException.class, () ->
 				validator.validate(safJournalpost, JOURNALPOST_ID));
@@ -189,7 +190,7 @@ class SafJournalpostValidatorQdist013Test extends SafJournalpostTest {
 		SafJournalpost.DokumentInfo.DokumentInfoBuilder dokumentInfoBuilder = createHovedDokumentInfo();
 		SafJournalpost.DokumentInfo dokumentInfo = dokumentInfoBuilder.dokumentvarianter(null).build();
 		SafJournalpost safJournalpost = safJournalpostBuilder
-				.dokumenter(Collections.singletonList(dokumentInfo))
+				.dokumenter(singletonList(dokumentInfo))
 				.build();
 		assertThrows(SafJournalpostValidationException.class, () ->
 				validator.validate(safJournalpost, JOURNALPOST_ID));
@@ -200,10 +201,10 @@ class SafJournalpostValidatorQdist013Test extends SafJournalpostTest {
 		SafJournalpost.SafJournalpostBuilder safJournalpostBuilder = createSafJournalpost();
 		SafJournalpost.DokumentInfo.DokumentInfoBuilder dokumentInfoBuilder = createHovedDokumentInfo();
 		SafJournalpost.DokumentInfo dokumentInfo = dokumentInfoBuilder
-				.dokumentvarianter(Collections.singletonList(createDokumentVariantOriginal()))
+				.dokumentvarianter(singletonList(createDokumentVariantOriginal()))
 				.build();
 		SafJournalpost safJournalpost = safJournalpostBuilder
-				.dokumenter(Collections.singletonList(dokumentInfo))
+				.dokumenter(singletonList(dokumentInfo))
 				.build();
 		assertThrows(SafJournalpostValidationException.class, () ->
 				validator.validate(safJournalpost, JOURNALPOST_ID));
