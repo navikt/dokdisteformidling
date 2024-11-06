@@ -3,7 +3,6 @@ package no.nav.dokdisteformidling.certificate;
 import lombok.Getter;
 import org.springframework.stereotype.Component;
 
-import java.security.KeyPair;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
@@ -75,12 +74,6 @@ public class AppCertificate {
 		} catch (KeyStoreException e) {
 			throw new IllegalStateException(ERR_GENERAL, e);
 		}
-	}
-
-	public KeyPair getKeyPair() {
-		PrivateKey privateKey = loadPrivateKey();
-		X509Certificate certificate = getX509Certificate();
-		return new KeyPair(certificate.getPublicKey(), privateKey);
 	}
 
 	public boolean shouldLockProvider() {

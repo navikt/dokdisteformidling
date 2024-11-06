@@ -37,7 +37,7 @@ class EformidlingMessageUnpackagerTest {
                 .filreferanse("fileReference")
                 .inputStream(inputStream)
                 .build());
-        altinnDokument = eformidlingMessageUnpackager.unpackageMessages(messageFromAltinns).get(0);
+        altinnDokument = eformidlingMessageUnpackager.unpackageMessages(messageFromAltinns).getFirst();
 
         BrokerServiceManifest actualManifest = altinnDokument.getManifest();
         assertThat(actualManifest).isNotNull();

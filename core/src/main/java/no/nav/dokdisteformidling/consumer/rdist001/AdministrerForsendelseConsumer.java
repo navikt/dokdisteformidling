@@ -76,7 +76,7 @@ public class AdministrerForsendelseConsumer implements AdministrerForsendelse {
 
 	@Override
 	@Retryable(retryFor = DokdistadminTechnicalException.class, backoff = @Backoff(delay = DELAY_SHORT, multiplier = MULTIPLIER_SHORT))
-	public HentEformidlingforsendelserResponseTo hentEformidlingForsendelser() {
+	public HentEformidlingforsendelserResponse hentEformidlingForsendelser() {
 		log.info("hentEformidlingForsendelser henter eformidlingsforsendelser fra rdist001 (dokdistadmin) med distribusjonskanal={}", DISTRIBUSJONSKANAL);
 
 		var response = webClient.get()
@@ -86,7 +86,7 @@ public class AdministrerForsendelseConsumer implements AdministrerForsendelse {
 						.build())
 				.attributes(clientRegistrationId(CLIENT_REGISTRATION_DOKDISTADMIN))
 				.retrieve()
-				.bodyToMono(HentEformidlingforsendelserResponseTo.class)
+				.bodyToMono(HentEformidlingforsendelserResponse.class)
 				.doOnError(this::handleError)
 				.block();
 
@@ -97,12 +97,12 @@ public class AdministrerForsendelseConsumer implements AdministrerForsendelse {
 		return response;
 	}
 
-	private static int getAntallForsendelser(HentEformidlingforsendelserResponseTo response) {
+	private static int getAntallForsendelser(HentEformidlingforsendelserResponse response) {
 		return response != null && response.getForsendelser() != null ? response.getForsendelser().size() : 0;
 	}
 
 	private void handleError(Throwable error) {
-		if (error instanceof WebClientResponseException response && ((WebClientResponseException) error).getStatusCode().is4xxClientError()) {
+		if (error instanceof WebClientResponseException response && response.getStatusCode().is4xxClientError()) {
 			throw new DokdistadminFunctionalException(
 					String.format("Kall mot rdist001 feilet funksjonelt med status=%s, feilmelding=%s",
 							response.getStatusCode(),

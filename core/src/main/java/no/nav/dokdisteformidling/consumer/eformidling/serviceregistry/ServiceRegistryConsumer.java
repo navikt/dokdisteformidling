@@ -63,7 +63,7 @@ public class ServiceRegistryConsumer {
             final ResponseEntity<IdentifierResource> exchange = restTemplate.exchange(uri, GET, httpEntity, IdentifierResource.class);
             return exchange.getBody();
         } catch (HttpClientErrorException e) {
-            log.warn(FUNKSJONELL_FEIL_ERROR_MESSAGE + e.getResponseBodyAsString(), e);
+			log.warn(FUNKSJONELL_FEIL_ERROR_MESSAGE + "{}", e.getResponseBodyAsString(), e);
             return IdentifierResource.empty();
         } catch (HttpServerErrorException e) {
             final String errorMessage = TEKNISK_FEIL_ERROR_MESSAGE + e.getResponseBodyAsString();

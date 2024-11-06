@@ -1,6 +1,7 @@
 package no.nav.dokdisteformidling.storage;
 
 import com.google.api.client.http.apache.v2.ApacheHttpTransport;
+import com.google.cloud.storage.HttpStorageOptions;
 import com.google.cloud.storage.Storage;
 import com.google.cloud.storage.StorageOptions;
 import com.google.crypto.tink.Aead;
@@ -43,7 +44,7 @@ public class GoogleCloudStorageConfiguration {
 		log.info("dokdisteformidling oppstart. Henter aead kryptering nøkkel");
 		Storage storage = StorageOptions.newBuilder()
 				.setProjectId(dokdistmellomlagerProperties.getProjectid())
-				.setTransportOptions(StorageOptions.getDefaultHttpTransportOptions().toBuilder()
+				.setTransportOptions(HttpStorageOptions.defaults().getDefaultTransportOptions().toBuilder()
 						.setConnectTimeout((int) SECONDS.toMillis(5))
 						.setReadTimeout((int) SECONDS.toMillis(20))
 						.setHttpTransportFactory(ApacheHttpTransport::new)

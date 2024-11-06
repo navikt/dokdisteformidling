@@ -13,8 +13,8 @@ import no.nav.dokdisteformidling.consumer.juridisklogg.LoggMeldingRequest;
 import no.nav.dokdisteformidling.consumer.juridisklogg.LoggMeldingResponse;
 import no.nav.dokdisteformidling.consumer.rdist001.AdministrerForsendelse;
 import no.nav.dokdisteformidling.consumer.rdist001.AdministrerForsendelseConsumer;
-import no.nav.dokdisteformidling.consumer.rdist001.HentEformidlingforsendelserResponseTo;
-import no.nav.dokdisteformidling.consumer.rdist001.HentEformidlingforsendelserResponseTo.ForsendelseTo;
+import no.nav.dokdisteformidling.consumer.rdist001.HentEformidlingforsendelserResponse;
+import no.nav.dokdisteformidling.consumer.rdist001.HentEformidlingforsendelserResponse.Forsendelse;
 import no.nav.dokdisteformidling.consumer.rdist001.HentForsendelseResponse;
 import no.nav.dokdisteformidling.sdist001.Sdist001Service;
 import org.junit.jupiter.api.BeforeEach;
@@ -193,29 +193,29 @@ class Sdist001ServiceTest {
 		);
 	}
 
-	private HentEformidlingforsendelserResponseTo hentEformidlingforsendelserResponseTo() {
+	private HentEformidlingforsendelserResponse hentEformidlingforsendelserResponseTo() {
 
-		return HentEformidlingforsendelserResponseTo.builder()
+		return HentEformidlingforsendelserResponse.builder()
 				.forsendelser(asList(
-						ForsendelseTo.builder()
+						Forsendelse.builder()
 								.distribusjonKanal("TRYGDERETTEN")
 								.forsendelseStatus(OVERSENDT.name())
 								.forsendelseId(FORSENDELSE_ID_1)
 								.konversasjonId(CONVERSATION_ID_1)
 								.build(),
-						ForsendelseTo.builder()
+						Forsendelse.builder()
 								.distribusjonKanal("TRYGDERETTEN")
 								.forsendelseStatus(BEKREFTET.name())
 								.forsendelseId(FORSENDELSE_ID_2)
 								.konversasjonId(CONVERSATION_ID_2)
 								.build(),
-						ForsendelseTo.builder()
+						Forsendelse.builder()
 								.distribusjonKanal("TRYGDERETTEN")
 								.forsendelseStatus(OVERSENDT.name())
 								.forsendelseId(FORSENDELSE_ID_3)
 								.konversasjonId(CONVERSATION_ID_3)
 								.build(),
-						ForsendelseTo.builder()
+						Forsendelse.builder()
 								.distribusjonKanal("TRYGDERETTEN")
 								.forsendelseStatus(EKSPEDERT.name())
 								.forsendelseId(FORSENDELSE_ID_4)

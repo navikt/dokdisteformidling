@@ -1,6 +1,9 @@
 package no.nav.dokdisteformidling.consumer.eformidling.dokumentpakker;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.JAXBException;
+import jakarta.xml.bind.Unmarshaller;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.dokdisteformidling.common.AutoCloseableTempFile;
 import no.nav.dokdisteformidling.consumer.eformidling.altinn.from.AltinnDokument;
@@ -11,8 +14,8 @@ import no.nav.dokdisteformidling.consumer.eformidling.dokumentpakker.trygderette
 import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
+import org.springframework.util.Assert;
 
-import jakarta.xml.bind.JAXBException;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -24,7 +27,6 @@ import java.util.zip.ZipFile;
 
 import static no.nav.dokdisteformidling.consumer.eformidling.altinn.from.AltinnDokument.MANIFEST_XML;
 import static no.nav.dokdisteformidling.consumer.eformidling.altinn.from.AltinnDokument.SBD_JSON;
-import static no.nav.dokdisteformidling.utils.XmlUtils.unmarshalXmlObject;
 
 /**
  * Pakker ut en eformidling melding fra Altinn.
@@ -75,7 +77,7 @@ public class EformidlingMessageUnpackager {
                 ZipEntry zipEntry = entries.nextElement();
                 final InputStream inputStream = zipFile.getInputStream(zipEntry);
                 if (MANIFEST_XML.equals(zipEntry.getName())) {
-                    manifest = unmarshalXmlObject(inputStream, BrokerServiceManifest.class);
+                    manifest = unmarshalXmlObject(inputStream);
                 } else if (SBD_JSON.equals(zipEntry.getName())) {
                     trygderettenMelding = objectMapper.readValue(inputStream, TrygderettenMelding.class);
                 } else {
@@ -83,7 +85,7 @@ public class EformidlingMessageUnpackager {
                 }
             }
         } catch (JAXBException | IOException e) {
-            log.error(UNMARSHALLING_EXCEPTION + fileReference, e);
+			log.error(UNMARSHALLING_EXCEPTION + "{}", fileReference, e);
             throw new DokumentUnpackingException(UNMARSHALLING_EXCEPTION + fileReference, e);
         }
         return AltinnDokument.builder()
@@ -92,5 +94,14 @@ public class EformidlingMessageUnpackager {
                 .trygderettenMelding(trygderettenMelding).build();
 
     }
+
+    private static <T> T unmarshalXmlObject(InputStream inputStream) throws JAXBException {
+        JAXBContext context = JAXBContext.newInstance(BrokerServiceManifest.class);
+        Unmarshaller unmarshal = context.createUnmarshaller();
+        Object object = unmarshal.unmarshal(inputStream);
+        Assert.isInstanceOf(BrokerServiceManifest.class, object);
+        return (T) object;
+    }
+
 
 }

@@ -9,9 +9,7 @@ public class DistribuerForsendelseTilTrygderettenMapper {
 
 	@Handler
 	public DistribuerForsendelseTilTrygderetten map(DistribuerTilKanal distribuerTilKanal) {
-		return DistribuerForsendelseTilTrygderetten.builder()
-				.forsendelseId(distribuerTilKanal.getForsendelseId())
-				.build();
+		return new DistribuerForsendelseTilTrygderetten(distribuerTilKanal.getForsendelseId());
 	}
 
 }

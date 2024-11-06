@@ -22,7 +22,7 @@ public class MottakerInfo {
 
 	private final String orgnummer;
 	private final String pemCertificate;
-	private X509Certificate x509Certificate;
+	private final X509Certificate x509Certificate;
 	private final String serviceCode;
 	private final String serviceEditionCode;
 

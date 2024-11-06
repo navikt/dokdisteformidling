@@ -4,6 +4,9 @@ import no.nav.dokdisteformidling.consumer.saf.journalpost.SafJournalpost;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
+import java.util.Collections;
+
+import static java.util.Collections.singletonList;
 
 public abstract class SafJournalpostTest {
 
@@ -65,7 +68,7 @@ public abstract class SafJournalpostTest {
 	private SafJournalpost.DokumentInfo createVedleggDokumentInfo() {
 		return SafJournalpost.DokumentInfo.builder()
 				.dokumentInfoId(VEDLEGG_DOKUMENT_INFO_ID)
-				.dokumentvarianter(Arrays.asList(createDokumentVariantArkiv()))
+				.dokumentvarianter(singletonList(createDokumentVariantArkiv()))
 				.originalJournalpostId(ORIGINAL_JOURNALPOST_ID)
 				.tittel(VEDLEGG_TITTEL)
 				.build();
