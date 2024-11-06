@@ -31,12 +31,12 @@
 		<cxf.version>4.0.5</cxf.version>
 		<logstash-logback-encoder.version>8.0</logstash-logback-encoder.version>
 		<resilience4j.version>2.2.0</resilience4j.version>
-		<google-cloud.version>26.49.0</google-cloud.version>
+		<google-cloud.version>26.50.0</google-cloud.version>
 		<tink.version>1.15.0</tink.version>
 		<tink-gcpkms.version>1.10.0</tink-gcpkms.version>
 		<ibm.mq.version>9.4.1.0</ibm.mq.version>
 		<commons-io.version>2.17.0</commons-io.version>
-		<nimbus-jose-jwt.version>9.42</nimbus-jose-jwt.version>
+		<nimbus-jose-jwt.version>9.45</nimbus-jose-jwt.version>
 		<jaxws-ri.version>4.0.3</jaxws-ri.version>
 		<commons-asic.version>1.0.2</commons-asic.version>
 		<httpclient4.version>4.5.14</httpclient4.version>

@@ -65,7 +65,7 @@ class JournalpostQdist013MapperTest extends SafJournalpostTest {
 		assertNotNull(hovedDokumentInfo);
 		assertEquals(ORIGINAL_JOURNALPOST_ID, hovedDokumentInfo.getOriginalJournalpostId());
 		assertEquals(1, hovedDokumentInfo.getDokumentvarianter().size());
-		assertDokumentVariantPDF(hovedDokumentInfo.getDokumentvarianter().get(0));
+		assertDokumentVariantPDF(hovedDokumentInfo.getDokumentvarianter().getFirst());
 		assertEquals(VEDLEGG_TITTEL, hovedDokumentInfo.getTittel());
 		assertEquals(VEDLEGG_DOKUMENT_INFO_ID, hovedDokumentInfo.getDokumentInfoId());
 	}
@@ -92,7 +92,7 @@ class JournalpostQdist013MapperTest extends SafJournalpostTest {
 	private void assertRelevanteDatoer(List<JournalpostQdist013.RelevantDato> relevantDatoer) {
 		assertNotNull(relevantDatoer);
 		assertEquals(1, relevantDatoer.size());
-		assertRelevantDatoJournalfoert(relevantDatoer.get(0));
+		assertRelevantDatoJournalfoert(relevantDatoer.getFirst());
 	}
 
 	private void assertRelevantDatoJournalfoert(JournalpostQdist013.RelevantDato relevantDato) {

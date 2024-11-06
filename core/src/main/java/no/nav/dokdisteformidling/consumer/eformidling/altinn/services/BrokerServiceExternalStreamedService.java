@@ -35,92 +35,92 @@ import static org.apache.cxf.headers.Header.HEADER_LIST;
 @Component
 public class BrokerServiceExternalStreamedService {
 
-    private static final String ALTINN_OPPLASTING_FEILET = "Altinn opplasting feilet: {}";
-    private static final String ALTINN_NEDLASTING_FEILET = "Altinn nedlasting feilet: {}";
-    private static final String ALTINN_AVLESING_AV_MELDING_FEILET = "Altinn avlesning av melding feilet: ";
-    private static final String ALTINN_BROKERSERVICEEXTERNALSTREAMED_NAMESPACE = BrokerServiceExternalStreamedSF.SERVICE.getNamespaceURI();
+	private static final String ALTINN_OPPLASTING_FEILET = "Altinn opplasting feilet: {}";
+	private static final String ALTINN_NEDLASTING_FEILET = "Altinn nedlasting feilet: {}";
+	private static final String ALTINN_AVLESING_AV_MELDING_FEILET = "Altinn avlesning av melding feilet: ";
+	private static final String ALTINN_BROKERSERVICEEXTERNALSTREAMED_NAMESPACE = BrokerServiceExternalStreamedSF.SERVICE.getNamespaceURI();
 
-    private final IBrokerServiceExternalStreamed brokerServiceExternalStreamed;
-    private final ObjectFactory objectFactory;
+	private final IBrokerServiceExternalStreamed brokerServiceExternalStreamed;
+	private final ObjectFactory objectFactory;
 
-    public BrokerServiceExternalStreamedService(final IBrokerServiceExternalStreamed brokerServiceExternalStreamed) {
-        this.brokerServiceExternalStreamed = brokerServiceExternalStreamed;
-        this.objectFactory = new ObjectFactory();
-    }
+	public BrokerServiceExternalStreamedService(final IBrokerServiceExternalStreamed brokerServiceExternalStreamed) {
+		this.brokerServiceExternalStreamed = brokerServiceExternalStreamed;
+		this.objectFactory = new ObjectFactory();
+	}
 
-    public ReceiptTo uploadFileToAltinn(String fileReference, String fileName, DataHandler dataHandler) {
-        List<Header> headerList = new ArrayList<>();
-        Header reportee = null;
-        Header reference = null;
-        Header filename = null;
+	public ReceiptTo uploadFileToAltinn(String fileReference, String fileName, DataHandler dataHandler) {
+		List<Header> headerList = new ArrayList<>();
+		Header reportee = null;
+		Header reference = null;
+		Header filename = null;
 
-        try {
-            reportee = new Header(new QName(ALTINN_BROKERSERVICEEXTERNALSTREAMED_NAMESPACE, "Reportee"), NAV_ORGNUMMER, new JAXBDataBinding(String.class));
-            reference = new Header(new QName(ALTINN_BROKERSERVICEEXTERNALSTREAMED_NAMESPACE, "Reference"), fileReference, new JAXBDataBinding(String.class));
-            filename = new Header(new QName(ALTINN_BROKERSERVICEEXTERNALSTREAMED_NAMESPACE, "FileName"), fileName, new JAXBDataBinding(String.class));
-        } catch (JAXBException e) {
-            log.error("Feil i uploadFileToAltinn:", e);
-        }
+		try {
+			reportee = new Header(new QName(ALTINN_BROKERSERVICEEXTERNALSTREAMED_NAMESPACE, "Reportee"), NAV_ORGNUMMER, new JAXBDataBinding(String.class));
+			reference = new Header(new QName(ALTINN_BROKERSERVICEEXTERNALSTREAMED_NAMESPACE, "Reference"), fileReference, new JAXBDataBinding(String.class));
+			filename = new Header(new QName(ALTINN_BROKERSERVICEEXTERNALSTREAMED_NAMESPACE, "FileName"), fileName, new JAXBDataBinding(String.class));
+		} catch (JAXBException e) {
+			log.error("Feil i uploadFileToAltinn:", e);
+		}
 
-        headerList.add(reportee);
-        headerList.add(reference);
-        headerList.add(filename);
+		headerList.add(reportee);
+		headerList.add(reference);
+		headerList.add(filename);
 
-        ((BindingProvider) brokerServiceExternalStreamed).getRequestContext().put(HEADER_LIST, headerList);
-        StreamedPayloadExternalBE streamedPayloadExternalBE = objectFactory.createStreamedPayloadExternalBE();
-        streamedPayloadExternalBE.setDataStream(dataHandler);
+		((BindingProvider) brokerServiceExternalStreamed).getRequestContext().put(HEADER_LIST, headerList);
+		StreamedPayloadExternalBE streamedPayloadExternalBE = objectFactory.createStreamedPayloadExternalBE();
+		streamedPayloadExternalBE.setDataStream(dataHandler);
 
-        try {
-            final ReceiptExternalStreamedBE receiptExternalStreamedBE = brokerServiceExternalStreamed.uploadFileStreamed(streamedPayloadExternalBE);
-            return mapReceipt(receiptExternalStreamedBE);
-        } catch (IBrokerServiceExternalStreamedUploadFileStreamedAltinnFaultFaultFaultMessage e) {
-            log.error(ALTINN_OPPLASTING_FEILET, from(e));
-            throw new AltinnBrokerServiceWsException(ALTINN_OPPLASTING_FEILET, AltinnReasonFactory.from(e), e);
-        }
-    }
+		try {
+			final ReceiptExternalStreamedBE receiptExternalStreamedBE = brokerServiceExternalStreamed.uploadFileStreamed(streamedPayloadExternalBE);
+			return mapReceipt(receiptExternalStreamedBE);
+		} catch (IBrokerServiceExternalStreamedUploadFileStreamedAltinnFaultFaultFaultMessage e) {
+			log.error(ALTINN_OPPLASTING_FEILET, from(e));
+			throw new AltinnBrokerServiceWsException(ALTINN_OPPLASTING_FEILET, AltinnReasonFactory.from(e), e);
+		}
+	}
 
-    private ReceiptTo mapReceipt(ReceiptExternalStreamedBE receiptExternalStreamedBE) {
-        return ReceiptTo.builder()
-                .lastChanged(receiptExternalStreamedBE.getLastChanged().getValue())
-                .parentReceiptId(receiptExternalStreamedBE.getParentReceiptId())
-                .receiptHistory(receiptExternalStreamedBE.getReceiptHistory().getValue())
-                .receiptId(receiptExternalStreamedBE.getReceiptId())
-                .receiptStatusCode(receiptExternalStreamedBE.getReceiptStatusCode().getValue())
-                .receiptText(receiptExternalStreamedBE.getReceiptText().getValue())
-                .receiptTypeName(receiptExternalStreamedBE.getReceiptTypeName().getValue())
-                .build();
-    }
+	private ReceiptTo mapReceipt(ReceiptExternalStreamedBE receiptExternalStreamedBE) {
+		return ReceiptTo.builder()
+				.lastChanged(receiptExternalStreamedBE.getLastChanged().getValue())
+				.parentReceiptId(receiptExternalStreamedBE.getParentReceiptId())
+				.receiptHistory(receiptExternalStreamedBE.getReceiptHistory().getValue())
+				.receiptId(receiptExternalStreamedBE.getReceiptId())
+				.receiptStatusCode(receiptExternalStreamedBE.getReceiptStatusCode().getValue())
+				.receiptText(receiptExternalStreamedBE.getReceiptText().getValue())
+				.receiptTypeName(receiptExternalStreamedBE.getReceiptTypeName().getValue())
+				.build();
+	}
 
-    public List<DownloadedMessageFromAltinn> downloadFilesFromAltinn(List<String> filreferanser) {
-        return filreferanser.stream()
-                .map(filreferanse -> mapReferenceToDownloadedFile(filreferanse, downloadFile(filreferanse)))
-                .collect(toList());
-    }
+	public List<DownloadedMessageFromAltinn> downloadFilesFromAltinn(List<String> filreferanser) {
+		return filreferanser.stream()
+				.map(filreferanse -> mapReferenceToDownloadedFile(filreferanse, downloadFile(filreferanse)))
+				.collect(toList());
+	}
 
-    private DownloadedMessageFromAltinn mapReferenceToDownloadedFile(String filreferanse, DataHandler dataHandler) {
-        InputStream inputStream;
+	private DownloadedMessageFromAltinn mapReferenceToDownloadedFile(String filreferanse, DataHandler dataHandler) {
+		InputStream inputStream;
 
-        try {
-            inputStream = dataHandler.getInputStream();
-        } catch (IOException | IllegalStateException e) {
-            log.error(ALTINN_AVLESING_AV_MELDING_FEILET, e);
-            throw new DokumentpakkingException(ALTINN_AVLESING_AV_MELDING_FEILET, e);
-        }
+		try {
+			inputStream = dataHandler.getInputStream();
+		} catch (IOException | IllegalStateException e) {
+			log.error(ALTINN_AVLESING_AV_MELDING_FEILET, e);
+			throw new DokumentpakkingException(ALTINN_AVLESING_AV_MELDING_FEILET, e);
+		}
 
-        return DownloadedMessageFromAltinn.builder().filreferanse(filreferanse).inputStream(inputStream).build();
-    }
+		return DownloadedMessageFromAltinn.builder().filreferanse(filreferanse).inputStream(inputStream).build();
+	}
 
-    public DataHandler downloadFile(String filreferanse) {
+	public DataHandler downloadFile(String filreferanse) {
 
-        log.info("Laster ned fil fra Altinn med filreferanse=" + filreferanse);
+		log.info("Laster ned fil fra Altinn med filreferanse={}", filreferanse);
 
-        try {
-            final DataHandler dataHandler = brokerServiceExternalStreamed.downloadFileStreamed(filreferanse, NAV_ORGNUMMER);
-            log.info("Lastet ned fil fra Altinn med filreferanse=" + filreferanse);
-            return dataHandler;
-        } catch (IBrokerServiceExternalStreamedDownloadFileStreamedAltinnFaultFaultFaultMessage e) {
-            log.error(ALTINN_NEDLASTING_FEILET, from(e));
-            throw new AltinnBrokerServiceWsException(ALTINN_NEDLASTING_FEILET, AltinnReasonFactory.from(e), e);
-        }
-    }
+		try {
+			final DataHandler dataHandler = brokerServiceExternalStreamed.downloadFileStreamed(filreferanse, NAV_ORGNUMMER);
+			log.info("Lastet ned fil fra Altinn med filreferanse={}", filreferanse);
+			return dataHandler;
+		} catch (IBrokerServiceExternalStreamedDownloadFileStreamedAltinnFaultFaultFaultMessage e) {
+			log.error(ALTINN_NEDLASTING_FEILET, from(e));
+			throw new AltinnBrokerServiceWsException(ALTINN_NEDLASTING_FEILET, AltinnReasonFactory.from(e), e);
+		}
+	}
 }

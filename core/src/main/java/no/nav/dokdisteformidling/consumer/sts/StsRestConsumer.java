@@ -35,7 +35,7 @@ public class StsRestConsumer {
 				.build();
 	}
 
-	@Retryable(include = AbstractDokdisteformidlingTechnicalException.class, backoff = @Backoff(delay = DELAY_SHORT, multiplier = MULTIPLIER_SHORT))
+	@Retryable(retryFor = AbstractDokdisteformidlingTechnicalException.class, backoff = @Backoff(delay = DELAY_SHORT, multiplier = MULTIPLIER_SHORT))
 	@Cacheable(STS_CACHE)
 	public String getOidcToken() {
 		try {

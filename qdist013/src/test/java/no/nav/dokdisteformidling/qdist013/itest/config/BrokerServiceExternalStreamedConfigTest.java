@@ -17,8 +17,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 
-import java.io.IOException;
-
 @Configuration
 @Profile("itest")
 public class BrokerServiceExternalStreamedConfigTest extends AbstractCxfEndpointConfig {
@@ -28,7 +26,7 @@ public class BrokerServiceExternalStreamedConfigTest extends AbstractCxfEndpoint
 	}
 
 	@Bean
-	public IBrokerServiceExternalStreamed iBrokerServiceExternalStreamed(BrokerServiceExternalStreamedProperties brokerServiceExternalStreamedProperties, DpoUserProperties dpoUserProperties) throws IOException {
+	public IBrokerServiceExternalStreamed iBrokerServiceExternalStreamed(BrokerServiceExternalStreamedProperties brokerServiceExternalStreamedProperties, DpoUserProperties dpoUserProperties) {
 		setWsdlUrl("wsdl/BrokerServiceExternalStreamedTest.wsdl");
 		setServiceName(BrokerServiceExternalStreamedSF.SERVICE);
 		setEndpointName(BrokerServiceExternalStreamedSF.CustomBindingIBrokerServiceExternalStreamed);

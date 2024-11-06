@@ -29,7 +29,7 @@ class BrokerServiceExternalServiceTest {
 	IBrokerServiceExternal iBrokerServiceExternalMock;
 	@InjectMocks
 	BrokerServiceExternalService brokerServiceExternalService;
-	ArgumentCaptor<BrokerServiceInitiation> brokerServiceInitiationArgumentCaptor = ArgumentCaptor.forClass(BrokerServiceInitiation.class);
+	final ArgumentCaptor<BrokerServiceInitiation> brokerServiceInitiationArgumentCaptor = ArgumentCaptor.forClass(BrokerServiceInitiation.class);
 
 	@Test
 	void shouldInitiateBrokerService() throws Exception {

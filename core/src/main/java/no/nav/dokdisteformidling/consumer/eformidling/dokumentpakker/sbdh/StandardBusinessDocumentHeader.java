@@ -9,14 +9,14 @@
 package no.nav.dokdisteformidling.consumer.eformidling.dokumentpakker.sbdh;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
-
 import jakarta.xml.bind.annotation.XmlAccessType;
 import jakarta.xml.bind.annotation.XmlAccessorType;
 import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlType;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
+
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
@@ -61,6 +61,7 @@ public class StandardBusinessDocumentHeader {
 	@XmlElement(name = "HeaderVersion", required = true)
 	private String headerVersion;
 
+	@Setter
 	@XmlElement(name = "Sender", required = true)
 	private Set<Sender> sender;
 
@@ -75,10 +76,6 @@ public class StandardBusinessDocumentHeader {
 
 	@XmlElement(name = "BusinessScope")
 	private BusinessScope businessScope;
-
-	public void setSender(Set<Sender> sender) {
-		this.sender = sender;
-	}
 
 	public Set<Sender> getSender() {
 		if (sender == null) {

@@ -357,12 +357,11 @@ class Qdist013ForAltinnIT extends AbstractQdist013IntegrationTest {
 		stubGetSecurityToken();
 		stubPostSafJournalpost("queryJournalpostId\":\"123\"", "saf/safQdist013GraphQlResponse-orgnr.json");
 		stubPostSafJournalpost("queryJournalpostId\":\"448212366\"", "saf/safLightweightGraphQlResponse-happy.json");
-		String nullStr = null;
 		stubFor(get("/ereg/v1/organisasjon/" + "123456789" + "/noekkelinfo")
 				.willReturn(aResponse()
 						.withStatus(OK.value())
 						.withHeader(CONTENT_TYPE, APPLICATION_JSON.getMimeType())
-						.withBody(nullStr)));
+						.withBody((String) null)));
 
 		sendStringMessage(qdist013, classpathToString("qdist013/qdist013-happy.xml"));
 

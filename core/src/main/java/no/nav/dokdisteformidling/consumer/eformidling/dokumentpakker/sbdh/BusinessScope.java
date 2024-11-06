@@ -8,14 +8,13 @@
 
 package no.nav.dokdisteformidling.consumer.eformidling.dokumentpakker.sbdh;
 
-import lombok.Data;
-
 import jakarta.xml.bind.annotation.XmlAccessType;
 import jakarta.xml.bind.annotation.XmlAccessorType;
 import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlType;
+import lombok.Data;
+
 import java.io.Serializable;
-import java.util.Arrays;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
@@ -75,14 +74,7 @@ public class BusinessScope implements Serializable {
 		return this.scope;
 	}
 
-	public BusinessScope addScope(Scope scope) {
+	public void addScope(Scope scope) {
 		getScope().add(scope);
-		return this;
 	}
-
-	public BusinessScope addScopes(Scope... scopes) {
-		getScope().addAll(Arrays.asList(scopes));
-		return this;
-	}
-
 }
