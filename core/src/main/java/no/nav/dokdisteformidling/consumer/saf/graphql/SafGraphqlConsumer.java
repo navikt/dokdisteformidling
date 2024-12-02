@@ -40,8 +40,8 @@ public class SafGraphqlConsumer {
 							  @Value("${saf.graphql.url}") String graphQLurl,
 							  StsRestConsumer stsRestConsumer) {
 		this.restTemplate = restTemplateBuilder
-				.setReadTimeout(Duration.ofSeconds(20))
-				.setConnectTimeout(Duration.ofSeconds(5))
+				.readTimeout(Duration.ofSeconds(20))
+				.connectTimeout(Duration.ofSeconds(5))
 				.build();
 		this.graphQLurl = graphQLurl;
 		this.stsRestConsumer = stsRestConsumer;
@@ -53,7 +53,7 @@ public class SafGraphqlConsumer {
 			ResponseEntity<SafJsonJournalpost> responseEntity = restTemplate.exchange(graphQLurl, POST, new HttpEntity<>(requestToJson(graphQLRequest), createAuthorizationHeader()), SafJsonJournalpost.class);
 
 			if (responseEntity.getBody() == null || responseEntity.getBody().getData() == null ||
-					responseEntity.getBody().getData().getJournalpost() == null) {
+				responseEntity.getBody().getData().getJournalpost() == null) {
 				// Forsøk på nytt. GraphQL endepunktet gir kun httpstatus 200. Verdikjeden forventer at man finner journalpost her.
 				// Hvis ikke er dette en teknisk feil, ikke funksjonell feil.
 				throw new SafJournalpostIkkeFunnetException("Ingen journalpost ble funnet i saf.");
