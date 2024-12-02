@@ -27,8 +27,8 @@ public class JuridiskLoggConsumer implements JuridiskLogg {
 								final ServiceuserAlias serviceuserAlias) {
 		this.juridiskLoggUrl = juridiskLoggUrl;
 		this.restTemplate = restTemplateBuilder
-				.setReadTimeout(Duration.ofSeconds(20))
-				.setConnectTimeout(Duration.ofSeconds(5))
+				.readTimeout(Duration.ofSeconds(20))
+				.connectTimeout(Duration.ofSeconds(5))
 				.basicAuthentication(serviceuserAlias.getUsername(), serviceuserAlias.getPassword())
 				.build();
 	}
