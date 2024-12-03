@@ -29,8 +29,8 @@ public class StsRestConsumer {
 						   final ServiceuserAlias serviceuserAlias) {
 		this.stsUrl = stsUrl;
 		this.restTemplate = restTemplateBuilder
-				.readTimeout(Duration.ofSeconds(20))
-				.connectTimeout(Duration.ofSeconds(5))
+				.setReadTimeout(Duration.ofSeconds(20))
+				.setConnectTimeout(Duration.ofSeconds(5))
 				.basicAuthentication(serviceuserAlias.getUsername(), serviceuserAlias.getPassword())
 				.build();
 	}

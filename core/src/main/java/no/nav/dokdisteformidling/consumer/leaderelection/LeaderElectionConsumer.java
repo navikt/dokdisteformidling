@@ -18,8 +18,8 @@ public class LeaderElectionConsumer implements LeaderElection {
 
 	public LeaderElectionConsumer(RestTemplateBuilder restTemplateBuilder, ObjectMapper mapper) {
 		this.restTemplate = restTemplateBuilder
-				.readTimeout(Duration.ofSeconds(20))
-				.connectTimeout(Duration.ofSeconds(5))
+				.setReadTimeout(Duration.ofSeconds(20))
+				.setConnectTimeout(Duration.ofSeconds(5))
 				.build();
 		this.mapper = mapper;
 	}
