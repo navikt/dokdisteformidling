@@ -38,6 +38,8 @@ public class EregConsumer {
 
 	@Retryable(retryFor = EregTechnicalException.class)
 	public String hentOrganisasjonsnavn(String orgnr) {
+		log.info("Henter organisasjonsnavn for orgnr={}", orgnr);
+
 		var organisasjonsnavn = webClient.get()
 				.uri("/{orgnr}/noekkelinfo", orgnr.trim())
 				.retrieve()
@@ -50,6 +52,8 @@ public class EregConsumer {
 		if (isBlank(organisasjonsnavn)) {
 			throw new EregFunctionalException("Organisasjonsnavn fra Enhetsregisteret for orgnr=%s mangler.".formatted(orgnr));
 		}
+
+		log.info("Har hentet organisasjonsnavn={} for orgnr={}", organisasjonsnavn, orgnr);
 
 		return organisasjonsnavn;
 	}
