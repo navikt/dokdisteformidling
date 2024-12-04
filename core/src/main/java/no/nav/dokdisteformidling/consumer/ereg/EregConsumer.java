@@ -1,87 +1,69 @@
 package no.nav.dokdisteformidling.consumer.ereg;
 
-import no.nav.dokdisteformidling.exception.functional.EregHentNoekkelinfoFunctionalException;
-import no.nav.dokdisteformidling.exception.technical.EregHentNoekkelinfoTechnicalException;
+import lombok.extern.slf4j.Slf4j;
+import no.nav.dokdisteformidling.config.props.DokdisteformidlingProperties;
+import no.nav.dokdisteformidling.exception.functional.EregFunctionalException;
+import no.nav.dokdisteformidling.exception.technical.EregTechnicalException;
 import org.slf4j.MDC;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.web.client.RestTemplateBuilder;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Component;
-import org.springframework.web.client.HttpClientErrorException;
-import org.springframework.web.client.HttpServerErrorException;
-import org.springframework.web.client.RestTemplate;
+import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 
-import java.time.Duration;
-
-import static java.lang.String.format;
 import static no.nav.dokdisteformidling.constants.DomainConstants.APP_NAME;
 import static no.nav.dokdisteformidling.constants.MdcConstants.MDC_CALL_ID;
 import static no.nav.dokdisteformidling.constants.NavHeaders.NAV_CALL_ID;
 import static no.nav.dokdisteformidling.constants.NavHeaders.NAV_CONSUMER_ID;
-import static org.springframework.http.HttpMethod.GET;
+import static org.apache.commons.lang3.StringUtils.isBlank;
+import static org.springframework.http.HttpStatus.NOT_FOUND;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 
+@Slf4j
 @Component
-public class EregConsumer implements Ereg {
+public class EregConsumer {
 
-	private final RestTemplate restTemplate;
-	private final String eregApiUrl;
+	private final WebClient webClient;
 
-	public EregConsumer(RestTemplateBuilder restTemplateBuilder,
-						@Value("${ereg.api.url}") String eregApiUrl) {
-		this.restTemplate = restTemplateBuilder
-				.setReadTimeout(Duration.ofSeconds(20))
-				.setConnectTimeout(Duration.ofSeconds(5))
+	public EregConsumer(WebClient webClient,
+						DokdisteformidlingProperties dokdisteformidlingProperties) {
+		this.webClient = webClient.mutate()
+				.baseUrl(dokdisteformidlingProperties.getEndpoints().getEreg().getUrl())
+				.defaultHeaders(httpHeaders -> {
+					httpHeaders.setContentType(APPLICATION_JSON);
+					httpHeaders.set(NAV_CONSUMER_ID, APP_NAME);
+					httpHeaders.set(NAV_CALL_ID, MDC.get(MDC_CALL_ID));
+				})
 				.build();
-		this.eregApiUrl = eregApiUrl;
 	}
 
-	@Retryable(retryFor = EregHentNoekkelinfoTechnicalException.class)
-	public String hentNavn(String orgnr) {
-		try {
-			final String orgnrTrimmed = orgnr.trim();
-			HttpHeaders headers = createHeaders();
+	@Retryable(retryFor = EregTechnicalException.class)
+	public String hentOrganisasjonsnavn(String orgnr) {
+		var organisasjonsnavn = webClient.get()
+				.uri("/{orgnr}/noekkelinfo", orgnr.trim())
+				.retrieve()
+				.bodyToMono(EregResponse.class)
+				.mapNotNull(EregResponse::navn)
+				.mapNotNull(EregResponse.Navn::sammensattnavn)
+				.doOnError(throwable -> handleError(orgnr, throwable))
+				.block();
 
-			EregHentNoekkelInfoResponse response = restTemplate.exchange(eregApiUrl + "/v1/organisasjon/" + orgnrTrimmed + "/noekkelinfo",
-					GET, new HttpEntity<>(headers), EregHentNoekkelInfoResponse.class).getBody();
-			validerRespons(response, orgnrTrimmed);
+		if (isBlank(organisasjonsnavn)) {
+			throw new EregFunctionalException("Organisasjonsnavn fra Enhetsregisteret for orgnr=%s mangler.".formatted(orgnr));
+		}
 
-			return getFullName(response.getNavn());
-		} catch (HttpClientErrorException e) {
-			throw new EregHentNoekkelinfoFunctionalException(format("Funksjonell feil ved kall mot ereg:hentNoekkelinfo for organisasjonsnummer=%s. feilmelding=%s",
-					orgnr, e.getMessage()), e);
-		} catch (HttpServerErrorException e) {
-			throw new EregHentNoekkelinfoTechnicalException(format("Teknisk feil ved kall mot ereg:hentNoekkelinfo for organisasjonsnummer=%s. Feilmelding=%s",
-					orgnr, e.getMessage()), e);
+		return organisasjonsnavn;
+	}
+
+	private void handleError(String orgnr, Throwable error) {
+		if (error instanceof WebClientResponseException response && response.getStatusCode().is4xxClientError()) {
+			if (NOT_FOUND.equals(response.getStatusCode())) {
+				throw new EregFunctionalException("Organisasjon med orgnr=%s ikke funnet i Enhetsregisteret".formatted(orgnr), error);
+			} else {
+				throw new EregFunctionalException("Kall mot Enhetsregisteret feilet funksjonelt med statuskode=%s for orgnr=%s".formatted(response.getStatusCode(), orgnr), error);
+			}
+		} else {
+			throw new EregTechnicalException("Kall mot Enhetsregisteret feilet teknisk for orgnr=%s".formatted(orgnr), error);
 		}
 	}
 
-	private HttpHeaders createHeaders() {
-		HttpHeaders headers = new HttpHeaders();
-
-		headers.setContentType(APPLICATION_JSON);
-		headers.add(NAV_CONSUMER_ID, APP_NAME);
-		headers.add(NAV_CALL_ID, MDC.get(MDC_CALL_ID));
-
-		return headers;
-	}
-
-	private void validerRespons(EregHentNoekkelInfoResponse eregHentNoekkelInfoResponse, String orgnr) {
-		if (eregHentNoekkelInfoResponse == null) {
-			throw new EregHentNoekkelinfoFunctionalException(format("Fikk ingen respons fra ereg:hentNoekkelinfo for organisasjonsnummer=%s.", orgnr));
-		} else if (eregHentNoekkelInfoResponse.getNavn() == null) {
-			throw new EregHentNoekkelinfoFunctionalException(format("Respons fra ereg:hentNoekkelinfo for organisasjonsnummer=%s mangler navn", orgnr));
-		}
-	}
-
-	private String getFullName(EregHentNoekkelInfoResponse.Navn navn) {
-		return trimString(format("%s %s %s %s %s", trimString(navn.getNavnelinje1()), trimString(navn.getNavnelinje2()),
-				trimString(navn.getNavnelinje3()), trimString(navn.getNavnelinje4()), trimString(navn.getNavnelinje5())));
-	}
-
-	private String trimString(String string) {
-		return string == null ? "" : string.trim();
-	}
 }
