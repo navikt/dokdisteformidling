@@ -35,6 +35,7 @@ import static org.springframework.http.MediaType.APPLICATION_XML_VALUE;
 public abstract class AbstractQdist013IntegrationTest {
 
 	protected static final String FORSENDELSE_ID = "33333";
+	protected static final String EREG_URL = "/v2/organisasjon/%s/noekkelinfo";
 	protected static final String OPPDATERFORSENDELSE_URL = "/administrerforsendelse/oppdaterforsendelse";
 
 	@Value("${altinn.brokerserviceexternal.endpointurl}")
@@ -74,12 +75,12 @@ public abstract class AbstractQdist013IntegrationTest {
 						.withStatus(status.value())));
 	}
 
-	protected static void stubGetEregHentOrgNavn(String orgnr) {
-		stubFor(get("/ereg/v1/organisasjon/" + orgnr + "/noekkelinfo")
+	protected static void stubEreg(String orgnr) {
+		stubFor(get(EREG_URL.formatted(orgnr))
 				.willReturn(aResponse()
 						.withStatus(OK.value())
 						.withHeader(CONTENT_TYPE, APPLICATION_JSON_VALUE)
-						.withBodyFile("ereg/eregHentNavn_happy.json")));
+						.withBodyFile("ereg/happy.json")));
 	}
 
 	public static void stubGetServiceRegistry() {

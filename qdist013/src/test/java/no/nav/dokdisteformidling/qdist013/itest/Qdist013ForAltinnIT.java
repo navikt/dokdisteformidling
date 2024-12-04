@@ -11,11 +11,12 @@ import no.nav.dokdisteformidling.storage.JsonSerializer;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.jms.core.JmsTemplate;
-import org.springframework.util.MimeTypeUtils;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.containing;
@@ -47,7 +48,6 @@ import static org.springframework.http.HttpStatus.NOT_FOUND;
 import static org.springframework.http.HttpStatus.OK;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.http.MediaType.APPLICATION_XML_VALUE;
-
 
 class Qdist013ForAltinnIT extends AbstractQdist013IntegrationTest {
 
@@ -131,7 +131,7 @@ class Qdist013ForAltinnIT extends AbstractQdist013IntegrationTest {
 		stubGetSecurityToken();
 		stubPostSafJournalpost("queryJournalpostId\":\"123\"", "saf/safQdist013GraphQlResponse-orgnr.json");
 		stubPostSafJournalpost("queryJournalpostId\":\"448212366\"", "saf/safLightweightGraphQlResponse-happy.json");
-		stubGetEregHentOrgNavn("123456789");
+		stubEreg("123456789");
 		stubPostMaskinporten();
 		stubGetServiceRegistry();
 		stubPostIntiateBrokerService();
@@ -337,14 +337,16 @@ class Qdist013ForAltinnIT extends AbstractQdist013IntegrationTest {
 		await().atMost(10, SECONDS).untilAsserted(() -> assertMessageOnQueue(qdist013FunksjonellFeil));
 	}
 
-	@Test
-	void shouldThrowEregHentNoekkelinfoFunctionalExceptionForForbiddenFraEreg() {
+	@ParameterizedTest
+	@EnumSource(value = HttpStatus.class, names = {"BAD_REQUEST", "NOT_FOUND"})
+	void shouldThrowEregFunctionalExceptionFor4xxFraEreg(HttpStatus httpStatus) {
 		stubGetForsendelse("__files/dokdistadmin/getForsendelse-happy.json");
 		stubGetSecurityToken();
 		stubPostSafJournalpost("queryJournalpostId\":\"123\"", "saf/safQdist013GraphQlResponse-orgnr.json");
 		stubPostSafJournalpost("queryJournalpostId\":\"448212366\"", "saf/safLightweightGraphQlResponse-happy.json");
-		stubFor(get("/ereg/v1/organisasjon/" + "123456789" + "/noekkelinfo")
-				.willReturn(aResponse().withStatus(FORBIDDEN.value())));
+		stubFor(get(EREG_URL.formatted("123456789"))
+				.willReturn(aResponse()
+						.withStatus(httpStatus.value())));
 
 		sendStringMessage(qdist013, classpathToString("qdist013/qdist013-happy.xml"));
 
@@ -352,12 +354,12 @@ class Qdist013ForAltinnIT extends AbstractQdist013IntegrationTest {
 	}
 
 	@Test
-	void shouldThrowEregHentNoekkelinfoFunctionalExceptionIngenResponse() {
+	void shouldThrowEregFunctionalExceptionWhenResponseNull() {
 		stubGetForsendelse("__files/dokdistadmin/getForsendelse-happy.json");
 		stubGetSecurityToken();
 		stubPostSafJournalpost("queryJournalpostId\":\"123\"", "saf/safQdist013GraphQlResponse-orgnr.json");
 		stubPostSafJournalpost("queryJournalpostId\":\"448212366\"", "saf/safLightweightGraphQlResponse-happy.json");
-		stubFor(get("/ereg/v1/organisasjon/" + "123456789" + "/noekkelinfo")
+		stubFor(get(EREG_URL.formatted("123456789"))
 				.willReturn(aResponse()
 						.withStatus(OK.value())
 						.withHeader(CONTENT_TYPE, APPLICATION_JSON.getMimeType())
@@ -369,15 +371,33 @@ class Qdist013ForAltinnIT extends AbstractQdist013IntegrationTest {
 	}
 
 	@Test
-	void shouldThrowEregHentNoekkelinfoFunctionalExceptionManglerNavn() {
+	void shouldThrowEregFunctionalExceptionWhenNavnMangler() {
 		stubGetForsendelse("__files/dokdistadmin/getForsendelse-happy.json");
 		stubGetSecurityToken();
 		stubPostSafJournalpost("queryJournalpostId\":\"123\"", "saf/safQdist013GraphQlResponse-orgnr.json");
 		stubPostSafJournalpost("queryJournalpostId\":\"448212366\"", "saf/safLightweightGraphQlResponse-happy.json");
-		stubFor(get("/ereg/v1/organisasjon/" + "123456789" + "/noekkelinfo").willReturn(aResponse()
-				.withStatus(OK.value())
-				.withHeader(CONTENT_TYPE, APPLICATION_JSON_VALUE)
-				.withBodyFile("ereg/eregHentNavn_manglerNavn.json")));
+		stubFor(get(EREG_URL.formatted("123456789"))
+				.willReturn(aResponse()
+						.withStatus(OK.value())
+						.withHeader(CONTENT_TYPE, APPLICATION_JSON_VALUE)
+						.withBodyFile("ereg/mangler_navn.json")));
+
+		sendStringMessage(qdist013, classpathToString("qdist013/qdist013-happy.xml"));
+
+		await().atMost(10, SECONDS).untilAsserted(() -> assertMessageOnQueue(qdist013FunksjonellFeil));
+	}
+
+	@Test
+	void shouldThrowEregFunctionalExceptionWhenSammensattnavnMangler() {
+		stubGetForsendelse("__files/dokdistadmin/getForsendelse-happy.json");
+		stubGetSecurityToken();
+		stubPostSafJournalpost("queryJournalpostId\":\"123\"", "saf/safQdist013GraphQlResponse-orgnr.json");
+		stubPostSafJournalpost("queryJournalpostId\":\"448212366\"", "saf/safLightweightGraphQlResponse-happy.json");
+		stubFor(get(EREG_URL.formatted("123456789"))
+				.willReturn(aResponse()
+						.withStatus(OK.value())
+						.withHeader(CONTENT_TYPE, APPLICATION_JSON_VALUE)
+						.withBodyFile("ereg/mangler_sammensattnavn.json")));
 
 		sendStringMessage(qdist013, classpathToString("qdist013/qdist013-happy.xml"));
 
@@ -390,7 +410,7 @@ class Qdist013ForAltinnIT extends AbstractQdist013IntegrationTest {
 		stubGetSecurityToken();
 		stubPostSafJournalpost("queryJournalpostId\":\"123\"", "saf/safQdist013GraphQlResponse-orgnr.json");
 		stubPostSafJournalpost("queryJournalpostId\":\"448212366\"", "saf/safLightweightGraphQlResponse-happy.json");
-		stubGetEregHentOrgNavn("123456789");
+		stubEreg("123456789");
 		stubPostMaskinporten();
 		stubGetServiceRegistry();
 		stubPostIntiateBrokerService();
@@ -439,7 +459,7 @@ class Qdist013ForAltinnIT extends AbstractQdist013IntegrationTest {
 		stubGetSecurityToken();
 		stubPostSafJournalpost("queryJournalpostId\":\"123\"", "saf/safQdist013GraphQlResponse-orgnr.json");
 		stubPostSafJournalpost("queryJournalpostId\":\"448212366\"", "saf/safLightweightGraphQlResponse-happy.json");
-		stubGetEregHentOrgNavn("123456789");
+		stubEreg("123456789");
 		stubPostMaskinporten();
 		stubGetServiceRegistry();
 		stubPostIntiateBrokerService();
@@ -458,13 +478,14 @@ class Qdist013ForAltinnIT extends AbstractQdist013IntegrationTest {
 		stubGetSecurityToken();
 		stubPostSafJournalpost("queryJournalpostId\":\"123\"", "saf/safQdist013GraphQlResponse-orgnr.json");
 		stubPostSafJournalpost("queryJournalpostId\":\"448212366\"", "saf/safLightweightGraphQlResponse-happy.json");
-		stubGetEregHentOrgNavn("123456789");
+		stubEreg("123456789");
 		stubPostMaskinporten();
 		stubGetServiceRegistry();
 		stubPostIntiateBrokerService();
 		stubUploadBrokerServiceStreamed();
 		stubFor(post(urlMatching("/juridisklogg.*"))
-				.willReturn(aResponse().withStatus(INTERNAL_SERVER_ERROR.value())));
+				.willReturn(aResponse()
+						.withStatus(INTERNAL_SERVER_ERROR.value())));
 
 		sendStringMessage(qdist013, classpathToString("qdist013/qdist013-happy.xml"));
 
@@ -472,12 +493,12 @@ class Qdist013ForAltinnIT extends AbstractQdist013IntegrationTest {
 	}
 
 	@Test
-	void shouldThrowEregHentNoekkelinfoTechnicalExceptionVedInternalServerErrorFraEreg() {
+	void shouldThrowEregTechnicalExceptionVedInternalServerErrorFraEreg() {
 		stubGetForsendelse("__files/dokdistadmin/getForsendelse-happy.json");
 		stubGetSecurityToken();
 		stubPostSafJournalpost("queryJournalpostId\":\"123\"", "saf/safQdist013GraphQlResponse-orgnr.json");
 		stubPostSafJournalpost("queryJournalpostId\":\"448212366\"", "saf/safLightweightGraphQlResponse-happy.json");
-		stubFor(get("/ereg/v1/organisasjon/" + "123456789" + "/noekkelinfo")
+		stubFor(get(EREG_URL.formatted("123456789"))
 				.willReturn(aResponse()
 						.withStatus(INTERNAL_SERVER_ERROR.value())));
 
@@ -492,11 +513,12 @@ class Qdist013ForAltinnIT extends AbstractQdist013IntegrationTest {
 		stubGetSecurityToken();
 		stubPostSafJournalpost("queryJournalpostId\":\"123\"", "saf/safQdist013GraphQlResponse-orgnr.json");
 		stubPostSafJournalpost("queryJournalpostId\":\"448212366\"", "saf/safLightweightGraphQlResponse-happy.json");
-		stubGetEregHentOrgNavn("123456789");
+		stubEreg("123456789");
 		stubPostMaskinporten();
 		stubFor(get(urlMatching("/serviceregistry/identifier/" + TRYGDERETTEN_ORGNUMMER + "/process/" + AVTALTMELDING_PROCESS))
-				.willReturn(aResponse().withStatus(INTERNAL_SERVER_ERROR.value())
-						.withHeader(CONTENT_TYPE, MimeTypeUtils.APPLICATION_JSON_VALUE)));
+				.willReturn(aResponse()
+						.withStatus(INTERNAL_SERVER_ERROR.value())
+						.withHeader(CONTENT_TYPE, APPLICATION_JSON_VALUE)));
 
 		sendStringMessage(qdist013, classpathToString("qdist013/qdist013-happy.xml"));
 
@@ -509,12 +531,13 @@ class Qdist013ForAltinnIT extends AbstractQdist013IntegrationTest {
 		stubGetSecurityToken();
 		stubPostSafJournalpost("queryJournalpostId\":\"123\"", "saf/safQdist013GraphQlResponse-orgnr.json");
 		stubPostSafJournalpost("queryJournalpostId\":\"448212366\"", "saf/safLightweightGraphQlResponse-happy.json");
-		stubGetEregHentOrgNavn("123456789");
+		stubEreg("123456789");
 		stubPostMaskinporten();
 		stubGetServiceRegistry();
 
 		stubFor(post(urlMatching("/brokerserviceexternal"))
-				.willReturn(aResponse().withStatus(INTERNAL_SERVER_ERROR.value())
+				.willReturn(aResponse()
+						.withStatus(INTERNAL_SERVER_ERROR.value())
 						.withHeader(CONTENT_TYPE, APPLICATION_XML_VALUE)));
 
 		sendStringMessage(qdist013, classpathToString("qdist013/qdist013-happy.xml"));

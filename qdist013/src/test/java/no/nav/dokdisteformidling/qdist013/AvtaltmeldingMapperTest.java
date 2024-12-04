@@ -10,7 +10,7 @@ import no.arkivverket.standarder.noark5.arkivmelding.Mappe;
 import no.arkivverket.standarder.noark5.arkivmelding.Part;
 import no.arkivverket.standarder.noark5.arkivmelding.Registrering;
 import no.arkivverket.standarder.noark5.arkivmelding.Saksmappe;
-import no.nav.dokdisteformidling.consumer.ereg.Ereg;
+import no.nav.dokdisteformidling.consumer.ereg.EregConsumer;
 import no.nav.dokdisteformidling.consumer.pdl.HentPersonInfo;
 import no.nav.dokdisteformidling.consumer.pdl.PdlGraphQLConsumer;
 import no.nav.dokdisteformidling.consumer.saf.SafJournalpostQueryService;
@@ -25,7 +25,6 @@ import java.math.BigInteger;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 import static java.util.Collections.singletonList;
@@ -109,15 +108,14 @@ class AvtaltmeldingMapperTest {
 	private static final String FILTYPE_PDF = "PDF";
 	private static final String FILTYPE_PDFA = "PDF/A";
 
-
-	private Ereg eregMock;
+	private EregConsumer eregMock;
 	private SafJournalpostQueryService safJournalpostQueryServiceMock;
 	private AvtaltmeldingMapper avtaltmeldingMapper;
 	private PdlGraphQLConsumer pdlGraphQLConsumer;
 
 	@BeforeEach
 	public void setUp() {
-		eregMock = mock(Ereg.class);
+		eregMock = mock(EregConsumer.class);
 		pdlGraphQLConsumer = mock(PdlGraphQLConsumer.class);
 		safJournalpostQueryServiceMock = mock(SafJournalpostQueryService.class);
 		avtaltmeldingMapper = new AvtaltmeldingMapper(safJournalpostQueryServiceMock, eregMock, pdlGraphQLConsumer);
@@ -136,14 +134,13 @@ class AvtaltmeldingMapperTest {
 		assertArkivmelding(arkivmelding);
 
 		verify(pdlGraphQLConsumer, times(1)).hentNavn(anyString());
-		verify(eregMock, times(0)).hentNavn(any(String.class));
-
+		verify(eregMock, times(0)).hentOrganisasjonsnavn(any(String.class));
 	}
 
 	@Test
 	@DisplayName("Case when bruker is organisasjon. Should get name from Ereg")
 	void happyPathBrukerIsOrgansisasjon() {
-		when(eregMock.hentNavn(any(String.class))).thenReturn(EREG_NAVN);
+		when(eregMock.hentOrganisasjonsnavn(any(String.class))).thenReturn(EREG_NAVN);
 
 		JournalpostQdist013 journalpostQdist013 = createJournalpostQdist013Builder()
 				.tema(TEMA)
@@ -163,9 +160,8 @@ class AvtaltmeldingMapperTest {
 		assertEquals(SAKSPART_ROLLE_DAP, sakspartDAP.getPartRolle());
 		assertNull(sakspartDAP.getKontaktperson());
 
-		verify(eregMock, times(1)).hentNavn(BRUKER_ID_ORGNR);
+		verify(eregMock, times(1)).hentOrganisasjonsnavn(BRUKER_ID_ORGNR);
 		verify(safJournalpostQueryServiceMock, times(0)).hentJournalpost(any(String.class));
-
 	}
 
 	@Test
@@ -192,7 +188,7 @@ class AvtaltmeldingMapperTest {
 		assertNull(sakspartDAP.getKontaktperson());
 
 		verify(pdlGraphQLConsumer, times(2)).hentNavn(anyString());
-		verify(eregMock, times(0)).hentNavn(any(String.class));
+		verify(eregMock, times(0)).hentOrganisasjonsnavn(any(String.class));
 		verify(safJournalpostQueryServiceMock, times(0)).hentJournalpost(any(String.class));
 	}
 
