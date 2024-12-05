@@ -40,7 +40,7 @@ public class EregConsumer {
 	public String hentOrganisasjonsnavn(String orgnr) {
 		log.info("Henter organisasjonsnavn for orgnr={}", orgnr);
 
-		var organisasjonsnavn = webClient.get()
+		String organisasjonsnavn = webClient.get()
 				.uri("/{orgnr}/noekkelinfo", orgnr.trim())
 				.retrieve()
 				.bodyToMono(EregResponse.class)
