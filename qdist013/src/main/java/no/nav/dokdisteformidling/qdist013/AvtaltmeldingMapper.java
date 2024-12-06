@@ -11,7 +11,7 @@ import no.arkivverket.standarder.noark5.arkivmelding.Korrespondansepart;
 import no.arkivverket.standarder.noark5.arkivmelding.ObjectFactory;
 import no.arkivverket.standarder.noark5.arkivmelding.Part;
 import no.arkivverket.standarder.noark5.arkivmelding.Saksmappe;
-import no.nav.dokdisteformidling.consumer.ereg.Ereg;
+import no.nav.dokdisteformidling.consumer.ereg.EregConsumer;
 import no.nav.dokdisteformidling.consumer.pdl.HentPersonInfo;
 import no.nav.dokdisteformidling.consumer.pdl.PdlGraphQLConsumer;
 import no.nav.dokdisteformidling.consumer.saf.SafJournalpostQueryService;
@@ -70,14 +70,14 @@ public class AvtaltmeldingMapper {
     public static final String UKJENT = "UKJENT";
 
     private final PdlGraphQLConsumer pdlGraphQLConsumer;
-    private final Ereg ereg;
+    private final EregConsumer eregConsumer;
     private final SafJournalpostQueryService<LightweightSafJournalpostQdist013> safJournalpostQueryService;
 
     public AvtaltmeldingMapper(@Qualifier("LightweightSafJournalpostQueryServiceQdist013") SafJournalpostQueryService<LightweightSafJournalpostQdist013> safJournalpostQueryService,
-                               Ereg ereg,
+                               EregConsumer eregConsumer,
                                PdlGraphQLConsumer pdlGraphQLConsumer) {
         this.safJournalpostQueryService = safJournalpostQueryService;
-        this.ereg = ereg;
+        this.eregConsumer = eregConsumer;
         this.pdlGraphQLConsumer = pdlGraphQLConsumer;
     }
 
@@ -377,10 +377,12 @@ public class AvtaltmeldingMapper {
     }
 
 	private String getSakspartNavnDAP(JournalpostQdist013 journalpostQdist013) {
-		if (brukerTypeIsOrgnr(journalpostQdist013)) {
-			return ereg.hentNavn(journalpostQdist013.getBruker().getId());
+		var brukerId = journalpostQdist013.getBruker().getId();
+
+        if (brukerTypeIsOrgnr(journalpostQdist013)) {
+			return eregConsumer.hentOrganisasjonsnavn(brukerId);
 		} else {
-			return getHentPersonInfo(journalpostQdist013.getBruker().getId()).getFulltnavn();
+			return getHentPersonInfo(brukerId).getFulltnavn();
 		}
 	}
 

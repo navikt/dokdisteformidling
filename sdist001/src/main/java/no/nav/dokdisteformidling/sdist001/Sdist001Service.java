@@ -50,6 +50,8 @@ public class Sdist001Service {
 	}
 
 	public void oppdaterDokDistEformidlingStatus() {
+		log.info("sdist001 starter regelmessig jobb for å oppdatere status for eFormidlingforsendelser");
+
 		var endringer = new ForsendelseStatusEndringer();
 		List<Forsendelse> forsendelserTo = administrerForsendelse.hentEformidlingForsendelser().getForsendelser();
 		log.info("Hentet eformidlingforsendelser fra rdist001 {} ", forsendelserTo);
