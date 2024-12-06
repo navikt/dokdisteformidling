@@ -21,6 +21,16 @@ public class DokdisteformidlingProperties {
 
 		@NotNull
 		private AzureEndpoint pdl;
+
+		@NotNull
+		private Endpoint ereg;
+	}
+
+	@Data
+	@Validated
+	public static class Endpoint {
+		@NotEmpty
+		private String url;
 	}
 
 	@Data
