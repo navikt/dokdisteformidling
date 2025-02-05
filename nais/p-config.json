@@ -1,5 +1,8 @@
 {
   "APP_NAME": "dokdisteformidling",
+  "INGRESSES": "https://dokdisteformidling.nais.adeo.no",
+  "MIN_REPLICAS": "2",
+  "MAX_REPLICAS": "2",
   "DOKDISTEFORMIDLING_ENDPOINTS_DOKDISTADMIN_URL": "https://dokdistadmin.intern.nav.no/rest/v1/administrerforsendelse",
   "DOKDISTEFORMIDLING_ENDPOINTS_DOKDISTADMIN_SCOPE": "api://prod-fss.teamdokumenthandtering.dokdistadmin/.default",
   "SECURITY_TOKEN_SERVICE_TOKEN_URL": "https://security-token-service.nais.adeo.no/rest/v1/sts/token",
@@ -19,7 +22,6 @@
   "SERVICEREGISTRY_URL": "https://meldingsutveksling.difi.no/serviceregistry/",
   "ALTINN_BROKERSERVICEEXTERNAL_ENDPOINTURL": "https://www.altinn.no/ServiceEngineExternal/BrokerServiceExternal.svc",
   "ALTINN_BROKERSERVICEEXTERNALSTREAMED_ENDPOINTURL": "https://www.altinn.no/ServiceEngineExternal/BrokerServiceExternalStreamed.svc",
-  "INGRESSES": "https://dokdisteformidling.nais.adeo.no",
   "SRVDOKDISTEFORMIDLING": "/serviceuser/data/prod/srvdokdisteformidling",
   "DOKDISTEFORMIDLING_VAULT": "/kv/prod/fss/dokdisteformidling/default",
   "KLAGEINSTANS_VAULT": "/secret/virksomhetssertifikat/prod/klageinstans/",
@@ -28,7 +30,5 @@
   "DOKDISTMELLOMLAGER_PROJECTID": "teamdokumenthandteri-prod-a63b",
   "DOKDISTMELLOMLAGER_BUCKET": "dokdistmellomlager-prod",
   "DOKDISTMELLOMLAGER_KEYRING": "dokdistmellomlager-keyring",
-  "DOKDISTMELLOMLAGER_KEYID": "dokdistmellomlager-symmetric",
-  "MIN_REPLICAS": "2",
-  "MAX_REPLICAS": "2"
+  "DOKDISTMELLOMLAGER_KEYID": "dokdistmellomlager-symmetric"
 }
