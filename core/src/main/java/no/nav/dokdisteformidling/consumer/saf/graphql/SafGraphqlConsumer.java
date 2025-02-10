@@ -40,8 +40,8 @@ public class SafGraphqlConsumer {
 							  @Value("${saf.graphql.url}") String graphQLurl,
 							  StsRestConsumer stsRestConsumer) {
 		this.restTemplate = restTemplateBuilder
-				.setReadTimeout(Duration.ofSeconds(20))
-				.setConnectTimeout(Duration.ofSeconds(5))
+				.readTimeout(Duration.ofSeconds(20))
+				.connectTimeout(Duration.ofSeconds(5))
 				.build();
 		this.graphQLurl = graphQLurl;
 		this.stsRestConsumer = stsRestConsumer;
