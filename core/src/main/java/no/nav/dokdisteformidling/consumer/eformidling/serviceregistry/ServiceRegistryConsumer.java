@@ -41,8 +41,8 @@ public class ServiceRegistryConsumer {
 								   RestTemplateBuilder restTemplateBuilder) {
 		this.maskinportenTokenConsumer = maskinportenTokenConsumer;
 		this.restTemplate = restTemplateBuilder
-				.setReadTimeout(Duration.ofSeconds(30))
-				.setConnectTimeout(Duration.ofSeconds(5))
+				.readTimeout(Duration.ofSeconds(30))
+				.connectTimeout(Duration.ofSeconds(5))
 				.build();
 		this.baseUrl = serviceRegistryProperties.getUrl().toString();
 	}
