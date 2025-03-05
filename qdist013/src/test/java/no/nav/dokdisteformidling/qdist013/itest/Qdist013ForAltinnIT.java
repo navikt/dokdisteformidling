@@ -34,7 +34,6 @@ import static java.util.concurrent.TimeUnit.SECONDS;
 import static no.nav.dokdisteformidling.consumer.eformidling.EformidlingConstants.AVTALTMELDING_PROCESS;
 import static no.nav.dokdisteformidling.consumer.eformidling.EformidlingConstants.TRYGDERETTEN_ORGNUMMER;
 import static no.nav.dokdisteformidling.qdist013.TestUtil.classpathToString;
-import static org.apache.http.entity.ContentType.APPLICATION_JSON;
 import static org.awaitility.Awaitility.await;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -598,7 +597,6 @@ class Qdist013ForAltinnIT extends AbstractQdist013IntegrationTest {
 	private void verifyPostUploadBrokerServiceStreamed() {
 		verify(1, postRequestedFor(urlEqualTo("/brokerserviceexternalstreamed/upload")));
 	}
-
 
 	private void verifyPostJuridiskLoggLagre() {
 		verify(1, postRequestedFor(urlEqualTo("/juridisklogg"))
