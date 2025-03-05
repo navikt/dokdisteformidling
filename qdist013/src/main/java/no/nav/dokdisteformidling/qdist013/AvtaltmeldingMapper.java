@@ -12,7 +12,6 @@ import no.arkivverket.standarder.noark5.arkivmelding.ObjectFactory;
 import no.arkivverket.standarder.noark5.arkivmelding.Part;
 import no.arkivverket.standarder.noark5.arkivmelding.Saksmappe;
 import no.nav.dokdisteformidling.consumer.ereg.EregConsumer;
-import no.nav.dokdisteformidling.consumer.pdl.HentPersonInfo;
 import no.nav.dokdisteformidling.consumer.pdl.PdlGraphQLConsumer;
 import no.nav.dokdisteformidling.consumer.saf.SafJournalpostQueryService;
 import no.nav.dokdisteformidling.qdist013.saf.lightweight.LightweightSafJournalpostQdist013;
@@ -364,7 +363,7 @@ public class AvtaltmeldingMapper {
 
 	private String getFoedselsnummer(JournalpostQdist013 journalpostQdist013) {
 		if (brukerTypeIsAktoerId(journalpostQdist013)) {
-			return pdlGraphQLConsumer.hentNavn(journalpostQdist013.getBruker().getId()).getIdent();
+			return pdlGraphQLConsumer.hentPerson(journalpostQdist013.getBruker().getId()).getIdent();
 		} else if (isBrukerTypeFnr(journalpostQdist013)) {
 			return journalpostQdist013.getBruker().getId();
 		} else {
@@ -382,11 +381,7 @@ public class AvtaltmeldingMapper {
         if (brukerTypeIsOrgnr(journalpostQdist013)) {
 			return eregConsumer.hentOrganisasjonsnavn(brukerId);
 		} else {
-			return getHentPersonInfo(brukerId).getFulltnavn();
+			return pdlGraphQLConsumer.hentPerson(brukerId).getFulltnavn();
 		}
-	}
-
-	private HentPersonInfo getHentPersonInfo(String ident) {
-		return pdlGraphQLConsumer.hentNavn(ident);
 	}
 }

@@ -29,7 +29,6 @@ public class PdlGraphQLConsumer {
 	private static final String HEADER_PDL_BEHANDLINGSNUMMER = "behandlingsnummer";
 	// https://behandlingskatalog.nais.adeo.no/process/purpose/ARKIVPLEIE/756fd557-b95e-4b20-9de9-6179fb8317e6
 	private static final String ARKIVPLEIE_BEHANDLINGSNUMMER = "B315";
-	private final MapHentNavnResponse mapHentNavnResponse;
 	private final WebClient webClient;
 
 	public PdlGraphQLConsumer(DokdisteformidlingProperties dokdisteformidlingProperties,
@@ -41,11 +40,10 @@ public class PdlGraphQLConsumer {
 					httpHeaders.setContentType(APPLICATION_JSON);
 				})
 				.build();
-		this.mapHentNavnResponse = new MapHentNavnResponse();
 	}
 
 	@Retryable(retryFor = AbstractDokdisteformidlingTechnicalException.class)
-	public HentPersonInfo hentNavn(final String ident) {
+	public HentPersonInfo hentPerson(final String ident) {
 		return webClient.post()
 				.attributes(clientRegistrationId(CLIENT_REGISTRATION_PDL))
 				.bodyValue(mapRequest(ident))
@@ -59,12 +57,12 @@ public class PdlGraphQLConsumer {
 
 	private HentPersonInfo mapPersonInfo(PdlHentPerson response) {
 		if (isNull(response.getErrors()) || response.getErrors().isEmpty()) {
-			return mapHentNavnResponse.mapNavn(response);
+			return HentPersonResponseMapper.map(response);
 		} else {
 			if (PERSON_IKKE_FUNNET_CODE.equals(response.getErrors().getFirst().getExtensions().getCode())) {
-				throw new PersonIkkeFunnetException("Fant ikke personnavn for person i pdl.");
+				throw new PersonIkkeFunnetException("Fant ikke person i pdl.");
 			}
-			throw new PdlFunctionalException("Kunne ikke hente personnavn for person i pdl. " + response.getErrors());
+			throw new PdlFunctionalException("Kunne ikke hente person i pdl. " + response.getErrors());
 		}
 	}
 
@@ -73,12 +71,12 @@ public class PdlGraphQLConsumer {
 		variables.put("ident", ident);
 
 		return PDLRequest.builder()
-				.query(hentPersonnavn)
+				.query(HENT_PERSON_GRAPHQL_QUERY)
 				.variables(variables)
 				.build();
 	}
 
-	private static final String hentPersonnavn = """
+	private static final String HENT_PERSON_GRAPHQL_QUERY = """
 			query hentPerson($ident: ID!){
 			  hentPerson(ident: $ident){
 			    navn(historikk: false){
