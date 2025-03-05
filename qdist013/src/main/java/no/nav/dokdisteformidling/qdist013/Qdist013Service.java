@@ -1,9 +1,6 @@
 package no.nav.dokdisteformidling.qdist013;
 
-import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.JAXBElement;
-import jakarta.xml.bind.JAXBException;
-import jakarta.xml.bind.Marshaller;
 import lombok.extern.slf4j.Slf4j;
 import no.arkivverket.standarder.noark5.arkivmelding.Arkivmelding;
 import no.arkivverket.standarder.noark5.arkivmelding.Dokumentbeskrivelse;
@@ -18,7 +15,6 @@ import no.nav.dokdisteformidling.consumer.saf.SafJournalpostQueryService;
 import no.nav.dokdisteformidling.exception.functional.IkkeSammenfallendeIderFunctionalException;
 import no.nav.dokdisteformidling.exception.functional.InvalidForsendelseStatusFunctionalException;
 import no.nav.dokdisteformidling.exception.functional.KunneIkkeDeserialisereBucketJsonPayloadFunctionalException;
-import no.nav.dokdisteformidling.exception.technical.KunneIkkeMarshalleArkivmeldingTechnicalException;
 import no.nav.dokdisteformidling.qdist013.saf.main.JournalpostQdist013;
 import no.nav.dokdisteformidling.storage.BucketStorage;
 import no.nav.dokdisteformidling.storage.DokdistDokument;
@@ -29,7 +25,6 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import java.io.ByteArrayInputStream;
-import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.UUID;
@@ -54,6 +49,7 @@ public class Qdist013Service {
     private final JuridiskLogg juridiskLogg;
     private final LagreJuridiskLoggMapper lagreJuridiskLoggMapper;
     private final AvtaltmeldingMapper avtaltmeldingMapper;
+    private final AvtaltmeldingMarshaller avtaltmeldingMarshaller;
     private final Eformidling eformidling;
 
     public Qdist013Service(BucketStorage bucketStorage,
@@ -62,6 +58,7 @@ public class Qdist013Service {
                            JuridiskLogg juridiskLogg,
                            LagreJuridiskLoggMapper lagreJuridiskLoggMapper,
                            AvtaltmeldingMapper avtaltmeldingMapper,
+                           AvtaltmeldingMarshaller avtaltmeldingMarshaller,
                            Eformidling eformidling) {
         this.bucketStorage = bucketStorage;
         this.administrerForsendelse = administrerForsendelse;
@@ -69,7 +66,8 @@ public class Qdist013Service {
         this.juridiskLogg = juridiskLogg;
         this.lagreJuridiskLoggMapper = lagreJuridiskLoggMapper;
         this.avtaltmeldingMapper = avtaltmeldingMapper;
-        this.eformidling = eformidling;
+		this.avtaltmeldingMarshaller = avtaltmeldingMarshaller;
+		this.eformidling = eformidling;
     }
 
     @Handler
@@ -93,7 +91,7 @@ public class Qdist013Service {
         final JournalpostQdist013 journalpostQdist013 = safJournalpostQueryService.hentJournalpost(hentForsendelseResponse.getArkivInformasjon()
                 .getArkivId());
         final JAXBElement<Arkivmelding> arkivmeldingJAXBElement = avtaltmeldingMapper.createArkivMelding(journalpostQdist013, bestillingsId);
-        final String arkivmeldingXmlString = marshalArkivmeldingToXmlString(arkivmeldingJAXBElement);
+        final String arkivmeldingXmlString = avtaltmeldingMarshaller.marshal(arkivmeldingJAXBElement);
 
         log.info("Sender eformidling forsendelse direkte til Altinn formidlingstjenesten. forsendelseId={}, konversasjonsId={}, bestillingsId={}",
                 forsendelseId, conversationId, bestillingsId);
@@ -123,23 +121,9 @@ public class Qdist013Service {
                 .collect(Collectors.toList());
     }
 
-    private String marshalArkivmeldingToXmlString(JAXBElement<Arkivmelding> arkivmeldingJAXBElement) {
-        try {
-            JAXBContext jaxbContext = JAXBContext.newInstance(Arkivmelding.class);
-            Marshaller marshaller = jaxbContext.createMarshaller();
-
-            StringWriter sw = new StringWriter();
-            marshaller.marshal(arkivmeldingJAXBElement, sw);
-            return sw.toString();
-        } catch (JAXBException e) {
-            throw new KunneIkkeMarshalleArkivmeldingTechnicalException("Kunne ikke marshalle Arkivmelding til xmlString", e);
-        }
-    }
-
     private String getDocumentFilename(Arkivmelding arkivmelding, String journalpostId, String dokumentInfoId) {
         Dokumentbeskrivelse dokumentbeskrivelse = getDokumentbeskrivelseByJpIdAndDokInfoId(arkivmelding, journalpostId, dokumentInfoId);
         return dokumentbeskrivelse.getDokumentobjekt().getFirst().getReferanseDokumentfil();
-
     }
 
     private Dokumentbeskrivelse getDokumentbeskrivelseByJpIdAndDokInfoId(Arkivmelding arkivmelding, String journalpostId, String dokumentInfoId) {
