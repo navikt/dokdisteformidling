@@ -44,7 +44,7 @@
 				<configuration>
 					<schemaDirectory>${basedir}/src/main/resources</schemaDirectory>
 					<schemaIncludes>
-						<include>arkivmelding.xsd</include>
+						<include>arkivmeldingNAV.xsd</include>
 					</schemaIncludes>
 					<bindingDirectory>${basedir}/src/main/resources</bindingDirectory>
 					<bindingIncludes>
