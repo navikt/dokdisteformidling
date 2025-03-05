@@ -43,113 +43,113 @@ import static no.nav.dokdisteformidling.consumer.eformidling.NavDokument.fromVed
 @Service
 public class Qdist013Service {
 
-    private final BucketStorage bucketStorage;
-    private final AdministrerForsendelse administrerForsendelse;
-    private final SafJournalpostQueryService<JournalpostQdist013> safJournalpostQueryService;
-    private final JuridiskLogg juridiskLogg;
-    private final LagreJuridiskLoggMapper lagreJuridiskLoggMapper;
-    private final AvtaltmeldingMapper avtaltmeldingMapper;
-    private final AvtaltmeldingMarshaller avtaltmeldingMarshaller;
-    private final Eformidling eformidling;
+	private final BucketStorage bucketStorage;
+	private final AdministrerForsendelse administrerForsendelse;
+	private final SafJournalpostQueryService<JournalpostQdist013> safJournalpostQueryService;
+	private final JuridiskLogg juridiskLogg;
+	private final LagreJuridiskLoggMapper lagreJuridiskLoggMapper;
+	private final AvtaltmeldingMapper avtaltmeldingMapper;
+	private final AvtaltmeldingMarshaller avtaltmeldingMarshaller;
+	private final Eformidling eformidling;
 
-    public Qdist013Service(BucketStorage bucketStorage,
-                           AdministrerForsendelse administrerForsendelse,
-                           @Qualifier("SafJournalpostQueryServiceQdist013") SafJournalpostQueryService<JournalpostQdist013> safJournalpostQueryService,
-                           JuridiskLogg juridiskLogg,
-                           LagreJuridiskLoggMapper lagreJuridiskLoggMapper,
-                           AvtaltmeldingMapper avtaltmeldingMapper,
-                           AvtaltmeldingMarshaller avtaltmeldingMarshaller,
-                           Eformidling eformidling) {
-        this.bucketStorage = bucketStorage;
-        this.administrerForsendelse = administrerForsendelse;
-        this.safJournalpostQueryService = safJournalpostQueryService;
-        this.juridiskLogg = juridiskLogg;
-        this.lagreJuridiskLoggMapper = lagreJuridiskLoggMapper;
-        this.avtaltmeldingMapper = avtaltmeldingMapper;
+	public Qdist013Service(BucketStorage bucketStorage,
+						   AdministrerForsendelse administrerForsendelse,
+						   @Qualifier("SafJournalpostQueryServiceQdist013") SafJournalpostQueryService<JournalpostQdist013> safJournalpostQueryService,
+						   JuridiskLogg juridiskLogg,
+						   LagreJuridiskLoggMapper lagreJuridiskLoggMapper,
+						   AvtaltmeldingMapper avtaltmeldingMapper,
+						   AvtaltmeldingMarshaller avtaltmeldingMarshaller,
+						   Eformidling eformidling) {
+		this.bucketStorage = bucketStorage;
+		this.administrerForsendelse = administrerForsendelse;
+		this.safJournalpostQueryService = safJournalpostQueryService;
+		this.juridiskLogg = juridiskLogg;
+		this.lagreJuridiskLoggMapper = lagreJuridiskLoggMapper;
+		this.avtaltmeldingMapper = avtaltmeldingMapper;
 		this.avtaltmeldingMarshaller = avtaltmeldingMarshaller;
 		this.eformidling = eformidling;
-    }
+	}
 
-    @Handler
-    public void processForsendelse(DistribuerForsendelseTilTrygderetten distribuerForsendelseTilTrygderetten, Exchange exchange) {
-        final String conversationId = UUID.randomUUID().toString();
-        exchange.setProperty(PROPERTY_CONVERSATION_ID, conversationId);
+	@Handler
+	public void processForsendelse(DistribuerForsendelseTilTrygderetten distribuerForsendelseTilTrygderetten, Exchange exchange) {
+		final String conversationId = UUID.randomUUID().toString();
+		exchange.setProperty(PROPERTY_CONVERSATION_ID, conversationId);
 
-        final Long forsendelseId = Long.valueOf(distribuerForsendelseTilTrygderetten.forsendelseId());
-        final HentForsendelseResponse hentForsendelseResponse = administrerForsendelse.hentForsendelse(forsendelseId);
+		final Long forsendelseId = Long.valueOf(distribuerForsendelseTilTrygderetten.forsendelseId());
+		final HentForsendelseResponse hentForsendelseResponse = administrerForsendelse.hentForsendelse(forsendelseId);
 
-        final String bestillingsId = hentForsendelseResponse.getBestillingsId();
-        exchange.setProperty(PROPERTY_BESTILLINGS_ID, bestillingsId);
+		final String bestillingsId = hentForsendelseResponse.getBestillingsId();
+		exchange.setProperty(PROPERTY_BESTILLINGS_ID, bestillingsId);
 
-        final String journalpostId =  hentForsendelseResponse.getArkivInformasjon().getArkivId();
-        exchange.setProperty(PROPERTY_JOURNALPOST_ID, journalpostId);
-        exchange.setProperty(PROPERTY_CONVERSATION_ID, conversationId);
-        validateThatForsendelseStatusIsKlarForDist(hentForsendelseResponse.getForsendelseStatus());
+		final String journalpostId = hentForsendelseResponse.getArkivInformasjon().getArkivId();
+		exchange.setProperty(PROPERTY_JOURNALPOST_ID, journalpostId);
+		exchange.setProperty(PROPERTY_CONVERSATION_ID, conversationId);
+		validateThatForsendelseStatusIsKlarForDist(hentForsendelseResponse.getForsendelseStatus());
 
-        final List<DokdistDokument> dokdistDokumentList = getDocumentsFromBucket(hentForsendelseResponse);
-        exchange.setProperty(PROPERTY_ANTALL_DOK, dokdistDokumentList.size());
-        final JournalpostQdist013 journalpostQdist013 = safJournalpostQueryService.hentJournalpost(hentForsendelseResponse.getArkivInformasjon()
-                .getArkivId());
-        final JAXBElement<Arkivmelding> arkivmeldingJAXBElement = avtaltmeldingMapper.createArkivMelding(journalpostQdist013, bestillingsId);
-        final String arkivmeldingXmlString = avtaltmeldingMarshaller.marshal(arkivmeldingJAXBElement);
+		final List<DokdistDokument> dokdistDokumentList = getDocumentsFromBucket(hentForsendelseResponse);
+		exchange.setProperty(PROPERTY_ANTALL_DOK, dokdistDokumentList.size());
+		final JournalpostQdist013 journalpostQdist013 = safJournalpostQueryService.hentJournalpost(hentForsendelseResponse.getArkivInformasjon()
+				.getArkivId());
+		final JAXBElement<Arkivmelding> arkivmeldingJAXBElement = avtaltmeldingMapper.createArkivMelding(journalpostQdist013, bestillingsId);
+		final String arkivmeldingXmlString = avtaltmeldingMarshaller.marshal(arkivmeldingJAXBElement);
 
-        log.info("Sender eformidling forsendelse direkte til Altinn formidlingstjenesten. forsendelseId={}, konversasjonsId={}, bestillingsId={}",
-                forsendelseId, conversationId, bestillingsId);
+		log.info("Sender eformidling forsendelse direkte til Altinn formidlingstjenesten. forsendelseId={}, konversasjonsId={}, bestillingsId={}",
+				forsendelseId, conversationId, bestillingsId);
 
-        eformidling.send(NavDokumentpakke.builder()
-                .conversationId(conversationId)
-                .bestillingsId(bestillingsId)
-                .messageChannelInstanceIdentifier(UUID.randomUUID())
-                .arkivmelding(fromAvtaltmelding(new ByteArrayInputStream(arkivmeldingXmlString.getBytes(StandardCharsets.UTF_8))))
-                .navDokumenter(dokdistDokumentList.stream()
-                        .map(d -> fromVedlegg(getDocumentFilename(arkivmeldingJAXBElement.getValue(), journalpostQdist013.getJournalpostId(), d.getDokumentInfoId()),
-                                new ByteArrayInputStream(d.getPdf())))
-                        .collect(Collectors.toList()))
-                .build(), arkivmeldingXmlString);
+		eformidling.send(NavDokumentpakke.builder()
+				.conversationId(conversationId)
+				.bestillingsId(bestillingsId)
+				.messageChannelInstanceIdentifier(UUID.randomUUID())
+				.arkivmelding(fromAvtaltmelding(new ByteArrayInputStream(arkivmeldingXmlString.getBytes(StandardCharsets.UTF_8))))
+				.navDokumenter(dokdistDokumentList.stream()
+						.map(d -> fromVedlegg(getDocumentFilename(arkivmeldingJAXBElement.getValue(), journalpostQdist013.getJournalpostId(), d.getDokumentInfoId()),
+								new ByteArrayInputStream(d.getPdf())))
+						.collect(Collectors.toList()))
+				.build(), arkivmeldingXmlString);
 
-        juridiskLogg.lagreJuridiskLogg(lagreJuridiskLoggMapper.map(hentForsendelseResponse, arkivmeldingXmlString.getBytes()));
-    }
+		juridiskLogg.lagreJuridiskLogg(lagreJuridiskLoggMapper.map(hentForsendelseResponse, arkivmeldingXmlString.getBytes()));
+	}
 
-    private List<DokdistDokument> getDocumentsFromBucket(HentForsendelseResponse hentForsendelseResponse) {
-        return hentForsendelseResponse.getDokumenter().stream()
-                .map(dokumentTo -> {
-                    String jsonPayload = bucketStorage.downloadObject(dokumentTo.getDokumentObjektReferanse(), hentForsendelseResponse.getBestillingsId());
-                    DokdistDokument dokdistDokument = deserializeBucketJsonPayloadToDokdistDokument(jsonPayload, dokumentTo.getDokumentObjektReferanse());
-                    dokdistDokument.setDokumentInfoId(dokumentTo.getArkivDokumentInfoId());
-                    return dokdistDokument;
-                })
-                .collect(Collectors.toList());
-    }
+	private List<DokdistDokument> getDocumentsFromBucket(HentForsendelseResponse hentForsendelseResponse) {
+		return hentForsendelseResponse.getDokumenter().stream()
+				.map(dokumentTo -> {
+					String jsonPayload = bucketStorage.downloadObject(dokumentTo.getDokumentObjektReferanse(), hentForsendelseResponse.getBestillingsId());
+					DokdistDokument dokdistDokument = deserializeBucketJsonPayloadToDokdistDokument(jsonPayload, dokumentTo.getDokumentObjektReferanse());
+					dokdistDokument.setDokumentInfoId(dokumentTo.getArkivDokumentInfoId());
+					return dokdistDokument;
+				})
+				.collect(Collectors.toList());
+	}
 
-    private String getDocumentFilename(Arkivmelding arkivmelding, String journalpostId, String dokumentInfoId) {
-        Dokumentbeskrivelse dokumentbeskrivelse = getDokumentbeskrivelseByJpIdAndDokInfoId(arkivmelding, journalpostId, dokumentInfoId);
-        return dokumentbeskrivelse.getDokumentobjekt().getFirst().getReferanseDokumentfil();
-    }
+	private String getDocumentFilename(Arkivmelding arkivmelding, String journalpostId, String dokumentInfoId) {
+		Dokumentbeskrivelse dokumentbeskrivelse = getDokumentbeskrivelseByJpIdAndDokInfoId(arkivmelding, journalpostId, dokumentInfoId);
+		return dokumentbeskrivelse.getDokumentobjekt().getFirst().getReferanseDokumentfil();
+	}
 
-    private Dokumentbeskrivelse getDokumentbeskrivelseByJpIdAndDokInfoId(Arkivmelding arkivmelding, String journalpostId, String dokumentInfoId) {
-        Journalpost journalpost = (Journalpost) arkivmelding.getMappe().getFirst().getRegistrering().getFirst();
-        return journalpost.getDokumentbeskrivelse().stream()
-                .filter(dokumentbeskrivelse -> dokumentbeskrivelse.getDokumentobjekt()
-                        .getFirst().getReferanseDokumentfil().startsWith(format("%s-%s", journalpostId, dokumentInfoId)))
-                .findAny()
-                .orElseThrow(() -> new IkkeSammenfallendeIderFunctionalException(format("DokumentInfoId=%s finnes på foresendelsen i dokdistDb, men ikke i respons fra SAF på journalpostId=%s.", dokumentInfoId, journalpostId)));
-    }
+	private Dokumentbeskrivelse getDokumentbeskrivelseByJpIdAndDokInfoId(Arkivmelding arkivmelding, String journalpostId, String dokumentInfoId) {
+		Journalpost journalpost = (Journalpost) arkivmelding.getMappe().getFirst().getRegistrering().getFirst();
+		return journalpost.getDokumentbeskrivelse().stream()
+				.filter(dokumentbeskrivelse -> dokumentbeskrivelse.getDokumentobjekt()
+						.getFirst().getReferanseDokumentfil().startsWith(format("%s-%s", journalpostId, dokumentInfoId)))
+				.findAny()
+				.orElseThrow(() -> new IkkeSammenfallendeIderFunctionalException(format("DokumentInfoId=%s finnes på foresendelsen i dokdistDb, men ikke i respons fra SAF på journalpostId=%s.", dokumentInfoId, journalpostId)));
+	}
 
-    private static void validateThatForsendelseStatusIsKlarForDist(String forsendelseStatus) {
-        if (!FORSENDELSE_STATUS_KLAR_FOR_DIST.equals(forsendelseStatus)) {
-            throw new InvalidForsendelseStatusFunctionalException(
-                    format("ForsendelseStatus må være %s. Fant forsendelseStatus=%s", FORSENDELSE_STATUS_KLAR_FOR_DIST, forsendelseStatus)
-            );
-        }
-    }
+	private static void validateThatForsendelseStatusIsKlarForDist(String forsendelseStatus) {
+		if (!FORSENDELSE_STATUS_KLAR_FOR_DIST.equals(forsendelseStatus)) {
+			throw new InvalidForsendelseStatusFunctionalException(
+					format("ForsendelseStatus må være %s. Fant forsendelseStatus=%s", FORSENDELSE_STATUS_KLAR_FOR_DIST, forsendelseStatus)
+			);
+		}
+	}
 
-    private static DokdistDokument deserializeBucketJsonPayloadToDokdistDokument(String jsonPayload, String objektReferanse) {
-        try {
-            DokdistDokument dokdistDokument = JsonSerializer.deserialize(jsonPayload, DokdistDokument.class);
-            dokdistDokument.setDokumentObjektReferanse(objektReferanse);
-            return dokdistDokument;
-        } catch (IllegalStateException e) {
-            throw new KunneIkkeDeserialisereBucketJsonPayloadFunctionalException(format("Kunne ikke deserialisere jsonPayload fra bucket for dokument med dokumentobjektreferanse=%s. Dokumentet er ikke persistert til bucket med korrekt format!", objektReferanse));
-        }
-    }
+	private static DokdistDokument deserializeBucketJsonPayloadToDokdistDokument(String jsonPayload, String objektReferanse) {
+		try {
+			DokdistDokument dokdistDokument = JsonSerializer.deserialize(jsonPayload, DokdistDokument.class);
+			dokdistDokument.setDokumentObjektReferanse(objektReferanse);
+			return dokdistDokument;
+		} catch (IllegalStateException e) {
+			throw new KunneIkkeDeserialisereBucketJsonPayloadFunctionalException(format("Kunne ikke deserialisere jsonPayload fra bucket for dokument med dokumentobjektreferanse=%s. Dokumentet er ikke persistert til bucket med korrekt format!", objektReferanse));
+		}
+	}
 }
