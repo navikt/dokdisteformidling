@@ -32,6 +32,7 @@ import static no.nav.dokdisteformidling.constants.DomainConstants.APP_NAME;
 import static no.nav.dokdisteformidling.constants.DomainConstants.VARIANTFORMAT_ARKIV;
 import static no.nav.dokdisteformidling.constants.DomainConstants.VARIANTFORMAT_PRODUKSJON;
 import static no.nav.dokdisteformidling.constants.DomainConstants.VARIANTFORMAT_SLADDET;
+import static no.nav.dokdisteformidling.consumer.eformidling.EformidlingConstants.NAV_ORGNUMMER;
 import static no.nav.dokdisteformidling.qdist013.AvtaltmeldingMapper.FERDIGSTILT;
 import static no.nav.dokdisteformidling.qdist013.AvtaltmeldingMapper.INNGAAENDE;
 import static no.nav.dokdisteformidling.qdist013.AvtaltmeldingMapper.NAV_KLAGEINSTANS;
@@ -79,7 +80,7 @@ class AvtaltmeldingMapperTest {
 	private static final String OPPRETTET_AV_NAVN = "opprettetAvNavn";
 	private static final String BRUKER_ID_FNR = "20026900817";
 	private static final String BRUKER_TYPE_FNR = "FNR";
-	private static final String BRUKER_ID_ORGNR = "brukerIdOrgNr";
+	private static final String BRUKER_ID_ORGNR = "999999999";
 	private static final String BRUKER_TYPE_ORGNR = "ORGNR";
 	private static final String BRUKER_ID_AKTOER_ID = "aktoerId";
 	private static final String BRUKER_TYPE_AKTOER_ID = "AKTOERID";
@@ -124,7 +125,7 @@ class AvtaltmeldingMapperTest {
 	@Test
 	@DisplayName("Asserts all fields")
 	void fullHappyPath() {
-		when(pdlGraphQLConsumer.hentNavn(anyString())).thenReturn(creatHentPersonInfo());
+		when(pdlGraphQLConsumer.hentPerson(anyString())).thenReturn(creatHentPersonInfo());
 		JAXBElement<Arkivmelding> arkivmeldingJAXBElement = avtaltmeldingMapper.createArkivMelding(createJournalpostQdist013Builder()
 				.tema(TEMA)
 				.build(), BESTILLINGS_ID);
@@ -133,13 +134,13 @@ class AvtaltmeldingMapperTest {
 		Arkivmelding arkivmelding = arkivmeldingJAXBElement.getValue();
 		assertArkivmelding(arkivmelding);
 
-		verify(pdlGraphQLConsumer, times(1)).hentNavn(anyString());
+		verify(pdlGraphQLConsumer, times(1)).hentPerson(anyString());
 		verify(eregMock, times(0)).hentOrganisasjonsnavn(any(String.class));
 	}
 
 	@Test
 	@DisplayName("Case when bruker is organisasjon. Should get name from Ereg")
-	void happyPathBrukerIsOrgansisasjon() {
+	void happyPathBrukerIsOrganisasjon() {
 		when(eregMock.hentOrganisasjonsnavn(any(String.class))).thenReturn(EREG_NAVN);
 
 		JournalpostQdist013 journalpostQdist013 = createJournalpostQdist013Builder()
@@ -158,6 +159,7 @@ class AvtaltmeldingMapperTest {
 
 		assertEquals(EREG_NAVN, sakspartDAP.getPartNavn());
 		assertEquals(SAKSPART_ROLLE_DAP, sakspartDAP.getPartRolle());
+		assertEquals(BRUKER_ID_ORGNR, sakspartDAP.getOrganisasjonsnummer().getOrganisasjonsnummer());
 		assertNull(sakspartDAP.getKontaktperson());
 
 		verify(eregMock, times(1)).hentOrganisasjonsnavn(BRUKER_ID_ORGNR);
@@ -167,7 +169,7 @@ class AvtaltmeldingMapperTest {
 	@Test
 	@DisplayName("Case when bruker is aktoer. Should get fnr from aktoerregister")
 	void happyPathBrukerIsAktoer() {
-		when(pdlGraphQLConsumer.hentNavn(anyString())).thenReturn(creatHentPersonInfo());
+		when(pdlGraphQLConsumer.hentPerson(anyString())).thenReturn(creatHentPersonInfo());
 
 		JournalpostQdist013 journalpostQdist013 = createJournalpostQdist013Builder()
 				.tema(TEMA)
@@ -187,7 +189,7 @@ class AvtaltmeldingMapperTest {
 		assertEquals(SAKSPART_ROLLE_DAP, sakspartDAP.getPartRolle());
 		assertNull(sakspartDAP.getKontaktperson());
 
-		verify(pdlGraphQLConsumer, times(2)).hentNavn(anyString());
+		verify(pdlGraphQLConsumer, times(2)).hentPerson(anyString());
 		verify(eregMock, times(0)).hentOrganisasjonsnavn(any(String.class));
 		verify(safJournalpostQueryServiceMock, times(0)).hentJournalpost(any(String.class));
 	}
@@ -201,7 +203,7 @@ class AvtaltmeldingMapperTest {
 				.dokumenter(Arrays.asList(createHoveddokumentBuilder().build(),
 						createVedleggBuilderUtenDato().build()))
 				.build();
-		when(pdlGraphQLConsumer.hentNavn(anyString())).thenReturn(creatHentPersonInfo());
+		when(pdlGraphQLConsumer.hentPerson(anyString())).thenReturn(creatHentPersonInfo());
 		JAXBElement<Arkivmelding> arkivmeldingJAXBElement = avtaltmeldingMapper.createArkivMelding(journalpostQdist013, BESTILLINGS_ID);
 		Arkivmelding arkivmelding = arkivmeldingJAXBElement.getValue();
 		List<Mappe> mappeList = arkivmelding.getMappe();
@@ -219,7 +221,7 @@ class AvtaltmeldingMapperTest {
 	@DisplayName("Case when journalposttype is inngaaende and vedlegg has original jpId. Should make a custom dokumenttittel")
 	void happyPathTestTittelWhenJpIsInngaaendeAndVedleggHasOriginalJpId() {
 		when(safJournalpostQueryServiceMock.hentJournalpost(ORIGINAL_JPID_VEDLEGG)).thenReturn(createLightweightSafJournalpostQdist013());
-		when(pdlGraphQLConsumer.hentNavn(anyString())).thenReturn(creatHentPersonInfo());
+		when(pdlGraphQLConsumer.hentPerson(anyString())).thenReturn(creatHentPersonInfo());
 		JournalpostQdist013 journalpostQdist013 = createJournalpostQdist013Builder()
 				.tema(TEMA)
 				.journalposttype(INNGAAENDE)
@@ -244,7 +246,7 @@ class AvtaltmeldingMapperTest {
 	@DisplayName("Case when journalposttype is utgaaende and vedlegg has original jpId. Should make a custom dokumenttittel")
 	void happyPathTestTittelWhenJpIsUtgaaendeAndVedleggHasOriginalJpId() {
 		when(safJournalpostQueryServiceMock.hentJournalpost(ORIGINAL_JPID_VEDLEGG)).thenReturn(createLightweightSafJournalpostQdist013());
-		when(pdlGraphQLConsumer.hentNavn(anyString())).thenReturn(creatHentPersonInfo());
+		when(pdlGraphQLConsumer.hentPerson(anyString())).thenReturn(creatHentPersonInfo());
 		JournalpostQdist013 journalpostQdist013 = createJournalpostQdist013Builder()
 				.tema(TEMA)
 				.journalposttype(UTGAAENDE)
@@ -269,7 +271,7 @@ class AvtaltmeldingMapperTest {
 	@DisplayName("Case when journalposttype is notat and vedlegg has original jpId. Should not make a custom dokumenttittel")
 	void happyPathTestTittelWhenJpIsNotatAndVedleggHasOriginalJpId() {
 		when(safJournalpostQueryServiceMock.hentJournalpost(ORIGINAL_JPID_VEDLEGG)).thenReturn(createLightweightSafJournalpostQdist013());
-		when(pdlGraphQLConsumer.hentNavn(anyString())).thenReturn(creatHentPersonInfo());
+		when(pdlGraphQLConsumer.hentPerson(anyString())).thenReturn(creatHentPersonInfo());
 		JournalpostQdist013 journalpostQdist013 = createJournalpostQdist013Builder()
 				.tema(TEMA)
 				.journalposttype("Notat")
@@ -294,7 +296,7 @@ class AvtaltmeldingMapperTest {
 	@DisplayName("Case when vedlegg has original jpId. Should get opprettet dato from original journalpost")
 	void happyPathTestOpprettetDatoWhenVedleggHasOriginalJpId() {
 		when(safJournalpostQueryServiceMock.hentJournalpost(ORIGINAL_JPID_VEDLEGG)).thenReturn(createLightweightSafJournalpostQdist013());
-		when(pdlGraphQLConsumer.hentNavn(anyString())).thenReturn(creatHentPersonInfo());
+		when(pdlGraphQLConsumer.hentPerson(anyString())).thenReturn(creatHentPersonInfo());
 		JournalpostQdist013 journalpostQdist013 = createJournalpostQdist013Builder()
 				.tema(TEMA)
 				.dokumenter(Arrays.asList(createHoveddokumentBuilder().build(),
@@ -326,7 +328,7 @@ class AvtaltmeldingMapperTest {
 	@DisplayName("Case when vedlegg has original jpId. Should get opprettet av from original journalpost")
 	void happyPathTestOpprettetAvWhenVedleggHasOriginalJpId() {
 		when(safJournalpostQueryServiceMock.hentJournalpost(ORIGINAL_JPID_VEDLEGG)).thenReturn(createLightweightSafJournalpostQdist013());
-		when(pdlGraphQLConsumer.hentNavn(anyString())).thenReturn(creatHentPersonInfo());
+		when(pdlGraphQLConsumer.hentPerson(anyString())).thenReturn(creatHentPersonInfo());
 		JournalpostQdist013 journalpostQdist013 = createJournalpostQdist013Builder()
 				.tema(TEMA)
 				.dokumenter(Arrays.asList(createHoveddokumentBuilder().build(),
@@ -358,7 +360,7 @@ class AvtaltmeldingMapperTest {
 	@DisplayName("Case when dokument does not have variantformat SLADDET (variantformat is ARKIV) and filtype is not PNG or JPEG. Should set variantformat to Produksjonsformat")
 	void happyPathTestNoSladdetVariantAndFiltypeNotPngOrJPEG() {
 		when(safJournalpostQueryServiceMock.hentJournalpost(ORIGINAL_JPID_VEDLEGG)).thenReturn(createLightweightSafJournalpostQdist013());
-		when(pdlGraphQLConsumer.hentNavn(anyString())).thenReturn(creatHentPersonInfo());
+		when(pdlGraphQLConsumer.hentPerson(anyString())).thenReturn(creatHentPersonInfo());
 		JournalpostQdist013 journalpostQdist013 = createJournalpostQdist013Builder()
 				.tema(TEMA)
 				.dokumenter(singletonList(createHoveddokumentBuilder()
@@ -391,7 +393,7 @@ class AvtaltmeldingMapperTest {
 	@DisplayName("Case when dokument does not have variantformat SLADDET (variantformat is ARKIV) and filtype is PNG. Should set variantformat to Arkivformat")
 	void happyPathTestNoSladdetVariantAndFiltypeIsPng() {
 		when(safJournalpostQueryServiceMock.hentJournalpost(ORIGINAL_JPID_VEDLEGG)).thenReturn(createLightweightSafJournalpostQdist013());
-		when(pdlGraphQLConsumer.hentNavn(anyString())).thenReturn(creatHentPersonInfo());
+		when(pdlGraphQLConsumer.hentPerson(anyString())).thenReturn(creatHentPersonInfo());
 		JournalpostQdist013 journalpostQdist013 = createJournalpostQdist013Builder()
 				.tema(TEMA)
 				.dokumenter(singletonList(createHoveddokumentBuilder()
@@ -424,7 +426,7 @@ class AvtaltmeldingMapperTest {
 	@DisplayName("Case when dokument does not have variantformat SLADDET (variantformat is ARKIV) and filtype is JPEG. Should set variantformat to Arkivformat")
 	void happyPathTestNoSladdetVariantAndFiltypeIsJPEG() {
 		when(safJournalpostQueryServiceMock.hentJournalpost(ORIGINAL_JPID_VEDLEGG)).thenReturn(createLightweightSafJournalpostQdist013());
-		when(pdlGraphQLConsumer.hentNavn(anyString())).thenReturn(creatHentPersonInfo());
+		when(pdlGraphQLConsumer.hentPerson(anyString())).thenReturn(creatHentPersonInfo());
 		JournalpostQdist013 journalpostQdist013 = createJournalpostQdist013Builder()
 				.tema(TEMA)
 				.dokumenter(singletonList(createHoveddokumentBuilder()
@@ -456,7 +458,7 @@ class AvtaltmeldingMapperTest {
 	@Test
 	@DisplayName("Case when vedlegg has no dokumentstatus set. That vedlegg should be considered FERDIGSTILT.")
 	void happyPathVedleggFerdigstiltUtenStatus() {
-		when(pdlGraphQLConsumer.hentNavn(anyString())).thenReturn(creatHentPersonInfo());
+		when(pdlGraphQLConsumer.hentPerson(anyString())).thenReturn(creatHentPersonInfo());
 		JournalpostQdist013 journalpostQdist013 = createJournalpostQdist013Builder()
 				.tema(TEMA)
 				.dokumenter(Arrays.asList(createHoveddokumentBuilder().build(),
@@ -476,7 +478,7 @@ class AvtaltmeldingMapperTest {
 	@Test
 	@DisplayName("Case when vedlegg does not have dokumentstatus FERDIGSTILT. That vedlegg should not be mapped.")
 	void happyPathIkkeFerdigstiltVedlegg() {
-		when(pdlGraphQLConsumer.hentNavn(anyString())).thenReturn(creatHentPersonInfo());
+		when(pdlGraphQLConsumer.hentPerson(anyString())).thenReturn(creatHentPersonInfo());
 		when(safJournalpostQueryServiceMock.hentJournalpost(ORIGINAL_JPID_VEDLEGG)).thenReturn(createLightweightSafJournalpostQdist013());
 		JournalpostQdist013 journalpostQdist013 = createJournalpostQdist013Builder()
 				.tema(TEMA)
@@ -501,7 +503,7 @@ class AvtaltmeldingMapperTest {
 	@DisplayName("Case for satt originalJournalPostId men ukjent journalfører")
 	void assertUkjentVedsafJournalpostgetJournalfortAvNavnErNull() {
 		when(safJournalpostQueryServiceMock.hentJournalpost(ORIGINAL_JPID_VEDLEGG)).thenReturn(createLightweightSafJournalpostQdist013NoJournalFoertAv());
-		when(pdlGraphQLConsumer.hentNavn(anyString())).thenReturn(creatHentPersonInfo());
+		when(pdlGraphQLConsumer.hentPerson(anyString())).thenReturn(creatHentPersonInfo());
 		JournalpostQdist013 journalpostQdist013 = createJournalpostQdist013BuilderNoJournalFoertAv()
 				.tema(TEMA)
 				.dokumenter(Arrays.asList(createHoveddokumentBuilder().build(),
@@ -526,7 +528,7 @@ class AvtaltmeldingMapperTest {
 	void shouldSetteOpprettetDatoPaaSakFraJournalpostTilhorendeTilEldsteVedlegg() {
 		LocalDateTime femDagerSiden = LocalDateTime.now().minusDays(5);
 		LocalDateTime treDagerSiden = LocalDateTime.now().minusDays(3);
-		when(pdlGraphQLConsumer.hentNavn(anyString())).thenReturn(creatHentPersonInfo());
+		when(pdlGraphQLConsumer.hentPerson(anyString())).thenReturn(creatHentPersonInfo());
 		when(safJournalpostQueryServiceMock
 				.hentJournalpost(DOKUMENT_INFO_ID_VEDLEGG))
 				.thenReturn(createLightweightSafJournalpostQdist013Builder()
@@ -574,13 +576,13 @@ class AvtaltmeldingMapperTest {
 		assertEquals(TEMA_NAVN, saksmappe.getTittel());
 		assertEquals(convertFromXmlGregorianCalendarToLocalDateTime(saksmappe.getOpprettetDato()).toString(), DATO_OPPRETTET_SAK.format(dateTimeFormatter));
 		assertEquals(OPPRETTET_AV_NAVN, saksmappe.getOpprettetAv());
+		assertEquals(ARKIV_SAKNUMMER, saksmappe.getVirksomhetsspesifikkeMetadata());
 		assertRegistrering(saksmappe.getRegistrering());
 		assertEquals(convertFromXmlGregorianCalendarToLocalDateTime(saksmappe.getSaksdato()).toString(), DATO_OPPRETTET_SAK.format(dateTimeFormatter));
 		assertEquals(NAV_KLAGEINSTANS, saksmappe.getAdministrativEnhet());
 		assertEquals(OPPRETTET_AV_NAVN, saksmappe.getSaksansvarlig());
 		assertEquals(UNDER_BEHANDLING, saksmappe.getSaksstatus());
 		assertSakspart(saksmappe.getPart());
-
 	}
 
 	private void assertRegistrering(List<Registrering> registreringList) {
@@ -618,11 +620,15 @@ class AvtaltmeldingMapperTest {
 		assertEquals(NAV_KLAGEINSTANS, sakspartAMP.getPartNavn());
 		assertEquals(SAKSPART_ROLLE_AMP, sakspartAMP.getPartRolle());
 		assertEquals(OPPRETTET_AV_NAVN, sakspartAMP.getKontaktperson());
+		assertEquals(NAV_ORGNUMMER, sakspartAMP.getOrganisasjonsnummer().getOrganisasjonsnummer());
+		assertNull(sakspartAMP.getFoedselsnummer());
+		assertNull(sakspartAMP.getDNummer());
 
 		Part sakspartDAP = sakspartList.get(1);
 		assertEquals(PDL_NAVN, sakspartDAP.getPartNavn());
 		assertEquals(SAKSPART_ROLLE_DAP, sakspartDAP.getPartRolle());
 		assertNull(sakspartDAP.getKontaktperson());
+		assertEquals(BRUKER_ID_FNR, sakspartDAP.getFoedselsnummer().getFoedselsnummer());
 	}
 
 	private void assertDokumentbeskrivelseOpprettetAv(List<Dokumentbeskrivelse> dokumentbeskrivelseList) {
@@ -635,7 +641,6 @@ class AvtaltmeldingMapperTest {
 		assertCommonAttributesVedleggDokumentbeskrivelseOpprettetAv(dokumentbeskrivelseHoveddok);
 		assertEquals(TITTEL_HOVEDDOK, dokumentbeskrivelseHoveddok.getTittel());
 		assertEquals(convertFromXmlGregorianCalendarToLocalDateTime(dokumentbeskrivelseHoveddok.getOpprettetDato()).toString(), DATO_JOURNALFOERT.format(dateTimeFormatter));
-
 
 		assertDokumentobjektHoveddokument(dokumentbeskrivelseHoveddok.getDokumentobjekt());
 
@@ -650,7 +655,6 @@ class AvtaltmeldingMapperTest {
 		assertDokumentobjektVedlegg(dokumentbeskrivelseVedlegg.getDokumentobjekt());
 	}
 
-
 	private void assertDokumentobjektHoveddokument(List<Dokumentobjekt> dokumentobjektList) {
 		assertTrue(dokumentobjektList != null && dokumentobjektList.size() == 1);
 		Dokumentobjekt dokumentobjektHoveddok = dokumentobjektList.getFirst();
@@ -660,7 +664,6 @@ class AvtaltmeldingMapperTest {
 		assertEquals(JOURNALFOERT_AV_NAVN, dokumentobjektHoveddok.getOpprettetAv());
 		assertEquals(dokumentobjektHoveddok.getReferanseDokumentfil(), JOURNALPOST_ID + "-" + DOKUMENT_INFO_ID_HOVEDDOK + "-" + DOKUMENT_HVOR_DELER_AV_INNHOLDET_ER_SKJERMET + "-" + FILTYPE_PDF);
 	}
-
 
 	private void assertDokumentobjektVedlegg(List<Dokumentobjekt> dokumentobjektList) {
 		assertTrue(dokumentobjektList != null && dokumentobjektList.size() == 1);
