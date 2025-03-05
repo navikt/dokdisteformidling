@@ -7,7 +7,7 @@
 
   <jaxb:globalBindings generateMixedExtensions="false"/>
 
-  <jaxb:bindings schemaLocation="arkivmelding.xsd" node="/xs:schema">
+  <jaxb:bindings schemaLocation="arkivmeldingNAV.xsd" node="/xs:schema">
     <jaxb:bindings node="xs:complexType[@name='arkivmelding']">
         <annox:annotateClass>@jakarta.xml.bind.annotation.XmlRootElement</annox:annotateClass>
     </jaxb:bindings>
