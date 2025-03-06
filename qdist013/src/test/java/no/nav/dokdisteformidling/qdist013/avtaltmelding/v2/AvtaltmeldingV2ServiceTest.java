@@ -4,9 +4,6 @@ import no.nav.dokdisteformidling.consumer.ereg.EregConsumer;
 import no.nav.dokdisteformidling.consumer.pdl.PdlGraphQLConsumer;
 import no.nav.dokdisteformidling.consumer.saf.SafJournalpostQueryService;
 import no.nav.dokdisteformidling.qdist013.avtaltmelding.Avtaltmelding;
-import no.nav.dokdisteformidling.qdist013.avtaltmelding.v1.AvtaltmeldingV1Mapper;
-import no.nav.dokdisteformidling.qdist013.avtaltmelding.v1.AvtaltmeldingV1Marshaller;
-import no.nav.dokdisteformidling.qdist013.avtaltmelding.v1.AvtaltmeldingV1Service;
 import no.nav.dokdisteformidling.qdist013.saf.lightweight.LightweightSafJournalpostQdist013;
 import org.junit.jupiter.api.Test;
 
@@ -29,15 +26,15 @@ class AvtaltmeldingV2ServiceTest {
 	private final EregConsumer eregMock = mock(EregConsumer.class);
 	private final SafJournalpostQueryService<LightweightSafJournalpostQdist013> safJournalpostQueryServiceMock = mock(SafJournalpostQueryService.class);
 	private final PdlGraphQLConsumer pdlGraphQLConsumer = mock(PdlGraphQLConsumer.class);
-	private final no.nav.dokdisteformidling.qdist013.avtaltmelding.v1.AvtaltmeldingV1Marshaller avtaltmeldingV1Marshaller = new AvtaltmeldingV1Marshaller(Map.of(JAXB_FORMATTED_OUTPUT, true));
-	private final no.nav.dokdisteformidling.qdist013.avtaltmelding.v1.AvtaltmeldingV1Mapper avtaltmeldingV1Mapper = new AvtaltmeldingV1Mapper(safJournalpostQueryServiceMock, eregMock, pdlGraphQLConsumer);
-	private final no.nav.dokdisteformidling.qdist013.avtaltmelding.v1.AvtaltmeldingV1Service avtaltmeldingV1Service = new AvtaltmeldingV1Service(avtaltmeldingV1Mapper, avtaltmeldingV1Marshaller);
+	private final AvtaltmeldingV2Marshaller avtaltmeldingV2Marshaller = new AvtaltmeldingV2Marshaller(Map.of(JAXB_FORMATTED_OUTPUT, true));
+	private final AvtaltmeldingV2Mapper avtaltmeldingV2Mapper = new AvtaltmeldingV2Mapper(safJournalpostQueryServiceMock, eregMock, pdlGraphQLConsumer);
+	private final AvtaltmeldingV2Service avtaltmeldingV2Service = new AvtaltmeldingV2Service(avtaltmeldingV2Mapper, avtaltmeldingV2Marshaller);
 
 	@Test
 	void shouldMap() {
 		when(pdlGraphQLConsumer.hentPerson(anyString())).thenReturn(creatHentPersonInfo());
 
-		Avtaltmelding avtaltmelding = avtaltmeldingV1Service.map(createJournalpostQdist013Builder()
+		Avtaltmelding avtaltmelding = avtaltmeldingV2Service.map(createJournalpostQdist013Builder()
 				.tema(TEMA)
 				.build(), BESTILLINGS_ID);
 

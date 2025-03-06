@@ -253,7 +253,6 @@ public class AvtaltmeldingV2Mapper {
         return getLightweightSafJournalpost(journalpostId) == null ? Objects.isNull(getLightweightSafJournalpost(journalpostId)) : getLightweightSafJournalpost(journalpostId).getDatoJournalfoert() == null;
     }
 
-
     private String getDokumentJournalfortAvNavn(boolean isHoveddok, JournalpostQdist013 journalpostQdist013, JournalpostQdist013.DokumentInfo dokumentInfo) {
         if (!isHoveddok && isNotBlank(dokumentInfo.getOriginalJournalpostId())) {
             LightweightSafJournalpostQdist013 lightweightSafJournalpostQdist013 = getLightweightSafJournalpost(dokumentInfo.getOriginalJournalpostId());
@@ -355,10 +354,14 @@ public class AvtaltmeldingV2Mapper {
         Part partDAP = objectFactory.createPart();
         partDAP.setPartNavn(getSakspartNavnDAP(journalpostQdist013));
         partDAP.setPartRolle(SAKSPART_ROLLE_DAP);
-        partDAP.setOrganisasjonsnummer(new EnhetsidentifikatorType()
-                .useOrganisasjonsnummer(hentOrgNummerDAP(journalpostQdist013)));
-        partDAP.setFoedselsnummer(new FoedselsnummerType()
-                .useFoedselsnummer(getFoedselsnummer(journalpostQdist013)));
+
+        if(brukerTypeIsOrgnr(journalpostQdist013)) {
+            partDAP.setOrganisasjonsnummer(new EnhetsidentifikatorType()
+                    .useOrganisasjonsnummer(hentOrgNummerDAP(journalpostQdist013)));
+        } else {
+            partDAP.setFoedselsnummer(new FoedselsnummerType()
+                    .useFoedselsnummer(getFoedselsnummer(journalpostQdist013)));
+        }
         return partDAP;
     }
 
