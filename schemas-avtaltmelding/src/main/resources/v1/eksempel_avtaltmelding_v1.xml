@@ -1,18 +1,14 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<arkivmelding xmlns="http://www.arkivverket.no/standarder/noark5/arkivmelding" xmlns:nav="http://www.nav.no/avtaltmelding/trygderetten">
+<arkivmelding xmlns="http://www.arkivverket.no/standarder/noark5/arkivmelding">
 	<system>dokdisteformidling</system>
 	<meldingId>bestillingsId</meldingId>
-	<tidspunkt>2025-03-06T13:48:08.534+01:00</tidspunkt>
+	<tidspunkt>2025-03-05T16:24:05.247+01:00</tidspunkt>
 	<antallFiler>2</antallFiler>
 	<mappe xsi:type="saksmappe" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 		<tittel>Dagpenger</tittel>
 		<opprettetDato>2025-03-15T13:15:30.01</opprettetDato>
 		<opprettetAv>Sak Sakbehandlersen</opprettetAv>
-		<virksomhetsspesifikkeMetadata>
-			<nav:navMappe>
-				<nav:saksnummer>111111</nav:saksnummer>
-			</nav:navMappe>
-		</virksomhetsspesifikkeMetadata>
+		<virksomhetsspesifikkeMetadata xsi:type="xs:string" xmlns:xs="http://www.w3.org/2001/XMLSchema">111111</virksomhetsspesifikkeMetadata>
 		<part>
 			<partNavn>NAV Klageinstans</partNavn>
 			<partRolle>AMP</partRolle>
@@ -24,6 +20,7 @@
 		<part>
 			<partNavn>Bjarne Betjent</partNavn>
 			<partRolle>DAP</partRolle>
+			<organisasjonsnummer/>
 			<foedselsnummer>
 				<foedselsnummer>20026900000</foedselsnummer>
 			</foedselsnummer>
@@ -39,7 +36,7 @@
 				<opprettetAv>Sak Sakbehandlersen</opprettetAv>
 				<tilknyttetRegistreringSom>Hoveddokument</tilknyttetRegistreringSom>
 				<dokumentnummer>1</dokumentnummer>
-				<tilknyttetDato>2025-03-06T13:48:08.534+01:00</tilknyttetDato>
+				<tilknyttetDato>2025-03-05T16:24:05.247+01:00</tilknyttetDato>
 				<tilknyttetAv>Sak Sakbehandlersen</tilknyttetAv>
 				<dokumentobjekt>
 					<versjonsnummer>1</versjonsnummer>
@@ -57,7 +54,7 @@
 				<opprettetAv>Sak Sakbehandlersen</opprettetAv>
 				<tilknyttetRegistreringSom>Vedlegg</tilknyttetRegistreringSom>
 				<dokumentnummer>2</dokumentnummer>
-				<tilknyttetDato>2025-03-06T13:48:08.534+01:00</tilknyttetDato>
+				<tilknyttetDato>2025-03-05T16:24:05.247+01:00</tilknyttetDato>
 				<tilknyttetAv>Sak Sakbehandlersen</tilknyttetAv>
 				<dokumentobjekt>
 					<versjonsnummer>1</versjonsnummer>

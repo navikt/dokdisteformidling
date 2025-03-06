@@ -5,6 +5,10 @@ import no.nav.dokdisteformidling.consumer.pdl.PdlGraphQLConsumer;
 import no.nav.dokdisteformidling.consumer.saf.SafJournalpostQueryService;
 import no.nav.dokdisteformidling.qdist013.saf.lightweight.LightweightSafJournalpostQdist013;
 import org.junit.jupiter.api.Test;
+import org.xmlunit.builder.Input;
+import org.xmlunit.validation.Languages;
+import org.xmlunit.validation.ValidationResult;
+import org.xmlunit.validation.Validator;
 
 import java.util.Map;
 import java.util.Set;
@@ -14,6 +18,7 @@ import static no.nav.dokdisteformidling.qdist013.TestUtil.classpathToString;
 import static no.nav.dokdisteformidling.qdist013.avtaltmelding.v2.AvtaltmeldingV2MapperTest.BESTILLINGS_ID;
 import static no.nav.dokdisteformidling.qdist013.avtaltmelding.v2.AvtaltmeldingV2MapperTest.TEMA;
 import static no.nav.dokdisteformidling.qdist013.avtaltmelding.v2.AvtaltmeldingV2MapperTest.creatHentPersonInfo;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -36,16 +41,33 @@ public class AvtaltmeldingV2MarshallerTest {
 				.tema(TEMA)
 				.build(), BESTILLINGS_ID));
 
-		System.out.println(avtaltmeldingXmlString);
 		assertThat(avtaltmeldingXmlString)
 				.and(classpathToString("avtaltmelding/avtaltmelding_v2.xml"))
 				.ignoreWhitespace()
 				.withNodeFilter(node -> {
-					if(node.getLocalName() != null) {
+					if (node.getLocalName() != null) {
 						return !IGNORE_LOCALNAMES.contains(node.getLocalName());
 					}
 					return true;
 				})
 				.areIdentical();
+	}
+
+	@Test
+	void shouldValidateXmlForSchema() {
+		when(pdlGraphQLConsumer.hentPerson(anyString())).thenReturn(creatHentPersonInfo());
+		String avtaltmeldingXmlString = avtaltmeldingV2Marshaller.marshal(avtaltmeldingV2Mapper.createArkivMelding(AvtaltmeldingV2MapperTest.createJournalpostQdist013Builder()
+				.tema(TEMA)
+				.build(), BESTILLINGS_ID));
+
+		Validator v = Validator.forLanguage(Languages.W3C_XML_SCHEMA_NS_URI);
+		v.setSchemaSources(
+				Input.fromStream(getClass().getResourceAsStream("/v2/metadatakatalog.xsd")).build(),
+				Input.fromStream(getClass().getResourceAsStream("/v2/avtaltmelding_nav_trygderetten_2.0.xsd")).build()
+		);
+
+		ValidationResult validationResult = v.validateInstance(Input.fromString(avtaltmeldingXmlString).build());
+
+		assertTrue(validationResult.isValid());
 	}
 }

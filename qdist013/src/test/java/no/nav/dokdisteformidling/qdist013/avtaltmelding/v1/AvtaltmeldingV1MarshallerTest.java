@@ -40,7 +40,7 @@ public class AvtaltmeldingV1MarshallerTest {
 				.and(classpathToString("avtaltmelding/avtaltmelding_v1.xml"))
 				.ignoreWhitespace()
 				.withNodeFilter(node -> {
-					if(node.getLocalName() != null) {
+					if (node.getLocalName() != null) {
 						return !IGNORE_LOCALNAMES.contains(node.getLocalName());
 					}
 					return true;
