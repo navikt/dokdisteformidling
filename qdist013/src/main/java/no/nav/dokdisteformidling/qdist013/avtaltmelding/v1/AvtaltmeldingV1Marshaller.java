@@ -1,4 +1,4 @@
-package no.nav.dokdisteformidling.qdist013;
+package no.nav.dokdisteformidling.qdist013.avtaltmelding.v1;
 
 import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.JAXBElement;
@@ -7,21 +7,23 @@ import jakarta.xml.bind.Marshaller;
 import jakarta.xml.bind.PropertyException;
 import no.arkivverket.standarder.noark5.arkivmelding.Arkivmelding;
 import no.nav.dokdisteformidling.exception.technical.KunneIkkeMarshalleArkivmeldingTechnicalException;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 import java.io.StringWriter;
 import java.util.Map;
 
+@Profile("avtaltmelding_v1")
 @Component
-public class AvtaltmeldingMarshaller {
+public class AvtaltmeldingV1Marshaller {
 	private final JAXBContext jaxbContext;
 	private final Map<String, Object> marshalProperties;
 
-	public AvtaltmeldingMarshaller() {
+	public AvtaltmeldingV1Marshaller() {
 		this(Map.of());
 	}
 
-	public AvtaltmeldingMarshaller(Map<String, Object> marshalProperties) {
+	public AvtaltmeldingV1Marshaller(Map<String, Object> marshalProperties) {
 		try {
 			this.jaxbContext = JAXBContext.newInstance(Arkivmelding.class);
 			this.marshalProperties = marshalProperties;
