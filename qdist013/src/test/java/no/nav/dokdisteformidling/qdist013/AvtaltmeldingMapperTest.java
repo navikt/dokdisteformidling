@@ -22,8 +22,10 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigInteger;
+import java.time.Clock;
+import java.time.Instant;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
+import java.time.ZoneId;
 import java.util.Arrays;
 import java.util.List;
 
@@ -69,48 +71,48 @@ import static org.mockito.Mockito.when;
 
 class AvtaltmeldingMapperTest {
 
-	private static final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS");
-	private static final String BESTILLINGS_ID = "bestillingsId";
-	private static final String JOURNALPOST_ID = "987654321";
+	static final String BESTILLINGS_ID = "bestillingsId";
+	static final String JOURNALPOST_ID = "987654321";
+	static final String ARKIV_SAKNUMMER = "111111";
+	static final Clock FIXED_CLOCK = Clock.fixed(Instant.parse("2025-03-15T12:15:30.01Z"), ZoneId.of("Europe/Oslo"));
+	static final LocalDateTime FIXED_LOCAL_DATE_TIME = LocalDateTime.now(FIXED_CLOCK);
+	static final LocalDateTime DATO_OPPRETTET_SAK = FIXED_LOCAL_DATE_TIME;
+	static final LocalDateTime DATO_OPPRETTET_JOURNALPOST = FIXED_LOCAL_DATE_TIME.minusDays(1);
+	static final LocalDateTime DATO_JOURNALFOERT = FIXED_LOCAL_DATE_TIME.minusDays(2);
+	static final String OPPRETTET_AV_NAVN = "opprettetAvNavn";
+	static final String BRUKER_ID_FNR = "20026900817";
+	static final String BRUKER_TYPE_FNR = "FNR";
+	static final String BRUKER_ID_ORGNR = "999999999";
+	static final String BRUKER_TYPE_ORGNR = "ORGNR";
+	static final String BRUKER_ID_AKTOER_ID = "aktoerId";
+	static final String BRUKER_TYPE_AKTOER_ID = "AKTOERID";
+	static final String TITTEL = "tittel";
+	static final String JOURNALFOERT_AV_NAVN = "journalfoertAvNavn";
+	static final String TEMA_NAVN = "temaNavn";
+	static final String TEMA = "DAG";
 
-	private static final String ARKIV_SAKNUMMER = "111111";
-	private static final LocalDateTime DATO_OPPRETTET_SAK = LocalDateTime.now();
-	private static final LocalDateTime DATO_OPPRETTET_JOURNALPOST = LocalDateTime.now().minusDays(1);
-	private static final LocalDateTime DATO_JOURNALFOERT = LocalDateTime.now().minusDays(2);
-	private static final String OPPRETTET_AV_NAVN = "opprettetAvNavn";
-	private static final String BRUKER_ID_FNR = "20026900817";
-	private static final String BRUKER_TYPE_FNR = "FNR";
-	private static final String BRUKER_ID_ORGNR = "999999999";
-	private static final String BRUKER_TYPE_ORGNR = "ORGNR";
-	private static final String BRUKER_ID_AKTOER_ID = "aktoerId";
-	private static final String BRUKER_TYPE_AKTOER_ID = "AKTOERID";
-	private static final String TITTEL = "tittel";
-	private static final String JOURNALFOERT_AV_NAVN = "journalfoertAvNavn";
-	private static final String TEMA_NAVN = "temaNavn";
-	private static final String TEMA = "DAG";
+	static final String DOKUMENT_INFO_ID_HOVEDDOK = "1234567";
+	static final String TITTEL_HOVEDDOK = "tittelHoveddok";
 
-	private static final String DOKUMENT_INFO_ID_HOVEDDOK = "1234567";
-	private static final String TITTEL_HOVEDDOK = "tittelHoveddok";
+	static final String DOKUMENT_INFO_ID_VEDLEGG = "7654321";
+	static final String TITTEL_VEDLEGG = "tittelVedlegg";
+	static final String ORIGINAL_JPID_VEDLEGG = "1111111111";
 
-	private static final String DOKUMENT_INFO_ID_VEDLEGG = "7654321";
-	private static final String TITTEL_VEDLEGG = "tittelVedlegg";
-	private static final String ORIGINAL_JPID_VEDLEGG = "1111111111";
+	static final String DOKUMENT_INFO_ID_VEDLEGG_2 = "9876543";
+	static final String EREG_NAVN = "ereg_navn";
+	static final String PDL_NAVN = "pdl_navn";
 
-	private static final String DOKUMENT_INFO_ID_VEDLEGG_2 = "9876543";
-	private static final String EREG_NAVN = "ereg_navn";
-	private static final String PDL_NAVN = "pdl_navn";
+	static final String AVSENDER_MOTTAKER_NAVN_ORIG_JP = "avsenderMottakerNavnOrigJp";
+	static final String JOURNALFOERT_AV_NAVN_ORIG_JP = "ajournalfoertAvNavnOrigJp";
+	static final LocalDateTime DATO_JOURNALFOERT_ORIG_JP = FIXED_LOCAL_DATE_TIME.minusDays(5);
 
-	private static final String AVSENDER_MOTTAKER_NAVN_ORIG_JP = "avsenderMottakerNavnOrigJp";
-	private static final String JOURNALFOERT_AV_NAVN_ORIG_JP = "ajournalfoertAvNavnOrigJp";
-	private static final LocalDateTime DATO_JOURNALFOERT_ORIG_JP = LocalDateTime.now().minusDays(5);
-
-	private static final String FILTYPE_PNG = "PNG";
-	private static final String FILTYPE_JPEG = "JPEG";
-	private static final String FILTYPE_PDF = "PDF";
-	private static final String FILTYPE_PDFA = "PDF/A";
+	static final String FILTYPE_PNG = "PNG";
+	static final String FILTYPE_JPEG = "JPEG";
+	static final String FILTYPE_PDF = "PDF";
+	static final String FILTYPE_PDFA = "PDF/A";
 
 	private EregConsumer eregMock;
-	private SafJournalpostQueryService safJournalpostQueryServiceMock;
+	private SafJournalpostQueryService<LightweightSafJournalpostQdist013> safJournalpostQueryServiceMock;
 	private AvtaltmeldingMapper avtaltmeldingMapper;
 	private PdlGraphQLConsumer pdlGraphQLConsumer;
 
@@ -316,10 +318,10 @@ class AvtaltmeldingMapperTest {
 				.get(1);
 		Dokumentobjekt dokumentobjektVedlegg = dokumentbeskrivelseVedlegg.getDokumentobjekt().getFirst();
 
-		assertEquals(convertFromXmlGregorianCalendarToLocalDateTime(dokumentbeskrivelseHoveddok.getOpprettetDato()).toString(), DATO_JOURNALFOERT.format(dateTimeFormatter));
-		assertEquals(convertFromXmlGregorianCalendarToLocalDateTime(dokumentobjektHoveddok.getOpprettetDato()).toString(), DATO_JOURNALFOERT.format(dateTimeFormatter));
-		assertEquals(convertFromXmlGregorianCalendarToLocalDateTime(dokumentbeskrivelseVedlegg.getOpprettetDato()).toString(), DATO_JOURNALFOERT_ORIG_JP.format(dateTimeFormatter));
-		assertEquals(convertFromXmlGregorianCalendarToLocalDateTime(dokumentobjektVedlegg.getOpprettetDato()).toString(), DATO_JOURNALFOERT_ORIG_JP.format(dateTimeFormatter));
+		assertEquals(convertFromXmlGregorianCalendarToLocalDateTime(dokumentbeskrivelseHoveddok.getOpprettetDato()).toString(), DATO_JOURNALFOERT.toString());
+		assertEquals(convertFromXmlGregorianCalendarToLocalDateTime(dokumentobjektHoveddok.getOpprettetDato()).toString(), DATO_JOURNALFOERT.toString());
+		assertEquals(convertFromXmlGregorianCalendarToLocalDateTime(dokumentbeskrivelseVedlegg.getOpprettetDato()).toString(), DATO_JOURNALFOERT_ORIG_JP.toString());
+		assertEquals(convertFromXmlGregorianCalendarToLocalDateTime(dokumentobjektVedlegg.getOpprettetDato()).toString(), DATO_JOURNALFOERT_ORIG_JP.toString());
 
 		verify(safJournalpostQueryServiceMock, times(18)).hentJournalpost(ORIGINAL_JPID_VEDLEGG);
 	}
@@ -526,21 +528,21 @@ class AvtaltmeldingMapperTest {
 	@Test
 	@DisplayName("Når sak mangler opprettetDato, sett opprettetDato fra eldste vedlegg sortert etter journalpostens dokumentbeskrivelse.opprettetDato")
 	void shouldSetteOpprettetDatoPaaSakFraJournalpostTilhorendeTilEldsteVedlegg() {
-		LocalDateTime femDagerSiden = LocalDateTime.now().minusDays(5);
-		LocalDateTime treDagerSiden = LocalDateTime.now().minusDays(3);
+		LocalDateTime femDagerSiden = FIXED_LOCAL_DATE_TIME.minusDays(5);
+		LocalDateTime treDagerSiden = FIXED_LOCAL_DATE_TIME.minusDays(3);
 		when(pdlGraphQLConsumer.hentPerson(anyString())).thenReturn(creatHentPersonInfo());
 		when(safJournalpostQueryServiceMock
 				.hentJournalpost(DOKUMENT_INFO_ID_VEDLEGG))
 				.thenReturn(createLightweightSafJournalpostQdist013Builder()
 						.datoJournalfoert(treDagerSiden)
 						.build()
-		);
+				);
 		when(safJournalpostQueryServiceMock
 				.hentJournalpost(DOKUMENT_INFO_ID_VEDLEGG_2))
 				.thenReturn(createLightweightSafJournalpostQdist013Builder()
 						.datoJournalfoert(femDagerSiden)
 						.build()
-		);
+				);
 
 		JournalpostQdist013.Sak sakUtenOpprettetDato = JournalpostQdist013.Sak.builder()
 				.arkivsaksnummer(ARKIV_SAKNUMMER)
@@ -555,7 +557,7 @@ class AvtaltmeldingMapperTest {
 		assertThat(arkivmeldingJAXBElement, notNullValue());
 		Arkivmelding arkivmelding = arkivmeldingJAXBElement.getValue();
 
-		assertEquals(femDagerSiden.format(dateTimeFormatter),
+		assertEquals(femDagerSiden.toString(),
 				convertFromXmlGregorianCalendarToLocalDateTime(arkivmelding.getMappe().getFirst().getOpprettetDato()).toString());
 	}
 
@@ -574,11 +576,11 @@ class AvtaltmeldingMapperTest {
 		Saksmappe saksmappe = (Saksmappe) mappeList.getFirst();
 
 		assertEquals(TEMA_NAVN, saksmappe.getTittel());
-		assertEquals(convertFromXmlGregorianCalendarToLocalDateTime(saksmappe.getOpprettetDato()).toString(), DATO_OPPRETTET_SAK.format(dateTimeFormatter));
+		assertEquals(convertFromXmlGregorianCalendarToLocalDateTime(saksmappe.getOpprettetDato()).toString(), DATO_OPPRETTET_SAK.toString());
 		assertEquals(OPPRETTET_AV_NAVN, saksmappe.getOpprettetAv());
 		assertEquals(ARKIV_SAKNUMMER, saksmappe.getVirksomhetsspesifikkeMetadata());
 		assertRegistrering(saksmappe.getRegistrering());
-		assertEquals(convertFromXmlGregorianCalendarToLocalDateTime(saksmappe.getSaksdato()).toString(), DATO_OPPRETTET_SAK.format(dateTimeFormatter));
+		assertEquals(convertFromXmlGregorianCalendarToLocalDateTime(saksmappe.getSaksdato()).toString(), DATO_OPPRETTET_SAK.toString());
 		assertEquals(NAV_KLAGEINSTANS, saksmappe.getAdministrativEnhet());
 		assertEquals(OPPRETTET_AV_NAVN, saksmappe.getSaksansvarlig());
 		assertEquals(UNDER_BEHANDLING, saksmappe.getSaksstatus());
@@ -590,13 +592,13 @@ class AvtaltmeldingMapperTest {
 		assertInstanceOf(Journalpost.class, registreringList.getFirst());
 
 		Journalpost registreringJp = (Journalpost) registreringList.getFirst();
-		assertEquals(convertFromXmlGregorianCalendarToLocalDateTime(registreringJp.getOpprettetDato()).toString(), DATO_OPPRETTET_JOURNALPOST.format(dateTimeFormatter));
+		assertEquals(convertFromXmlGregorianCalendarToLocalDateTime(registreringJp.getOpprettetDato()).toString(), DATO_OPPRETTET_JOURNALPOST.toString());
 		assertEquals(OPPRETTET_AV_NAVN, registreringJp.getOpprettetAv());
 		assertDokumentbeskrivelseOpprettetAv(registreringJp.getDokumentbeskrivelse());
 		assertEquals(TITTEL, registreringJp.getTittel());
 		assertEquals(UTGAAENDE_DOKUMENT, registreringJp.getJournalposttype());
 		assertEquals(EKSPEDERT, registreringJp.getJournalstatus());
-		assertEquals(convertFromXmlGregorianCalendarToLocalDateTime(registreringJp.getJournaldato()).toString(), DATO_JOURNALFOERT.format(dateTimeFormatter));
+		assertEquals(convertFromXmlGregorianCalendarToLocalDateTime(registreringJp.getJournaldato()).toString(), DATO_JOURNALFOERT.toString());
 		assertKorrespondanseparter(registreringJp.getKorrespondansepart());
 	}
 
@@ -640,7 +642,7 @@ class AvtaltmeldingMapperTest {
 		assertEquals(BigInteger.ONE, dokumentbeskrivelseHoveddok.getDokumentnummer());
 		assertCommonAttributesVedleggDokumentbeskrivelseOpprettetAv(dokumentbeskrivelseHoveddok);
 		assertEquals(TITTEL_HOVEDDOK, dokumentbeskrivelseHoveddok.getTittel());
-		assertEquals(convertFromXmlGregorianCalendarToLocalDateTime(dokumentbeskrivelseHoveddok.getOpprettetDato()).toString(), DATO_JOURNALFOERT.format(dateTimeFormatter));
+		assertEquals(convertFromXmlGregorianCalendarToLocalDateTime(dokumentbeskrivelseHoveddok.getOpprettetDato()).toString(), DATO_JOURNALFOERT.toString());
 
 		assertDokumentobjektHoveddokument(dokumentbeskrivelseHoveddok.getDokumentobjekt());
 
@@ -650,7 +652,7 @@ class AvtaltmeldingMapperTest {
 		assertEquals(dokumentbeskrivelseVedlegg.getDokumentnummer(), BigInteger.valueOf(2));
 		assertCommonAttributesVedleggDokumentbeskrivelseOpprettetAv(dokumentbeskrivelseVedlegg);
 		assertEquals(TITTEL_VEDLEGG, dokumentbeskrivelseVedlegg.getTittel());
-		assertEquals(convertFromXmlGregorianCalendarToLocalDateTime(dokumentbeskrivelseVedlegg.getOpprettetDato()).toString(), DATO_JOURNALFOERT.format(dateTimeFormatter));
+		assertEquals(convertFromXmlGregorianCalendarToLocalDateTime(dokumentbeskrivelseVedlegg.getOpprettetDato()).toString(), DATO_JOURNALFOERT.toString());
 
 		assertDokumentobjektVedlegg(dokumentbeskrivelseVedlegg.getDokumentobjekt());
 	}
@@ -660,7 +662,7 @@ class AvtaltmeldingMapperTest {
 		Dokumentobjekt dokumentobjektHoveddok = dokumentobjektList.getFirst();
 		assertEquals(BigInteger.ONE, dokumentobjektHoveddok.getVersjonsnummer());
 		assertEquals(DOKUMENT_HVOR_DELER_AV_INNHOLDET_ER_SKJERMET, dokumentobjektHoveddok.getVariantformat());
-		assertEquals(convertFromXmlGregorianCalendarToLocalDateTime(dokumentobjektHoveddok.getOpprettetDato()).toString(), DATO_JOURNALFOERT.format(dateTimeFormatter));
+		assertEquals(convertFromXmlGregorianCalendarToLocalDateTime(dokumentobjektHoveddok.getOpprettetDato()).toString(), DATO_JOURNALFOERT.toString());
 		assertEquals(JOURNALFOERT_AV_NAVN, dokumentobjektHoveddok.getOpprettetAv());
 		assertEquals(dokumentobjektHoveddok.getReferanseDokumentfil(), JOURNALPOST_ID + "-" + DOKUMENT_INFO_ID_HOVEDDOK + "-" + DOKUMENT_HVOR_DELER_AV_INNHOLDET_ER_SKJERMET + "-" + FILTYPE_PDF);
 	}
@@ -670,7 +672,7 @@ class AvtaltmeldingMapperTest {
 		Dokumentobjekt dokumentobjektVedlegg = dokumentobjektList.getFirst();
 		assertEquals(BigInteger.ONE, dokumentobjektVedlegg.getVersjonsnummer());
 		assertEquals(ARKIVFORMAT, dokumentobjektVedlegg.getVariantformat());
-		assertEquals(convertFromXmlGregorianCalendarToLocalDateTime(dokumentobjektVedlegg.getOpprettetDato()).toString(), DATO_JOURNALFOERT.format(dateTimeFormatter));
+		assertEquals(convertFromXmlGregorianCalendarToLocalDateTime(dokumentobjektVedlegg.getOpprettetDato()).toString(), DATO_JOURNALFOERT.toString());
 		assertEquals(JOURNALFOERT_AV_NAVN, dokumentobjektVedlegg.getOpprettetAv());
 		assertEquals(dokumentobjektVedlegg.getReferanseDokumentfil(), JOURNALPOST_ID + "-" + DOKUMENT_INFO_ID_VEDLEGG + "-" + ARKIVFORMAT + "-" + FILTYPE_JPEG);
 	}
@@ -683,7 +685,7 @@ class AvtaltmeldingMapperTest {
 		assertEquals(JOURNALFOERT_AV_NAVN, dokumentbeskrivelse.getTilknyttetAv());
 	}
 
-	private JournalpostQdist013.JournalpostQdist013Builder createJournalpostQdist013Builder() {
+	static JournalpostQdist013.JournalpostQdist013Builder createJournalpostQdist013Builder() {
 		return JournalpostQdist013.builder()
 				.journalpostId(JOURNALPOST_ID)
 				.sak(JournalpostQdist013.Sak.builder()
@@ -708,7 +710,7 @@ class AvtaltmeldingMapperTest {
 				));
 	}
 
-	private JournalpostQdist013.JournalpostQdist013Builder createJournalpostQdist013BuilderNoJournalFoertAv() {
+	static JournalpostQdist013.JournalpostQdist013Builder createJournalpostQdist013BuilderNoJournalFoertAv() {
 		return JournalpostQdist013.builder()
 				.journalpostId(JOURNALPOST_ID)
 				.sak(JournalpostQdist013.Sak.builder()
@@ -732,7 +734,7 @@ class AvtaltmeldingMapperTest {
 				));
 	}
 
-	private JournalpostQdist013.DokumentInfo.DokumentInfoBuilder createHoveddokumentBuilder() {
+	static JournalpostQdist013.DokumentInfo.DokumentInfoBuilder createHoveddokumentBuilder() {
 		return JournalpostQdist013.DokumentInfo.builder()
 				.dokumentInfoId(DOKUMENT_INFO_ID_HOVEDDOK)
 				.dokumentstatus(FERDIGSTILT)
@@ -748,7 +750,7 @@ class AvtaltmeldingMapperTest {
 								.build()));
 	}
 
-	private JournalpostQdist013.DokumentInfo.DokumentInfoBuilder createVedleggBuilderUtenDato() {
+	static JournalpostQdist013.DokumentInfo.DokumentInfoBuilder createVedleggBuilderUtenDato() {
 		return JournalpostQdist013.DokumentInfo.builder()
 				.dokumentInfoId(DOKUMENT_INFO_ID_VEDLEGG)
 				.dokumentstatus(FERDIGSTILT)
@@ -764,7 +766,7 @@ class AvtaltmeldingMapperTest {
 								.build()));
 	}
 
-	private JournalpostQdist013.DokumentInfo.DokumentInfoBuilder createVedleggBuilder() {
+	static JournalpostQdist013.DokumentInfo.DokumentInfoBuilder createVedleggBuilder() {
 		return JournalpostQdist013.DokumentInfo.builder()
 				.dokumentInfoId(DOKUMENT_INFO_ID_VEDLEGG)
 				.dokumentstatus(FERDIGSTILT)
@@ -780,14 +782,14 @@ class AvtaltmeldingMapperTest {
 								.build()));
 	}
 
-	private static HentPersonInfo creatHentPersonInfo() {
+	static HentPersonInfo creatHentPersonInfo() {
 		return HentPersonInfo.builder()
 				.ident(BRUKER_ID_FNR)
 				.fulltnavn(PDL_NAVN)
 				.build();
 	}
 
-	private LightweightSafJournalpostQdist013 createLightweightSafJournalpostQdist013() {
+	static LightweightSafJournalpostQdist013 createLightweightSafJournalpostQdist013() {
 		return LightweightSafJournalpostQdist013.builder()
 				.avsenderMottakerNavn(AVSENDER_MOTTAKER_NAVN_ORIG_JP)
 				.journalposttype(UTGAAENDE)
@@ -796,14 +798,14 @@ class AvtaltmeldingMapperTest {
 				.build();
 	}
 
-	private LightweightSafJournalpostQdist013 createLightweightSafJournalpostQdist013NoJournalFoertAv() {
+	static LightweightSafJournalpostQdist013 createLightweightSafJournalpostQdist013NoJournalFoertAv() {
 		return LightweightSafJournalpostQdist013.builder()
 				.avsenderMottakerNavn(AVSENDER_MOTTAKER_NAVN_ORIG_JP)
 				.datoJournalfoert(DATO_JOURNALFOERT_ORIG_JP)
 				.build();
 	}
 
-	private LightweightSafJournalpostQdist013.LightweightSafJournalpostQdist013Builder createLightweightSafJournalpostQdist013Builder() {
+	static LightweightSafJournalpostQdist013.LightweightSafJournalpostQdist013Builder createLightweightSafJournalpostQdist013Builder() {
 		return LightweightSafJournalpostQdist013.builder()
 				.avsenderMottakerNavn(AVSENDER_MOTTAKER_NAVN_ORIG_JP)
 				.journalposttype(UTGAAENDE)
