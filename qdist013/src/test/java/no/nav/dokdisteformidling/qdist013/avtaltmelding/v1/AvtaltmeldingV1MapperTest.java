@@ -1,4 +1,4 @@
-package no.nav.dokdisteformidling.qdist013;
+package no.nav.dokdisteformidling.qdist013.avtaltmelding.v1;
 
 import jakarta.xml.bind.JAXBElement;
 import no.arkivverket.standarder.noark5.arkivmelding.Arkivmelding;
@@ -35,15 +35,15 @@ import static no.nav.dokdisteformidling.constants.DomainConstants.VARIANTFORMAT_
 import static no.nav.dokdisteformidling.constants.DomainConstants.VARIANTFORMAT_PRODUKSJON;
 import static no.nav.dokdisteformidling.constants.DomainConstants.VARIANTFORMAT_SLADDET;
 import static no.nav.dokdisteformidling.consumer.eformidling.EformidlingConstants.NAV_ORGNUMMER;
-import static no.nav.dokdisteformidling.qdist013.AvtaltmeldingMapper.FERDIGSTILT;
-import static no.nav.dokdisteformidling.qdist013.AvtaltmeldingMapper.INNGAAENDE;
-import static no.nav.dokdisteformidling.qdist013.AvtaltmeldingMapper.NAV_KLAGEINSTANS;
-import static no.nav.dokdisteformidling.qdist013.AvtaltmeldingMapper.SAKSPART_ROLLE_AMP;
-import static no.nav.dokdisteformidling.qdist013.AvtaltmeldingMapper.SAKSPART_ROLLE_DAP;
-import static no.nav.dokdisteformidling.qdist013.AvtaltmeldingMapper.TRYGDERETTEN;
-import static no.nav.dokdisteformidling.qdist013.AvtaltmeldingMapper.UKJENT;
-import static no.nav.dokdisteformidling.qdist013.AvtaltmeldingMapper.UTGAAENDE;
 import static no.nav.dokdisteformidling.qdist013.TestUtil.convertFromXmlGregorianCalendarToLocalDateTime;
+import static no.nav.dokdisteformidling.qdist013.avtaltmelding.v1.AvtaltmeldingV1Mapper.FERDIGSTILT;
+import static no.nav.dokdisteformidling.qdist013.avtaltmelding.v1.AvtaltmeldingV1Mapper.INNGAAENDE;
+import static no.nav.dokdisteformidling.qdist013.avtaltmelding.v1.AvtaltmeldingV1Mapper.NAV_KLAGEINSTANS;
+import static no.nav.dokdisteformidling.qdist013.avtaltmelding.v1.AvtaltmeldingV1Mapper.SAKSPART_ROLLE_AMP;
+import static no.nav.dokdisteformidling.qdist013.avtaltmelding.v1.AvtaltmeldingV1Mapper.SAKSPART_ROLLE_DAP;
+import static no.nav.dokdisteformidling.qdist013.avtaltmelding.v1.AvtaltmeldingV1Mapper.TRYGDERETTEN;
+import static no.nav.dokdisteformidling.qdist013.avtaltmelding.v1.AvtaltmeldingV1Mapper.UKJENT;
+import static no.nav.dokdisteformidling.qdist013.avtaltmelding.v1.AvtaltmeldingV1Mapper.UTGAAENDE;
 import static no.nav.dokdisteformidling.qdist013.util.AvtaltmeldingConstant.ARKIVFORMAT;
 import static no.nav.dokdisteformidling.qdist013.util.AvtaltmeldingConstant.AVSENDER;
 import static no.nav.dokdisteformidling.qdist013.util.AvtaltmeldingConstant.DOKUMENTASJON;
@@ -69,7 +69,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-class AvtaltmeldingMapperTest {
+class AvtaltmeldingV1MapperTest {
 
 	static final String BESTILLINGS_ID = "bestillingsId";
 	static final String JOURNALPOST_ID = "987654321";
@@ -79,28 +79,28 @@ class AvtaltmeldingMapperTest {
 	static final LocalDateTime DATO_OPPRETTET_SAK = FIXED_LOCAL_DATE_TIME;
 	static final LocalDateTime DATO_OPPRETTET_JOURNALPOST = FIXED_LOCAL_DATE_TIME.minusDays(1);
 	static final LocalDateTime DATO_JOURNALFOERT = FIXED_LOCAL_DATE_TIME.minusDays(2);
-	static final String OPPRETTET_AV_NAVN = "opprettetAvNavn";
-	static final String BRUKER_ID_FNR = "20026900817";
+	static final String OPPRETTET_AV_NAVN = "Sak Sakbehandlersen";
+	static final String BRUKER_ID_FNR = "20026900000";
 	static final String BRUKER_TYPE_FNR = "FNR";
 	static final String BRUKER_ID_ORGNR = "999999999";
 	static final String BRUKER_TYPE_ORGNR = "ORGNR";
 	static final String BRUKER_ID_AKTOER_ID = "aktoerId";
 	static final String BRUKER_TYPE_AKTOER_ID = "AKTOERID";
-	static final String TITTEL = "tittel";
-	static final String JOURNALFOERT_AV_NAVN = "journalfoertAvNavn";
-	static final String TEMA_NAVN = "temaNavn";
+	static final String TITTEL = "Klage på saksbehandling";
+	static final String JOURNALFOERT_AV_NAVN = "Sak Sakbehandlersen";
+	static final String TEMA_NAVN = "Dagpenger";
 	static final String TEMA = "DAG";
 
 	static final String DOKUMENT_INFO_ID_HOVEDDOK = "1234567";
-	static final String TITTEL_HOVEDDOK = "tittelHoveddok";
+	static final String TITTEL_HOVEDDOK = "Klage på saksbehandling";
 
 	static final String DOKUMENT_INFO_ID_VEDLEGG = "7654321";
-	static final String TITTEL_VEDLEGG = "tittelVedlegg";
+	static final String TITTEL_VEDLEGG = "Dokumentasjon til klage";
 	static final String ORIGINAL_JPID_VEDLEGG = "1111111111";
 
 	static final String DOKUMENT_INFO_ID_VEDLEGG_2 = "9876543";
-	static final String EREG_NAVN = "ereg_navn";
-	static final String PDL_NAVN = "pdl_navn";
+	static final String EREG_NAVN = "Bedrift AS";
+	static final String PDL_NAVN = "Bjarne Betjent";
 
 	static final String AVSENDER_MOTTAKER_NAVN_ORIG_JP = "avsenderMottakerNavnOrigJp";
 	static final String JOURNALFOERT_AV_NAVN_ORIG_JP = "ajournalfoertAvNavnOrigJp";
@@ -113,7 +113,7 @@ class AvtaltmeldingMapperTest {
 
 	private EregConsumer eregMock;
 	private SafJournalpostQueryService<LightweightSafJournalpostQdist013> safJournalpostQueryServiceMock;
-	private AvtaltmeldingMapper avtaltmeldingMapper;
+	private AvtaltmeldingV1Mapper avtaltmeldingV1Mapper;
 	private PdlGraphQLConsumer pdlGraphQLConsumer;
 
 	@BeforeEach
@@ -121,14 +121,14 @@ class AvtaltmeldingMapperTest {
 		eregMock = mock(EregConsumer.class);
 		pdlGraphQLConsumer = mock(PdlGraphQLConsumer.class);
 		safJournalpostQueryServiceMock = mock(SafJournalpostQueryService.class);
-		avtaltmeldingMapper = new AvtaltmeldingMapper(safJournalpostQueryServiceMock, eregMock, pdlGraphQLConsumer);
+		avtaltmeldingV1Mapper = new AvtaltmeldingV1Mapper(safJournalpostQueryServiceMock, eregMock, pdlGraphQLConsumer);
 	}
 
 	@Test
 	@DisplayName("Asserts all fields")
 	void fullHappyPath() {
 		when(pdlGraphQLConsumer.hentPerson(anyString())).thenReturn(creatHentPersonInfo());
-		JAXBElement<Arkivmelding> arkivmeldingJAXBElement = avtaltmeldingMapper.createArkivMelding(createJournalpostQdist013Builder()
+		JAXBElement<Arkivmelding> arkivmeldingJAXBElement = avtaltmeldingV1Mapper.createArkivMelding(createJournalpostQdist013Builder()
 				.tema(TEMA)
 				.build(), BESTILLINGS_ID);
 
@@ -153,7 +153,7 @@ class AvtaltmeldingMapperTest {
 						.build())
 				.build();
 
-		JAXBElement<Arkivmelding> arkivmeldingJAXBElement = avtaltmeldingMapper.createArkivMelding(journalpostQdist013, BESTILLINGS_ID);
+		JAXBElement<Arkivmelding> arkivmeldingJAXBElement = avtaltmeldingV1Mapper.createArkivMelding(journalpostQdist013, BESTILLINGS_ID);
 		Arkivmelding arkivmelding = arkivmeldingJAXBElement.getValue();
 		List<Mappe> mappeList = arkivmelding.getMappe();
 		Saksmappe saksmappe = (Saksmappe) mappeList.getFirst();
@@ -181,7 +181,7 @@ class AvtaltmeldingMapperTest {
 						.build())
 				.build();
 
-		JAXBElement<Arkivmelding> arkivmeldingJAXBElement = avtaltmeldingMapper.createArkivMelding(journalpostQdist013, BESTILLINGS_ID);
+		JAXBElement<Arkivmelding> arkivmeldingJAXBElement = avtaltmeldingV1Mapper.createArkivMelding(journalpostQdist013, BESTILLINGS_ID);
 		Arkivmelding arkivmelding = arkivmeldingJAXBElement.getValue();
 		List<Mappe> mappeList = arkivmelding.getMappe();
 		Saksmappe saksmappe = (Saksmappe) mappeList.getFirst();
@@ -206,7 +206,7 @@ class AvtaltmeldingMapperTest {
 						createVedleggBuilderUtenDato().build()))
 				.build();
 		when(pdlGraphQLConsumer.hentPerson(anyString())).thenReturn(creatHentPersonInfo());
-		JAXBElement<Arkivmelding> arkivmeldingJAXBElement = avtaltmeldingMapper.createArkivMelding(journalpostQdist013, BESTILLINGS_ID);
+		JAXBElement<Arkivmelding> arkivmeldingJAXBElement = avtaltmeldingV1Mapper.createArkivMelding(journalpostQdist013, BESTILLINGS_ID);
 		Arkivmelding arkivmelding = arkivmeldingJAXBElement.getValue();
 		List<Mappe> mappeList = arkivmelding.getMappe();
 		Saksmappe saksmappe = (Saksmappe) mappeList.getFirst();
@@ -231,7 +231,7 @@ class AvtaltmeldingMapperTest {
 						createVedleggBuilder().originalJournalpostId(ORIGINAL_JPID_VEDLEGG).build()))
 				.build();
 
-		JAXBElement<Arkivmelding> arkivmeldingJAXBElement = avtaltmeldingMapper.createArkivMelding(journalpostQdist013, BESTILLINGS_ID);
+		JAXBElement<Arkivmelding> arkivmeldingJAXBElement = avtaltmeldingV1Mapper.createArkivMelding(journalpostQdist013, BESTILLINGS_ID);
 		Arkivmelding arkivmelding = arkivmeldingJAXBElement.getValue();
 		List<Mappe> mappeList = arkivmelding.getMappe();
 		Saksmappe saksmappe = (Saksmappe) mappeList.getFirst();
@@ -256,7 +256,7 @@ class AvtaltmeldingMapperTest {
 						createVedleggBuilder().originalJournalpostId(ORIGINAL_JPID_VEDLEGG).build()))
 				.build();
 
-		JAXBElement<Arkivmelding> arkivmeldingJAXBElement = avtaltmeldingMapper.createArkivMelding(journalpostQdist013, BESTILLINGS_ID);
+		JAXBElement<Arkivmelding> arkivmeldingJAXBElement = avtaltmeldingV1Mapper.createArkivMelding(journalpostQdist013, BESTILLINGS_ID);
 		Arkivmelding arkivmelding = arkivmeldingJAXBElement.getValue();
 		List<Mappe> mappeList = arkivmelding.getMappe();
 		Saksmappe saksmappe = (Saksmappe) mappeList.getFirst();
@@ -281,7 +281,7 @@ class AvtaltmeldingMapperTest {
 						createVedleggBuilder().originalJournalpostId(ORIGINAL_JPID_VEDLEGG).build()))
 				.build();
 
-		JAXBElement<Arkivmelding> arkivmeldingJAXBElement = avtaltmeldingMapper.createArkivMelding(journalpostQdist013, BESTILLINGS_ID);
+		JAXBElement<Arkivmelding> arkivmeldingJAXBElement = avtaltmeldingV1Mapper.createArkivMelding(journalpostQdist013, BESTILLINGS_ID);
 		Arkivmelding arkivmelding = arkivmeldingJAXBElement.getValue();
 		List<Mappe> mappeList = arkivmelding.getMappe();
 		Saksmappe saksmappe = (Saksmappe) mappeList.getFirst();
@@ -305,7 +305,7 @@ class AvtaltmeldingMapperTest {
 						createVedleggBuilder().originalJournalpostId(ORIGINAL_JPID_VEDLEGG).build()))
 				.build();
 
-		JAXBElement<Arkivmelding> arkivmeldingJAXBElement = avtaltmeldingMapper.createArkivMelding(journalpostQdist013, BESTILLINGS_ID);
+		JAXBElement<Arkivmelding> arkivmeldingJAXBElement = avtaltmeldingV1Mapper.createArkivMelding(journalpostQdist013, BESTILLINGS_ID);
 		Arkivmelding arkivmelding = arkivmeldingJAXBElement.getValue();
 		List<Mappe> mappeList = arkivmelding.getMappe();
 		Saksmappe saksmappe = (Saksmappe) mappeList.getFirst();
@@ -337,7 +337,7 @@ class AvtaltmeldingMapperTest {
 						createVedleggBuilder().originalJournalpostId(ORIGINAL_JPID_VEDLEGG).build()))
 				.build();
 
-		JAXBElement<Arkivmelding> arkivmeldingJAXBElement = avtaltmeldingMapper.createArkivMelding(journalpostQdist013, BESTILLINGS_ID);
+		JAXBElement<Arkivmelding> arkivmeldingJAXBElement = avtaltmeldingV1Mapper.createArkivMelding(journalpostQdist013, BESTILLINGS_ID);
 		Arkivmelding arkivmelding = arkivmeldingJAXBElement.getValue();
 		List<Mappe> mappeList = arkivmelding.getMappe();
 		Saksmappe saksmappe = (Saksmappe) mappeList.getFirst();
@@ -377,7 +377,7 @@ class AvtaltmeldingMapperTest {
 						.build()))
 				.build();
 
-		JAXBElement<Arkivmelding> arkivmeldingJAXBElement = avtaltmeldingMapper.createArkivMelding(journalpostQdist013, BESTILLINGS_ID);
+		JAXBElement<Arkivmelding> arkivmeldingJAXBElement = avtaltmeldingV1Mapper.createArkivMelding(journalpostQdist013, BESTILLINGS_ID);
 		Arkivmelding arkivmelding = arkivmeldingJAXBElement.getValue();
 		List<Mappe> mappeList = arkivmelding.getMappe();
 		Saksmappe saksmappe = (Saksmappe) mappeList.getFirst();
@@ -410,7 +410,7 @@ class AvtaltmeldingMapperTest {
 						.build()))
 				.build();
 
-		JAXBElement<Arkivmelding> arkivmeldingJAXBElement = avtaltmeldingMapper.createArkivMelding(journalpostQdist013, BESTILLINGS_ID);
+		JAXBElement<Arkivmelding> arkivmeldingJAXBElement = avtaltmeldingV1Mapper.createArkivMelding(journalpostQdist013, BESTILLINGS_ID);
 		Arkivmelding arkivmelding = arkivmeldingJAXBElement.getValue();
 		List<Mappe> mappeList = arkivmelding.getMappe();
 		Saksmappe saksmappe = (Saksmappe) mappeList.getFirst();
@@ -443,7 +443,7 @@ class AvtaltmeldingMapperTest {
 						.build()))
 				.build();
 
-		JAXBElement<Arkivmelding> arkivmeldingJAXBElement = avtaltmeldingMapper.createArkivMelding(journalpostQdist013, BESTILLINGS_ID);
+		JAXBElement<Arkivmelding> arkivmeldingJAXBElement = avtaltmeldingV1Mapper.createArkivMelding(journalpostQdist013, BESTILLINGS_ID);
 		Arkivmelding arkivmelding = arkivmeldingJAXBElement.getValue();
 		List<Mappe> mappeList = arkivmelding.getMappe();
 		Saksmappe saksmappe = (Saksmappe) mappeList.getFirst();
@@ -467,7 +467,7 @@ class AvtaltmeldingMapperTest {
 						createVedleggBuilder().dokumentstatus(null).build()))
 				.build();
 
-		JAXBElement<Arkivmelding> arkivmeldingJAXBElement = avtaltmeldingMapper.createArkivMelding(journalpostQdist013, BESTILLINGS_ID);
+		JAXBElement<Arkivmelding> arkivmeldingJAXBElement = avtaltmeldingV1Mapper.createArkivMelding(journalpostQdist013, BESTILLINGS_ID);
 		Arkivmelding arkivmelding = arkivmeldingJAXBElement.getValue();
 		List<Mappe> mappeList = arkivmelding.getMappe();
 		Saksmappe saksmappe = (Saksmappe) mappeList.getFirst();
@@ -491,7 +491,7 @@ class AvtaltmeldingMapperTest {
 						createVedleggBuilder().build()))
 				.build();
 
-		JAXBElement<Arkivmelding> arkivmeldingJAXBElement = avtaltmeldingMapper.createArkivMelding(journalpostQdist013, BESTILLINGS_ID);
+		JAXBElement<Arkivmelding> arkivmeldingJAXBElement = avtaltmeldingV1Mapper.createArkivMelding(journalpostQdist013, BESTILLINGS_ID);
 		Arkivmelding arkivmelding = arkivmeldingJAXBElement.getValue();
 		List<Mappe> mappeList = arkivmelding.getMappe();
 		Saksmappe saksmappe = (Saksmappe) mappeList.getFirst();
@@ -512,7 +512,7 @@ class AvtaltmeldingMapperTest {
 						createVedleggBuilder().originalJournalpostId(ORIGINAL_JPID_VEDLEGG).build()))
 				.build();
 
-		JAXBElement<Arkivmelding> arkivmeldingJAXBElement = avtaltmeldingMapper.createArkivMelding(journalpostQdist013, BESTILLINGS_ID);
+		JAXBElement<Arkivmelding> arkivmeldingJAXBElement = avtaltmeldingV1Mapper.createArkivMelding(journalpostQdist013, BESTILLINGS_ID);
 		Arkivmelding arkivmelding = arkivmeldingJAXBElement.getValue();
 		List<Mappe> mappeList = arkivmelding.getMappe();
 		Saksmappe saksmappe = (Saksmappe) mappeList.getFirst();
@@ -547,7 +547,7 @@ class AvtaltmeldingMapperTest {
 		JournalpostQdist013.Sak sakUtenOpprettetDato = JournalpostQdist013.Sak.builder()
 				.arkivsaksnummer(ARKIV_SAKNUMMER)
 				.build();
-		JAXBElement<Arkivmelding> arkivmeldingJAXBElement = avtaltmeldingMapper.createArkivMelding(createJournalpostQdist013Builder()
+		JAXBElement<Arkivmelding> arkivmeldingJAXBElement = avtaltmeldingV1Mapper.createArkivMelding(createJournalpostQdist013Builder()
 				.sak(sakUtenOpprettetDato)
 				.dokumenter(Arrays.asList(createHoveddokumentBuilder().build(),
 						createVedleggBuilder().originalJournalpostId(DOKUMENT_INFO_ID_VEDLEGG).build(),
