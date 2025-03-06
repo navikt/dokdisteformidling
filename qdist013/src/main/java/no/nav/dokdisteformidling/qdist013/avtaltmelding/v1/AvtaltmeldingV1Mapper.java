@@ -1,4 +1,4 @@
-package no.nav.dokdisteformidling.qdist013;
+package no.nav.dokdisteformidling.qdist013.avtaltmelding.v1;
 
 import jakarta.xml.bind.JAXBElement;
 import no.arkivverket.standarder.noark5.arkivmelding.Arkivmelding;
@@ -17,6 +17,7 @@ import no.nav.dokdisteformidling.consumer.saf.SafJournalpostQueryService;
 import no.nav.dokdisteformidling.qdist013.saf.lightweight.LightweightSafJournalpostQdist013;
 import no.nav.dokdisteformidling.qdist013.saf.main.JournalpostQdist013;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 import javax.xml.datatype.DatatypeConstants;
@@ -54,8 +55,9 @@ import static no.nav.dokdisteformidling.utils.DateConverterUtil.getNow;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
+@Profile("avtaltmelding_v1")
 @Component
-public class AvtaltmeldingMapper {
+public class AvtaltmeldingV1Mapper {
 
     public static final String NAV_KLAGEINSTANS = "NAV Klageinstans";
     public static final String TRYGDERETTEN = "TRYGDERETTEN";
@@ -72,9 +74,9 @@ public class AvtaltmeldingMapper {
     private final EregConsumer eregConsumer;
     private final SafJournalpostQueryService<LightweightSafJournalpostQdist013> safJournalpostQueryService;
 
-    public AvtaltmeldingMapper(@Qualifier("LightweightSafJournalpostQueryServiceQdist013") SafJournalpostQueryService<LightweightSafJournalpostQdist013> safJournalpostQueryService,
-                               EregConsumer eregConsumer,
-                               PdlGraphQLConsumer pdlGraphQLConsumer) {
+    public AvtaltmeldingV1Mapper(@Qualifier("LightweightSafJournalpostQueryServiceQdist013") SafJournalpostQueryService<LightweightSafJournalpostQdist013> safJournalpostQueryService,
+                                 EregConsumer eregConsumer,
+                                 PdlGraphQLConsumer pdlGraphQLConsumer) {
         this.safJournalpostQueryService = safJournalpostQueryService;
         this.eregConsumer = eregConsumer;
         this.pdlGraphQLConsumer = pdlGraphQLConsumer;
@@ -278,7 +280,6 @@ public class AvtaltmeldingMapper {
     private String getReferanseDokumentFil(String journalpostId, JournalpostQdist013.DokumentInfo dokumentInfo) {
         return format("%s-%s-%s-%s", journalpostId, dokumentInfo.getDokumentInfoId(), getDokumentVariant(dokumentInfo), getFiltype(dokumentInfo));
     }
-
 
     private String getDokumentVariant(JournalpostQdist013.DokumentInfo dokumentInfo) {
         if (dokumentInfoContainsSladdetDokumentvariant(dokumentInfo)) {

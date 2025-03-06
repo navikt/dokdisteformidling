@@ -34,50 +34,50 @@
 				</dependencies>
 				<executions>
 					<execution>
-						<id>xsd-generate</id>
+						<id>generate-avtaltmelding-v1</id>
 						<phase>generate-sources</phase>
 						<goals>
 							<goal>generate</goal>
 						</goals>
+						<configuration>
+							<schemaDirectory>${basedir}/src/main/resources/v1</schemaDirectory>
+							<schemaIncludes>
+								<include>arkivmeldingNAV.xsd</include>
+							</schemaIncludes>
+							<bindingDirectory>${basedir}/src/main/resources/v1</bindingDirectory>
+							<bindingIncludes>
+								<include>bindings.xml</include>
+							</bindingIncludes>
+							<generateDirectory>${project.build.directory}/generated-sources</generateDirectory>
+							<strict>true</strict>
+							<extension>true</extension>
+							<verbose>true</verbose>
+							<removeOldOutput>true</removeOldOutput>
+							<args>
+								<arg>-XfluentAPI</arg>
+								<arg>-Xannotate</arg>
+								<arg>-Xsimplify</arg>
+							</args>
+							<plugins>
+								<plugin>
+									<groupId>org.patrodyne.jvnet</groupId>
+									<artifactId>hisrc-hyperjaxb-annox-plugin</artifactId>
+									<version>${hisrc-basicjaxb.version}</version>
+								</plugin>
+								<plugin>
+									<groupId>org.patrodyne.jvnet</groupId>
+									<artifactId>hisrc-basicjaxb-plugins</artifactId>
+									<version>${hisrc-basicjaxb.version}</version>
+								</plugin>
+								<plugin>
+									<groupId>org.patrodyne.jvnet</groupId>
+									<artifactId>hisrc-basicjaxb-tools</artifactId>
+									<version>${hisrc-basicjaxb.version}</version>
+								</plugin>
+							</plugins>
+						</configuration>
 					</execution>
 				</executions>
-				<configuration>
-					<schemaDirectory>${basedir}/src/main/resources</schemaDirectory>
-					<schemaIncludes>
-						<include>arkivmeldingNAV.xsd</include>
-					</schemaIncludes>
-					<bindingDirectory>${basedir}/src/main/resources</bindingDirectory>
-					<bindingIncludes>
-						<include>bindings.xml</include>
-					</bindingIncludes>
-					<generateDirectory>${project.build.directory}/generated-sources</generateDirectory>
-					<strict>true</strict>
-					<extension>true</extension>
-					<verbose>true</verbose>
-					<removeOldOutput>true</removeOldOutput>
-					<args>
-						<arg>-XfluentAPI</arg>
-						<arg>-Xannotate</arg>
-						<arg>-Xsimplify</arg>
-					</args>
-					<plugins>
-						<plugin>
-							<groupId>org.patrodyne.jvnet</groupId>
-							<artifactId>hisrc-hyperjaxb-annox-plugin</artifactId>
-							<version>${hisrc-basicjaxb.version}</version>
-						</plugin>
-						<plugin>
-							<groupId>org.patrodyne.jvnet</groupId>
-							<artifactId>hisrc-basicjaxb-plugins</artifactId>
-							<version>${hisrc-basicjaxb.version}</version>
-						</plugin>
-						<plugin>
-							<groupId>org.patrodyne.jvnet</groupId>
-							<artifactId>hisrc-basicjaxb-tools</artifactId>
-							<version>${hisrc-basicjaxb.version}</version>
-						</plugin>
-					</plugins>
-				</configuration>
 			</plugin>
 		</plugins>
 	</build>
