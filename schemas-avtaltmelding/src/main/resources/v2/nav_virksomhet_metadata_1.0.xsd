@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+		   xmlns="http://www.nav.no/avtaltmelding/trygderetten"
+		   targetNamespace="http://www.nav.no/avtaltmelding/trygderetten"
+		   elementFormDefault="qualified" version="1.0">
+	<xs:element name="navMappe" type="navMappe"/>
+	<xs:complexType name="navMappe">
+		<xs:sequence>
+			<xs:element name="saksnummer" type="xs:string"/>
+		</xs:sequence>
+	</xs:complexType>
+</xs:schema>

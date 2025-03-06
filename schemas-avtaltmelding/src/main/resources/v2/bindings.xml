@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<jaxb:bindings version="3.0" xmlns:xs="http://www.w3.org/2001/XMLSchema"
+			   xmlns:jaxb="https://jakarta.ee/xml/ns/jaxb"
+			   xmlns:annox="http://jvnet.org/basicjaxb/xjc/annox"
+			   jaxb:extensionBindingPrefixes="xjc annox simplify">
+
+
+	<jaxb:globalBindings generateMixedExtensions="false"/>
+
+	<jaxb:bindings schemaLocation="avtaltmelding_nav_trygderetten_2.0.xsd" node="/xs:schema">
+		<jaxb:bindings node="xs:complexType[@name='arkivmelding']">
+			<annox:annotateClass>@jakarta.xml.bind.annotation.XmlRootElement</annox:annotateClass>
+			<annox:annotatePackage>
+				@jakarta.xml.bind.annotation.XmlSchema(
+				xmlns = {
+				@jakarta.xml.bind.annotation.XmlNs(prefix = "", namespaceURI = "http://www.arkivverket.no/standarder/noark5/arkivmelding")
+				},
+				elementFormDefault = jakarta.xml.bind.annotation.XmlNsForm.QUALIFIED)
+			</annox:annotatePackage>
+		</jaxb:bindings>
+		<jaxb:bindings
+				node="xs:complexType[@name='mappe']/xs:sequence/xs:element[@name='virksomhetsspesifikkeMetadata']">
+			<annox:annotate target="field">@jakarta.xml.bind.annotation.XmlAnyElement(lax = true)</annox:annotate>
+		</jaxb:bindings>
+		<jaxb:schemaBindings>
+			<jaxb:package name="no.arkivverket.standarder.noark5.arkivmelding.v2"/>
+		</jaxb:schemaBindings>
+	</jaxb:bindings>
+	<jaxb:bindings schemaLocation="nav_virksomhet_metadata_1.0.xsd" node="/xs:schema">
+		<jaxb:bindings node="xs:complexType[@name='navMappe']">
+			<annox:annotateClass>@jakarta.xml.bind.annotation.XmlRootElement</annox:annotateClass>
+			<annox:annotatePackage>
+				@jakarta.xml.bind.annotation.XmlSchema(
+				xmlns = {
+				@jakarta.xml.bind.annotation.XmlNs(prefix = "nav", namespaceURI = "http://www.nav.no/avtaltmelding/trygderetten")
+				},
+				elementFormDefault = jakarta.xml.bind.annotation.XmlNsForm.QUALIFIED)
+			</annox:annotatePackage>
+		</jaxb:bindings>
+		<jaxb:schemaBindings>
+			<jaxb:package name="no.nav.avtaltmelding.trygderetten.v1"/>
+		</jaxb:schemaBindings>
+	</jaxb:bindings>
+	<jaxb:bindings schemaLocation="metadatakatalog.xsd" node="/xs:schema">
+		<jaxb:schemaBindings>
+			<jaxb:package name="no.arkivverket.standarder.noark5.arkivmelding.v2"/>
+		</jaxb:schemaBindings>
+	</jaxb:bindings>
+
+</jaxb:bindings>

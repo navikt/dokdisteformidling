@@ -48,7 +48,52 @@
 							<bindingIncludes>
 								<include>bindings.xml</include>
 							</bindingIncludes>
-							<generateDirectory>${project.build.directory}/generated-sources</generateDirectory>
+							<generateDirectory>${project.build.directory}/generated-sources/avtaltmelding-v1</generateDirectory>
+							<strict>true</strict>
+							<extension>true</extension>
+							<verbose>true</verbose>
+							<removeOldOutput>true</removeOldOutput>
+							<args>
+								<arg>-XfluentAPI</arg>
+								<arg>-Xannotate</arg>
+								<arg>-Xsimplify</arg>
+							</args>
+							<plugins>
+								<plugin>
+									<groupId>org.patrodyne.jvnet</groupId>
+									<artifactId>hisrc-hyperjaxb-annox-plugin</artifactId>
+									<version>${hisrc-basicjaxb.version}</version>
+								</plugin>
+								<plugin>
+									<groupId>org.patrodyne.jvnet</groupId>
+									<artifactId>hisrc-basicjaxb-plugins</artifactId>
+									<version>${hisrc-basicjaxb.version}</version>
+								</plugin>
+								<plugin>
+									<groupId>org.patrodyne.jvnet</groupId>
+									<artifactId>hisrc-basicjaxb-tools</artifactId>
+									<version>${hisrc-basicjaxb.version}</version>
+								</plugin>
+							</plugins>
+						</configuration>
+					</execution>
+					<execution>
+						<id>generate-avtaltmelding-v2</id>
+						<phase>generate-sources</phase>
+						<goals>
+							<goal>generate</goal>
+						</goals>
+						<configuration>
+							<schemaDirectory>${basedir}/src/main/resources/v2</schemaDirectory>
+							<schemaIncludes>
+								<include>avtaltmelding_nav_trygderetten_2.0.xsd</include>
+								<include>nav_virksomhet_metadata_1.0.xsd</include>
+							</schemaIncludes>
+							<bindingDirectory>${basedir}/src/main/resources/v2</bindingDirectory>
+							<bindingIncludes>
+								<include>bindings.xml</include>
+							</bindingIncludes>
+							<generateDirectory>${project.build.directory}/generated-sources/avtaltmelding-v2</generateDirectory>
 							<strict>true</strict>
 							<extension>true</extension>
 							<verbose>true</verbose>
