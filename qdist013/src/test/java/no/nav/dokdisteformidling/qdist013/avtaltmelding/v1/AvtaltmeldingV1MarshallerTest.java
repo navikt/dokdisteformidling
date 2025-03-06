@@ -1,4 +1,4 @@
-package no.nav.dokdisteformidling.qdist013;
+package no.nav.dokdisteformidling.qdist013.avtaltmelding.v1;
 
 import no.nav.dokdisteformidling.consumer.ereg.EregConsumer;
 import no.nav.dokdisteformidling.consumer.pdl.PdlGraphQLConsumer;
@@ -10,29 +10,29 @@ import java.util.Map;
 import java.util.Set;
 
 import static jakarta.xml.bind.Marshaller.JAXB_FORMATTED_OUTPUT;
-import static no.nav.dokdisteformidling.qdist013.AvtaltmeldingMapperTest.BESTILLINGS_ID;
-import static no.nav.dokdisteformidling.qdist013.AvtaltmeldingMapperTest.TEMA;
-import static no.nav.dokdisteformidling.qdist013.AvtaltmeldingMapperTest.creatHentPersonInfo;
 import static no.nav.dokdisteformidling.qdist013.TestUtil.classpathToString;
+import static no.nav.dokdisteformidling.qdist013.avtaltmelding.v1.AvtaltmeldingV1MapperTest.BESTILLINGS_ID;
+import static no.nav.dokdisteformidling.qdist013.avtaltmelding.v1.AvtaltmeldingV1MapperTest.TEMA;
+import static no.nav.dokdisteformidling.qdist013.avtaltmelding.v1.AvtaltmeldingV1MapperTest.creatHentPersonInfo;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.xmlunit.assertj.XmlAssert.assertThat;
 
-public class AvtaltmeldingMarshallerTest {
+public class AvtaltmeldingV1MarshallerTest {
 
 	private static final Set<String> IGNORE_LOCALNAMES = Set.of("tidspunkt", "tilknyttetDato");
 
-	private final AvtaltmeldingMarshaller avtaltmeldingMarshaller = new AvtaltmeldingMarshaller(Map.of(JAXB_FORMATTED_OUTPUT, true));
+	private final AvtaltmeldingV1Marshaller avtaltmeldingV1Marshaller = new AvtaltmeldingV1Marshaller(Map.of(JAXB_FORMATTED_OUTPUT, true));
 	private final EregConsumer eregMock = mock(EregConsumer.class);
 	private final SafJournalpostQueryService<LightweightSafJournalpostQdist013> safJournalpostQueryServiceMock = mock(SafJournalpostQueryService.class);
 	private final PdlGraphQLConsumer pdlGraphQLConsumer = mock(PdlGraphQLConsumer.class);
-	private final AvtaltmeldingMapper avtaltmeldingMapper = new AvtaltmeldingMapper(safJournalpostQueryServiceMock, eregMock, pdlGraphQLConsumer);
+	private final AvtaltmeldingV1Mapper avtaltmeldingV1Mapper = new AvtaltmeldingV1Mapper(safJournalpostQueryServiceMock, eregMock, pdlGraphQLConsumer);
 
 	@Test
 	void shouldAssertAvtaltmelding() {
 		when(pdlGraphQLConsumer.hentPerson(anyString())).thenReturn(creatHentPersonInfo());
-		String avtaltmeldingXmlString = avtaltmeldingMarshaller.marshal(avtaltmeldingMapper.createArkivMelding(AvtaltmeldingMapperTest.createJournalpostQdist013Builder()
+		String avtaltmeldingXmlString = avtaltmeldingV1Marshaller.marshal(avtaltmeldingV1Mapper.createArkivMelding(AvtaltmeldingV1MapperTest.createJournalpostQdist013Builder()
 				.tema(TEMA)
 				.build(), BESTILLINGS_ID));
 

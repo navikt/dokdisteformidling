@@ -1,10 +1,6 @@
 package no.nav.dokdisteformidling.qdist013;
 
-import jakarta.xml.bind.JAXBElement;
 import lombok.extern.slf4j.Slf4j;
-import no.arkivverket.standarder.noark5.arkivmelding.Arkivmelding;
-import no.arkivverket.standarder.noark5.arkivmelding.Dokumentbeskrivelse;
-import no.arkivverket.standarder.noark5.arkivmelding.Journalpost;
 import no.nav.dokdisteformidling.consumer.eformidling.Eformidling;
 import no.nav.dokdisteformidling.consumer.eformidling.NavDokumentpakke;
 import no.nav.dokdisteformidling.consumer.juridisklogg.JuridiskLogg;
@@ -12,9 +8,10 @@ import no.nav.dokdisteformidling.consumer.juridisklogg.LagreJuridiskLoggMapper;
 import no.nav.dokdisteformidling.consumer.rdist001.AdministrerForsendelse;
 import no.nav.dokdisteformidling.consumer.rdist001.HentForsendelseResponse;
 import no.nav.dokdisteformidling.consumer.saf.SafJournalpostQueryService;
-import no.nav.dokdisteformidling.exception.functional.IkkeSammenfallendeIderFunctionalException;
 import no.nav.dokdisteformidling.exception.functional.InvalidForsendelseStatusFunctionalException;
 import no.nav.dokdisteformidling.exception.functional.KunneIkkeDeserialisereBucketJsonPayloadFunctionalException;
+import no.nav.dokdisteformidling.qdist013.avtaltmelding.Avtaltmelding;
+import no.nav.dokdisteformidling.qdist013.avtaltmelding.AvtaltmeldingService;
 import no.nav.dokdisteformidling.qdist013.saf.main.JournalpostQdist013;
 import no.nav.dokdisteformidling.storage.BucketStorage;
 import no.nav.dokdisteformidling.storage.DokdistDokument;
@@ -25,7 +22,6 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import java.io.ByteArrayInputStream;
-import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -48,8 +44,7 @@ public class Qdist013Service {
 	private final SafJournalpostQueryService<JournalpostQdist013> safJournalpostQueryService;
 	private final JuridiskLogg juridiskLogg;
 	private final LagreJuridiskLoggMapper lagreJuridiskLoggMapper;
-	private final AvtaltmeldingMapper avtaltmeldingMapper;
-	private final AvtaltmeldingMarshaller avtaltmeldingMarshaller;
+	private final AvtaltmeldingService avtaltmeldingService;
 	private final Eformidling eformidling;
 
 	public Qdist013Service(BucketStorage bucketStorage,
@@ -57,16 +52,14 @@ public class Qdist013Service {
 						   @Qualifier("SafJournalpostQueryServiceQdist013") SafJournalpostQueryService<JournalpostQdist013> safJournalpostQueryService,
 						   JuridiskLogg juridiskLogg,
 						   LagreJuridiskLoggMapper lagreJuridiskLoggMapper,
-						   AvtaltmeldingMapper avtaltmeldingMapper,
-						   AvtaltmeldingMarshaller avtaltmeldingMarshaller,
+						   AvtaltmeldingService avtaltmeldingService,
 						   Eformidling eformidling) {
 		this.bucketStorage = bucketStorage;
 		this.administrerForsendelse = administrerForsendelse;
 		this.safJournalpostQueryService = safJournalpostQueryService;
 		this.juridiskLogg = juridiskLogg;
 		this.lagreJuridiskLoggMapper = lagreJuridiskLoggMapper;
-		this.avtaltmeldingMapper = avtaltmeldingMapper;
-		this.avtaltmeldingMarshaller = avtaltmeldingMarshaller;
+		this.avtaltmeldingService = avtaltmeldingService;
 		this.eformidling = eformidling;
 	}
 
@@ -90,8 +83,8 @@ public class Qdist013Service {
 		exchange.setProperty(PROPERTY_ANTALL_DOK, dokdistDokumentList.size());
 		final JournalpostQdist013 journalpostQdist013 = safJournalpostQueryService.hentJournalpost(hentForsendelseResponse.getArkivInformasjon()
 				.getArkivId());
-		final JAXBElement<Arkivmelding> arkivmeldingJAXBElement = avtaltmeldingMapper.createArkivMelding(journalpostQdist013, bestillingsId);
-		final String arkivmeldingXmlString = avtaltmeldingMarshaller.marshal(arkivmeldingJAXBElement);
+		final Avtaltmelding avtaltmelding = avtaltmeldingService.map(journalpostQdist013, bestillingsId);
+		final byte[] avtaltmeldingBytes = avtaltmelding.asBytes();
 
 		log.info("Sender eformidling forsendelse direkte til Altinn formidlingstjenesten. forsendelseId={}, konversasjonsId={}, bestillingsId={}",
 				forsendelseId, conversationId, bestillingsId);
@@ -100,14 +93,14 @@ public class Qdist013Service {
 				.conversationId(conversationId)
 				.bestillingsId(bestillingsId)
 				.messageChannelInstanceIdentifier(UUID.randomUUID())
-				.arkivmelding(fromAvtaltmelding(new ByteArrayInputStream(arkivmeldingXmlString.getBytes(StandardCharsets.UTF_8))))
+				.arkivmelding(fromAvtaltmelding(new ByteArrayInputStream(avtaltmeldingBytes)))
 				.navDokumenter(dokdistDokumentList.stream()
-						.map(d -> fromVedlegg(getDocumentFilename(arkivmeldingJAXBElement.getValue(), journalpostQdist013.getJournalpostId(), d.getDokumentInfoId()),
+						.map(d -> fromVedlegg(avtaltmelding.lookupFilnavn(d.getDokumentInfoId()),
 								new ByteArrayInputStream(d.getPdf())))
 						.collect(Collectors.toList()))
-				.build(), arkivmeldingXmlString);
+				.build(), avtaltmelding.asXmlString());
 
-		juridiskLogg.lagreJuridiskLogg(lagreJuridiskLoggMapper.map(hentForsendelseResponse, arkivmeldingXmlString.getBytes()));
+		juridiskLogg.lagreJuridiskLogg(lagreJuridiskLoggMapper.map(hentForsendelseResponse, avtaltmeldingBytes));
 	}
 
 	private List<DokdistDokument> getDocumentsFromBucket(HentForsendelseResponse hentForsendelseResponse) {
@@ -119,20 +112,6 @@ public class Qdist013Service {
 					return dokdistDokument;
 				})
 				.collect(Collectors.toList());
-	}
-
-	private String getDocumentFilename(Arkivmelding arkivmelding, String journalpostId, String dokumentInfoId) {
-		Dokumentbeskrivelse dokumentbeskrivelse = getDokumentbeskrivelseByJpIdAndDokInfoId(arkivmelding, journalpostId, dokumentInfoId);
-		return dokumentbeskrivelse.getDokumentobjekt().getFirst().getReferanseDokumentfil();
-	}
-
-	private Dokumentbeskrivelse getDokumentbeskrivelseByJpIdAndDokInfoId(Arkivmelding arkivmelding, String journalpostId, String dokumentInfoId) {
-		Journalpost journalpost = (Journalpost) arkivmelding.getMappe().getFirst().getRegistrering().getFirst();
-		return journalpost.getDokumentbeskrivelse().stream()
-				.filter(dokumentbeskrivelse -> dokumentbeskrivelse.getDokumentobjekt()
-						.getFirst().getReferanseDokumentfil().startsWith(format("%s-%s", journalpostId, dokumentInfoId)))
-				.findAny()
-				.orElseThrow(() -> new IkkeSammenfallendeIderFunctionalException(format("DokumentInfoId=%s finnes på foresendelsen i dokdistDb, men ikke i respons fra SAF på journalpostId=%s.", dokumentInfoId, journalpostId)));
 	}
 
 	private static void validateThatForsendelseStatusIsKlarForDist(String forsendelseStatus) {
