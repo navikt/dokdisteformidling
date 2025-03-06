@@ -15,7 +15,7 @@ public class Avtaltmelding {
 
 	public Avtaltmelding(String journalpostId, String melding, Map<String, String> filnavnRegistry) {
 		if (isBlank(journalpostId) || isBlank(melding) || filnavnRegistry == null || filnavnRegistry.isEmpty()) {
-			throw new IllegalArgumentException("journalpostId, melding, filnavnRegistry must not be null or empty");
+			throw new IllegalArgumentException("journalpostId, melding, filnavnRegistry kan ikke være null eller tom");
 		}
 		this.journalpostId = journalpostId;
 		this.melding = melding;
