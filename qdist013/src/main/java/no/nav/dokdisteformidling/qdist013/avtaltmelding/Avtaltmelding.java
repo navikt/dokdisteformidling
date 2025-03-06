@@ -6,6 +6,7 @@ import java.util.Map;
 
 import static java.lang.String.format;
 import static java.nio.charset.StandardCharsets.UTF_8;
+import static org.apache.commons.lang3.StringUtils.isBlank;
 
 public class Avtaltmelding {
 	private final String journalpostId;
@@ -13,6 +14,9 @@ public class Avtaltmelding {
 	private final Map<String, String> filnavnRegistry;
 
 	public Avtaltmelding(String journalpostId, String melding, Map<String, String> filnavnRegistry) {
+		if (isBlank(journalpostId) || isBlank(melding) || filnavnRegistry == null || filnavnRegistry.isEmpty()) {
+			throw new IllegalArgumentException("journalpostId, melding, filnavnRegistry must not be null or empty");
+		}
 		this.journalpostId = journalpostId;
 		this.melding = melding;
 		this.filnavnRegistry = filnavnRegistry;
