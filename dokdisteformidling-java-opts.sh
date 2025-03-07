@@ -5,6 +5,5 @@ JAVA_OPTS="${JAVA_OPTS} -Djavax.net.ssl.keyStorePassword=${NAV_TRUSTSTORE_PASSWO
 JAVA_OPTS="${JAVA_OPTS} -Djavax.net.ssl.keyStoreType=jks"
 JAVA_OPTS="${JAVA_OPTS} -XX:MaxRAMPercentage=75"
 JAVA_OPTS="${JAVA_OPTS} -Djava.security.egd=file:/dev/./urandom"
-JAVA_OPTS="${JAVA_OPTS} -Dspring.profiles.active=nais,avtaltmelding_v1"
 
 export JAVA_OPTS
