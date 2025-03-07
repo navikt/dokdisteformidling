@@ -28,7 +28,7 @@
 		<java.version>21</java.version>
 
 		<camel.version>4.10.0</camel.version>
-		<cxf.version>4.1.0</cxf.version>
+		<cxf.version>4.1.1</cxf.version>
 		<logstash-logback-encoder.version>8.0</logstash-logback-encoder.version>
 		<resilience4j.version>2.3.0</resilience4j.version>
 		<libraries-bom.version>26.55.0</libraries-bom.version>
