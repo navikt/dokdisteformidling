@@ -24,6 +24,5 @@ Avtaltmelding mellom Trygderetten og Nav
 
 * La til `xs:schema` `version` attributt
 * La til `nav_virksomhet_metadata_1.0.xsd` som vedlegg. Inneholder typen `navMappe` for å sende over Nav arkivsaksnummer (`saksnummer`) til Trygderetten
-* Endret `format` element til valgfritt. Denne blir aldri satt
 * Fjernet `DNummerType` typen da denne aldri ble brukt
 * Fjernet `DNummer` element fra `part` og `korrespondansepart` da dette aldri ble brukt

@@ -30,6 +30,7 @@ import java.time.ZoneId;
 import java.util.Arrays;
 import java.util.List;
 
+import static java.lang.String.format;
 import static java.util.Collections.singletonList;
 import static no.nav.dokdisteformidling.constants.DomainConstants.APP_NAME;
 import static no.nav.dokdisteformidling.constants.DomainConstants.VARIANTFORMAT_ARKIV;
@@ -40,6 +41,7 @@ import static no.nav.dokdisteformidling.qdist013.TestUtil.convertFromXmlGregoria
 import static no.nav.dokdisteformidling.qdist013.avtaltmelding.v2.AvtaltmeldingV2Mapper.FERDIGSTILT;
 import static no.nav.dokdisteformidling.qdist013.avtaltmelding.v2.AvtaltmeldingV2Mapper.INNGAAENDE;
 import static no.nav.dokdisteformidling.qdist013.avtaltmelding.v2.AvtaltmeldingV2Mapper.NAV_KLAGEINSTANS;
+import static no.nav.dokdisteformidling.qdist013.avtaltmelding.v2.AvtaltmeldingV2Mapper.REFERANSE_DOKUMENTFIL_FORMAT;
 import static no.nav.dokdisteformidling.qdist013.avtaltmelding.v2.AvtaltmeldingV2Mapper.SAKSPART_ROLLE_AMP;
 import static no.nav.dokdisteformidling.qdist013.avtaltmelding.v2.AvtaltmeldingV2Mapper.SAKSPART_ROLLE_DAP;
 import static no.nav.dokdisteformidling.qdist013.avtaltmelding.v2.AvtaltmeldingV2Mapper.TRYGDERETTEN;
@@ -110,7 +112,7 @@ class AvtaltmeldingV2MapperTest {
 	static final String FILTYPE_PNG = "PNG";
 	static final String FILTYPE_JPEG = "JPEG";
 	static final String FILTYPE_PDF = "PDF";
-	static final String FILTYPE_PDFA = "PDF/A";
+	static final String FILTYPE_XLSX = "XLSX";
 
 	private EregConsumer eregMock;
 	private SafJournalpostQueryService<LightweightSafJournalpostQdist013> safJournalpostQueryServiceMock;
@@ -362,7 +364,7 @@ class AvtaltmeldingV2MapperTest {
 
 	@Test
 	@DisplayName("Case when dokument does not have variantformat SLADDET (variantformat is ARKIV) and filtype is not PNG or JPEG. Should set variantformat to Produksjonsformat")
-	void happyPathTestNoSladdetVariantAndFiltypeNotPngOrJPEG() {
+	void happyPathTestNoSladdetVariantAndFiltypeNotPNGOrJPEG() {
 		when(safJournalpostQueryServiceMock.hentJournalpost(ORIGINAL_JPID_VEDLEGG)).thenReturn(createLightweightSafJournalpostQdist013());
 		when(pdlGraphQLConsumer.hentPerson(anyString())).thenReturn(creatHentPersonInfo());
 		JournalpostQdist013 journalpostQdist013 = createJournalpostQdist013Builder()
@@ -370,7 +372,7 @@ class AvtaltmeldingV2MapperTest {
 				.dokumenter(singletonList(createHoveddokumentBuilder()
 						.dokumentvarianter(Arrays.asList(JournalpostQdist013.DokumentInfo.Dokumentvariant.builder()
 										.variantformat(VARIANTFORMAT_ARKIV)
-										.filtype(FILTYPE_PDFA)
+										.filtype(FILTYPE_XLSX)
 										.build(),
 								JournalpostQdist013.DokumentInfo.Dokumentvariant.builder()
 										.variantformat(VARIANTFORMAT_PRODUKSJON)
@@ -670,9 +672,10 @@ class AvtaltmeldingV2MapperTest {
 		Dokumentobjekt dokumentobjektHoveddok = dokumentobjektList.getFirst();
 		assertEquals(BigInteger.ONE, dokumentobjektHoveddok.getVersjonsnummer());
 		assertEquals(DOKUMENT_HVOR_DELER_AV_INNHOLDET_ER_SKJERMET, dokumentobjektHoveddok.getVariantformat());
-		assertEquals(convertFromXmlGregorianCalendarToLocalDateTime(dokumentobjektHoveddok.getOpprettetDato()).toString(), DATO_JOURNALFOERT.toString());
+		assertEquals(AvtaltFilformat.PDF.getFormat(), dokumentobjektHoveddok.getFormat());
+		assertEquals(DATO_JOURNALFOERT.toString(), convertFromXmlGregorianCalendarToLocalDateTime(dokumentobjektHoveddok.getOpprettetDato()).toString());
 		assertEquals(JOURNALFOERT_AV_NAVN, dokumentobjektHoveddok.getOpprettetAv());
-		assertEquals(dokumentobjektHoveddok.getReferanseDokumentfil(), JOURNALPOST_ID + "-" + DOKUMENT_INFO_ID_HOVEDDOK + "-" + DOKUMENT_HVOR_DELER_AV_INNHOLDET_ER_SKJERMET + "-" + FILTYPE_PDF);
+		assertEquals(format(REFERANSE_DOKUMENTFIL_FORMAT, JOURNALPOST_ID, DOKUMENT_INFO_ID_HOVEDDOK, DOKUMENT_HVOR_DELER_AV_INNHOLDET_ER_SKJERMET, AvtaltFilformat.PDF.getFilendelse()), dokumentobjektHoveddok.getReferanseDokumentfil());
 	}
 
 	private void assertDokumentobjektVedlegg(List<Dokumentobjekt> dokumentobjektList) {
@@ -680,9 +683,10 @@ class AvtaltmeldingV2MapperTest {
 		Dokumentobjekt dokumentobjektVedlegg = dokumentobjektList.getFirst();
 		assertEquals(BigInteger.ONE, dokumentobjektVedlegg.getVersjonsnummer());
 		assertEquals(ARKIVFORMAT, dokumentobjektVedlegg.getVariantformat());
-		assertEquals(convertFromXmlGregorianCalendarToLocalDateTime(dokumentobjektVedlegg.getOpprettetDato()).toString(), DATO_JOURNALFOERT.toString());
+		assertEquals(AvtaltFilformat.JPEG.getFormat(), dokumentobjektVedlegg.getFormat());
+		assertEquals(DATO_JOURNALFOERT.toString(), convertFromXmlGregorianCalendarToLocalDateTime(dokumentobjektVedlegg.getOpprettetDato()).toString());
 		assertEquals(JOURNALFOERT_AV_NAVN, dokumentobjektVedlegg.getOpprettetAv());
-		assertEquals(dokumentobjektVedlegg.getReferanseDokumentfil(), JOURNALPOST_ID + "-" + DOKUMENT_INFO_ID_VEDLEGG + "-" + ARKIVFORMAT + "-" + FILTYPE_JPEG);
+		assertEquals(format(REFERANSE_DOKUMENTFIL_FORMAT, JOURNALPOST_ID, DOKUMENT_INFO_ID_VEDLEGG, ARKIVFORMAT, AvtaltFilformat.JPEG.getFilendelse()), dokumentobjektVedlegg.getReferanseDokumentfil());
 	}
 
 	private void assertCommonAttributesVedleggDokumentbeskrivelseOpprettetAv(Dokumentbeskrivelse dokumentbeskrivelse) {
