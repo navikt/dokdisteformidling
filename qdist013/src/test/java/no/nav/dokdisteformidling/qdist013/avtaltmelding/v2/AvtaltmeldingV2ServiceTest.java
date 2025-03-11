@@ -41,8 +41,8 @@ class AvtaltmeldingV2ServiceTest {
 		assertThat(avtaltmelding.asXmlString()).isNotEmpty();
 		assertThat(avtaltmelding.asBytes()).isNotEmpty();
 		assertThat(avtaltmelding.lookupFilnavn(DOKUMENT_INFO_ID_HOVEDDOK))
-				.isEqualTo("987654321-1234567-Dokument hvor deler av innholdet er skjermet-PDF");
+				.isEqualTo("987654321-1234567-Dokument hvor deler av innholdet er skjermet.pdf");
 		assertThat(avtaltmelding.lookupFilnavn(DOKUMENT_INFO_ID_VEDLEGG))
-				.isEqualTo("987654321-7654321-Arkivformat-JPEG");
+				.isEqualTo("987654321-7654321-Arkivformat.jpeg");
 	}
 }

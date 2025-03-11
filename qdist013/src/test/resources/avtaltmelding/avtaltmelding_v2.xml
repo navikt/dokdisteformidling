@@ -44,9 +44,10 @@
 				<dokumentobjekt>
 					<versjonsnummer>1</versjonsnummer>
 					<variantformat>Dokument hvor deler av innholdet er skjermet</variantformat>
+					<format>pdf</format>
 					<opprettetDato>2025-03-13T13:15:30.01</opprettetDato>
 					<opprettetAv>Sak Sakbehandlersen</opprettetAv>
-					<referanseDokumentfil>987654321-1234567-Dokument hvor deler av innholdet er skjermet-PDF</referanseDokumentfil>
+					<referanseDokumentfil>987654321-1234567-Dokument hvor deler av innholdet er skjermet.pdf</referanseDokumentfil>
 				</dokumentobjekt>
 			</dokumentbeskrivelse>
 			<dokumentbeskrivelse>
@@ -62,9 +63,10 @@
 				<dokumentobjekt>
 					<versjonsnummer>1</versjonsnummer>
 					<variantformat>Arkivformat</variantformat>
+					<format>jpeg</format>
 					<opprettetDato>2025-03-13T13:15:30.01</opprettetDato>
 					<opprettetAv>Sak Sakbehandlersen</opprettetAv>
-					<referanseDokumentfil>987654321-7654321-Arkivformat-JPEG</referanseDokumentfil>
+					<referanseDokumentfil>987654321-7654321-Arkivformat.jpeg</referanseDokumentfil>
 				</dokumentobjekt>
 			</dokumentbeskrivelse>
 			<tittel>Klage på saksbehandling</tittel>

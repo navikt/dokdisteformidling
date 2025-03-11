@@ -65,6 +65,12 @@ public class JournalpostQdist013 implements Journalpost {
 		@Value
 		@Builder
 		public static class Dokumentvariant {
+			public static final String FILTYPE_PNG = "PNG";
+			public static final String FILTYPE_JPEG = "JPEG";
+			public static final String FILTYPE_PDF = "PDF";
+			public static final String FILTYPE_TIFF = "TIFF";
+			public static final String FILTYPE_XLSX = "XLSX";
+
 			String variantformat;
 			String filtype;
 		}
