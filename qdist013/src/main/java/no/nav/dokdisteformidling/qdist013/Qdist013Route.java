@@ -1,5 +1,7 @@
 package no.nav.dokdisteformidling.qdist013;
 
+import jakarta.jms.Queue;
+import jakarta.xml.bind.JAXBContext;
 import no.nav.dokdisteformidling.common.DokdistAdministrerForsendelseUpdater;
 import no.nav.dokdisteformidling.common.IdsProcessor;
 import no.nav.dokdisteformidling.exception.functional.AbstractDokdisteformidlingFunctionalException;
@@ -10,9 +12,6 @@ import org.apache.camel.ValidationException;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.converter.jaxb.JaxbDataFormat;
 import org.springframework.stereotype.Component;
-
-import jakarta.jms.Queue;
-import jakarta.xml.bind.JAXBContext;
 
 import static no.nav.dokdisteformidling.constants.RouteConstants.PROPERTY_BESTILLINGS_ID;
 import static no.nav.dokdisteformidling.constants.RouteConstants.PROPERTY_CONVERSATION_ID;
@@ -66,7 +65,7 @@ public class Qdist013Route extends RouteBuilder {
 				.unmarshal(new JaxbDataFormat(JAXBContext.newInstance(DistribuerTilKanal.class)))
 				.bean(distribuerForsendelseTilTrygderettenMapper)
 				.bean(qdist013Service)
-				.log(LoggingLevel.INFO, log, "qdist013 har videresendt forsendelse med " + getIdsForLogging() + " til DIFI for distribusjon via TRYGDERETTEN. " +
+				.log(LoggingLevel.INFO, log, "qdist013 har sendt forsendelse med " + getIdsForLogging() + " til Trygderetten gjennom eFormidling. " +
 						"Forsendelsen inneholder ${exchangeProperty.antallDok} dokumenter og avtaltmelding.")
 				.bean(dokdistAdministrerforsendelseUpdater, "updateStatusAndConversationId")
 				.log(LoggingLevel.INFO, log, "qdist013 har oppdatert dokdistDb med konversasjonsId=${exchangeProperty.conversationId} og forsendelseStatus=OVERSENDT og avslutter behandling av forsendelse med " + getIdsForLogging())
