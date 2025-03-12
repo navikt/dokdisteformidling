@@ -55,17 +55,20 @@ public class Sdist001Service {
 
 		var endringer = new ForsendelseStatusEndringer();
 		List<Forsendelse> forsendelserTo = administrerForsendelse.hentEformidlingForsendelser().getForsendelser();
-		log.info("Hentet eformidlingforsendelser fra rdist001 {} ", forsendelserTo);
+		log.info("sdist001 hentet eformidlingforsendelser fra rdist001 {} ", forsendelserTo);
 
-		eformidling.hent()
-				.forEach(downloadResponse -> {
-					log.info("Hentet trygderetten kvittering melding fra Altinn med konversasjonId={}, SendersReference={}, KvitteringStatus={}",
-							downloadResponse.getConversationId(), downloadResponse.getSendersReference(), downloadResponse.getKvitteringStatus());
-					forsendelserTo
-							.forEach(behandleForsendelse(downloadResponse, endringer));
-				});
-
-		log.info("sdist001 har oppdatert status for eFormidlingforsendelser: {}", endringer);
+		if(forsendelserTo.isEmpty()) {
+			eformidling.hent()
+					.forEach(downloadResponse -> {
+						log.info("Hentet trygderetten kvittering melding fra Altinn med konversasjonId={}, SendersReference={}, KvitteringStatus={}",
+								downloadResponse.getConversationId(), downloadResponse.getSendersReference(), downloadResponse.getKvitteringStatus());
+						forsendelserTo
+								.forEach(behandleForsendelse(downloadResponse, endringer));
+					});
+			log.info("sdist001 har oppdatert status for eFormidlingforsendelser: {}", endringer);
+		} else {
+			log.info("sdist001 har ingen forsendelser å avstemme. Henter ikke kvitteringer fra eFormidling");
+		}
 	}
 
 	private boolean validateForsendelse(Forsendelse forsendelse, DownloadResponse downloadResponse) {
