@@ -38,40 +38,28 @@ public class AdministrerForsendelseConsumer implements AdministrerForsendelse {
 	@Override
 	@Retryable(retryFor = AbstractDokdisteformidlingTechnicalException.class, backoff = @Backoff(delay = DELAY_SHORT, multiplier = MULTIPLIER_SHORT))
 	public HentForsendelseResponse hentForsendelse(final Long forsendelseId) {
-		log.info("hentForsendelse henter forsendelse med forsendelseId={}", forsendelseId);
-
-		var response = webClient.get()
+		return webClient.get()
 				.uri(uriBuilder -> uriBuilder
 						.path("/{forsendelseId}")
 						.build(forsendelseId))
 				.attributes(clientRegistrationId(CLIENT_REGISTRATION_DOKDISTADMIN))
 				.retrieve()
 				.bodyToMono(HentForsendelseResponse.class)
-				.doOnError(this::handleError)
+				.onErrorMap(this::mapError)
 				.block();
-
-		log.info("hentForsendelse har hentet forsendelse med forsendelseId={}", forsendelseId);
-
-		return response;
 	}
 
 	@Override
 	@Retryable(retryFor = AbstractDokdisteformidlingTechnicalException.class, backoff = @Backoff(delay = DELAY_SHORT, multiplier = MULTIPLIER_SHORT))
 	public void oppdaterForsendelse(OppdaterForsendelseRequest oppdaterForsendelse) {
-		log.info("oppdaterForsendelse oppdaterer forsendelse med forsendelseId={}", oppdaterForsendelse.forsendelseId());
-
 		webClient.put()
 				.uri("/oppdaterforsendelse")
 				.attributes(clientRegistrationId(CLIENT_REGISTRATION_DOKDISTADMIN))
 				.bodyValue(oppdaterForsendelse)
 				.retrieve()
 				.toBodilessEntity()
-				.doOnError(this::handleError)
+				.onErrorMap(this::mapError)
 				.block();
-
-		log.info("oppdaterForsendelse har oppdatert forsendelse med forsendelseId={} til forsendelseStatus={}",
-				oppdaterForsendelse.forsendelseId(), oppdaterForsendelse.forsendelseStatus());
-
 	}
 
 	@Override
@@ -87,7 +75,7 @@ public class AdministrerForsendelseConsumer implements AdministrerForsendelse {
 				.attributes(clientRegistrationId(CLIENT_REGISTRATION_DOKDISTADMIN))
 				.retrieve()
 				.bodyToMono(HentEformidlingforsendelserResponse.class)
-				.doOnError(this::handleError)
+				.onErrorMap(this::mapError)
 				.block();
 
 		int antallForsendelser = getAntallForsendelser(response);
@@ -101,15 +89,15 @@ public class AdministrerForsendelseConsumer implements AdministrerForsendelse {
 		return response != null && response.getForsendelser() != null ? response.getForsendelser().size() : 0;
 	}
 
-	private void handleError(Throwable error) {
+	private Throwable mapError(Throwable error) {
 		if (error instanceof WebClientResponseException response && response.getStatusCode().is4xxClientError()) {
-			throw new DokdistadminFunctionalException(
+			return new DokdistadminFunctionalException(
 					String.format("Kall mot rdist001 feilet funksjonelt med status=%s, feilmelding=%s",
 							response.getStatusCode(),
 							response.getMessage()),
 					error);
 		} else {
-			throw new DokdistadminTechnicalException(
+			return new DokdistadminTechnicalException(
 					String.format("Kall mot rdist001 feilet teknisk med feilmelding=%s", error.getMessage()),
 					error);
 		}
