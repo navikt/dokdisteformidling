@@ -58,6 +58,8 @@ public class Sdist001Service {
 		log.info("sdist001 hentet eformidlingforsendelser fra rdist001 {} ", forsendelserTo);
 
 		if(forsendelserTo.isEmpty()) {
+			log.info("sdist001 har ingen forsendelser å avstemme. Henter ikke kvitteringer fra eFormidling");
+		} else {
 			eformidling.hent()
 					.forEach(downloadResponse -> {
 						log.info("Hentet trygderetten kvittering melding fra Altinn med konversasjonId={}, SendersReference={}, KvitteringStatus={}",
@@ -66,8 +68,6 @@ public class Sdist001Service {
 								.forEach(behandleForsendelse(downloadResponse, endringer));
 					});
 			log.info("sdist001 har oppdatert status for eFormidlingforsendelser: {}", endringer);
-		} else {
-			log.info("sdist001 har ingen forsendelser å avstemme. Henter ikke kvitteringer fra eFormidling");
 		}
 	}
 
