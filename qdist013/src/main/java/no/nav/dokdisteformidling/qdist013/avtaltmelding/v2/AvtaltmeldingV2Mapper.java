@@ -36,6 +36,8 @@ import static no.nav.dokdisteformidling.constants.DomainConstants.VARIANTFORMAT_
 import static no.nav.dokdisteformidling.constants.DomainConstants.VARIANTFORMAT_SLADDET;
 import static no.nav.dokdisteformidling.consumer.eformidling.EformidlingConstants.NAV_ORGNUMMER;
 import static no.nav.dokdisteformidling.consumer.eformidling.EformidlingConstants.TRYGDERETTEN_ORGNUMMER;
+import static no.nav.dokdisteformidling.qdist013.saf.main.JournalpostQdist013.DokumentInfo.Dokumentvariant.FILTYPE_JPEG;
+import static no.nav.dokdisteformidling.qdist013.saf.main.JournalpostQdist013.DokumentInfo.Dokumentvariant.FILTYPE_PNG;
 import static no.nav.dokdisteformidling.qdist013.util.ArkivMapperUtil.brukerTypeIsAktoerId;
 import static no.nav.dokdisteformidling.qdist013.util.ArkivMapperUtil.brukerTypeIsOrgnr;
 import static no.nav.dokdisteformidling.qdist013.util.ArkivMapperUtil.isBrukerTypeFnr;
@@ -61,319 +63,300 @@ import static org.apache.commons.lang3.StringUtils.isNotBlank;
 @Component
 public class AvtaltmeldingV2Mapper {
 
-    public static final String NAV_KLAGEINSTANS = "NAV Klageinstans";
-    public static final String TRYGDERETTEN = "TRYGDERETTEN";
-    public static final String SAKSPART_ROLLE_DAP = "DAP";
-    public static final String SAKSPART_ROLLE_AMP = "AMP";
-    public static final String INNGAAENDE = "I";
-    public static final String UTGAAENDE = "U";
-    public static final String FERDIGSTILT = "FERDIGSTILT";
-    public static final String FILFORMAT_PNG = "PNG";
-    public static final String FILFORMAT_JPEG = "JPEG";
-    public static final String UKJENT = "UKJENT";
-    public static final String AVTALTMELDING_NAMESPACE = "http://www.arkivverket.no/standarder/noark5/arkivmelding";
+	static final String NAV_KLAGEINSTANS = "NAV Klageinstans";
+	static final String TRYGDERETTEN = "TRYGDERETTEN";
+	static final String SAKSPART_ROLLE_DAP = "DAP";
+	static final String SAKSPART_ROLLE_AMP = "AMP";
+	static final String INNGAAENDE = "I";
+	static final String UTGAAENDE = "U";
+	static final String FERDIGSTILT = "FERDIGSTILT";
+	static final String UKJENT = "UKJENT";
+	static final String AVTALTMELDING_NAMESPACE = "http://www.arkivverket.no/standarder/noark5/arkivmelding";
+	static final String REFERANSE_DOKUMENTFIL_FORMAT = "%s-%s-%s.%s";
 
-    private final PdlGraphQLConsumer pdlGraphQLConsumer;
-    private final EregConsumer eregConsumer;
-    private final SafJournalpostQueryService<LightweightSafJournalpostQdist013> safJournalpostQueryService;
+	private final PdlGraphQLConsumer pdlGraphQLConsumer;
+	private final EregConsumer eregConsumer;
+	private final SafJournalpostQueryService<LightweightSafJournalpostQdist013> safJournalpostQueryService;
 
-    public AvtaltmeldingV2Mapper(@Qualifier("LightweightSafJournalpostQueryServiceQdist013") SafJournalpostQueryService<LightweightSafJournalpostQdist013> safJournalpostQueryService,
-                                 EregConsumer eregConsumer,
-                                 PdlGraphQLConsumer pdlGraphQLConsumer) {
-        this.safJournalpostQueryService = safJournalpostQueryService;
-        this.eregConsumer = eregConsumer;
-        this.pdlGraphQLConsumer = pdlGraphQLConsumer;
-    }
+	public AvtaltmeldingV2Mapper(@Qualifier("LightweightSafJournalpostQueryServiceQdist013") SafJournalpostQueryService<LightweightSafJournalpostQdist013> safJournalpostQueryService,
+								 EregConsumer eregConsumer,
+								 PdlGraphQLConsumer pdlGraphQLConsumer) {
+		this.safJournalpostQueryService = safJournalpostQueryService;
+		this.eregConsumer = eregConsumer;
+		this.pdlGraphQLConsumer = pdlGraphQLConsumer;
+	}
 
-    public JAXBElement<Arkivmelding> createArkivMelding(JournalpostQdist013 journalpostQdist013, String bestillingsId) {
-        ObjectFactory objectFactory = new ObjectFactory();
-        final XMLGregorianCalendar datoArkivmeldingOpprettet = getNow();
+	public JAXBElement<Arkivmelding> createArkivMelding(JournalpostQdist013 journalpostQdist013, String bestillingsId) {
+		ObjectFactory objectFactory = new ObjectFactory();
+		final XMLGregorianCalendar datoArkivmeldingOpprettet = getNow();
 
-        Arkivmelding arkivmelding = objectFactory.createArkivmelding();
-        arkivmelding.setSystem(APP_NAME);
-        arkivmelding.setMeldingId(bestillingsId);
-        arkivmelding.setTidspunkt(datoArkivmeldingOpprettet);
-        arkivmelding.setAntallFiler(((int) journalpostQdist013.getDokumenter()
-                .stream()
-                .filter(dokumentInfo -> isDokumentFerdigstilt(dokumentInfo.getDokumentstatus()))
-                .count()));
-        arkivmelding.getMappe()
-                .add(createAndPopulateSaksmappe(journalpostQdist013, datoArkivmeldingOpprettet, objectFactory));
+		Arkivmelding arkivmelding = objectFactory.createArkivmelding();
+		arkivmelding.setSystem(APP_NAME);
+		arkivmelding.setMeldingId(bestillingsId);
+		arkivmelding.setTidspunkt(datoArkivmeldingOpprettet);
+		arkivmelding.setAntallFiler(((int) journalpostQdist013.getDokumenter()
+				.stream()
+				.filter(dokumentInfo -> isDokumentFerdigstilt(dokumentInfo.getDokumentstatus()))
+				.count()));
+		arkivmelding.getMappe()
+				.add(createAndPopulateSaksmappe(journalpostQdist013, datoArkivmeldingOpprettet, objectFactory));
 
-        return objectFactory.createArkivmelding(arkivmelding);
-    }
+		return objectFactory.createArkivmelding(arkivmelding);
+	}
 
-    private boolean isDokumentFerdigstilt(String dokumentStatus) {
-        return isBlank(dokumentStatus) || FERDIGSTILT.equals(dokumentStatus);
-    }
+	private boolean isDokumentFerdigstilt(String dokumentStatus) {
+		return isBlank(dokumentStatus) || FERDIGSTILT.equals(dokumentStatus);
+	}
 
-    private Saksmappe createAndPopulateSaksmappe(JournalpostQdist013 journalpostQdist013,
-                                                 XMLGregorianCalendar datoArkivmeldingOpprettet,
-                                                 ObjectFactory objectFactory) {
-        Journalpost journalpost = mapJournalpost(journalpostQdist013, datoArkivmeldingOpprettet, objectFactory);
-        XMLGregorianCalendar datoOpprettet = mapOpprettetDato(journalpostQdist013, journalpost);
+	private Saksmappe createAndPopulateSaksmappe(JournalpostQdist013 journalpostQdist013,
+												 XMLGregorianCalendar datoArkivmeldingOpprettet,
+												 ObjectFactory objectFactory) {
+		Journalpost journalpost = mapJournalpost(journalpostQdist013, datoArkivmeldingOpprettet, objectFactory);
+		XMLGregorianCalendar datoOpprettet = mapOpprettetDato(journalpostQdist013, journalpost);
 
-        Saksmappe saksmappe = objectFactory.createSaksmappe();
-        saksmappe.setTittel(journalpostQdist013.getTemanavn());
-        saksmappe.setOpprettetDato(datoOpprettet);
-        saksmappe.setOpprettetAv(journalpostQdist013.getOpprettetAvNavn());
-        saksmappe.setVirksomhetsspesifikkeMetadata(mapNavMappe(journalpostQdist013.getSak().getArkivsaksnummer()));
-        saksmappe.getPart()
-                .add(createAndPopulatePartAMP(journalpostQdist013, objectFactory));
-        saksmappe.getPart()
-                .add(createAndPopulatePartDAP(journalpostQdist013, objectFactory));
-        saksmappe.getRegistrering().add(journalpost);
-        saksmappe.setSaksdato(datoOpprettet);
-        saksmappe.setAdministrativEnhet(NAV_KLAGEINSTANS);
-        saksmappe.setSaksansvarlig(journalpostQdist013.getOpprettetAvNavn());
-        saksmappe.setJournalenhet(journalpostQdist013.getJournalfoerendeEnhet());
-        saksmappe.setSaksstatus(UNDER_BEHANDLING);
+		Saksmappe saksmappe = objectFactory.createSaksmappe();
+		saksmappe.setTittel(journalpostQdist013.getTemanavn());
+		saksmappe.setOpprettetDato(datoOpprettet);
+		saksmappe.setOpprettetAv(journalpostQdist013.getOpprettetAvNavn());
+		saksmappe.setVirksomhetsspesifikkeMetadata(mapNavMappe(journalpostQdist013.getSak().getArkivsaksnummer()));
+		saksmappe.getPart()
+				.add(createAndPopulatePartAMP(journalpostQdist013, objectFactory));
+		saksmappe.getPart()
+				.add(createAndPopulatePartDAP(journalpostQdist013, objectFactory));
+		saksmappe.getRegistrering().add(journalpost);
+		saksmappe.setSaksdato(datoOpprettet);
+		saksmappe.setAdministrativEnhet(NAV_KLAGEINSTANS);
+		saksmappe.setSaksansvarlig(journalpostQdist013.getOpprettetAvNavn());
+		saksmappe.setJournalenhet(journalpostQdist013.getJournalfoerendeEnhet());
+		saksmappe.setSaksstatus(UNDER_BEHANDLING);
 
-        return saksmappe;
-    }
+		return saksmappe;
+	}
 
-    private static JAXBElement<JAXBElement> mapNavMappe(String arkivsaksnummer) {
-        NavMappe navMappe = new NavMappe();
-        navMappe.setSaksnummer(arkivsaksnummer);
-        JAXBElement<NavMappe> navMappeElement = new no.nav.avtaltmelding.trygderetten.v1.ObjectFactory().createNavMappe(navMappe);
-        return new JAXBElement<>(new QName(AVTALTMELDING_NAMESPACE, "virksomhetsspesifikkeMetadata"), JAXBElement.class, navMappeElement);
-    }
+	private static JAXBElement<JAXBElement> mapNavMappe(String arkivsaksnummer) {
+		NavMappe navMappe = new NavMappe();
+		navMappe.setSaksnummer(arkivsaksnummer);
+		JAXBElement<NavMappe> navMappeElement = new no.nav.avtaltmelding.trygderetten.v1.ObjectFactory().createNavMappe(navMappe);
+		return new JAXBElement<>(new QName(AVTALTMELDING_NAMESPACE, "virksomhetsspesifikkeMetadata"), JAXBElement.class, navMappeElement);
+	}
 
-    private static XMLGregorianCalendar mapOpprettetDato(JournalpostQdist013 journalpostQdist013, Journalpost journalpost) {
-        LocalDateTime opprettetDato = journalpostQdist013.getSak().getDatoOpprettet();
-        if (opprettetDato == null) {
-            return finnEldsteVedleggSortertEtterDokumentbeskrivelseOpprettetDato(journalpost);
-        }
-        return convertLocalDateTimeToXmlGregorianCalendar(opprettetDato);
-    }
+	private static XMLGregorianCalendar mapOpprettetDato(JournalpostQdist013 journalpostQdist013, Journalpost journalpost) {
+		LocalDateTime opprettetDato = journalpostQdist013.getSak().getDatoOpprettet();
+		if (opprettetDato == null) {
+			return finnEldsteVedleggSortertEtterDokumentbeskrivelseOpprettetDato(journalpost);
+		}
+		return convertLocalDateTimeToXmlGregorianCalendar(opprettetDato);
+	}
 
-    private static XMLGregorianCalendar finnEldsteVedleggSortertEtterDokumentbeskrivelseOpprettetDato(Journalpost journalpost) {
-        XMLGregorianCalendar eldstedato = null;
-        for (Dokumentbeskrivelse dokumentbeskrivelse : journalpost.getDokumentbeskrivelse()) {
-            if (dokumentbeskrivelse.getTilknyttetRegistreringSom().equals(VEDLEGG)) {
-                if (eldstedato == null || dokumentbeskrivelse.getOpprettetDato().compare(eldstedato) == DatatypeConstants.LESSER) {
-                    eldstedato = dokumentbeskrivelse.getOpprettetDato();
-                }
-            }
-        }
-        return eldstedato;
-    }
+	private static XMLGregorianCalendar finnEldsteVedleggSortertEtterDokumentbeskrivelseOpprettetDato(Journalpost journalpost) {
+		XMLGregorianCalendar eldstedato = null;
+		for (Dokumentbeskrivelse dokumentbeskrivelse : journalpost.getDokumentbeskrivelse()) {
+			if (dokumentbeskrivelse.getTilknyttetRegistreringSom().equals(VEDLEGG)) {
+				if (eldstedato == null || dokumentbeskrivelse.getOpprettetDato().compare(eldstedato) == DatatypeConstants.LESSER) {
+					eldstedato = dokumentbeskrivelse.getOpprettetDato();
+				}
+			}
+		}
+		return eldstedato;
+	}
 
-    private Journalpost mapJournalpost(JournalpostQdist013 journalpostQdist013, XMLGregorianCalendar datoArkivmeldingOpprettet, ObjectFactory objectFactory) {
-        Journalpost journalpost = objectFactory.createJournalpost();
-        journalpost.setOpprettetDato(convertLocalDateTimeToXmlGregorianCalendar(journalpostQdist013.getDatoOpprettet()));
-        journalpost.setOpprettetAv(journalpostQdist013.getOpprettetAvNavn());
-        addDokumentBeskrivelserToJournalpost(journalpost, journalpostQdist013, datoArkivmeldingOpprettet, objectFactory);
-        journalpost.setTittel(journalpostQdist013.getTittel());
-        journalpost.getKorrespondansepart().add(createAndPolpulateKorrespondanspartMottaker(objectFactory));
-        journalpost.getKorrespondansepart().add(createAndPolpulateKorrespondanspartAvsender(objectFactory));
-        journalpost.setJournalposttype(UTGAAENDE_DOKUMENT);
-        journalpost.setJournalstatus(EKSPEDERT);
-        journalpost.setJournaldato(convertLocalDateTimeToXmlGregorianCalendar(journalpostQdist013.getDatoJournalfoert()));
-        return journalpost;
-    }
+	private Journalpost mapJournalpost(JournalpostQdist013 journalpostQdist013, XMLGregorianCalendar datoArkivmeldingOpprettet, ObjectFactory objectFactory) {
+		Journalpost journalpost = objectFactory.createJournalpost();
+		journalpost.setOpprettetDato(convertLocalDateTimeToXmlGregorianCalendar(journalpostQdist013.getDatoOpprettet()));
+		journalpost.setOpprettetAv(journalpostQdist013.getOpprettetAvNavn());
+		addDokumentBeskrivelserToJournalpost(journalpost, journalpostQdist013, datoArkivmeldingOpprettet, objectFactory);
+		journalpost.setTittel(journalpostQdist013.getTittel());
+		journalpost.getKorrespondansepart().add(createAndPolpulateKorrespondanspartMottaker(objectFactory));
+		journalpost.getKorrespondansepart().add(createAndPolpulateKorrespondanspartAvsender(objectFactory));
+		journalpost.setJournalposttype(UTGAAENDE_DOKUMENT);
+		journalpost.setJournalstatus(EKSPEDERT);
+		journalpost.setJournaldato(convertLocalDateTimeToXmlGregorianCalendar(journalpostQdist013.getDatoJournalfoert()));
+		return journalpost;
+	}
 
-    private void addDokumentBeskrivelserToJournalpost(Journalpost journalpost,
-                                                      JournalpostQdist013 journalpostQdist013,
-                                                      XMLGregorianCalendar avtalemeldingOprettetDato,
-                                                      ObjectFactory objectFactory) {
-        List<Dokumentbeskrivelse> dokumentbeskrivelser = journalpost.getDokumentbeskrivelse();
-        journalpostQdist013.getDokumenter()
-                .forEach(dokumentInfo -> {
-                    if (isDokumentFerdigstilt(dokumentInfo.getDokumentstatus())) {
-                        dokumentbeskrivelser.add(createAndPopulateDokumentBeskrivelse(journalpostQdist013, dokumentInfo,
-                                dokumentbeskrivelser.size() + 1, avtalemeldingOprettetDato, objectFactory));
-                    }
+	private void addDokumentBeskrivelserToJournalpost(Journalpost journalpost,
+													  JournalpostQdist013 journalpostQdist013,
+													  XMLGregorianCalendar avtalemeldingOprettetDato,
+													  ObjectFactory objectFactory) {
+		List<Dokumentbeskrivelse> dokumentbeskrivelser = journalpost.getDokumentbeskrivelse();
+		journalpostQdist013.getDokumenter()
+				.forEach(dokumentInfo -> {
+					if (isDokumentFerdigstilt(dokumentInfo.getDokumentstatus())) {
+						dokumentbeskrivelser.add(createAndPopulateDokumentBeskrivelse(journalpostQdist013, dokumentInfo,
+								dokumentbeskrivelser.size() + 1, avtalemeldingOprettetDato, objectFactory));
+					}
 
-                });
-    }
-
-
-    private Dokumentbeskrivelse createAndPopulateDokumentBeskrivelse(JournalpostQdist013 journalpostQdist013,
-                                                                     JournalpostQdist013.DokumentInfo dokumentInfo,
-                                                                     int rekkefolge,
-                                                                     XMLGregorianCalendar datoArkivmeldingOpprettet,
-                                                                     ObjectFactory objectFactory) {
-        Dokumentbeskrivelse dokumentbeskrivelse = objectFactory.createDokumentbeskrivelse();
-
-        dokumentbeskrivelse.setDokumenttype(DOKUMENTASJON);
-        dokumentbeskrivelse.setDokumentstatus(DOKUMENTET_ER_FERDIGSTILT);
-        dokumentbeskrivelse.setTittel(getDokumentbeskrivelseTittel(dokumentInfo, isHoveddokument(rekkefolge)));
-        dokumentbeskrivelse.setOpprettetDato(getDokumentDatoJournalfoert(isHoveddokument(rekkefolge), journalpostQdist013, dokumentInfo));
-        dokumentbeskrivelse.setOpprettetAv(getDokumentJournalfortAvNavn(isHoveddokument(rekkefolge), journalpostQdist013, dokumentInfo));
-        dokumentbeskrivelse.setTilknyttetRegistreringSom(isHoveddokument(rekkefolge) ? HOVEDDOKUMENT : VEDLEGG);
-        dokumentbeskrivelse.setDokumentnummer(BigInteger.valueOf(rekkefolge));
-        dokumentbeskrivelse.setTilknyttetDato(datoArkivmeldingOpprettet);
-        dokumentbeskrivelse.setTilknyttetAv(journalpostQdist013.getJournalfortAvNavn());
-        dokumentbeskrivelse.getDokumentobjekt()
-                .add(createAndPopulateDokumentObjekt(journalpostQdist013, dokumentInfo, isHoveddokument(rekkefolge), objectFactory));
-
-        return dokumentbeskrivelse;
-    }
-
-    private String getDokumentbeskrivelseTittel(JournalpostQdist013.DokumentInfo dokumentInfo, boolean isHoveddok) {
-        if (!isHoveddok && isNotBlank(dokumentInfo.getOriginalJournalpostId())) {
-            if (INNGAAENDE.equals(getJournalpostType(dokumentInfo.getOriginalJournalpostId()))) {
-                return format("%s, Fra %s", dokumentInfo.getTittel(), getAvsenderMottakerNavn(dokumentInfo.getOriginalJournalpostId()));
-            } else if (UTGAAENDE.equals(getJournalpostType(dokumentInfo.getOriginalJournalpostId()))) {
-                return format("%s, Til %s", dokumentInfo.getTittel(), getAvsenderMottakerNavn(dokumentInfo.getOriginalJournalpostId()));
-            } else {
-                return dokumentInfo.getTittel();
-            }
-
-        } else {
-            return dokumentInfo.getTittel();
-        }
-    }
-
-    private String getJournalpostType(String originalJournalpostId) {
-        return getLightweightSafJournalpost(originalJournalpostId) == null ? null : Objects.requireNonNull(getLightweightSafJournalpost(originalJournalpostId)).getJournalposttype();
-    }
-
-    private String getAvsenderMottakerNavn(String journalpostId) {
-        return getLightweightSafJournalpost(journalpostId) == null ? null : getLightweightSafJournalpost(journalpostId).getAvsenderMottakerNavn();
-
-    }
-
-    private LightweightSafJournalpostQdist013 getLightweightSafJournalpost(String journalpostId) {
-        return isBlank(journalpostId) ? null : safJournalpostQueryService.hentJournalpost(journalpostId);
-    }
-
-    private XMLGregorianCalendar getDokumentDatoJournalfoert(boolean isHoveddok, JournalpostQdist013 journalpostQdist013, JournalpostQdist013.DokumentInfo dokumentInfo) {
-        if (!isHoveddok && isNotBlank(dokumentInfo.getOriginalJournalpostId()) && !isJournalDatoNull(dokumentInfo.getOriginalJournalpostId())) {
-            LightweightSafJournalpostQdist013 lightweightSafJournalpostQdist013 = safJournalpostQueryService.hentJournalpost(dokumentInfo
-                    .getOriginalJournalpostId());
-            return convertLocalDateTimeToXmlGregorianCalendar(lightweightSafJournalpostQdist013.getDatoJournalfoert());
-        } else {
-            return convertLocalDateTimeToXmlGregorianCalendar(journalpostQdist013.getDatoJournalfoert());
-        }
-    }
-
-    private boolean isJournalDatoNull(String journalpostId) {
-        return getLightweightSafJournalpost(journalpostId) == null ? Objects.isNull(getLightweightSafJournalpost(journalpostId)) : getLightweightSafJournalpost(journalpostId).getDatoJournalfoert() == null;
-    }
-
-    private String getDokumentJournalfortAvNavn(boolean isHoveddok, JournalpostQdist013 journalpostQdist013, JournalpostQdist013.DokumentInfo dokumentInfo) {
-        if (!isHoveddok && isNotBlank(dokumentInfo.getOriginalJournalpostId())) {
-            LightweightSafJournalpostQdist013 lightweightSafJournalpostQdist013 = getLightweightSafJournalpost(dokumentInfo.getOriginalJournalpostId());
-            if (!isJournalfortAvNavnNull(dokumentInfo.getOriginalJournalpostId())) {
-                return lightweightSafJournalpostQdist013.getJournalfortAvNavn();
-            }
-            return UKJENT;
-
-        } else {
-            return journalpostQdist013.getJournalfortAvNavn();
-        }
-    }
-
-    private boolean isJournalfortAvNavnNull(String journalpostId) {
-        return getLightweightSafJournalpost(journalpostId) == null ? Objects.isNull(getLightweightSafJournalpost(journalpostId)) : isBlank(getLightweightSafJournalpost(journalpostId).getJournalfortAvNavn());
-    }
+				});
+	}
 
 
-    private Dokumentobjekt createAndPopulateDokumentObjekt(JournalpostQdist013 journalpostQdist013,
-                                                           JournalpostQdist013.DokumentInfo dokumentInfo,
-                                                           boolean isHoveddokument,
-                                                           ObjectFactory objectFactory) {
-        Dokumentobjekt dokumentobjekt = objectFactory.createDokumentobjekt();
+	private Dokumentbeskrivelse createAndPopulateDokumentBeskrivelse(JournalpostQdist013 journalpostQdist013,
+																	 JournalpostQdist013.DokumentInfo dokumentInfo,
+																	 int rekkefolge,
+																	 XMLGregorianCalendar datoArkivmeldingOpprettet,
+																	 ObjectFactory objectFactory) {
+		Dokumentbeskrivelse dokumentbeskrivelse = objectFactory.createDokumentbeskrivelse();
 
-        dokumentobjekt.setVersjonsnummer(ONE);
-        dokumentobjekt.setVariantformat(getDokumentVariant(dokumentInfo));
-        dokumentobjekt.setOpprettetDato(getDokumentDatoJournalfoert(isHoveddokument, journalpostQdist013, dokumentInfo));
-        dokumentobjekt.setOpprettetAv(getDokumentJournalfortAvNavn(isHoveddokument, journalpostQdist013, dokumentInfo));
-        dokumentobjekt.setReferanseDokumentfil(getReferanseDokumentFil(journalpostQdist013.getJournalpostId(), dokumentInfo));
+		dokumentbeskrivelse.setDokumenttype(DOKUMENTASJON);
+		dokumentbeskrivelse.setDokumentstatus(DOKUMENTET_ER_FERDIGSTILT);
+		dokumentbeskrivelse.setTittel(getDokumentbeskrivelseTittel(dokumentInfo, isHoveddokument(rekkefolge)));
+		dokumentbeskrivelse.setOpprettetDato(getDokumentDatoJournalfoert(isHoveddokument(rekkefolge), journalpostQdist013, dokumentInfo));
+		dokumentbeskrivelse.setOpprettetAv(getDokumentJournalfortAvNavn(isHoveddokument(rekkefolge), journalpostQdist013, dokumentInfo));
+		dokumentbeskrivelse.setTilknyttetRegistreringSom(isHoveddokument(rekkefolge) ? HOVEDDOKUMENT : VEDLEGG);
+		dokumentbeskrivelse.setDokumentnummer(BigInteger.valueOf(rekkefolge));
+		dokumentbeskrivelse.setTilknyttetDato(datoArkivmeldingOpprettet);
+		dokumentbeskrivelse.setTilknyttetAv(journalpostQdist013.getJournalfortAvNavn());
+		dokumentbeskrivelse.getDokumentobjekt()
+				.add(createAndPopulateDokumentObjekt(journalpostQdist013, dokumentInfo, isHoveddokument(rekkefolge), objectFactory));
 
-        return dokumentobjekt;
-    }
+		return dokumentbeskrivelse;
+	}
 
-    private String getReferanseDokumentFil(String journalpostId, JournalpostQdist013.DokumentInfo dokumentInfo) {
-        return format("%s-%s-%s-%s", journalpostId, dokumentInfo.getDokumentInfoId(), getDokumentVariant(dokumentInfo), getFiltype(dokumentInfo));
-    }
+	private String getDokumentbeskrivelseTittel(JournalpostQdist013.DokumentInfo dokumentInfo, boolean isHoveddok) {
+		if (!isHoveddok && isNotBlank(dokumentInfo.getOriginalJournalpostId())) {
+			if (INNGAAENDE.equals(getJournalpostType(dokumentInfo.getOriginalJournalpostId()))) {
+				return format("%s, Fra %s", dokumentInfo.getTittel(), getAvsenderMottakerNavn(dokumentInfo.getOriginalJournalpostId()));
+			} else if (UTGAAENDE.equals(getJournalpostType(dokumentInfo.getOriginalJournalpostId()))) {
+				return format("%s, Til %s", dokumentInfo.getTittel(), getAvsenderMottakerNavn(dokumentInfo.getOriginalJournalpostId()));
+			} else {
+				return dokumentInfo.getTittel();
+			}
 
-    private String getDokumentVariant(JournalpostQdist013.DokumentInfo dokumentInfo) {
-        if (dokumentInfoContainsSladdetDokumentvariant(dokumentInfo)) {
-            return DOKUMENT_HVOR_DELER_AV_INNHOLDET_ER_SKJERMET;
-        } else {
-            JournalpostQdist013.DokumentInfo.Dokumentvariant dokumentvariantArkiv = dokumentInfo.getDokumentvarianter()
-                    .stream()
-                    .filter(dokumentvariant -> VARIANTFORMAT_ARKIV.equals(dokumentvariant.getVariantformat()))
-                    .findAny()
-                    .get(); //Ok, already validated in SafJournalpostValidatorQdist013.
+		} else {
+			return dokumentInfo.getTittel();
+		}
+	}
 
-            return isFiltypePNGorJPEG(dokumentvariantArkiv) ? ARKIVFORMAT : PRODUKSJONSFORMAT;
-        }
-    }
+	private String getJournalpostType(String originalJournalpostId) {
+		return getLightweightSafJournalpost(originalJournalpostId) == null ? null : Objects.requireNonNull(getLightweightSafJournalpost(originalJournalpostId)).getJournalposttype();
+	}
 
-    private boolean dokumentInfoContainsSladdetDokumentvariant(JournalpostQdist013.DokumentInfo dokumentInfo) {
-        return dokumentInfo.getDokumentvarianter()
-                .stream()
-                .anyMatch(dokumentvariant -> VARIANTFORMAT_SLADDET.equals(dokumentvariant.getVariantformat()));
-    }
+	private String getAvsenderMottakerNavn(String journalpostId) {
+		return getLightweightSafJournalpost(journalpostId) == null ? null : getLightweightSafJournalpost(journalpostId).getAvsenderMottakerNavn();
+	}
 
-    private String getFiltype(JournalpostQdist013.DokumentInfo dokumentInfo) {
-        if (dokumentInfoContainsSladdetDokumentvariant(dokumentInfo)) {
-            return dokumentInfo.getDokumentvarianter().stream()
-                    .filter(dokumentvariant -> VARIANTFORMAT_SLADDET.equals(dokumentvariant.getVariantformat()))
-                    .findAny()
-                    .get()
-                    //Ok, already validated in SafJournalpostValidatorQdist013.
-                    .getFiltype();
-        } else {
-            return dokumentInfo.getDokumentvarianter().stream()
-                    .filter(dokumentvariant -> VARIANTFORMAT_ARKIV.equals(dokumentvariant.getVariantformat()))
-                    .findAny()
-                    .get()//Ok, already validated in SafJournalpostValidatorQdist013.
-                    .getFiltype();
-        }
-    }
+	private LightweightSafJournalpostQdist013 getLightweightSafJournalpost(String journalpostId) {
+		return isBlank(journalpostId) ? null : safJournalpostQueryService.hentJournalpost(journalpostId);
+	}
 
-    private boolean isFiltypePNGorJPEG(JournalpostQdist013.DokumentInfo.Dokumentvariant dokumentvariant) {
-        return FILFORMAT_JPEG.equals(dokumentvariant.getFiltype()) || FILFORMAT_PNG.equals(dokumentvariant.getFiltype());
-    }
+	private XMLGregorianCalendar getDokumentDatoJournalfoert(boolean isHoveddok, JournalpostQdist013 journalpostQdist013, JournalpostQdist013.DokumentInfo dokumentInfo) {
+		if (!isHoveddok && isNotBlank(dokumentInfo.getOriginalJournalpostId()) && !isJournalDatoNull(dokumentInfo.getOriginalJournalpostId())) {
+			LightweightSafJournalpostQdist013 lightweightSafJournalpostQdist013 = safJournalpostQueryService.hentJournalpost(dokumentInfo
+					.getOriginalJournalpostId());
+			return convertLocalDateTimeToXmlGregorianCalendar(lightweightSafJournalpostQdist013.getDatoJournalfoert());
+		} else {
+			return convertLocalDateTimeToXmlGregorianCalendar(journalpostQdist013.getDatoJournalfoert());
+		}
+	}
 
-    private Korrespondansepart createAndPolpulateKorrespondanspartAvsender(ObjectFactory objectFactory) {
-        Korrespondansepart korrespondansepartAvsender = objectFactory.createKorrespondansepart();
-        korrespondansepartAvsender.setKorrespondanseparttype(AVSENDER);
-        korrespondansepartAvsender.setKorrespondansepartNavn(NAV_KLAGEINSTANS);
-        korrespondansepartAvsender.setOrganisasjonsnummer(new EnhetsidentifikatorType()
-                .useOrganisasjonsnummer(TRYGDERETTEN_ORGNUMMER));
-        return korrespondansepartAvsender;
-    }
+	private boolean isJournalDatoNull(String journalpostId) {
+		return getLightweightSafJournalpost(journalpostId) == null ? Objects.isNull(getLightweightSafJournalpost(journalpostId)) : getLightweightSafJournalpost(journalpostId).getDatoJournalfoert() == null;
+	}
 
-    private Korrespondansepart createAndPolpulateKorrespondanspartMottaker(ObjectFactory objectFactory) {
-        Korrespondansepart korrespondansepartMottaker = objectFactory.createKorrespondansepart();
-        korrespondansepartMottaker.setKorrespondanseparttype(MOTTAKER);
-        korrespondansepartMottaker.setKorrespondansepartNavn(TRYGDERETTEN);
-        korrespondansepartMottaker.setOrganisasjonsnummer(new EnhetsidentifikatorType()
-                .useOrganisasjonsnummer(TRYGDERETTEN_ORGNUMMER)
-                );
-        return korrespondansepartMottaker;
-    }
+	private String getDokumentJournalfortAvNavn(boolean isHoveddok, JournalpostQdist013 journalpostQdist013, JournalpostQdist013.DokumentInfo dokumentInfo) {
+		if (!isHoveddok && isNotBlank(dokumentInfo.getOriginalJournalpostId())) {
+			LightweightSafJournalpostQdist013 lightweightSafJournalpostQdist013 = getLightweightSafJournalpost(dokumentInfo.getOriginalJournalpostId());
+			if (!isJournalfortAvNavnNull(dokumentInfo.getOriginalJournalpostId())) {
+				return lightweightSafJournalpostQdist013.getJournalfortAvNavn();
+			}
+			return UKJENT;
 
-    private Part createAndPopulatePartDAP(JournalpostQdist013 journalpostQdist013, ObjectFactory objectFactory) {
-        Part partDAP = objectFactory.createPart();
-        partDAP.setPartNavn(getSakspartNavnDAP(journalpostQdist013));
-        partDAP.setPartRolle(SAKSPART_ROLLE_DAP);
+		} else {
+			return journalpostQdist013.getJournalfortAvNavn();
+		}
+	}
 
-        if(brukerTypeIsOrgnr(journalpostQdist013)) {
-            partDAP.setOrganisasjonsnummer(new EnhetsidentifikatorType()
-                    .useOrganisasjonsnummer(hentOrgNummerDAP(journalpostQdist013)));
-        } else {
-            partDAP.setFoedselsnummer(new FoedselsnummerType()
-                    .useFoedselsnummer(getFoedselsnummer(journalpostQdist013)));
-        }
-        return partDAP;
-    }
+	private boolean isJournalfortAvNavnNull(String journalpostId) {
+		return getLightweightSafJournalpost(journalpostId) == null ? Objects.isNull(getLightweightSafJournalpost(journalpostId)) : isBlank(getLightweightSafJournalpost(journalpostId).getJournalfortAvNavn());
+	}
 
-    private Part createAndPopulatePartAMP(JournalpostQdist013 journalpostQdist013, ObjectFactory objectFactory) {
-        Part partAMP = objectFactory.createPart();
-        partAMP.setPartNavn(NAV_KLAGEINSTANS);
-        partAMP.setPartRolle(SAKSPART_ROLLE_AMP);
-        partAMP.setOrganisasjonsnummer(new EnhetsidentifikatorType()
-                .useOrganisasjonsnummer(NAV_ORGNUMMER));
-        partAMP.setKontaktperson(journalpostQdist013.getOpprettetAvNavn());
-        return partAMP;
-    }
+
+	private Dokumentobjekt createAndPopulateDokumentObjekt(JournalpostQdist013 journalpostQdist013,
+														   JournalpostQdist013.DokumentInfo dokumentInfo,
+														   boolean isHoveddokument,
+														   ObjectFactory objectFactory) {
+		Dokumentobjekt dokumentobjekt = objectFactory.createDokumentobjekt();
+		dokumentobjekt.setVersjonsnummer(ONE);
+		AvtaltFilformat avtaltFilformat = AvtaltFilformatMapper.map(dokumentInfo);
+		dokumentobjekt.setVariantformat(getDokumentVariant(dokumentInfo));
+		dokumentobjekt.setFormat(avtaltFilformat.getFormat());
+		dokumentobjekt.setOpprettetDato(getDokumentDatoJournalfoert(isHoveddokument, journalpostQdist013, dokumentInfo));
+		dokumentobjekt.setOpprettetAv(getDokumentJournalfortAvNavn(isHoveddokument, journalpostQdist013, dokumentInfo));
+		dokumentobjekt.setReferanseDokumentfil(mapReferanseDokumentfil(journalpostQdist013.getJournalpostId(), dokumentInfo, avtaltFilformat));
+		return dokumentobjekt;
+	}
+
+	private String mapReferanseDokumentfil(String journalpostId, JournalpostQdist013.DokumentInfo dokumentInfo, AvtaltFilformat avtaltFilformat) {
+		return format(REFERANSE_DOKUMENTFIL_FORMAT, journalpostId, dokumentInfo.getDokumentInfoId(), getDokumentVariant(dokumentInfo), avtaltFilformat.getFilendelse());
+	}
+
+	private String getDokumentVariant(JournalpostQdist013.DokumentInfo dokumentInfo) {
+		if (dokumentInfoContainsSladdetDokumentvariant(dokumentInfo)) {
+			return DOKUMENT_HVOR_DELER_AV_INNHOLDET_ER_SKJERMET;
+		} else {
+			JournalpostQdist013.DokumentInfo.Dokumentvariant dokumentvariantArkiv = dokumentInfo.getDokumentvarianter()
+					.stream()
+					.filter(dokumentvariant -> VARIANTFORMAT_ARKIV.equals(dokumentvariant.getVariantformat()))
+					.findAny()
+					.get(); //Ok, already validated in SafJournalpostValidatorQdist013.
+
+			return isFiltypePNGorJPEG(dokumentvariantArkiv) ? ARKIVFORMAT : PRODUKSJONSFORMAT;
+		}
+	}
+
+	static boolean dokumentInfoContainsSladdetDokumentvariant(JournalpostQdist013.DokumentInfo dokumentInfo) {
+		return dokumentInfo.getDokumentvarianter()
+				.stream()
+				.anyMatch(dokumentvariant -> VARIANTFORMAT_SLADDET.equals(dokumentvariant.getVariantformat()));
+	}
+
+	private boolean isFiltypePNGorJPEG(JournalpostQdist013.DokumentInfo.Dokumentvariant dokumentvariant) {
+		return FILTYPE_JPEG.equals(dokumentvariant.getFiltype()) || FILTYPE_PNG.equals(dokumentvariant.getFiltype());
+	}
+
+	private Korrespondansepart createAndPolpulateKorrespondanspartAvsender(ObjectFactory objectFactory) {
+		Korrespondansepart korrespondansepartAvsender = objectFactory.createKorrespondansepart();
+		korrespondansepartAvsender.setKorrespondanseparttype(AVSENDER);
+		korrespondansepartAvsender.setKorrespondansepartNavn(NAV_KLAGEINSTANS);
+		korrespondansepartAvsender.setOrganisasjonsnummer(new EnhetsidentifikatorType()
+				.useOrganisasjonsnummer(TRYGDERETTEN_ORGNUMMER));
+		return korrespondansepartAvsender;
+	}
+
+	private Korrespondansepart createAndPolpulateKorrespondanspartMottaker(ObjectFactory objectFactory) {
+		Korrespondansepart korrespondansepartMottaker = objectFactory.createKorrespondansepart();
+		korrespondansepartMottaker.setKorrespondanseparttype(MOTTAKER);
+		korrespondansepartMottaker.setKorrespondansepartNavn(TRYGDERETTEN);
+		korrespondansepartMottaker.setOrganisasjonsnummer(new EnhetsidentifikatorType()
+				.useOrganisasjonsnummer(TRYGDERETTEN_ORGNUMMER)
+		);
+		return korrespondansepartMottaker;
+	}
+
+	private Part createAndPopulatePartDAP(JournalpostQdist013 journalpostQdist013, ObjectFactory objectFactory) {
+		Part partDAP = objectFactory.createPart();
+		partDAP.setPartNavn(getSakspartNavnDAP(journalpostQdist013));
+		partDAP.setPartRolle(SAKSPART_ROLLE_DAP);
+
+		if (brukerTypeIsOrgnr(journalpostQdist013)) {
+			partDAP.setOrganisasjonsnummer(new EnhetsidentifikatorType()
+					.useOrganisasjonsnummer(hentOrgNummerDAP(journalpostQdist013)));
+		} else {
+			partDAP.setFoedselsnummer(new FoedselsnummerType()
+					.useFoedselsnummer(getFoedselsnummer(journalpostQdist013)));
+		}
+		return partDAP;
+	}
+
+	private Part createAndPopulatePartAMP(JournalpostQdist013 journalpostQdist013, ObjectFactory objectFactory) {
+		Part partAMP = objectFactory.createPart();
+		partAMP.setPartNavn(NAV_KLAGEINSTANS);
+		partAMP.setPartRolle(SAKSPART_ROLLE_AMP);
+		partAMP.setOrganisasjonsnummer(new EnhetsidentifikatorType()
+				.useOrganisasjonsnummer(NAV_ORGNUMMER));
+		partAMP.setKontaktperson(journalpostQdist013.getOpprettetAvNavn());
+		return partAMP;
+	}
 
 	private String getFoedselsnummer(JournalpostQdist013 journalpostQdist013) {
 		if (brukerTypeIsAktoerId(journalpostQdist013)) {
@@ -385,14 +368,14 @@ public class AvtaltmeldingV2Mapper {
 		}
 	}
 
-    private String hentOrgNummerDAP(JournalpostQdist013 journalpostQdist013) {
-        return brukerTypeIsOrgnr(journalpostQdist013) ? journalpostQdist013.getBruker().getId() : null;
-    }
+	private String hentOrgNummerDAP(JournalpostQdist013 journalpostQdist013) {
+		return brukerTypeIsOrgnr(journalpostQdist013) ? journalpostQdist013.getBruker().getId() : null;
+	}
 
 	private String getSakspartNavnDAP(JournalpostQdist013 journalpostQdist013) {
 		var brukerId = journalpostQdist013.getBruker().getId();
 
-        if (brukerTypeIsOrgnr(journalpostQdist013)) {
+		if (brukerTypeIsOrgnr(journalpostQdist013)) {
 			return eregConsumer.hentOrganisasjonsnavn(brukerId);
 		} else {
 			return pdlGraphQLConsumer.hentPerson(brukerId).getFulltnavn();
