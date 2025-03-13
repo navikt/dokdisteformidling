@@ -71,11 +71,6 @@ public class Sdist001Service {
 		}
 	}
 
-	private boolean validateForsendelse(Forsendelse forsendelse, DownloadResponse downloadResponse) {
-		return downloadResponse.getConversationId().equals(forsendelse.getKonversasjonId()) &&
-			   !EKSPEDERT.name().equals(forsendelse.getForsendelseStatus());
-	}
-
 	private Consumer<Forsendelse> behandleForsendelse(DownloadResponse downloadResponse, ForsendelseStatusEndringer endringer) {
 		return forsendelse -> {
 
@@ -94,7 +89,12 @@ public class Sdist001Service {
 		};
 	}
 
-	public void kontrollerEformidlingStatus(String kvitteringStatus, Forsendelse forsendelse, ForsendelseStatusEndringer endringer) {
+	private boolean validateForsendelse(Forsendelse forsendelse, DownloadResponse downloadResponse) {
+		return downloadResponse.getConversationId().equals(forsendelse.getKonversasjonId()) &&
+			   !EKSPEDERT.name().equals(forsendelse.getForsendelseStatus());
+	}
+
+	private void kontrollerEformidlingStatus(String kvitteringStatus, Forsendelse forsendelse, ForsendelseStatusEndringer endringer) {
 		String forsendelseStatus = forsendelse.getForsendelseStatus();
 
 		if (!OVERSENDT.name().equals(forsendelseStatus) && !BEKREFTET.name().equals(forsendelse.getForsendelseStatus())) {
