@@ -32,7 +32,7 @@
 		<logstash-logback-encoder.version>8.0</logstash-logback-encoder.version>
 		<resilience4j.version>2.3.0</resilience4j.version>
 		<libraries-bom.version>26.56.0</libraries-bom.version>
-		<tink.version>1.16.0</tink.version>
+		<tink.version>1.17.0</tink.version>
 		<tink-gcpkms.version>1.10.0</tink-gcpkms.version>
 		<com.ibm.mq.jakarta.client.version>9.4.2.0</com.ibm.mq.jakarta.client.version>
 		<commons-io.version>2.18.0</commons-io.version>
