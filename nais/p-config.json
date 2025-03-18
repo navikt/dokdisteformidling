@@ -1,8 +1,10 @@
 {
   "APP_NAME": "dokdisteformidling",
   "INGRESSES": "https://dokdisteformidling.intern.nav.no",
-  "MIN_REPLICAS": "2",
-  "MAX_REPLICAS": "2",
+  "MIN_REPLICAS": "1",
+  "MAX_REPLICAS": "1",
+  "MEMORY_LIMITS": "8192Mi",
+  "MEMORY_REQUESTS": "6144Mi",
   "DOKDISTEFORMIDLING_ENDPOINTS_DOKDISTADMIN_URL": "https://dokdistadmin.intern.nav.no/rest/v1/administrerforsendelse",
   "DOKDISTEFORMIDLING_ENDPOINTS_DOKDISTADMIN_SCOPE": "api://prod-fss.teamdokumenthandtering.dokdistadmin/.default",
   "SECURITY_TOKEN_SERVICE_TOKEN_URL": "https://security-token-service.nais.adeo.no/rest/v1/sts/token",
