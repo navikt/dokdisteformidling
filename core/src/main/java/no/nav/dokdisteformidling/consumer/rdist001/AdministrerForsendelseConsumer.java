@@ -9,6 +9,8 @@ import no.nav.dokdisteformidling.utils.NavHeadersFilter;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Component;
+import org.springframework.util.unit.DataSize;
+import org.springframework.web.reactive.function.client.ExchangeStrategies;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 
@@ -31,6 +33,11 @@ public class AdministrerForsendelseConsumer implements AdministrerForsendelse {
 		this.webClient = webClient.mutate()
 				.baseUrl(dokdisteformidlingProperties.getEndpoints().getDokdistadmin().getUrl())
 				.defaultHeader(CONTENT_TYPE, APPLICATION_JSON_VALUE)
+				.exchangeStrategies(ExchangeStrategies.builder()
+						.codecs(clientCodecConfigurer -> clientCodecConfigurer
+								.defaultCodecs()
+								.maxInMemorySize((int) DataSize.ofMegabytes(1).toBytes()))
+						.build())
 				.filter(new NavHeadersFilter())
 				.build();
 	}
