@@ -4,7 +4,6 @@ import no.nav.dokdisteformidling.consumer.saf.journalpost.SafJournalpost;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
-import java.util.Collections;
 
 import static java.util.Collections.singletonList;
 

@@ -19,7 +19,7 @@ import org.springframework.core.io.FileSystemResource;
 
 import java.io.ByteArrayInputStream;
 import java.net.MalformedURLException;
-import java.net.URL;
+import java.net.URI;
 import java.time.Clock;
 import java.util.UUID;
 
@@ -51,12 +51,12 @@ class AltinnEformidlingManualTest {
 		System.setProperty("https.nonProxyHosts", "*.155.55.|*.192.168.|*.10.|*.local|*.rtv.gov|*.adeo.no|*.nav.no|*.aetat.no|*.devillo.no|*.oera.no");
 		maskinportenProperties.setAudience("https://oidc-ver1.difi.no/idporten-oidc-provider/");
 		maskinportenProperties.setClientid("MOVE_IP_991078045");
-		maskinportenProperties.setUrl(new URL("https://oidc-ver1.difi.no/idporten-oidc-provider/token"));
+		maskinportenProperties.setUrl(URI.create("https://oidc-ver1.difi.no/idporten-oidc-provider/token").toURL());
 		keyStoreProperties.setType(System.getProperty("virksomhetssertifikat.type"));
 		keyStoreProperties.setAlias(System.getProperty("virksomhetssertifikat.alias"));
 		keyStoreProperties.setPassword(System.getProperty("virksomhetssertifikat.password"));
 		keyStoreProperties.setPath(new FileSystemResource(System.getProperty("virksomhetssertifikat.path")));
-		serviceRegistryProperties.setUrl(new URL("https://qa-meldingsutveksling.difi.no/serviceregistry/"));
+		serviceRegistryProperties.setUrl(URI.create("https://qa-meldingsutveksling.difi.no/serviceregistry/").toURL());
 		appCertificate = new AppCertificate(keyStoreProperties);
 	}
 

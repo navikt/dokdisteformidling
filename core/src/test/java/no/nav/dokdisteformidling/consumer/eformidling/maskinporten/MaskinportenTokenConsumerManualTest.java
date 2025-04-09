@@ -10,7 +10,7 @@ import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.core.io.FileSystemResource;
 
 import java.net.MalformedURLException;
-import java.net.URL;
+import java.net.URI;
 
 @Disabled("Manuell test")
 class MaskinportenTokenConsumerManualTest {
@@ -37,7 +37,7 @@ class MaskinportenTokenConsumerManualTest {
 //        maskinportenProperties.setUrl(new URL("https://oidc-ver1.difi.no/idporten-oidc-provider/token"));
         // prod
         maskinportenProperties.setAudience("https://oidc.difi.no/idporten-oidc-provider/");
-        maskinportenProperties.setUrl(new URL("https://oidc.difi.no/idporten-oidc-provider/token"));
+        maskinportenProperties.setUrl(URI.create("https://oidc.difi.no/idporten-oidc-provider/token").toURL());
         keyStoreProperties.setType(System.getProperty("virksomhetssertifikat.type"));
         keyStoreProperties.setAlias(System.getProperty("virksomhetssertifikat.alias"));
         keyStoreProperties.setPassword(System.getProperty("virksomhetssertifikat.password"));
