@@ -4,8 +4,6 @@ import no.nav.dokdisteformidling.consumer.saf.journalpost.SafJournalpost;
 import no.nav.dokdisteformidling.exception.functional.SafJournalpostValidationException;
 import org.junit.jupiter.api.Test;
 
-import java.util.Collections;
-
 import static java.util.Collections.singletonList;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
