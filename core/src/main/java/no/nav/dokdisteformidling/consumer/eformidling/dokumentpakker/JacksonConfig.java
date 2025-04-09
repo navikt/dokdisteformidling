@@ -17,7 +17,7 @@ import java.time.temporal.TemporalQueries;
 
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
 import static com.fasterxml.jackson.core.JsonGenerator.Feature.AUTO_CLOSE_TARGET;
-import static com.fasterxml.jackson.core.JsonParser.Feature.ALLOW_UNQUOTED_CONTROL_CHARS;
+import static com.fasterxml.jackson.core.json.JsonReadFeature.ALLOW_UNESCAPED_CONTROL_CHARS;
 import static com.fasterxml.jackson.databind.MapperFeature.DEFAULT_VIEW_INCLUSION;
 import static com.fasterxml.jackson.databind.SerializationFeature.CLOSE_CLOSEABLE;
 import static com.fasterxml.jackson.databind.SerializationFeature.INDENT_OUTPUT;
@@ -43,7 +43,7 @@ public class JacksonConfig {
 				.serializationInclusion(NON_NULL)
 				.featuresToEnable(
 						INDENT_OUTPUT,
-						ALLOW_UNQUOTED_CONTROL_CHARS,
+						ALLOW_UNESCAPED_CONTROL_CHARS.mappedFeature(),
 						DEFAULT_VIEW_INCLUSION)
 				.featuresToDisable(
 						WRITE_DATES_AS_TIMESTAMPS,

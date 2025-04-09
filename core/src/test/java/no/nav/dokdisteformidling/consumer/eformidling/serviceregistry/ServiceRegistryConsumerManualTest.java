@@ -12,7 +12,7 @@ import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.core.io.FileSystemResource;
 
 import java.net.MalformedURLException;
-import java.net.URL;
+import java.net.URI;
 
 import static no.nav.dokdisteformidling.consumer.eformidling.EformidlingConstants.AVTALTMELDING_PROCESS;
 import static no.nav.dokdisteformidling.consumer.eformidling.EformidlingConstants.TRYGDERETTEN_ORGNUMMER;
@@ -43,7 +43,7 @@ class ServiceRegistryConsumerManualTest {
 //		maskinportenProperties.setUrl(new URL("https://oidc-ver1.difi.no/idporten-oidc-provider/token"));
 		//prod
 		maskinportenProperties.setAudience("https://oidc.difi.no/idporten-oidc-provider/");
-		maskinportenProperties.setUrl(new URL("https://oidc.difi.no/idporten-oidc-provider/token"));
+		maskinportenProperties.setUrl(URI.create("https://oidc.difi.no/idporten-oidc-provider/token").toURL());
 		keyStoreProperties.setType(System.getProperty("virksomhetssertifikat.type"));
 		keyStoreProperties.setAlias(System.getProperty("virksomhetssertifikat.alias"));
 		keyStoreProperties.setPassword(System.getProperty("virksomhetssertifikat.password"));
@@ -51,7 +51,7 @@ class ServiceRegistryConsumerManualTest {
 		//test
 //		serviceRegistryProperties.setUrl(new URL("https://qa-meldingsutveksling.difi.no/serviceregistry/"));
 		//prod
-		serviceRegistryProperties.setUrl(new URL("https://meldingsutveksling.difi.no/serviceregistry/"));
+		serviceRegistryProperties.setUrl(URI.create("https://meldingsutveksling.difi.no/serviceregistry/").toURL());
 	}
 
 	@Test
