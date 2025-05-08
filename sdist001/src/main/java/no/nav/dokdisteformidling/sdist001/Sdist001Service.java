@@ -6,6 +6,7 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.dokdisteformidling.consumer.eformidling.Eformidling;
 import no.nav.dokdisteformidling.consumer.eformidling.altinn.from.DownloadResponse;
+import no.nav.dokdisteformidling.consumer.eformidling.dokumentpakker.trygderetten.json.KvitteringStatus;
 import no.nav.dokdisteformidling.consumer.juridisklogg.JuridiskLogg;
 import no.nav.dokdisteformidling.consumer.juridisklogg.LagreJuridiskLoggMapper;
 import no.nav.dokdisteformidling.consumer.juridisklogg.LoggMeldingRequest;
@@ -19,8 +20,8 @@ import no.nav.dokdisteformidling.sdist001.domain.ForsendelseStatusEndringer;
 import no.nav.dokdisteformidling.sdist001.domain.to.AltinnKvitteringStatus;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.function.Consumer;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import static java.lang.Long.parseLong;
 import static java.time.LocalDateTime.now;
@@ -54,39 +55,55 @@ public class Sdist001Service {
 		log.info("sdist001 starter regelmessig jobb for å oppdatere status for eFormidlingforsendelser");
 
 		var endringer = new ForsendelseStatusEndringer();
-		List<Forsendelse> forsendelserTo = administrerForsendelse.hentEformidlingForsendelser().getForsendelser();
-		log.info("sdist001 hentet eformidlingforsendelser fra rdist001 {} ", forsendelserTo);
+		Map<String, Forsendelse> uekspederteTrygderettenForsendelser = hentUekspederteTrygderettenForsendelser();
+		log.info("sdist001 hentet antall={} uekspederte Trygderetten forsendelser fra dokdistadmin", uekspederteTrygderettenForsendelser.size());
 
-		if(forsendelserTo.isEmpty()) {
+		if (uekspederteTrygderettenForsendelser.isEmpty()) {
 			log.info("sdist001 har ingen forsendelser å avstemme. Henter ikke kvitteringer fra eFormidling");
 		} else {
 			eformidling.hent()
 					.forEach(downloadResponse -> {
+						String kvitteringKonversasjonId = downloadResponse.getConversationId();
 						log.info("Hentet trygderetten kvittering melding fra Altinn med konversasjonId={}, SendersReference={}, KvitteringStatus={}",
-								downloadResponse.getConversationId(), downloadResponse.getSendersReference(), downloadResponse.getKvitteringStatus());
-						forsendelserTo
-								.forEach(behandleForsendelse(downloadResponse, endringer));
+								kvitteringKonversasjonId, downloadResponse.getSendersReference(), downloadResponse.getKvitteringStatus());
+						if (uekspederteTrygderettenForsendelser.containsKey(kvitteringKonversasjonId)) {
+							Forsendelse forsendelse = uekspederteTrygderettenForsendelser.get(kvitteringKonversasjonId);
+							behandleForsendelse(forsendelse, downloadResponse, endringer);
+						} else {
+							log.warn("Trygderetten kvittering finnes ikke i oversikten over uekspederte Trygderetten forsendelser" +
+									 "konversasjonId={}, downloadResponse={}", kvitteringKonversasjonId, downloadResponse);
+						}
 					});
 			log.info("sdist001 har oppdatert status for eFormidlingforsendelser: {}", endringer);
 		}
 	}
 
-	private Consumer<Forsendelse> behandleForsendelse(DownloadResponse downloadResponse, ForsendelseStatusEndringer endringer) {
-		return forsendelse -> {
+	private Map<String, Forsendelse> hentUekspederteTrygderettenForsendelser() {
+		return administrerForsendelse.hentEformidlingForsendelser().getForsendelser()
+				.stream()
+				.filter(forsendelse -> !EKSPEDERT.name().equals(forsendelse.getForsendelseStatus()))
+				.filter(forsendelse -> forsendelse.getKonversasjonId() != null)
+				.collect(Collectors.toMap(Forsendelse::getKonversasjonId, forsendelse -> forsendelse));
+	}
 
-			try {
-				if (validateForsendelse(forsendelse, downloadResponse)) {
-					log.info("sdist001 behandler forsendelse={}", forsendelse);
-					kontrollerEformidlingStatus(downloadResponse.getKvitteringStatus().getStatus(), forsendelse, endringer);
+	private void behandleForsendelse(Forsendelse forsendelse, DownloadResponse downloadResponse, ForsendelseStatusEndringer endringer) {
+		try {
+			if (validateForsendelse(forsendelse, downloadResponse)) {
+				log.info("sdist001 behandler forsendelse={}", forsendelse);
+				KvitteringStatus kvitteringStatus = downloadResponse.getKvitteringStatus();
+				if(kvitteringStatus == null) {
+					log.info("Trygderetten kvittering har kvitteringStatus=null. Bekrefter denne likevel. downloadResponse={}", downloadResponse);
 				} else {
-					log.warn("sdist001 behandler ikke kvittering={} da konversasjonId ikke matcher eller forsendelseStatus=EKSPEDERT. forsendelse={}. " +
-							 "Bekrefter fremdeles mottak av kvittering", downloadResponse, forsendelse);
+					kontrollerEformidlingStatus(kvitteringStatus.getStatus(), forsendelse, endringer);
 				}
 				eformidling.bekreft(downloadResponse.getFileReference());
-			} catch (Exception e) {
-				log.error("sdist001 klarte ikke å behandle kvittering. forsendelse={}", forsendelse, e);
+			} else {
+				log.warn("sdist001 behandler ikke kvittering={} da konversasjonId ikke matcher eller forsendelseStatus=EKSPEDERT. forsendelse={}",
+						downloadResponse, forsendelse);
 			}
-		};
+		} catch (Exception e) {
+			log.error("sdist001 klarte ikke å behandle kvittering. forsendelse={}", forsendelse, e);
+		}
 	}
 
 	private boolean validateForsendelse(Forsendelse forsendelse, DownloadResponse downloadResponse) {
