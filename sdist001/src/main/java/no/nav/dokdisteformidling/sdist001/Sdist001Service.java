@@ -59,7 +59,7 @@ public class Sdist001Service {
 		log.info("sdist001 hentet antall={} uekspederte Trygderetten forsendelser fra dokdistadmin", uekspederteTrygderettenForsendelser.size());
 
 		if (uekspederteTrygderettenForsendelser.isEmpty()) {
-			log.info("sdist001 har ingen forsendelser å avstemme. Henter ikke kvitteringer fra eFormidling");
+			log.info("sdist001 har ingen uekspederte Trygderetten forsendelser å avstemme. Henter ikke kvitteringer fra eFormidling");
 		} else {
 			eformidling.hent()
 					.forEach(downloadResponse -> {
@@ -70,7 +70,7 @@ public class Sdist001Service {
 							Forsendelse forsendelse = uekspederteTrygderettenForsendelser.get(kvitteringKonversasjonId);
 							behandleForsendelse(forsendelse, downloadResponse, endringer);
 						} else {
-							log.warn("Trygderetten kvittering finnes ikke i oversikten over uekspederte Trygderetten forsendelser" +
+							log.warn("Trygderetten kvittering finnes ikke i oversikten over uekspederte Trygderetten forsendelser." +
 									 "konversasjonId={}, downloadResponse={}", kvitteringKonversasjonId, downloadResponse);
 						}
 					});
