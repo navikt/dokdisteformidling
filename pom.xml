@@ -34,7 +34,7 @@
 		<libraries-bom.version>26.59.0</libraries-bom.version>
 		<tink.version>1.17.0</tink.version>
 		<tink-gcpkms.version>1.10.0</tink-gcpkms.version>
-		<com.ibm.mq.jakarta.client.version>9.4.2.0</com.ibm.mq.jakarta.client.version>
+		<com.ibm.mq.jakarta.client.version>9.4.2.1</com.ibm.mq.jakarta.client.version>
 		<commons-io.version>2.19.0</commons-io.version>
 		<nimbus-jose-jwt.version>10.2</nimbus-jose-jwt.version>
 		<jaxws-ri.version>4.0.3</jaxws-ri.version>
