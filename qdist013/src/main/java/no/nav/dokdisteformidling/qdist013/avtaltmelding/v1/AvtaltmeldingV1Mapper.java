@@ -155,8 +155,8 @@ public class AvtaltmeldingV1Mapper {
         journalpost.setOpprettetAv(journalpostQdist013.getOpprettetAvNavn());
         addDokumentBeskrivelserToJournalpost(journalpost, journalpostQdist013, datoArkivmeldingOpprettet, objectFactory);
         journalpost.setTittel(journalpostQdist013.getTittel());
-        journalpost.getKorrespondansepart().add(createKorrespondanspartMottaker(objectFactory));
-        journalpost.getKorrespondansepart().add(createKorrespondanspartAvsender(objectFactory));
+        journalpost.getKorrespondansepart().add(createKorrespondansepartMottaker(objectFactory));
+        journalpost.getKorrespondansepart().add(createKorrespondansepartAvsender(objectFactory));
         journalpost.setJournalposttype(UTGAAENDE_DOKUMENT);
         journalpost.setJournalstatus(EKSPEDERT);
         journalpost.setJournaldato(convertLocalDateTimeToXmlGregorianCalendar(journalpostQdist013.getDatoJournalfoert()));
@@ -322,7 +322,7 @@ public class AvtaltmeldingV1Mapper {
         return FILFORMAT_JPEG.equals(dokumentvariant.getFiltype()) || FILFORMAT_PNG.equals(dokumentvariant.getFiltype());
     }
 
-    private Korrespondansepart createKorrespondanspartAvsender(ObjectFactory objectFactory) {
+    private Korrespondansepart createKorrespondansepartAvsender(ObjectFactory objectFactory) {
         Korrespondansepart korrespondansepartAvsender = objectFactory.createKorrespondansepart();
         korrespondansepartAvsender.setKorrespondanseparttype(AVSENDER);
         korrespondansepartAvsender.setKorrespondansepartNavn(NAV_KLAGEINSTANS);
@@ -331,7 +331,7 @@ public class AvtaltmeldingV1Mapper {
         return korrespondansepartAvsender;
     }
 
-    private Korrespondansepart createKorrespondanspartMottaker(ObjectFactory objectFactory) {
+    private Korrespondansepart createKorrespondansepartMottaker(ObjectFactory objectFactory) {
         Korrespondansepart korrespondansepartMottaker = objectFactory.createKorrespondansepart();
         korrespondansepartMottaker.setKorrespondanseparttype(MOTTAKER);
         korrespondansepartMottaker.setKorrespondansepartNavn(TRYGDERETTEN);
