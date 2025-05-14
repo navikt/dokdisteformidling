@@ -26,7 +26,7 @@ import java.util.List;
 
 import static java.util.stream.Collectors.toList;
 import static no.altinn.brokerserviceexternal.BrokerServiceAvailableFileStatus.UPLOADED;
-import static no.nav.dokdisteformidling.consumer.eformidling.EformidlingConstants.NAV_ORGNUMMER;
+import static no.nav.dokdisteformidling.consumer.eformidling.EformidlingConstants.NAV_KLAGEINSTANS_STYRINGSENHETEN_ORGNUMMER;
 
 @Component
 @Slf4j
@@ -74,7 +74,7 @@ public class AltinnEformidling implements Eformidling {
 
     UploadManifest mapUploadManifest(final MottakerInfo mottakerInfo, final String senderReference) {
         return UploadManifest.builder()
-                .avsender(NAV_ORGNUMMER)
+                .avsender(NAV_KLAGEINSTANS_STYRINGSENHETEN_ORGNUMMER)
                 .serviceCode(mottakerInfo.getServiceCode())
                 .serviceEditionCode(mottakerInfo.getServiceEditionCode())
                 .fileZipName(FILE_NAME)

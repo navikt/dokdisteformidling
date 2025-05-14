@@ -32,7 +32,7 @@ import static java.math.BigInteger.ONE;
 import static no.nav.dokdisteformidling.constants.DomainConstants.APP_NAME;
 import static no.nav.dokdisteformidling.constants.DomainConstants.VARIANTFORMAT_ARKIV;
 import static no.nav.dokdisteformidling.constants.DomainConstants.VARIANTFORMAT_SLADDET;
-import static no.nav.dokdisteformidling.consumer.eformidling.EformidlingConstants.NAV_ORGNUMMER;
+import static no.nav.dokdisteformidling.consumer.eformidling.EformidlingConstants.NAV_KLAGEINSTANS_STYRINGSENHETEN_ORGNUMMER;
 import static no.nav.dokdisteformidling.consumer.eformidling.EformidlingConstants.TRYGDERETTEN_ORGNUMMER;
 import static no.nav.dokdisteformidling.qdist013.util.ArkivMapperUtil.brukerTypeIsAktoerId;
 import static no.nav.dokdisteformidling.qdist013.util.ArkivMapperUtil.brukerTypeIsOrgnr;
@@ -155,8 +155,8 @@ public class AvtaltmeldingV1Mapper {
         journalpost.setOpprettetAv(journalpostQdist013.getOpprettetAvNavn());
         addDokumentBeskrivelserToJournalpost(journalpost, journalpostQdist013, datoArkivmeldingOpprettet, objectFactory);
         journalpost.setTittel(journalpostQdist013.getTittel());
-        journalpost.getKorrespondansepart().add(createAndPolpulateKorrespondanspartMottaker(objectFactory));
-        journalpost.getKorrespondansepart().add(createAndPolpulateKorrespondanspartAvsender(objectFactory));
+        journalpost.getKorrespondansepart().add(createKorrespondanspartMottaker(objectFactory));
+        journalpost.getKorrespondansepart().add(createKorrespondanspartAvsender(objectFactory));
         journalpost.setJournalposttype(UTGAAENDE_DOKUMENT);
         journalpost.setJournalstatus(EKSPEDERT);
         journalpost.setJournaldato(convertLocalDateTimeToXmlGregorianCalendar(journalpostQdist013.getDatoJournalfoert()));
@@ -322,16 +322,16 @@ public class AvtaltmeldingV1Mapper {
         return FILFORMAT_JPEG.equals(dokumentvariant.getFiltype()) || FILFORMAT_PNG.equals(dokumentvariant.getFiltype());
     }
 
-    private Korrespondansepart createAndPolpulateKorrespondanspartAvsender(ObjectFactory objectFactory) {
+    private Korrespondansepart createKorrespondanspartAvsender(ObjectFactory objectFactory) {
         Korrespondansepart korrespondansepartAvsender = objectFactory.createKorrespondansepart();
         korrespondansepartAvsender.setKorrespondanseparttype(AVSENDER);
         korrespondansepartAvsender.setKorrespondansepartNavn(NAV_KLAGEINSTANS);
         korrespondansepartAvsender.setOrganisasjonsnummer(new EnhetsidentifikatorType()
-                .useOrganisasjonsnummer(TRYGDERETTEN_ORGNUMMER));
+                .useOrganisasjonsnummer(NAV_KLAGEINSTANS_STYRINGSENHETEN_ORGNUMMER));
         return korrespondansepartAvsender;
     }
 
-    private Korrespondansepart createAndPolpulateKorrespondanspartMottaker(ObjectFactory objectFactory) {
+    private Korrespondansepart createKorrespondanspartMottaker(ObjectFactory objectFactory) {
         Korrespondansepart korrespondansepartMottaker = objectFactory.createKorrespondansepart();
         korrespondansepartMottaker.setKorrespondanseparttype(MOTTAKER);
         korrespondansepartMottaker.setKorrespondansepartNavn(TRYGDERETTEN);
@@ -357,7 +357,7 @@ public class AvtaltmeldingV1Mapper {
         partAMP.setPartNavn(NAV_KLAGEINSTANS);
         partAMP.setPartRolle(SAKSPART_ROLLE_AMP);
         partAMP.setOrganisasjonsnummer(new EnhetsidentifikatorType()
-                .useOrganisasjonsnummer(NAV_ORGNUMMER));
+                .useOrganisasjonsnummer(NAV_KLAGEINSTANS_STYRINGSENHETEN_ORGNUMMER));
         partAMP.setKontaktperson(journalpostQdist013.getOpprettetAvNavn());
         return partAMP;
     }
