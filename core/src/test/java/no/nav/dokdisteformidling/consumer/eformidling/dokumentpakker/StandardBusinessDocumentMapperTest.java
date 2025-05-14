@@ -17,7 +17,7 @@ import java.time.OffsetDateTime;
 import java.util.UUID;
 
 import static no.nav.dokdisteformidling.constants.DomainConstants.DEFAULT_ZONE_ID;
-import static no.nav.dokdisteformidling.consumer.eformidling.EformidlingConstants.NAV_ORGNUMMER;
+import static no.nav.dokdisteformidling.consumer.eformidling.EformidlingConstants.NAV_KLAGEINSTANS_STYRINGSENHETEN_ORGNUMMER;
 import static no.nav.dokdisteformidling.consumer.eformidling.EformidlingConstants.TRYGDERETTEN_ORGNUMMER;
 import static no.nav.dokdisteformidling.consumer.eformidling.dokumentpakker.StandardBusinessDocumentMapper.AVTALTMELDING_FORRETNINGSMELDING;
 import static no.nav.dokdisteformidling.consumer.eformidling.dokumentpakker.StandardBusinessDocumentMapper.DOCUMENT_IDENTIFICATOR_STANDARD;
@@ -50,7 +50,7 @@ class StandardBusinessDocumentMapperTest {
 				.extracting(PartnerIdentification::getAuthority).contains(IDENTIFIER_AUTHORITY);
 		assertThat(sbd.getStandardBusinessDocumentHeader().getSender())
 				.extracting(Sender::getIdentifier)
-				.extracting(PartnerIdentification::getValue).contains(Organisasjonsnummer.asIso6523(NAV_ORGNUMMER));
+				.extracting(PartnerIdentification::getValue).contains(Organisasjonsnummer.asIso6523(NAV_KLAGEINSTANS_STYRINGSENHETEN_ORGNUMMER));
 		assertThat(sbd.getStandardBusinessDocumentHeader().getReceiver())
 				.extracting(Receiver::getIdentifier)
 				.extracting(PartnerIdentification::getAuthority).contains(IDENTIFIER_AUTHORITY);

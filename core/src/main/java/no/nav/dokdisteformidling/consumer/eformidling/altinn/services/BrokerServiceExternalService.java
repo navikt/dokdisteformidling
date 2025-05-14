@@ -27,7 +27,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static no.nav.dokdisteformidling.consumer.eformidling.EformidlingConstants.NAV_ORGNUMMER;
+import static no.nav.dokdisteformidling.consumer.eformidling.EformidlingConstants.NAV_KLAGEINSTANS_STYRINGSENHETEN_ORGNUMMER;
 import static no.nav.dokdisteformidling.consumer.eformidling.EformidlingConstants.TRYGDERETTEN_ORGNUMMER;
 import static no.nav.dokdisteformidling.utils.DateConverterUtil.convertLocalDateTimeToXmlGregorianCalendar;
 
@@ -58,7 +58,7 @@ public class BrokerServiceExternalService {
 
     public Optional<BrokerServiceAvailableFileList> getFileReferences(SearchCriteria criteria, ServiceCode serviceCode) {
         try {
-            return Optional.of(brokerServiceExternal.getAvailableFiles(getBrokerServiceSearch(NAV_ORGNUMMER, serviceCode, criteria)));
+            return Optional.of(brokerServiceExternal.getAvailableFiles(getBrokerServiceSearch(NAV_KLAGEINSTANS_STYRINGSENHETEN_ORGNUMMER, serviceCode, criteria)));
         } catch (IBrokerServiceExternalGetAvailableFilesAltinnFaultFaultFaultMessage e) {
             throw new AltinnBrokerServiceWsException(GET_AVAILABLE_FILES_FEILET, AltinnReasonFactory.from(e), e);
         }
@@ -66,7 +66,7 @@ public class BrokerServiceExternalService {
 
     public void confirmDownloaded(String fileReference) {
         try {
-            brokerServiceExternal.confirmDownloaded(fileReference, NAV_ORGNUMMER);
+            brokerServiceExternal.confirmDownloaded(fileReference, NAV_KLAGEINSTANS_STYRINGSENHETEN_ORGNUMMER);
             log.info("Sender nedlasting bekreftelse for fileReference:{} til Altinn", fileReference);
         } catch (IBrokerServiceExternalConfirmDownloadedAltinnFaultFaultFaultMessage e) {
             log.error(CONFIRM_DOWNLOADED_FEILET + "med fileReference: {}",fileReference);

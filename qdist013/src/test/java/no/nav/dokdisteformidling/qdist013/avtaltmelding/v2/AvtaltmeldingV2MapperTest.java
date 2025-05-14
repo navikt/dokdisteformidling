@@ -36,7 +36,8 @@ import static no.nav.dokdisteformidling.constants.DomainConstants.APP_NAME;
 import static no.nav.dokdisteformidling.constants.DomainConstants.VARIANTFORMAT_ARKIV;
 import static no.nav.dokdisteformidling.constants.DomainConstants.VARIANTFORMAT_PRODUKSJON;
 import static no.nav.dokdisteformidling.constants.DomainConstants.VARIANTFORMAT_SLADDET;
-import static no.nav.dokdisteformidling.consumer.eformidling.EformidlingConstants.NAV_ORGNUMMER;
+import static no.nav.dokdisteformidling.consumer.eformidling.EformidlingConstants.NAV_KLAGEINSTANS_STYRINGSENHETEN_ORGNUMMER;
+import static no.nav.dokdisteformidling.consumer.eformidling.EformidlingConstants.TRYGDERETTEN_ORGNUMMER;
 import static no.nav.dokdisteformidling.qdist013.TestUtil.convertFromXmlGregorianCalendarToLocalDateTime;
 import static no.nav.dokdisteformidling.qdist013.avtaltmelding.v2.AvtaltmeldingV2Mapper.FERDIGSTILT;
 import static no.nav.dokdisteformidling.qdist013.avtaltmelding.v2.AvtaltmeldingV2Mapper.INNGAAENDE;
@@ -618,10 +619,12 @@ class AvtaltmeldingV2MapperTest {
 		Korrespondansepart mottaker = korrespondansepartList.getFirst();
 		assertEquals(MOTTAKER, mottaker.getKorrespondanseparttype());
 		assertEquals(TRYGDERETTEN, mottaker.getKorrespondansepartNavn());
+		assertEquals(TRYGDERETTEN_ORGNUMMER, mottaker.getOrganisasjonsnummer().getOrganisasjonsnummer());
 
 		Korrespondansepart avsender = korrespondansepartList.get(1);
 		assertEquals(AVSENDER, avsender.getKorrespondanseparttype());
 		assertEquals(NAV_KLAGEINSTANS, avsender.getKorrespondansepartNavn());
+		assertEquals(NAV_KLAGEINSTANS_STYRINGSENHETEN_ORGNUMMER, avsender.getOrganisasjonsnummer().getOrganisasjonsnummer());
 	}
 
 	private void assertSakspart(List<Part> sakspartList) {
@@ -632,7 +635,7 @@ class AvtaltmeldingV2MapperTest {
 		assertEquals(NAV_KLAGEINSTANS, sakspartAMP.getPartNavn());
 		assertEquals(SAKSPART_ROLLE_AMP, sakspartAMP.getPartRolle());
 		assertEquals(OPPRETTET_AV_NAVN, sakspartAMP.getKontaktperson());
-		assertEquals(NAV_ORGNUMMER, sakspartAMP.getOrganisasjonsnummer().getOrganisasjonsnummer());
+		assertEquals(NAV_KLAGEINSTANS_STYRINGSENHETEN_ORGNUMMER, sakspartAMP.getOrganisasjonsnummer().getOrganisasjonsnummer());
 		assertNull(sakspartAMP.getFoedselsnummer());
 
 		Part sakspartDAP = sakspartList.get(1);
