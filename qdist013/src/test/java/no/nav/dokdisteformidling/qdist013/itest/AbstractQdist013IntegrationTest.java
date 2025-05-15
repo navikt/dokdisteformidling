@@ -31,7 +31,7 @@ import static org.springframework.http.MediaType.APPLICATION_XML_VALUE;
 @SpringBootTest(classes = {ApplicationTestConfig.class},
 		webEnvironment = RANDOM_PORT)
 @AutoConfigureWireMock(port = 0)
-@ActiveProfiles({"itest", "avtaltmelding_v1"})
+@ActiveProfiles({"itest", "avtaltmelding_v2"})
 public abstract class AbstractQdist013IntegrationTest {
 
 	protected static final String FORSENDELSE_ID = "33333";
