@@ -17,6 +17,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
@@ -118,16 +119,17 @@ public class StandardBusinessDocumentHeader {
 	}
 
 	@JsonIgnore
-	public String getReceiverOrganisationNumber() {
+	public String getDocumentType() {
+		return this.getDocumentIdentification().getStandard();
+	}
 
-		if (receiver.size() != 1) {
-			throw new RuntimeException(String.valueOf(receiver.size()));
-		}
-		Partner partner = receiver.iterator().next();
-		PartnerIdentification identifier = partner.getIdentifier();
-		if (identifier == null) {
-			throw new RuntimeException();
-		}
-		return identifier.getValue();
+	@JsonIgnore
+	public Set<Scope> getScopes() {
+		return Optional.ofNullable(this.getBusinessScope()).flatMap((p) -> Optional.ofNullable(p.getScope())).orElseGet(Collections::emptySet);
+	}
+
+	@JsonIgnore
+	public Optional<Scope> getScope(ScopeType scopeType) {
+		return this.getScopes().stream().filter((scope) -> scopeType.toString().equals(scope.getType()) || scopeType.name().equals(scope.getType())).findAny();
 	}
 }
