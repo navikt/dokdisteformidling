@@ -55,7 +55,7 @@ public class LightweightSafJournalpostQueryServiceImplQdist013 implements SafJou
 		SafJournalpost safJournalpost = safGraphqlConsumer.performQuery(request);
 
 		if (safJournalpost.getAvsenderMottaker() == null || isEmpty(safJournalpost.getAvsenderMottaker().getNavn())) {
-			log.warn("AvsenderMottakerNavn er null eller tom i respons fra SAF på journalpostId={}", journalpostId);
+			log.info("AvsenderMottakerNavn er null eller tom i respons fra SAF på journalpostId={}", journalpostId);
 		}
 
 		return LightweightSafJournalpostQdist013.builder()
