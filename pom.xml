@@ -21,22 +21,22 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>3.4.5</version>
+		<version>3.5.0</version>
 	</parent>
 
 	<properties>
 		<java.version>21</java.version>
 
 		<camel.version>4.11.0</camel.version>
-		<cxf.version>4.1.1</cxf.version>
+		<cxf.version>4.1.2</cxf.version>
 		<logstash-logback-encoder.version>8.1</logstash-logback-encoder.version>
 		<resilience4j.version>2.3.0</resilience4j.version>
-		<libraries-bom.version>26.59.0</libraries-bom.version>
+		<libraries-bom.version>26.61.0</libraries-bom.version>
 		<tink.version>1.17.0</tink.version>
 		<tink-gcpkms.version>1.10.0</tink-gcpkms.version>
 		<com.ibm.mq.jakarta.client.version>9.4.2.1</com.ibm.mq.jakarta.client.version>
 		<commons-io.version>2.19.0</commons-io.version>
-		<nimbus-jose-jwt.version>10.2</nimbus-jose-jwt.version>
+		<nimbus-jose-jwt.version>10.3</nimbus-jose-jwt.version>
 		<jaxws-ri.version>4.0.3</jaxws-ri.version>
 		<commons-asic.version>1.0.2</commons-asic.version>
 		<httpclient4.version>4.5.14</httpclient4.version>
@@ -46,7 +46,7 @@
 		<melding-virksomhet-dokdistfordeling.version>7-18c61bf</melding-virksomhet-dokdistfordeling.version>
 
 		<!-- test -->
-		<spring-cloud-contract-wiremock.version>4.2.1</spring-cloud-contract-wiremock.version>
+		<spring-cloud-contract-wiremock.version>4.3.0</spring-cloud-contract-wiremock.version>
 
 		<!-- Plugins -->
 		<maven-jaxb2-plugin.version>2.1.1</maven-jaxb2-plugin.version>

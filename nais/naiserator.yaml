@@ -98,3 +98,7 @@ spec:
     application:
       enabled: true
   webproxy: true
+  observability:
+    logging:
+      destinations:
+        - id: elastic
