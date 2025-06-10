@@ -11,7 +11,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import static no.nav.dokdisteformidling.consumer.eformidling.EformidlingConstants.NAV_ORGNUMMER;
+import static no.nav.dokdisteformidling.consumer.eformidling.EformidlingConstants.NAV_KLAGEINSTANS_STYRINGSENHETEN_ORGNUMMER;
 import static no.nav.dokdisteformidling.consumer.eformidling.EformidlingConstants.TRYGDERETTEN_ORGNUMMER;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
@@ -40,7 +40,7 @@ class BrokerServiceExternalServiceTest {
 		final BrokerServiceInitiation brokerServiceInitiation = brokerServiceInitiationArgumentCaptor.getValue();
 		assertThat(brokerServiceInitiation.getManifest())
 				.extracting("externalServiceCode", "externalServiceEditionCode", "reportee", "sendersReference")
-				.contains(SERVICE_CODE, Integer.parseInt(SERVICE_EDITION_CODE), NAV_ORGNUMMER, SENDER_REFERENCE);
+				.contains(SERVICE_CODE, Integer.parseInt(SERVICE_EDITION_CODE), NAV_KLAGEINSTANS_STYRINGSENHETEN_ORGNUMMER, SENDER_REFERENCE);
 		assertThat(brokerServiceInitiation.getManifest().getPropertyList())
 				.isNull();
 		assertThat(brokerServiceInitiation.getManifest().getFileList().getValue().getFile())
@@ -54,7 +54,7 @@ class BrokerServiceExternalServiceTest {
 
 	private UploadManifest createUploadManifest() {
 		return UploadManifest.builder()
-				.avsender(NAV_ORGNUMMER)
+				.avsender(NAV_KLAGEINSTANS_STYRINGSENHETEN_ORGNUMMER)
 				.fileZipName(FILE_ZIP_NAME)
 				.senderReference(SENDER_REFERENCE)
 				.serviceCode(SERVICE_CODE)

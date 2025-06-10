@@ -19,7 +19,7 @@ import java.io.OutputStream;
 import java.util.stream.Stream;
 
 import static no.difi.asic.MimeType.XML;
-import static no.nav.dokdisteformidling.consumer.eformidling.EformidlingConstants.NAV_ORGNUMMER;
+import static no.nav.dokdisteformidling.consumer.eformidling.EformidlingConstants.NAV_KLAGEINSTANS_STYRINGSENHETEN_ORGNUMMER;
 import static no.nav.dokdisteformidling.consumer.eformidling.EformidlingConstants.TRYGDERETTEN_ORGNUMMER;
 
 /**
@@ -42,7 +42,7 @@ class AsiceCreator {
 									 AppCertificate appCertificate) throws IOException {
 
 		ByteArrayOutputStream asiceArchive = new ByteArrayOutputStream();
-		String xmlManifest = xmlManifestCreator.createManifest(arkivmelding, NAV_ORGNUMMER, TRYGDERETTEN_ORGNUMMER);
+		String xmlManifest = xmlManifestCreator.createManifest(arkivmelding, NAV_KLAGEINSTANS_STYRINGSENHETEN_ORGNUMMER, TRYGDERETTEN_ORGNUMMER);
 
 		AsicWriter asicWriter = AsicWriterFactory.newFactory()
 				.newContainer(asiceArchive)
