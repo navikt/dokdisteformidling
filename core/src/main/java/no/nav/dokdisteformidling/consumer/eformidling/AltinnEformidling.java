@@ -7,7 +7,6 @@ import no.nav.dokdisteformidling.certificate.AppCertificate;
 import no.nav.dokdisteformidling.consumer.eformidling.altinn.from.AltinnDokument;
 import no.nav.dokdisteformidling.consumer.eformidling.altinn.from.DownloadResponse;
 import no.nav.dokdisteformidling.consumer.eformidling.altinn.from.DownloadedMessageFromAltinn;
-import no.nav.dokdisteformidling.consumer.eformidling.altinn.mapper.DownloadResponseBuilder;
 import no.nav.dokdisteformidling.consumer.eformidling.altinn.mapper.InputStreamDataSource;
 import no.nav.dokdisteformidling.consumer.eformidling.altinn.services.BrokerServiceExternalService;
 import no.nav.dokdisteformidling.consumer.eformidling.altinn.services.BrokerServiceExternalStreamedService;
@@ -84,8 +83,9 @@ public class AltinnEformidling implements Eformidling {
 
     @Override
     public List<DownloadResponse> hent() {
-        log.info("Henter filreferanser til meldinger fra Trygderetten som kan lastes ned gjennom Altinns formidlingstjeneste");
-        List<String> filreferanser = brokerServiceExternalService.getAvailableFiles(getSearchCriteria(), getServiceCode());
+        final ServiceCode serviceCode = getServiceCode();
+        log.info("Henter filreferanser til meldinger fra Trygderetten som kan lastes ned gjennom Altinns formidlingstjeneste på serviceCode={}", serviceCode);
+        List<String> filreferanser = brokerServiceExternalService.getAvailableFiles(getSearchCriteria(), serviceCode);
         log.info("Hentet {} filreferanser fra Altinn, referanser={}", filreferanser.size(), filreferanser);
 
         log.info("Henter meldinger fra Altinn");
@@ -124,7 +124,7 @@ public class AltinnEformidling implements Eformidling {
     }
 
     private List<DownloadResponse> getDownloadResponses(List<AltinnDokument> altinnDokuments) {
-        return altinnDokuments.stream().map(altinnDokument -> new DownloadResponseBuilder().withAltinnDokument(altinnDokument).build()).collect(toList());
+        return altinnDokuments.stream().map(DownloadResponse::from).collect(toList());
     }
 
     @Override

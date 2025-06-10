@@ -56,7 +56,8 @@ public class SafGraphqlConsumer {
 				responseEntity.getBody().getData().getJournalpost() == null) {
 				// Forsøk på nytt. GraphQL endepunktet gir kun httpstatus 200. Verdikjeden forventer at man finner journalpost her.
 				// Hvis ikke er dette en teknisk feil, ikke funksjonell feil.
-				throw new SafJournalpostIkkeFunnetException("Ingen journalpost ble funnet i saf.");
+				String journalpostId = (String) graphQLRequest.getVariables().get("queryJournalpostId");
+				throw new SafJournalpostIkkeFunnetException("Journalpost med journalpostId=" + journalpostId + " ble ikke funnet i saf.");
 			}
 			return responseEntity.getBody().getJournalpost();
 		} catch (HttpClientErrorException e) {
