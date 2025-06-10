@@ -18,7 +18,7 @@ import java.time.OffsetDateTime;
 import java.util.UUID;
 
 import static java.time.Duration.ofDays;
-import static no.nav.dokdisteformidling.consumer.eformidling.EformidlingConstants.NAV_ORGNUMMER;
+import static no.nav.dokdisteformidling.consumer.eformidling.EformidlingConstants.NAV_KLAGEINSTANS_STYRINGSENHETEN_ORGNUMMER;
 import static no.nav.dokdisteformidling.consumer.eformidling.EformidlingConstants.TRYGDERETTEN_ORGNUMMER;
 import static no.nav.dokdisteformidling.consumer.eformidling.Organisasjonsnummer.asIso6523;
 
@@ -78,7 +78,7 @@ public class StandardBusinessDocumentMapper {
 		final Sender sender = new Sender();
 		final PartnerIdentification senderIdentification = new PartnerIdentification();
 		senderIdentification.setAuthority(IDENTIFIER_AUTHORITY);
-		senderIdentification.setValue(asIso6523(NAV_ORGNUMMER));
+		senderIdentification.setValue(asIso6523(NAV_KLAGEINSTANS_STYRINGSENHETEN_ORGNUMMER));
 		sender.setIdentifier(senderIdentification);
 		return sender;
 	}

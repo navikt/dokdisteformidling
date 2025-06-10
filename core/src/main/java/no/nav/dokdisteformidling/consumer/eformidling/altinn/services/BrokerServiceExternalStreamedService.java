@@ -27,7 +27,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static java.util.stream.Collectors.toList;
-import static no.nav.dokdisteformidling.consumer.eformidling.EformidlingConstants.NAV_ORGNUMMER;
+import static no.nav.dokdisteformidling.consumer.eformidling.EformidlingConstants.NAV_KLAGEINSTANS_STYRINGSENHETEN_ORGNUMMER;
 import static no.nav.dokdisteformidling.consumer.eformidling.altinn.to.AltinnReasonFactory.from;
 import static org.apache.cxf.headers.Header.HEADER_LIST;
 
@@ -55,7 +55,7 @@ public class BrokerServiceExternalStreamedService {
 		Header filename = null;
 
 		try {
-			reportee = new Header(new QName(ALTINN_BROKERSERVICEEXTERNALSTREAMED_NAMESPACE, "Reportee"), NAV_ORGNUMMER, new JAXBDataBinding(String.class));
+			reportee = new Header(new QName(ALTINN_BROKERSERVICEEXTERNALSTREAMED_NAMESPACE, "Reportee"), NAV_KLAGEINSTANS_STYRINGSENHETEN_ORGNUMMER, new JAXBDataBinding(String.class));
 			reference = new Header(new QName(ALTINN_BROKERSERVICEEXTERNALSTREAMED_NAMESPACE, "Reference"), fileReference, new JAXBDataBinding(String.class));
 			filename = new Header(new QName(ALTINN_BROKERSERVICEEXTERNALSTREAMED_NAMESPACE, "FileName"), fileName, new JAXBDataBinding(String.class));
 		} catch (JAXBException e) {
@@ -115,7 +115,7 @@ public class BrokerServiceExternalStreamedService {
 		log.info("Laster ned fil fra Altinn med filreferanse={}", filreferanse);
 
 		try {
-			final DataHandler dataHandler = brokerServiceExternalStreamed.downloadFileStreamed(filreferanse, NAV_ORGNUMMER);
+			final DataHandler dataHandler = brokerServiceExternalStreamed.downloadFileStreamed(filreferanse, NAV_KLAGEINSTANS_STYRINGSENHETEN_ORGNUMMER);
 			log.info("Lastet ned fil fra Altinn med filreferanse={}", filreferanse);
 			return dataHandler;
 		} catch (IBrokerServiceExternalStreamedDownloadFileStreamedAltinnFaultFaultFaultMessage e) {
