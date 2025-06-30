@@ -49,7 +49,7 @@
 		<spring-cloud-contract-wiremock.version>4.3.0</spring-cloud-contract-wiremock.version>
 
 		<!-- Plugins -->
-		<maven-jaxb2-plugin.version>2.1.1</maven-jaxb2-plugin.version>
+		<maven-jaxb2-plugin.version>2.2.1</maven-jaxb2-plugin.version>
 		<hisrc-basicjaxb.version>2.2.1</hisrc-basicjaxb.version>
 		<maven-toolchains-plugin.version>3.2.0</maven-toolchains-plugin.version>
 	</properties>
