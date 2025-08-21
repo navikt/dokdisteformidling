@@ -27,7 +27,6 @@ public class HeaderOutInterceptor extends AbstractPhaseInterceptor {
 
     @Override
     public void handleMessage(Message message) {
-        log.info("Adding Keep-Alive header");
         Map<String, List> headers = (Map<String, List>) message.get(PROTOCOL_HEADERS);
         headers.put("Connection", singletonList("Keep-Alive"));
     }
