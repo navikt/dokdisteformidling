@@ -19,6 +19,8 @@ import static no.nav.dokdisteformidling.constants.RouteConstants.PROPERTY_FORSEN
 import static no.nav.dokdisteformidling.constants.RouteConstants.PROPERTY_JOURNALPOST_ID;
 import static no.nav.dokdisteformidling.constants.RouteConstants.QDIST013_SERVICE_ID;
 import static org.apache.camel.LoggingLevel.ERROR;
+import static org.apache.camel.LoggingLevel.INFO;
+import static org.apache.camel.LoggingLevel.WARN;
 
 @Component
 public class Qdist013Route extends RouteBuilder {
@@ -52,7 +54,7 @@ public class Qdist013Route extends RouteBuilder {
 		onException(AbstractDokdisteformidlingFunctionalException.class, ValidationException.class)
 				.handled(true)
 				.useOriginalMessage()
-				.log(LoggingLevel.WARN, log, "${exception}; " + getIdsForLogging())
+				.log(WARN, log, "${exception}; " + getIdsForLogging())
 				.to("jms:" + qdist013FunksjonellFeil.getQueueName());
 
 		from("jms:" + qdist013.getQueueName() +
@@ -60,15 +62,15 @@ public class Qdist013Route extends RouteBuilder {
 				.routeId(QDIST013_SERVICE_ID)
 				.setExchangePattern(ExchangePattern.InOnly)
 				.process(new IdsProcessor())
-				.log(LoggingLevel.INFO, log, "qdist013 har mottatt forsendelse med forsendelseId=${exchangeProperty." + PROPERTY_FORSENDELSE_ID + "}")
+				.log(INFO, log, "qdist013 har mottatt forsendelse med forsendelseId=${exchangeProperty." + PROPERTY_FORSENDELSE_ID + "}")
 				.to("validator:no/nav/meldinger/virksomhet/dokdistfordeling/xsd/qdist008/out/distribuertilkanal.xsd")
 				.unmarshal(new JaxbDataFormat(JAXBContext.newInstance(DistribuerTilKanal.class)))
 				.bean(distribuerForsendelseTilTrygderettenMapper)
 				.bean(qdist013Service)
-				.log(LoggingLevel.INFO, log, "qdist013 har sendt forsendelse med " + getIdsForLogging() + " til Trygderetten gjennom eFormidling. " +
-						"Forsendelsen inneholder ${exchangeProperty.antallDok} dokumenter og avtaltmelding.")
+				.log(INFO, log, "qdist013 har sendt forsendelse med " + getIdsForLogging() + " til Trygderetten gjennom eFormidling. " +
+								"Forsendelsen inneholder ${exchangeProperty.antallDok} dokumenter og avtaltmelding.")
 				.bean(dokdistAdministrerforsendelseUpdater, "updateStatusAndConversationId")
-				.log(LoggingLevel.INFO, log, "qdist013 har oppdatert dokdistDb med konversasjonsId=${exchangeProperty.conversationId} og forsendelseStatus=OVERSENDT og avslutter behandling av forsendelse med " + getIdsForLogging())
+				.log(INFO, log, "qdist013 har oppdatert dokdistDb med konversasjonsId=${exchangeProperty.conversationId} og forsendelseStatus=OVERSENDT og avslutter behandling av forsendelse med " + getIdsForLogging())
 				.end();
 	}
 
