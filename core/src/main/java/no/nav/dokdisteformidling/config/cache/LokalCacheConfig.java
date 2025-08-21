@@ -32,15 +32,19 @@ public class LokalCacheConfig {
 		manager.setCaches(asList(
 				new CaffeineCache(AZURE_TOKEN_CACHE, Caffeine.newBuilder()
 						.expireAfterWrite(55, MINUTES)
+						.recordStats()
 						.build()),
 				new CaffeineCache(STS_CACHE, Caffeine.newBuilder()
 						.expireAfterWrite(55, MINUTES)
+						.recordStats()
 						.build()),
 				new CaffeineCache(LIGHTWEIGHT_SAF_JOURNALPOST_QDIST013_CACHE, Caffeine.newBuilder()
 						.expireAfterWrite(30, SECONDS)
+						.recordStats()
 						.build()),
 				new CaffeineCache(SAF_JOURNALPOST_QDIST013_CACHE, Caffeine.newBuilder()
 						.expireAfterWrite(30, SECONDS)
+						.recordStats()
 						.build())
 		));
 
