@@ -53,6 +53,5 @@ public class BrokerServiceExternalStreamedConfig extends AbstractCxfEndpointConf
         client.getRequestContext().put("ws-security.callback-handler", new ClientCallBackHandler(dpoUserProperties));
         client.getRequestContext().put("org.apache.cxf.message.Message.MAINTAIN_SESSION", TRUE);
         client.getRequestContext().put("jakarta.xml.ws.session.maintain", TRUE);
-        client.getRequestContext().put("org.apache.cxf.stax.maxChildElements", "300000");
     }
 }
