@@ -71,7 +71,8 @@ public class Sdist001Service {
 							behandleForsendelse(forsendelse, downloadResponse, endringer);
 						} else {
 							log.warn("Trygderetten kvittering finnes ikke i oversikten over uekspederte Trygderetten forsendelser." +
-									 "konversasjonId={}, downloadResponse={}", kvitteringKonversasjonId, downloadResponse);
+									 "konversasjonId={}, downloadResponse={}. Bekrefter fileReference.", kvitteringKonversasjonId, downloadResponse);
+							eformidling.bekreft(downloadResponse.getFileReference());
 						}
 					});
 			log.info("sdist001 har oppdatert status for eFormidlingforsendelser: {}", endringer);
