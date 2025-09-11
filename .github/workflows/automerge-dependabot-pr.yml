@@ -11,5 +11,6 @@ jobs:
       contents: write
       pull-requests: write
       statuses: read
+      id-token: write
     uses: navikt/dok-workflows/.github/workflows/automerge-dependabot-pr.yml@main
     secrets: inherit
