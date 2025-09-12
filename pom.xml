@@ -36,7 +36,7 @@
 		<tink-gcpkms.version>1.10.0</tink-gcpkms.version>
 		<com.ibm.mq.jakarta.client.version>9.4.3.1</com.ibm.mq.jakarta.client.version>
 		<commons-io.version>2.20.0</commons-io.version>
-		<nimbus-jose-jwt.version>10.4.2</nimbus-jose-jwt.version>
+		<nimbus-jose-jwt.version>10.5</nimbus-jose-jwt.version>
 		<jaxws-ri.version>4.0.3</jaxws-ri.version>
 		<commons-asic.version>1.0.2</commons-asic.version>
 		<httpclient4.version>4.5.14</httpclient4.version>
