@@ -45,7 +45,7 @@ public class EregConsumer {
 				.retrieve()
 				.bodyToMono(EregResponse.class)
 				.mapNotNull(EregResponse::navn)
-				.mapNotNull(EregResponse.Navn::sammensattnavn)
+				.mapNotNull(navn -> isBlank(navn.sammensattnavn()) ? navn.navnelinje1() : navn.sammensattnavn())
 				.doOnError(throwable -> handleError(orgnr, throwable))
 				.block();
 
