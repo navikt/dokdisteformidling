@@ -14,7 +14,7 @@
   "MQGATEWAY01_PORT": "1413",
   "DOKDISTEFORMIDLING_QDIST013_DIST_TRYGDERETTEN_QUEUENAME": "QA.Q2_DOKDISTEFORMIDLING.QDIST013_DIST_TRYGDERE",
   "DOKDISTEFORMIDLING_QDIST013_FUNK_FEIL_QUEUENAME": "QA.Q2_DOKDISTEFORMIDLING.QDIST013_FUNK_FEIL",
-  "DOKDISTEFORMIDLING_ENDPOINTS_EREG_URL": "http://ereg-services-q2.arbeidsforhold.svc.nais.local/v2/organisasjon",
+  "DOKDISTEFORMIDLING_ENDPOINTS_EREG_URL": "https://ereg-services.dev.intern.nav.no/v1/organisasjon",
   "LAGREJURIDISKLOGG_REST_URL": "https://app-q1.adeo.no/juridisklogg/api/rest/logg",
   "DOKDISTEFORMIDLING_ENDPOINTS_PDL_URL": "https://pdl-api.dev.intern.nav.no/graphql",
   "DOKDISTEFORMIDLING_ENDPOINTS_PDL_SCOPE": "api://dev-fss.pdl.pdl-api/.default",
