@@ -18,6 +18,8 @@ import no.nav.dokdisteformidling.storage.DokdistDokument;
 import no.nav.dokdisteformidling.storage.JsonSerializer;
 import org.apache.camel.Exchange;
 import org.apache.camel.Handler;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
@@ -46,6 +48,9 @@ public class Qdist013Service {
 	private final LagreJuridiskLoggMapper lagreJuridiskLoggMapper;
 	private final AvtaltmeldingService avtaltmeldingService;
 	private final Eformidling eformidling;
+
+	private static final Logger secureLog = LoggerFactory.getLogger("secureLog");
+
 
 	public Qdist013Service(BucketStorage bucketStorage,
 						   AdministrerForsendelse administrerForsendelse,
@@ -88,6 +93,8 @@ public class Qdist013Service {
 
 		log.info("Sender eformidling forsendelse direkte til Altinn formidlingstjenesten. forsendelseId={}, konversasjonsId={}, bestillingsId={}",
 				forsendelseId, conversationId, bestillingsId);
+
+		secureLog.info("Avtaltmelding {}", avtaltmelding.asXmlString());
 
 		eformidling.send(NavDokumentpakke.builder()
 				.conversationId(conversationId)

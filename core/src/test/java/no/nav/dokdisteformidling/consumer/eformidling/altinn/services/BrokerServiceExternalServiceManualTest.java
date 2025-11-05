@@ -36,10 +36,10 @@ class BrokerServiceExternalServiceManualTest {
 		brokerServiceExternalProperties.setConnecttimeoutms(5000);
 		brokerServiceExternalProperties.setReadtimeoutms(30000);
 
-		final BrokerServiceExternalConfig brokerServiceExternalConfig = new BrokerServiceExternalConfig(CXFBusFactory.getDefaultBus());
+		final BrokerServiceExternalConfig brokerServiceExternalConfig = new BrokerServiceExternalConfig(CXFBusFactory.getDefaultBus(), dpoUserProperties);
 
 		BrokerServiceExternalService brokerServiceExternalService = new BrokerServiceExternalService(
-				brokerServiceExternalConfig.iBrokerServiceExternal(brokerServiceExternalProperties, dpoUserProperties));
+				brokerServiceExternalConfig.iBrokerServiceExternal(brokerServiceExternalProperties));
 		brokerServiceExternalService.test();
 	}
 }

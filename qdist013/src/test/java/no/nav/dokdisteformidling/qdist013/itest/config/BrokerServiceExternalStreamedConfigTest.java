@@ -21,8 +21,8 @@ import org.springframework.context.annotation.Profile;
 @Profile("itest")
 public class BrokerServiceExternalStreamedConfigTest extends AbstractCxfEndpointConfig {
 
-	public BrokerServiceExternalStreamedConfigTest(Bus bus) {
-		super(bus);
+	public BrokerServiceExternalStreamedConfigTest(Bus bus, DpoUserProperties dpoUserProperties) {
+		super(bus, dpoUserProperties);
 	}
 
 	@Bean
@@ -43,17 +43,8 @@ public class BrokerServiceExternalStreamedConfigTest extends AbstractCxfEndpoint
 
 		IBrokerServiceExternalStreamed iBrokerServiceExternalStreamed = createPort(IBrokerServiceExternalStreamed.class);
 		final Client client = ClientProxy.getClient(iBrokerServiceExternalStreamed);
-		setRequestContext(client, dpoUserProperties);
+		setRequestContext(client);
 		return iBrokerServiceExternalStreamed;
-	}
-
-
-	private void setRequestContext(final Client client, DpoUserProperties dpoUserProperties) {
-		client.getRequestContext().put("ws-security.must-understand", Boolean.TRUE);
-		client.getRequestContext().put("ws-security.username", dpoUserProperties.getUsername());
-		client.getRequestContext().put("ws-security.callback-handler", new ClientCallBackHandler(dpoUserProperties));
-		client.getRequestContext().put("org.apache.cxf.message.Message.MAINTAIN_SESSION", Boolean.TRUE);
-		client.getRequestContext().put("jakarta.xml.ws.session.maintain", Boolean.TRUE);
 	}
 
 }
