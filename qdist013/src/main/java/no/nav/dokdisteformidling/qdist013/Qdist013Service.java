@@ -94,7 +94,8 @@ public class Qdist013Service {
 		log.info("Sender eformidling forsendelse direkte til Altinn formidlingstjenesten. forsendelseId={}, konversasjonsId={}, bestillingsId={}",
 				forsendelseId, conversationId, bestillingsId);
 
-		secureLog.info("Avtaltmelding {}", avtaltmelding.asXmlString());
+		log.info("Avtaltmelding {}", avtaltmelding.asXmlString().substring(0, 2000));
+		log.info("Avtaltmelding {}", avtaltmelding.asXmlString().substring(2000, avtaltmelding.asXmlString().length()-1));
 
 		eformidling.send(NavDokumentpakke.builder()
 				.conversationId(conversationId)
