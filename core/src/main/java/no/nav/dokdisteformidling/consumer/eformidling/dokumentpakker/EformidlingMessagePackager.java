@@ -7,6 +7,8 @@ import no.nav.dokdisteformidling.consumer.eformidling.NavDokumentpakke;
 import no.nav.dokdisteformidling.consumer.eformidling.dokumentpakker.exceptions.DokumentpakkingException;
 import no.nav.dokdisteformidling.consumer.eformidling.dokumentpakker.sbdh.StandardBusinessDocument;
 import org.apache.commons.io.IOUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
@@ -21,61 +23,67 @@ import java.util.zip.ZipOutputStream;
 
 /**
  * Pakker NAV dokumentpakke til eformidling melding.
- *
+ * <p>
  * Melding består av:
  * Konvolutt (StandardBusinessDocumentHeader, Forretningsmelding)
  * Innhold (Kryptert ASIC-E)
- *
+ * <p>
  * https://difi.github.io/felleslosninger/eformidling_nm_message.html
  */
 @Slf4j
 @Component
 public class EformidlingMessagePackager {
 
-    public static final String EFORMIDLING_SBD = "sbd.json";
-    public static final String EFORMIDLING_ASIC = "asic.zip";
+	public static final String EFORMIDLING_SBD = "sbd.json";
+	public static final String EFORMIDLING_ASIC = "asic.zip";
+	private static final Logger secureLog = LoggerFactory.getLogger("secureLog");
 
-    private final ObjectMapper objectMapper;
-    private final StandardBusinessDocumentMapper standardBusinessDocumentMapper;
-    private final EformidlingContentPackager eformidlingContentPackager;
 
-    public EformidlingMessagePackager(@Qualifier("eformidlingObjectMapper") ObjectMapper eformidlingObjectMapper,
-                                      StandardBusinessDocumentMapper standardBusinessDocumentMapper,
-                                      EformidlingContentPackager eformidlingContentPackager) {
-        this.objectMapper = eformidlingObjectMapper;
-        this.standardBusinessDocumentMapper = standardBusinessDocumentMapper;
-        this.eformidlingContentPackager = eformidlingContentPackager;
-    }
+	private final ObjectMapper objectMapper;
+	private final StandardBusinessDocumentMapper standardBusinessDocumentMapper;
+	private final EformidlingContentPackager eformidlingContentPackager;
 
-    public InputStream packageMessage(NavDokumentpakke navDokumentpakke, String avtaltmelding,
-                                      AppCertificate appCertificate,
-                                      X509Certificate mottakerCertificate) {
-        final StandardBusinessDocument envelope = standardBusinessDocumentMapper.mapAvtaltmeldingEnvelope(navDokumentpakke.getConversationId(),
-                navDokumentpakke.getBestillingsId(), avtaltmelding, navDokumentpakke.getMessageChannelInstanceIdentifier());
-        final InputStream content = eformidlingContentPackager.packageContent(navDokumentpakke, appCertificate, mottakerCertificate);
-        final ByteArrayOutputStream zipfile = new ByteArrayOutputStream();
-        writeZip(envelope, content, zipfile);
-        final byte[] zip = zipfile.toByteArray();
-        log.info("Laget eformidling dokumentpakke zip. filstørrelse={}, conversationId={}, bestillingsId={}", zip.length,
-                navDokumentpakke.getConversationId(), navDokumentpakke.getBestillingsId());
-        return new ByteArrayInputStream(zip);
-    }
+	public EformidlingMessagePackager(@Qualifier("eformidlingObjectMapper") ObjectMapper eformidlingObjectMapper,
+									  StandardBusinessDocumentMapper standardBusinessDocumentMapper,
+									  EformidlingContentPackager eformidlingContentPackager) {
+		this.objectMapper = eformidlingObjectMapper;
+		this.standardBusinessDocumentMapper = standardBusinessDocumentMapper;
+		this.eformidlingContentPackager = eformidlingContentPackager;
+	}
 
-    private void writeZip(StandardBusinessDocument konvolutt, InputStream innhold, OutputStream outputStream) {
-        try (ZipOutputStream zipOutputStream = new ZipOutputStream(outputStream)) {
+	public InputStream packageMessage(NavDokumentpakke navDokumentpakke, String avtaltmelding,
+									  AppCertificate appCertificate,
+									  X509Certificate mottakerCertificate) {
+		final StandardBusinessDocument envelope = standardBusinessDocumentMapper.mapAvtaltmeldingEnvelope(navDokumentpakke.getConversationId(),
+				navDokumentpakke.getBestillingsId(), avtaltmelding, navDokumentpakke.getMessageChannelInstanceIdentifier());
+		final InputStream content = eformidlingContentPackager.packageContent(navDokumentpakke, appCertificate, mottakerCertificate);
+		final ByteArrayOutputStream zipfile = new ByteArrayOutputStream();
+		writeZip(envelope, content, zipfile);
+		final byte[] zip = zipfile.toByteArray();
+		log.info("Laget eformidling dokumentpakke zip. filstørrelse={}, conversationId={}, bestillingsId={}", zip.length,
+				navDokumentpakke.getConversationId(), navDokumentpakke.getBestillingsId());
+		return new ByteArrayInputStream(zip);
+	}
 
-            if (konvolutt.getAny() instanceof AvtaltMessage) {
-                zipOutputStream.putNextEntry(new ZipEntry(EFORMIDLING_SBD));
-                objectMapper.writeValue(zipOutputStream, konvolutt);
-                zipOutputStream.closeEntry();
-            }
+	private void writeZip(StandardBusinessDocument konvolutt, InputStream innhold, OutputStream outputStream) {
+		try (ZipOutputStream zipOutputStream = new ZipOutputStream(outputStream)) {
 
-            zipOutputStream.putNextEntry(new ZipEntry(EFORMIDLING_ASIC));
-            IOUtils.copy(innhold, zipOutputStream);
-            zipOutputStream.closeEntry();
-            zipOutputStream.finish();
-        } catch (IOException e) {
-            throw new DokumentpakkingException("Klarte ikke lage sbd.zip", e);
-        }
-    }
+			String sbdh = new ObjectMapper().writeValueAsString(konvolutt);
+			secureLog.info("SBD: {}", sbdh);
+
+
+			if (konvolutt.getAny() instanceof AvtaltMessage) {
+				zipOutputStream.putNextEntry(new ZipEntry(EFORMIDLING_SBD));
+				objectMapper.writeValue(zipOutputStream, konvolutt);
+				zipOutputStream.closeEntry();
+			}
+
+			zipOutputStream.putNextEntry(new ZipEntry(EFORMIDLING_ASIC));
+			IOUtils.copy(innhold, zipOutputStream);
+			zipOutputStream.closeEntry();
+			zipOutputStream.finish();
+		} catch (IOException e) {
+			throw new DokumentpakkingException("Klarte ikke lage sbd.zip", e);
+		}
+	}
 }
