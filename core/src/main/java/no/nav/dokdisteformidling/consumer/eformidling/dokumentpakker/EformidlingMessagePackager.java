@@ -56,6 +56,14 @@ public class EformidlingMessagePackager {
 									  X509Certificate mottakerCertificate) {
 		final StandardBusinessDocument envelope = standardBusinessDocumentMapper.mapAvtaltmeldingEnvelope(navDokumentpakke.getConversationId(),
 				navDokumentpakke.getBestillingsId(), avtaltmelding, navDokumentpakke.getMessageChannelInstanceIdentifier());
+		try {
+			String sbdh = objectMapper.writeValueAsString(envelope);
+			secureLog.info("Eformidling SBD for sending: {}", sbdh);
+		} catch (IOException e) {
+			log.warn("Klarte ikke logge eformidling sbd for conversationId={}, bestillingsId={}", navDokumentpakke.getConversationId(),
+					navDokumentpakke.getBestillingsId(), e);
+		}
+
 		final InputStream content = eformidlingContentPackager.packageContent(navDokumentpakke, appCertificate, mottakerCertificate);
 		final ByteArrayOutputStream zipfile = new ByteArrayOutputStream();
 		writeZip(envelope, content, zipfile);
@@ -67,10 +75,6 @@ public class EformidlingMessagePackager {
 
 	private void writeZip(StandardBusinessDocument konvolutt, InputStream innhold, OutputStream outputStream) {
 		try (ZipOutputStream zipOutputStream = new ZipOutputStream(outputStream)) {
-
-			String sbdh = new ObjectMapper().writeValueAsString(konvolutt);
-			secureLog.info("SBD: {}", sbdh);
-
 
 			if (konvolutt.getAny() instanceof AvtaltMessage) {
 				zipOutputStream.putNextEntry(new ZipEntry(EFORMIDLING_SBD));
