@@ -44,6 +44,7 @@
 
 		<!-- NAV -->
 		<melding-virksomhet-dokdistfordeling.version>7-18c61bf</melding-virksomhet-dokdistfordeling.version>
+		<dok-common.version>1.7.1</dok-common.version>
 
 		<!-- test -->
 		<spring-cloud-contract-wiremock.version>4.3.0</spring-cloud-contract-wiremock.version>
@@ -85,6 +86,11 @@
 				<groupId>no.nav.meldinger.virksomhet</groupId>
 				<artifactId>melding-virksomhet-dokdistfordeling</artifactId>
 				<version>${melding-virksomhet-dokdistfordeling.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>no.nav.dok-common</groupId>
+				<artifactId>util</artifactId>
+				<version>${dok-common.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>org.apache.httpcomponents</groupId>

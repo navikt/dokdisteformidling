@@ -2,6 +2,7 @@ package no.nav.dokdisteformidling.sdist001.itest.config;
 
 import no.nav.dokdisteformidling.azure.AzureProperties;
 import no.nav.dokdisteformidling.azure.OAuthEnabledWebClientConfig;
+import no.nav.dokdisteformidling.certificate.AppCertificateConfig;
 import no.nav.dokdisteformidling.certificate.KeyStoreProperties;
 import no.nav.dokdisteformidling.config.alias.ServiceuserAlias;
 import no.nav.dokdisteformidling.config.props.BrokerServiceExternalProperties;
@@ -31,6 +32,7 @@ import org.springframework.context.annotation.Profile;
 })
 @Import({
 		BrokerServiceExternalTestConfig.class,
+		AppCertificateConfig.class,
 		LocalTestCacheConfig.class,
 		OAuthEnabledWebClientConfig.class
 })
