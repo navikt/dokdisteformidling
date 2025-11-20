@@ -19,7 +19,7 @@ import java.security.KeyStore;
 public record KeyStoreProperties (
 		@Exists @NotNull
 		String key,
-		@NotBlank
+		@Exists @NotNull
 		String credentials
 ) {
 }
