@@ -10,7 +10,7 @@ import org.junit.jupiter.api.Test;
 
 @Disabled("Manuell test")
 class BrokerServiceExternalServiceManualTest {
-	private final DpoUserProperties dpoUserProperties = new DpoUserProperties();
+	private DpoUserProperties dpoUserProperties;
 
 	@BeforeEach
 	public void setup() {
@@ -24,8 +24,7 @@ class BrokerServiceExternalServiceManualTest {
 		System.setProperty("https.proxyPort", "8088");
 		System.setProperty("https.nonProxyHosts", "*.155.55.|*.192.168.|*.10.|*.local|*.rtv.gov|*.adeo.no|*.nav.no|*.aetat.no|*.devillo.no|*.oera.no");
 
-		dpoUserProperties.setUsername(System.getProperty("dpo.username"));
-		dpoUserProperties.setPassword(System.getProperty("dpo.password"));
+		dpoUserProperties = new DpoUserProperties(System.getProperty("dpo.username"), System.getProperty("dpo.password"));
 	}
 
 	@Test
