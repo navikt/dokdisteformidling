@@ -1,5 +1,7 @@
 package no.nav.dokdisteformidling;
 
+import no.nav.dokdisteformidling.certificate.AppCertificate;
+import no.nav.dokdisteformidling.certificate.KeyStoreCredentials;
 import no.nav.dokdisteformidling.certificate.KeyStoreProperties;
 import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
@@ -40,8 +42,8 @@ public final class CertTestUtils {
 
 	public static final String SELF_SIGNED_PEM = "secrets/itest.pem";
 	public static final String SELF_SIGNED_RSA_PRIVATE_KEY = "secrets/itest.key";
-	public static final String SELF_SIGNED_PKCS12 = "secrets/itest.p12";
-	public static final String SELF_SIGNED_PKCS12_BASE64 = "secrets/itest.p12.b64";
+	public static final String SELF_SIGNED_PKCS12 = "../core/src/test/resources/secrets/itest.p12";
+	public static final String SELF_SIGNED_PKCS12_BASE64 = "../core/src/test/resources/secrets/itest.p12.b64";
 	public static final String PKCS_12 = "PKCS12";
 	public static final String SELF_SIGNED_PKCS12_ALIAS = "1";
 	public static final String SELF_SIGNED_PKCS12_PASSWORD = "bjarne";
@@ -77,22 +79,16 @@ public final class CertTestUtils {
 		return factory.generateCertificate(new ByteArrayInputStream(holder.getEncoded()));
 	}
 
-	public static KeyStoreProperties itestVirksomhetssertifikatProperties() {
-		KeyStoreProperties keyStoreProperties = new KeyStoreProperties();
-		keyStoreProperties.setType(PKCS_12);
-		keyStoreProperties.setAlias(SELF_SIGNED_PKCS12_ALIAS);
-		keyStoreProperties.setPassword(SELF_SIGNED_PKCS12_PASSWORD);
-		keyStoreProperties.setPath(new ClassPathResource(SELF_SIGNED_PKCS12));
-		return keyStoreProperties;
+	public static AppCertificate itestVirksomhetssertifikatProperties() {
+		KeyStoreProperties keyStoreProperties = new KeyStoreProperties(SELF_SIGNED_PKCS12, "");
+		KeyStoreCredentials keyStoreCredentials = new KeyStoreCredentials(PKCS_12, SELF_SIGNED_PKCS12_ALIAS, SELF_SIGNED_PKCS12_PASSWORD);
+		return new AppCertificate(keyStoreProperties, keyStoreCredentials);
 	}
 
-	public static KeyStoreProperties itestVirksomhetssertifikatBase64Properties() {
-		KeyStoreProperties keyStoreProperties = new KeyStoreProperties();
-		keyStoreProperties.setType(PKCS_12);
-		keyStoreProperties.setAlias(SELF_SIGNED_PKCS12_ALIAS);
-		keyStoreProperties.setPassword(SELF_SIGNED_PKCS12_PASSWORD);
-		keyStoreProperties.setPath(new ClassPathResource(SELF_SIGNED_PKCS12_BASE64));
-		return keyStoreProperties;
+	public static AppCertificate itestVirksomhetssertifikatBase64Properties() {
+		KeyStoreProperties keyStoreProperties = new KeyStoreProperties(SELF_SIGNED_PKCS12_BASE64, "");
+		KeyStoreCredentials keyStoreCredentials = new KeyStoreCredentials(PKCS_12, SELF_SIGNED_PKCS12_ALIAS, SELF_SIGNED_PKCS12_PASSWORD);
+		return new AppCertificate(keyStoreProperties, keyStoreCredentials);
 	}
 
 	public static PrivateKey itestPrivateKey() throws Exception {

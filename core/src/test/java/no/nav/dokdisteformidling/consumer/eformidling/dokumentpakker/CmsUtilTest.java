@@ -33,14 +33,14 @@ class CmsUtilTest {
 
 	@Test
 	void shouldEncryptAndDecryptWithCmsWhenB64PKCS12File() throws Exception {
-		AppCertificate appCertificate = new AppCertificate(itestVirksomhetssertifikatBase64Properties());
+		AppCertificate appCertificate = itestVirksomhetssertifikatBase64Properties();
 
 		byte[] plaintext = "Text to be encrypted".getBytes();
 		ByteArrayOutputStream ciphertext = new ByteArrayOutputStream();
 
 		final CmsUtil cmsUtil = new CmsUtil();
 		cmsUtil.createCMSStreamed(new ByteArrayInputStream(plaintext), ciphertext, appCertificate.getX509Certificate());
-		final InputStream recoveredPlaintext = cmsUtil.decryptCMSStreamed(new ByteArrayInputStream(ciphertext.toByteArray()), appCertificate.loadPrivateKey());
+		final InputStream recoveredPlaintext = cmsUtil.decryptCMSStreamed(new ByteArrayInputStream(ciphertext.toByteArray()), appCertificate.getPrivateKey());
 
 		assertThat(IOUtils.toByteArray(recoveredPlaintext)).isEqualTo(plaintext);
 	}

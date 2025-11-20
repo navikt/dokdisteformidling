@@ -47,7 +47,7 @@ class EformidlingMessagePackagerTest {
 				.build();
 
 		final InputStream inputStream = eformidlingMessagePackager.packageMessage(navDokumentpakke, ARKIVMELDING,
-				new AppCertificate(itestVirksomhetssertifikatProperties()),
+				itestVirksomhetssertifikatProperties(),
 				itestPemCertificate());
 
 		final List<AppTestUtils.ZipFile> zipEntries = zipEntries(inputStream);
@@ -69,7 +69,7 @@ class EformidlingMessagePackagerTest {
 		var dokumentpakkingException = assertThrows(DokumentpakkingException.class, () ->
 				eformidlingMessagePackager.packageMessage(navDokumentpakke,
 						ARKIVMELDING,
-						new AppCertificate(itestVirksomhetssertifikatProperties()),
+						itestVirksomhetssertifikatProperties(),
 						itestPemCertificate()
 				)
 		);

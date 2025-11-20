@@ -1,6 +1,7 @@
 package no.nav.dokdisteformidling.consumer.eformidling.serviceregistry;
 
 import no.nav.dokdisteformidling.certificate.AppCertificate;
+import no.nav.dokdisteformidling.certificate.KeyStoreCredentials;
 import no.nav.dokdisteformidling.certificate.KeyStoreProperties;
 import no.nav.dokdisteformidling.config.props.MaskinportenProperties;
 import no.nav.dokdisteformidling.config.props.ServiceRegistryProperties;
@@ -20,7 +21,8 @@ import static no.nav.dokdisteformidling.consumer.eformidling.EformidlingConstant
 @Disabled("Manuell test")
 class ServiceRegistryConsumerManualTest {
 
-	private final KeyStoreProperties keyStoreProperties = new KeyStoreProperties();
+	private KeyStoreProperties keyStoreProperties;
+	private KeyStoreCredentials keyStoreCredentials;
 	private final MaskinportenProperties maskinportenProperties = new MaskinportenProperties();
 	private final ServiceRegistryProperties serviceRegistryProperties = new ServiceRegistryProperties();
 
@@ -44,10 +46,8 @@ class ServiceRegistryConsumerManualTest {
 		//prod
 		maskinportenProperties.setAudience("https://oidc.difi.no/idporten-oidc-provider/");
 		maskinportenProperties.setUrl(URI.create("https://oidc.difi.no/idporten-oidc-provider/token").toURL());
-		keyStoreProperties.setType(System.getProperty("virksomhetssertifikat.type"));
-		keyStoreProperties.setAlias(System.getProperty("virksomhetssertifikat.alias"));
-		keyStoreProperties.setPassword(System.getProperty("virksomhetssertifikat.password"));
-		keyStoreProperties.setPath(new FileSystemResource(System.getProperty("virksomhetssertifikat.path")));
+		keyStoreCredentials = new KeyStoreCredentials(System.getProperty("virksomhetssertifikat.type"), System.getProperty("virksomhetssertifikat.alias"), System.getProperty("virksomhetssertifikat.password"));
+		keyStoreProperties = new KeyStoreProperties(System.getProperty("virksomhetssertifikat.path"), "");
 		//test
 //		serviceRegistryProperties.setUrl(new URL("https://qa-meldingsutveksling.difi.no/serviceregistry/"));
 		//prod
@@ -56,7 +56,7 @@ class ServiceRegistryConsumerManualTest {
 
 	@Test
 	void shouldFetchMottakerInfoWhenSystemPropertiesSet() {
-		MaskinportenTokenConsumer maskinportenTokenConsumer = new MaskinportenTokenConsumer(new AppCertificate(keyStoreProperties), maskinportenProperties, new RestTemplateBuilder());
+		MaskinportenTokenConsumer maskinportenTokenConsumer = new MaskinportenTokenConsumer(new AppCertificate(keyStoreProperties, keyStoreCredentials), maskinportenProperties, new RestTemplateBuilder());
 		ServiceRegistryConsumer serviceRegistryConsumer = new ServiceRegistryConsumer(serviceRegistryProperties, maskinportenTokenConsumer, new RestTemplateBuilder());
 
 		final IdentifierResource identifierResource = serviceRegistryConsumer.getIdentifierResource(TRYGDERETTEN_ORGNUMMER, AVTALTMELDING_PROCESS);
