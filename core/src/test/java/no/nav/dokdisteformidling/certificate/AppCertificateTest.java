@@ -10,13 +10,13 @@ class AppCertificateTest {
 
 	@Test
 	void shouldLoadPKCS12KeyStore() {
-		AppCertificate appCertificate = new AppCertificate(itestVirksomhetssertifikatProperties());
+		AppCertificate appCertificate = itestVirksomhetssertifikatProperties();
 		assertNotNull(appCertificate.getX509Certificate());
 	}
 
 	@Test
 	void shouldLoadPKCS12KeyStoreAsBase64() {
-		AppCertificate appCertificate = new AppCertificate(itestVirksomhetssertifikatBase64Properties());
+		AppCertificate appCertificate = itestVirksomhetssertifikatBase64Properties();
 		assertNotNull(appCertificate.getX509Certificate());
 	}
 }

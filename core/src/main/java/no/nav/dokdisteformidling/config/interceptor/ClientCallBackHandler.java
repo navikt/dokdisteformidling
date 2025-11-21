@@ -17,6 +17,6 @@ public class ClientCallBackHandler implements CallbackHandler {
     @Override
     public void handle(Callback[] callbacks) {
         WSPasswordCallback wsPasswordCallback = (WSPasswordCallback) callbacks[0];
-        wsPasswordCallback.setPassword(dpoUserProperties.getPassword());
+        wsPasswordCallback.setPassword(dpoUserProperties.password());
     }
 }

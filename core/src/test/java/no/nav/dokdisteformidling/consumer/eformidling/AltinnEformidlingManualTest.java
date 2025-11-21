@@ -1,6 +1,7 @@
 package no.nav.dokdisteformidling.consumer.eformidling;
 
 import no.nav.dokdisteformidling.certificate.AppCertificate;
+import no.nav.dokdisteformidling.certificate.KeyStoreCredentials;
 import no.nav.dokdisteformidling.certificate.KeyStoreProperties;
 import no.nav.dokdisteformidling.config.props.MaskinportenProperties;
 import no.nav.dokdisteformidling.config.props.ServiceRegistryProperties;
@@ -31,7 +32,8 @@ class AltinnEformidlingManualTest {
 
 	private static final Clock SYSTEM_CLOCK = Clock.system(DEFAULT_ZONE_ID);
 
-	private final KeyStoreProperties keyStoreProperties = new KeyStoreProperties();
+	private KeyStoreProperties keyStoreProperties;
+	private KeyStoreCredentials keyStoreCredentials;
 	private final MaskinportenProperties maskinportenProperties = new MaskinportenProperties();
 	private final ServiceRegistryProperties serviceRegistryProperties = new ServiceRegistryProperties();
 	private AppCertificate appCertificate;
@@ -45,19 +47,17 @@ class AltinnEformidlingManualTest {
 		// virksomhetssertifikat.type
 		// virksomhetssertifikat.alias
 		// virksomhetssertifikat.password
-		// virksomhetssertifikat.path
+		// virksomhetssertifikat.key
 		System.setProperty("https.proxyHost", "webproxy-utvikler.nav.no");
 		System.setProperty("https.proxyPort", "8088");
 		System.setProperty("https.nonProxyHosts", "*.155.55.|*.192.168.|*.10.|*.local|*.rtv.gov|*.adeo.no|*.nav.no|*.aetat.no|*.devillo.no|*.oera.no");
 		maskinportenProperties.setAudience("https://oidc-ver1.difi.no/idporten-oidc-provider/");
 		maskinportenProperties.setClientid("MOVE_IP_991078045");
 		maskinportenProperties.setUrl(URI.create("https://oidc-ver1.difi.no/idporten-oidc-provider/token").toURL());
-		keyStoreProperties.setType(System.getProperty("virksomhetssertifikat.type"));
-		keyStoreProperties.setAlias(System.getProperty("virksomhetssertifikat.alias"));
-		keyStoreProperties.setPassword(System.getProperty("virksomhetssertifikat.password"));
-		keyStoreProperties.setPath(new FileSystemResource(System.getProperty("virksomhetssertifikat.path")));
+		keyStoreCredentials = new KeyStoreCredentials(System.getProperty("virksomhetssertifikat.type"), System.getProperty("virksomhetssertifikat.alias"), System.getProperty("virksomhetssertifikat.password"));
+		keyStoreProperties = new KeyStoreProperties(System.getProperty("virksomhetssertifikat.key"), "");
 		serviceRegistryProperties.setUrl(URI.create("https://qa-meldingsutveksling.difi.no/serviceregistry/").toURL());
-		appCertificate = new AppCertificate(keyStoreProperties);
+		appCertificate = new AppCertificate(keyStoreProperties, keyStoreCredentials);
 	}
 
 	@Test

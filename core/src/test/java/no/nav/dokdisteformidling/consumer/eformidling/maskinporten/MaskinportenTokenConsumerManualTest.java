@@ -1,6 +1,7 @@
 package no.nav.dokdisteformidling.consumer.eformidling.maskinporten;
 
 import no.nav.dokdisteformidling.certificate.AppCertificate;
+import no.nav.dokdisteformidling.certificate.KeyStoreCredentials;
 import no.nav.dokdisteformidling.certificate.KeyStoreProperties;
 import no.nav.dokdisteformidling.config.props.MaskinportenProperties;
 import org.junit.jupiter.api.BeforeEach;
@@ -15,7 +16,8 @@ import java.net.URI;
 @Disabled("Manuell test")
 class MaskinportenTokenConsumerManualTest {
 
-    private final KeyStoreProperties keyStoreProperties = new KeyStoreProperties();
+    private KeyStoreProperties keyStoreProperties;
+    private KeyStoreCredentials keyStoreCredentials;
     private final MaskinportenProperties maskinportenProperties = new MaskinportenProperties();
 
     @BeforeEach
@@ -27,7 +29,7 @@ class MaskinportenTokenConsumerManualTest {
         // virksomhetssertifikat.type
         // virksomhetssertifikat.alias
         // virksomhetssertifikat.password
-        // virksomhetssertifikat.path
+        // virksomhetssertifikat.key
         System.setProperty("https.proxyHost", "webproxy-utvikler.nav.no");
         System.setProperty("https.proxyPort", "8088");
         System.setProperty("https.nonProxyHosts", "*.155.55.|*.192.168.|*.10.|*.local|*.rtv.gov|*.adeo.no|*.nav.no|*.aetat.no|*.devillo.no|*.oera.no");
@@ -38,15 +40,13 @@ class MaskinportenTokenConsumerManualTest {
         // prod
         maskinportenProperties.setAudience("https://oidc.difi.no/idporten-oidc-provider/");
         maskinportenProperties.setUrl(URI.create("https://oidc.difi.no/idporten-oidc-provider/token").toURL());
-        keyStoreProperties.setType(System.getProperty("virksomhetssertifikat.type"));
-        keyStoreProperties.setAlias(System.getProperty("virksomhetssertifikat.alias"));
-        keyStoreProperties.setPassword(System.getProperty("virksomhetssertifikat.password"));
-        keyStoreProperties.setPath(new FileSystemResource(System.getProperty("virksomhetssertifikat.path")));
+        keyStoreCredentials = new KeyStoreCredentials(System.getProperty("virksomhetssertifikat.type"), System.getProperty("virksomhetssertifikat.alias"), System.getProperty("virksomhetssertifikat.password"));
+        keyStoreProperties = new KeyStoreProperties(System.getProperty("virksomhetssertifikat.key"), "");
     }
 
     @Test
     void shouldFetchTokenWhenSystemPropertiesSet() {
-        MaskinportenTokenConsumer oidcTokenClient = new MaskinportenTokenConsumer(new AppCertificate(keyStoreProperties), maskinportenProperties, new RestTemplateBuilder());
+        MaskinportenTokenConsumer oidcTokenClient = new MaskinportenTokenConsumer(new AppCertificate(keyStoreProperties, keyStoreCredentials), maskinportenProperties, new RestTemplateBuilder());
 
         final OidcTokenResponse oidcTokenResponse = oidcTokenClient.fetchToken();
         System.out.println(oidcTokenResponse.getAccessToken());

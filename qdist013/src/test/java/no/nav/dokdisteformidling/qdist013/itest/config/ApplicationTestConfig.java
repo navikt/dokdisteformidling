@@ -2,6 +2,7 @@ package no.nav.dokdisteformidling.qdist013.itest.config;
 
 import no.nav.dokdisteformidling.CoreConfig;
 import no.nav.dokdisteformidling.azure.AzureProperties;
+import no.nav.dokdisteformidling.certificate.AppCertificateConfig;
 import no.nav.dokdisteformidling.certificate.KeyStoreProperties;
 import no.nav.dokdisteformidling.config.alias.MqGatewayAlias;
 import no.nav.dokdisteformidling.config.alias.ServiceuserAlias;
@@ -37,6 +38,7 @@ import static org.mockito.Mockito.mock;
 @Import({
 		CoreConfig.class,
 		JmsItestConfig.class,
+		AppCertificateConfig.class,
 		BrokerServiceExternalTestConfig.class,
 		BrokerServiceExternalStreamedConfigTest.class})
 public class ApplicationTestConfig {

@@ -37,7 +37,7 @@ class AsiceCreatorTest {
 				fromAvtaltmelding(new ByteArrayInputStream(AVTALTMELDING_CONTENTS.getBytes())),
 				Stream.of(fromVedlegg(DOKUMENT_1_NAME, new ByteArrayInputStream(DOKUMENT_1_CONTENTS.getBytes())),
 						fromVedlegg(DOKUMENT_2_NAME, new ByteArrayInputStream(DOKUMENT_2_CONTENTS.getBytes()))),
-				new AppCertificate(CertTestUtils.itestVirksomhetssertifikatProperties())
+				CertTestUtils.itestVirksomhetssertifikatProperties()
 		);
 
 		final ByteArrayInputStream asice = new ByteArrayInputStream(((ByteArrayOutputStream) asiceStreamed).toByteArray());
