@@ -47,7 +47,7 @@ class AltinnEformidlingManualTest {
 		// virksomhetssertifikat.type
 		// virksomhetssertifikat.alias
 		// virksomhetssertifikat.password
-		// virksomhetssertifikat.path
+		// virksomhetssertifikat.key
 		System.setProperty("https.proxyHost", "webproxy-utvikler.nav.no");
 		System.setProperty("https.proxyPort", "8088");
 		System.setProperty("https.nonProxyHosts", "*.155.55.|*.192.168.|*.10.|*.local|*.rtv.gov|*.adeo.no|*.nav.no|*.aetat.no|*.devillo.no|*.oera.no");
@@ -55,7 +55,7 @@ class AltinnEformidlingManualTest {
 		maskinportenProperties.setClientid("MOVE_IP_991078045");
 		maskinportenProperties.setUrl(URI.create("https://oidc-ver1.difi.no/idporten-oidc-provider/token").toURL());
 		keyStoreCredentials = new KeyStoreCredentials(System.getProperty("virksomhetssertifikat.type"), System.getProperty("virksomhetssertifikat.alias"), System.getProperty("virksomhetssertifikat.password"));
-		keyStoreProperties = new KeyStoreProperties(System.getProperty("virksomhetssertifikat.path"), "");
+		keyStoreProperties = new KeyStoreProperties(System.getProperty("virksomhetssertifikat.key"), "");
 		serviceRegistryProperties.setUrl(URI.create("https://qa-meldingsutveksling.difi.no/serviceregistry/").toURL());
 		appCertificate = new AppCertificate(keyStoreProperties, keyStoreCredentials);
 	}

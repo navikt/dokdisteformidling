@@ -35,7 +35,7 @@ class ServiceRegistryConsumerManualTest {
 		// virksomhetssertifikat.type
 		// virksomhetssertifikat.alias
 		// virksomhetssertifikat.password
-		// virksomhetssertifikat.path
+		// virksomhetssertifikat.key
 		System.setProperty("https.proxyHost", "webproxy-utvikler.nav.no");
 		System.setProperty("https.proxyPort", "8088");
 		System.setProperty("https.nonProxyHosts", "*.155.55.|*.192.168.|*.10.|*.local|*.rtv.gov|*.adeo.no|*.nav.no|*.aetat.no|*.devillo.no|*.oera.no");
@@ -47,7 +47,7 @@ class ServiceRegistryConsumerManualTest {
 		maskinportenProperties.setAudience("https://oidc.difi.no/idporten-oidc-provider/");
 		maskinportenProperties.setUrl(URI.create("https://oidc.difi.no/idporten-oidc-provider/token").toURL());
 		keyStoreCredentials = new KeyStoreCredentials(System.getProperty("virksomhetssertifikat.type"), System.getProperty("virksomhetssertifikat.alias"), System.getProperty("virksomhetssertifikat.password"));
-		keyStoreProperties = new KeyStoreProperties(System.getProperty("virksomhetssertifikat.path"), "");
+		keyStoreProperties = new KeyStoreProperties(System.getProperty("virksomhetssertifikat.key"), "");
 		//test
 //		serviceRegistryProperties.setUrl(new URL("https://qa-meldingsutveksling.difi.no/serviceregistry/"));
 		//prod
