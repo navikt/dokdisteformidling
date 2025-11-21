@@ -121,11 +121,7 @@ public class MaskinportenTokenConsumer {
 				.expirationTime(Date.from(OffsetDateTime.now(DEFAULT_ZONE_ID).toInstant().plusSeconds(120)))
 				.build();
 
-		RSASSASigner signer = new RSASSASigner(appCertificate.loadPrivateKey());
-
-		if (appCertificate.shouldLockProvider()) {
-			signer.getJCAContext().setProvider(appCertificate.getKeyStore().getProvider());
-		}
+		RSASSASigner signer = new RSASSASigner(appCertificate.getPrivateKey());
 
 		SignedJWT signedJWT = new SignedJWT(jwsHeader, claims);
 		try {

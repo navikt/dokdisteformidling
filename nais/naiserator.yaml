@@ -6,7 +6,22 @@ metadata:
   labels:
     team: teamdokumenthandtering
 spec:
+  envFrom:
+    - secret: {{ DOKDISTEFORMIDLING_SECRET }}
+  filesFrom:
+    - secret: {{ DOKDISTEFORMIDLING_SECRET }}
+      mountPath: "/var/run/secrets/nais_secrets"
   env:
+    - name: JAVA_TRUSTSTORE_OPTIONS
+      value: "-Djavax.net.ssl.trustStore=$(NAV_TRUSTSTORE_PATH)
+              -Djavax.net.ssl.trustStorePassword=$(NAV_TRUSTSTORE_PASSWORD)"
+    - name: JDK_JAVA_OPTIONS
+      value: "-Djavax.net.ssl.keyStore=$(NAV_TRUSTSTORE_PATH)
+              -Djavax.net.ssl.keyStorePassword=$(NAV_TRUSTSTORE_PASSWORD)
+              -Djavax.net.ssl.keyStoreType=jks
+              -XX:MaxRAMPercentage=75
+              -Dorg.apache.cxf.stax.maxChildElements=300000
+              $(JAVA_PROXY_OPTIONS) $(JAVA_TRUSTSTORE_OPTIONS)"
     - name: DOKDISTEFORMIDLING_ENDPOINTS_DOKDISTADMIN_URL
       value: {{ DOKDISTEFORMIDLING_ENDPOINTS_DOKDISTADMIN_URL }}
     - name: DOKDISTEFORMIDLING_ENDPOINTS_DOKDISTADMIN_SCOPE
@@ -57,6 +72,8 @@ spec:
       value: {{ DOKDISTMELLOMLAGER_KEYRING }}
     - name: DOKDISTMELLOMLAGER_KEYID
       value: {{ DOKDISTMELLOMLAGER_KEYID }}
+    - name: GOOGLE_APPLICATION_CREDENTIALS
+      value: "/var/run/secrets/nais_secrets/gcloud_serviceaccount.json"
   image: {{ image }}
   ingresses:
     - {{ INGRESSES }}
@@ -88,10 +105,6 @@ spec:
   vault:
     enabled: true
     paths:
-      - kvPath: {{ SRVDOKDISTEFORMIDLING }}
-        mountPath: "/secrets/serviceuser/srvdokdisteformidling"
-      - kvPath: {{ DOKDISTEFORMIDLING_VAULT }}
-        mountPath: "/var/run/secrets/nais.io/vault"
       - kvPath: {{ KLAGEINSTANS_VAULT }}
         mountPath: "/secrets/virksomhetssertifikat"
   azure:

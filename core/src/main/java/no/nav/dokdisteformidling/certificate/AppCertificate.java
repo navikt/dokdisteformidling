@@ -1,13 +1,17 @@
 package no.nav.dokdisteformidling.certificate;
 
 import lombok.Getter;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 
+import java.io.IOException;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
-import java.security.UnrecoverableEntryException;
+import java.security.UnrecoverableKeyException;
+import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 
 /**
@@ -16,7 +20,6 @@ import java.security.cert.X509Certificate;
  * Kopiert fra https://github.com/difi/move-integrasjonspunkt
  */
 @Getter
-@Component
 public class AppCertificate {
 
 	private static final String ERR_MISSING_PRIVATE_KEY_OR_PASS = "Problem accessing PrivateKey with alias \"%s\" inadequate access or Password is wrong";
@@ -25,58 +28,62 @@ public class AppCertificate {
 	private static final String ERR_GENERAL = "Unexpected problem occurred when operating KeyStore";
 
 	private final KeyStoreProperties properties;
+	private final KeyStoreCredentials credentials;
 	private final KeyStore keyStore;
+	private final PrivateKey privateKey;
+	private final X509Certificate certificate;
 
-	public AppCertificate(KeyStoreProperties properties) {
+	public AppCertificate(KeyStoreProperties properties, KeyStoreCredentials credentials) {
 		this.properties = properties;
+		this.credentials = credentials;
 		try {
-			this.keyStore = KeystoreProvider.loadKeyStore(properties);
-		} catch (KeystoreProviderException e) {
+			this.keyStore = loadKeyStore(properties, credentials);
+			this.privateKey = loadPrivateKey();
+			this.certificate = loadX509Certificate();
+		} catch (Exception e) {
 			throw new IllegalStateException(e);
 		}
 	}
 
-	/**
-	 * Loads the private key from the keystore
-	 *
-	 * @return the private key
-	 */
-	public PrivateKey loadPrivateKey() {
-		PrivateKey privateKey;
-		char[] password = properties.getPassword().toCharArray();
-		try {
-			privateKey = (PrivateKey) keyStore.getKey(properties.getAlias(), password);
-			if (privateKey == null) {
-				throw new IllegalStateException(
-						String.format(ERR_MISSING_PRIVATE_KEY, properties.getAlias())
-				);
+	private static KeyStore loadKeyStore(KeyStoreProperties properties, KeyStoreCredentials credentials) throws IOException, KeyStoreException, CertificateException, NoSuchAlgorithmException {
+		String type = credentials.type();
+		String password = credentials.password();
+		Resource path = new FileSystemResource(properties.key());
+
+		KeyStore keyStore = KeyStore.getInstance(type);
+		if ("none".equalsIgnoreCase(path.getFilename())) {
+			keyStore.load(null, password.toCharArray());
+		} else {
+			if (path.getFilename().endsWith(".b64")) {
+				keyStore.load(java.util.Base64.getDecoder().wrap(path.getInputStream()), password.toCharArray());
+			} else {
+				keyStore.load(path.getInputStream(), password.toCharArray());
 			}
-		} catch (KeyStoreException | NoSuchAlgorithmException e) {
-			throw new IllegalStateException(ERR_GENERAL, e);
-		} catch (UnrecoverableEntryException e) {
-			throw new IllegalStateException(
-					String.format(ERR_MISSING_PRIVATE_KEY_OR_PASS, properties.getAlias())
-					, e
-			);
+		}
+		return keyStore;
+	}
+
+	private PrivateKey loadPrivateKey() throws UnrecoverableKeyException, KeyStoreException, NoSuchAlgorithmException {
+		PrivateKey privateKey = (PrivateKey) keyStore.getKey(credentials.alias(), credentials.password().toCharArray());
+		if (privateKey == null) {
+			throw new IllegalStateException(String.format(ERR_MISSING_PRIVATE_KEY, credentials.alias()));
 		}
 		return privateKey;
 	}
 
-	public X509Certificate getX509Certificate() {
-		try {
-			X509Certificate certificate = (X509Certificate) keyStore.getCertificate(properties.getAlias());
-			if (certificate == null) {
-				throw new IllegalStateException(
-						String.format(ERR_MISSING_CERTIFICATE, properties.getAlias())
-				);
-			}
-			return certificate;
-		} catch (KeyStoreException e) {
-			throw new IllegalStateException(ERR_GENERAL, e);
+	private X509Certificate loadX509Certificate() throws KeyStoreException {
+		X509Certificate certificate = (X509Certificate) keyStore.getCertificate(credentials.alias());
+		if (certificate == null) {
+			throw new IllegalStateException(String.format(ERR_MISSING_CERTIFICATE, credentials.alias()));
 		}
+		return certificate;
 	}
 
-	public boolean shouldLockProvider() {
-		return properties.getLockProvider();
+	public X509Certificate getX509Certificate() {
+		return certificate;
+	}
+
+	public PrivateKey getPrivateKey() {
+		return privateKey;
 	}
 }

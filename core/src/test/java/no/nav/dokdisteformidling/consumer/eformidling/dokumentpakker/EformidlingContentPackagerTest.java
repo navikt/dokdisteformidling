@@ -43,7 +43,7 @@ class EformidlingContentPackagerTest {
 				.build();
 
 		final InputStream encryptedAsice = eformidlingContentPackager.packageContent(navDokumentpakke,
-				new AppCertificate(itestVirksomhetssertifikatProperties()), itestPemCertificate());
+				itestVirksomhetssertifikatProperties(), itestPemCertificate());
 
 		final InputStream decryptedAsice = cmsUtil.decryptCMSStreamed(encryptedAsice, itestPrivateKey());
 		final List<AppTestUtils.ZipFile> asicFiles = zipEntries(IOUtils.toBufferedInputStream(decryptedAsice));

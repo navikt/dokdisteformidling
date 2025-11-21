@@ -47,7 +47,7 @@ public class BrokerServiceExternalTestConfig extends AbstractCxfEndpointConfig {
 
     private void setRequestContext(final Client client, DpoUserProperties dpoUserProperties) {
         client.getRequestContext().put("ws-security.must-understand", Boolean.TRUE);
-        client.getRequestContext().put("ws-security.username", dpoUserProperties.getUsername());
+        client.getRequestContext().put("ws-security.username", dpoUserProperties.username());
         client.getRequestContext().put("ws-security.callback-handler", new ClientCallBackHandler(dpoUserProperties));
         client.getRequestContext().put("org.apache.cxf.message.Message.MAINTAIN_SESSION", Boolean.TRUE);
         client.getRequestContext().put("jakarta.xml.ws.session.maintain", Boolean.TRUE);
