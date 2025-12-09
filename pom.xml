@@ -47,7 +47,7 @@
 		<dok-common.version>1.7.1</dok-common.version>
 
 		<!-- test -->
-		<spring-cloud-contract-wiremock.version>4.3.0</spring-cloud-contract-wiremock.version>
+		<spring-cloud-contract-wiremock.version>5.0.0</spring-cloud-contract-wiremock.version>
 
 		<!-- Plugins -->
 		<maven-jaxb2-plugin.version>2.2.1</maven-jaxb2-plugin.version>
