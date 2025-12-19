@@ -5,4 +5,8 @@ public class DokdistIllegalArgumentException extends AbstractDokdisteformidlingF
 	public DokdistIllegalArgumentException(String message) {
 		super(message);
 	}
+
+	public DokdistIllegalArgumentException(String message, Throwable cause) {
+		super(message, cause);
+	}
 }

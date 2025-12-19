@@ -15,9 +15,12 @@ import no.nav.dokdisteformidling.consumer.eformidling.altinn.from.DownloadedMess
 import no.nav.dokdisteformidling.consumer.eformidling.altinn.to.AltinnReasonFactory;
 import no.nav.dokdisteformidling.consumer.eformidling.altinn.to.ReceiptTo;
 import no.nav.dokdisteformidling.consumer.eformidling.dokumentpakker.exceptions.DokumentpakkingException;
-import no.nav.dokdisteformidling.exception.technical.AltinnBrokerServiceWsException;
+import no.nav.dokdisteformidling.exception.functional.DokdistIllegalArgumentException;
+import no.nav.dokdisteformidling.exception.functional.AltinnBrokerServiceWsException;
+import no.nav.dokdisteformidling.exception.technical.DokdisteformidlingTechnicalException;
 import org.apache.cxf.headers.Header;
 import org.apache.cxf.jaxb.JAXBDataBinding;
+import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Component;
 
 import javax.xml.namespace.QName;
@@ -35,8 +38,8 @@ import static org.apache.cxf.headers.Header.HEADER_LIST;
 @Component
 public class BrokerServiceExternalStreamedService {
 
-	private static final String ALTINN_OPPLASTING_FEILET = "Altinn opplasting feilet: {}";
-	private static final String ALTINN_NEDLASTING_FEILET = "Altinn nedlasting feilet: {}";
+	private static final String ALTINN_OPPLASTING_FEILET = "Altinn opplasting feilet: ";
+	private static final String ALTINN_NEDLASTING_FEILET = "Altinn nedlasting feilet: ";
 	private static final String ALTINN_AVLESING_AV_MELDING_FEILET = "Altinn avlesning av melding feilet: ";
 	private static final String ALTINN_BROKERSERVICEEXTERNALSTREAMED_NAMESPACE = BrokerServiceExternalStreamedSF.SERVICE.getNamespaceURI();
 
@@ -48,23 +51,12 @@ public class BrokerServiceExternalStreamedService {
 		this.objectFactory = new ObjectFactory();
 	}
 
+	@Retryable(retryFor = DokdisteformidlingTechnicalException.class, noRetryFor = AltinnBrokerServiceWsException.class)
 	public ReceiptTo uploadFileToAltinn(String fileReference, String fileName, DataHandler dataHandler) {
 		List<Header> headerList = new ArrayList<>();
-		Header reportee = null;
-		Header reference = null;
-		Header filename = null;
-
-		try {
-			reportee = new Header(new QName(ALTINN_BROKERSERVICEEXTERNALSTREAMED_NAMESPACE, "Reportee"), NAV_KLAGEINSTANS_STYRINGSENHETEN_ORGNUMMER, new JAXBDataBinding(String.class));
-			reference = new Header(new QName(ALTINN_BROKERSERVICEEXTERNALSTREAMED_NAMESPACE, "Reference"), fileReference, new JAXBDataBinding(String.class));
-			filename = new Header(new QName(ALTINN_BROKERSERVICEEXTERNALSTREAMED_NAMESPACE, "FileName"), fileName, new JAXBDataBinding(String.class));
-		} catch (JAXBException e) {
-			log.error("Feil i uploadFileToAltinn:", e);
-		}
-
-		headerList.add(reportee);
-		headerList.add(reference);
-		headerList.add(filename);
+		headerList.add(mapHeader("Reportee", NAV_KLAGEINSTANS_STYRINGSENHETEN_ORGNUMMER));
+		headerList.add(mapHeader("Reference", fileReference));
+		headerList.add(mapHeader("FileName", fileName));
 
 		((BindingProvider) brokerServiceExternalStreamed).getRequestContext().put(HEADER_LIST, headerList);
 		StreamedPayloadExternalBE streamedPayloadExternalBE = objectFactory.createStreamedPayloadExternalBE();
@@ -72,10 +64,21 @@ public class BrokerServiceExternalStreamedService {
 
 		try {
 			final ReceiptExternalStreamedBE receiptExternalStreamedBE = brokerServiceExternalStreamed.uploadFileStreamed(streamedPayloadExternalBE);
+			if (receiptExternalStreamedBE == null) {
+				throw new DokdisteformidlingTechnicalException(ALTINN_OPPLASTING_FEILET + "receiptExternalStreamedBE responsen er null");
+			}
 			return mapReceipt(receiptExternalStreamedBE);
 		} catch (IBrokerServiceExternalStreamedUploadFileStreamedAltinnFaultFaultFaultMessage e) {
-			log.error(ALTINN_OPPLASTING_FEILET, from(e));
+			log.error(ALTINN_OPPLASTING_FEILET + "{}", from(e));
 			throw new AltinnBrokerServiceWsException(ALTINN_OPPLASTING_FEILET, AltinnReasonFactory.from(e), e);
+		}
+	}
+
+	private static Header mapHeader(String headerLocalPart, String headerValue) {
+		try {
+			return new Header(new QName(ALTINN_BROKERSERVICEEXTERNALSTREAMED_NAMESPACE, headerLocalPart), headerValue, new JAXBDataBinding(String.class));
+		} catch (JAXBException e) {
+			throw new AltinnBrokerServiceWsException("Klarte ikke mappe WS Header localPart=" + headerLocalPart, e);
 		}
 	}
 
@@ -119,7 +122,7 @@ public class BrokerServiceExternalStreamedService {
 			log.info("Lastet ned fil fra Altinn med filreferanse={}", filreferanse);
 			return dataHandler;
 		} catch (IBrokerServiceExternalStreamedDownloadFileStreamedAltinnFaultFaultFaultMessage e) {
-			log.error(ALTINN_NEDLASTING_FEILET, from(e));
+			log.error(ALTINN_NEDLASTING_FEILET + "{}", from(e));
 			throw new AltinnBrokerServiceWsException(ALTINN_NEDLASTING_FEILET, AltinnReasonFactory.from(e), e);
 		}
 	}
