@@ -19,7 +19,7 @@ import no.nav.dokdisteformidling.consumer.eformidling.altinn.to.AltinnReasonFact
 import no.nav.dokdisteformidling.consumer.eformidling.altinn.to.SearchCriteria;
 import no.nav.dokdisteformidling.consumer.eformidling.altinn.to.ServiceCode;
 import no.nav.dokdisteformidling.consumer.eformidling.altinn.to.UploadManifest;
-import no.nav.dokdisteformidling.exception.technical.AltinnBrokerServiceWsException;
+import no.nav.dokdisteformidling.exception.functional.AltinnBrokerServiceWsException;
 import org.springframework.stereotype.Component;
 
 import java.util.Collections;
