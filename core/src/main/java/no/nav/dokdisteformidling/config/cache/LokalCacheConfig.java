@@ -19,7 +19,6 @@ import static java.util.concurrent.TimeUnit.SECONDS;
 public class LokalCacheConfig {
 
 	public static final String AZURE_TOKEN_CACHE = "AzureToken";
-	public static final String STS_CACHE = "stsCache";
 	public static final String LIGHTWEIGHT_SAF_JOURNALPOST_QDIST013_CACHE = "LightweightSafJournalpostQdist013Cache";
 	public static final String SAF_JOURNALPOST_QDIST013_CACHE = "SafJournalpostQueryServiceImplQdist013Cache";
 
@@ -31,10 +30,6 @@ public class LokalCacheConfig {
 
 		manager.setCaches(asList(
 				new CaffeineCache(AZURE_TOKEN_CACHE, Caffeine.newBuilder()
-						.expireAfterWrite(55, MINUTES)
-						.recordStats()
-						.build()),
-				new CaffeineCache(STS_CACHE, Caffeine.newBuilder()
 						.expireAfterWrite(55, MINUTES)
 						.recordStats()
 						.build()),

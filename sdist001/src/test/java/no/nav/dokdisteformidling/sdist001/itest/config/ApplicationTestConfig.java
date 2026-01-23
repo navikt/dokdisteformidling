@@ -10,6 +10,7 @@ import no.nav.dokdisteformidling.config.props.BrokerServiceExternalStreamedPrope
 import no.nav.dokdisteformidling.config.props.DokdisteformidlingProperties;
 import no.nav.dokdisteformidling.config.props.DpoUserProperties;
 import no.nav.dokdisteformidling.config.props.MaskinportenProperties;
+import no.nav.dokdisteformidling.config.props.NaisProperties;
 import no.nav.dokdisteformidling.config.props.ServiceRegistryProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.ComponentScan;
@@ -28,7 +29,8 @@ import org.springframework.context.annotation.Profile;
 		KeyStoreProperties.class,
 		MaskinportenProperties.class,
 		ServiceRegistryProperties.class,
-		DokdisteformidlingProperties.class
+		DokdisteformidlingProperties.class,
+		NaisProperties.class
 })
 @Import({
 		BrokerServiceExternalTestConfig.class,
