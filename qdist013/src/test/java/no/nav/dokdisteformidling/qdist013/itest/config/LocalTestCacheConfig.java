@@ -15,7 +15,6 @@ import static java.util.concurrent.TimeUnit.SECONDS;
 import static no.nav.dokdisteformidling.config.cache.LokalCacheConfig.AZURE_TOKEN_CACHE;
 import static no.nav.dokdisteformidling.config.cache.LokalCacheConfig.LIGHTWEIGHT_SAF_JOURNALPOST_QDIST013_CACHE;
 import static no.nav.dokdisteformidling.config.cache.LokalCacheConfig.SAF_JOURNALPOST_QDIST013_CACHE;
-import static no.nav.dokdisteformidling.config.cache.LokalCacheConfig.STS_CACHE;
 
 @Configuration
 @Profile({"itest"})
@@ -25,10 +24,6 @@ public class LocalTestCacheConfig {
     CacheManager cacheManager() {
         SimpleCacheManager manager = new SimpleCacheManager();
         manager.setCaches(Arrays.asList(
-                new CaffeineCache(STS_CACHE, Caffeine.newBuilder()
-                        .expireAfterWrite(0, MINUTES)
-                        .maximumSize(0)
-                        .build()),
                 new CaffeineCache(LIGHTWEIGHT_SAF_JOURNALPOST_QDIST013_CACHE, Caffeine.newBuilder()
                         .expireAfterWrite(0, SECONDS)
                         .maximumSize(0)

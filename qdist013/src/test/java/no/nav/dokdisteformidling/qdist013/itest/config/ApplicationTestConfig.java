@@ -11,6 +11,7 @@ import no.nav.dokdisteformidling.config.props.BrokerServiceExternalStreamedPrope
 import no.nav.dokdisteformidling.config.props.DokdisteformidlingProperties;
 import no.nav.dokdisteformidling.config.props.DpoUserProperties;
 import no.nav.dokdisteformidling.config.props.MaskinportenProperties;
+import no.nav.dokdisteformidling.config.props.NaisProperties;
 import no.nav.dokdisteformidling.config.props.ServiceRegistryProperties;
 import no.nav.dokdisteformidling.storage.BucketStorage;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -34,7 +35,8 @@ import static org.mockito.Mockito.mock;
 		MqGatewayAlias.class,
 		MaskinportenProperties.class,
 		ServiceRegistryProperties.class,
-		DokdisteformidlingProperties.class})
+		DokdisteformidlingProperties.class,
+		NaisProperties.class})
 @Import({
 		CoreConfig.class,
 		JmsItestConfig.class,

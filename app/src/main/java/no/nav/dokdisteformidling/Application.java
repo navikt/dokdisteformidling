@@ -10,6 +10,7 @@ import no.nav.dokdisteformidling.config.props.DokdisteformidlingProperties;
 import no.nav.dokdisteformidling.config.props.DokdistmellomlagerProperties;
 import no.nav.dokdisteformidling.config.props.DpoUserProperties;
 import no.nav.dokdisteformidling.config.props.MaskinportenProperties;
+import no.nav.dokdisteformidling.config.props.NaisProperties;
 import no.nav.dokdisteformidling.config.props.ServiceRegistryProperties;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -30,12 +31,13 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 		ServiceRegistryProperties.class,
 		DokdistmellomlagerProperties.class,
 		DokdisteformidlingProperties.class,
-		AzureProperties.class
+		AzureProperties.class,
+		NaisProperties.class
 })
 @SpringBootApplication(exclude = UserDetailsServiceAutoConfiguration.class)
 public class Application {
 
-	public static void main(String[] args) {
+	static void main(String[] args) {
 		SpringApplication.run(Application.class, args);
 	}
 }
