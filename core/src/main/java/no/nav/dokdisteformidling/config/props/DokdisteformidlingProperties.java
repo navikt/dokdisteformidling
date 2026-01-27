@@ -1,5 +1,6 @@
 package no.nav.dokdisteformidling.config.props;
 
+import jakarta.validation.Valid;
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.validation.annotation.Validated;
@@ -11,6 +12,7 @@ import jakarta.validation.constraints.NotNull;
 @ConfigurationProperties("dokdisteformidling")
 public class DokdisteformidlingProperties {
 
+	@Valid
 	private final Endpoints endpoints = new Endpoints();
 
 	@Data
@@ -21,6 +23,9 @@ public class DokdisteformidlingProperties {
 
 		@NotNull
 		private AzureEndpoint pdl;
+
+		@NotNull
+		private AzureEndpoint saf;
 
 		@NotNull
 		private Endpoint ereg;
