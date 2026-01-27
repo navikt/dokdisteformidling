@@ -89,9 +89,9 @@ class Qdist013ForAltinnIT extends AbstractQdist013IntegrationTest {
 	@Test
 	void shouldUploadFileToAltinnWhenAktoerIdHappyCase() {
 		stubGetForsendelse("__files/dokdistadmin/getForsendelse-happy.json");
-		stubGetSecurityToken();
-		stubPostSafJournalpost("queryJournalpostId\":\"123\"", "saf/safQdist013GraphQlResponse-aktoerId.json");
-		stubPostSafJournalpost("queryJournalpostId\":\"448212366\"", "saf/safLightweightGraphQlResponse-happy.json");
+
+		stubPostSafJournalpost("123", "saf/safQdist013GraphQlResponse-aktoerId.json");
+		stubPostSafJournalpost("448212366", "saf/safLightweightGraphQlResponse-happy.json");
 		postPdlGraphql(PDL_PERSONNAVN_HAPPY, OK.value());
 		stubPostMaskinporten();
 		stubGetServiceRegistry();
@@ -108,9 +108,8 @@ class Qdist013ForAltinnIT extends AbstractQdist013IntegrationTest {
 	@Test
 	void shouldUploadFileToAltinnWhenFnrHappyCase() {
 		stubGetForsendelse("__files/dokdistadmin/getForsendelse-happy.json");
-		stubGetSecurityToken();
-		stubPostSafJournalpost("queryJournalpostId\":\"123\"", "saf/safQdist013GraphQlResponse-fnr.json");
-		stubPostSafJournalpost("queryJournalpostId\":\"448212366\"", "saf/safLightweightGraphQlResponse-happy.json");
+		stubPostSafJournalpost("123", "saf/safQdist013GraphQlResponse-fnr.json");
+		stubPostSafJournalpost("448212366", "saf/safLightweightGraphQlResponse-happy.json");
 		postPdlGraphql(PDL_PERSONNAVN_HAPPY, OK.value());
 		stubPostMaskinporten();
 		stubGetServiceRegistry();
@@ -127,9 +126,8 @@ class Qdist013ForAltinnIT extends AbstractQdist013IntegrationTest {
 	@Test
 	void shouldUploadFileToAltinnWhenOrgnrHappyCase() {
 		stubGetForsendelse("__files/dokdistadmin/getForsendelse-happy.json");
-		stubGetSecurityToken();
-		stubPostSafJournalpost("queryJournalpostId\":\"123\"", "saf/safQdist013GraphQlResponse-orgnr.json");
-		stubPostSafJournalpost("queryJournalpostId\":\"448212366\"", "saf/safLightweightGraphQlResponse-happy.json");
+		stubPostSafJournalpost("123", "saf/safQdist013GraphQlResponse-orgnr.json");
+		stubPostSafJournalpost("448212366", "saf/safLightweightGraphQlResponse-happy.json");
 		stubEreg();
 		stubPostMaskinporten();
 		stubGetServiceRegistry();
@@ -146,9 +144,8 @@ class Qdist013ForAltinnIT extends AbstractQdist013IntegrationTest {
 	@Test
 	void shouldUploadFileToAltinnWhenLightweightSafDatoJournalfoertErNull() {
 		stubGetForsendelse("__files/dokdistadmin/getForsendelse-happy.json");
-		stubGetSecurityToken();
-		stubPostSafJournalpost("queryJournalpostId\":\"123\"", "saf/safQdist013GraphQlResponse-aktoerId.json");
-		stubPostSafJournalpost("queryJournalpostId\":\"448212366\"", "saf/safLightweightGraphQlResponse-datojournalfoert-null.json");
+		stubPostSafJournalpost("123", "saf/safQdist013GraphQlResponse-aktoerId.json");
+		stubPostSafJournalpost("448212366", "saf/safLightweightGraphQlResponse-datojournalfoert-null.json");
 		postPdlGraphql(PDL_PERSONNAVN_HAPPY, OK.value());
 		stubPostMaskinporten();
 		stubGetServiceRegistry();
@@ -165,9 +162,8 @@ class Qdist013ForAltinnIT extends AbstractQdist013IntegrationTest {
 	@Test
 	void shouldUploadFileToAltinnWhenLightweightSafSakDatoOpprettetErNull() {
 		stubGetForsendelse("__files/dokdistadmin/getForsendelse-happy.json");
-		stubGetSecurityToken();
-		stubPostSafJournalpost("queryJournalpostId\":\"123\"", "saf/safQdist013GraphQlResponse-sak-datoopprettet-null.json");
-		stubPostSafJournalpost("queryJournalpostId\":\"448212366\"", "saf/safLightweightGraphQlResponse-happy.json");
+		stubPostSafJournalpost("123", "saf/safQdist013GraphQlResponse-sak-datoopprettet-null.json");
+		stubPostSafJournalpost("448212366", "saf/safLightweightGraphQlResponse-happy.json");
 		postPdlGraphql(PDL_PERSONNAVN_HAPPY, OK.value());
 		stubPostMaskinporten();
 		stubGetServiceRegistry();
@@ -184,9 +180,8 @@ class Qdist013ForAltinnIT extends AbstractQdist013IntegrationTest {
 	@Test
 	void shouldThrowExceptionWhenDatoJournalfoertErNullInJpQdist013() {
 		stubGetForsendelse("__files/dokdistadmin/getForsendelse-happy.json");
-		stubGetSecurityToken();
-		stubPostSafJournalpost("queryJournalpostId\":\"123\"", "saf/safQdist013GraphQlResponse-relevantdato-null.json");
-		stubPostSafJournalpost("queryJournalpostId\":\"448212366\"", "saf/safLightweightGraphQlResponse-datojournalfoert-null.json");
+		stubPostSafJournalpost("123", "saf/safQdist013GraphQlResponse-relevantdato-null.json");
+		stubPostSafJournalpost("448212366", "saf/safLightweightGraphQlResponse-datojournalfoert-null.json");
 
 		sendStringMessage(qdist013, classpathToString("qdist013/qdist013-happy.xml"));
 
@@ -228,7 +223,6 @@ class Qdist013ForAltinnIT extends AbstractQdist013IntegrationTest {
 	@Test
 	void shouldPutOnBackoutQueueWhenSafJournalpostIkkeFunnetException() {
 		stubGetForsendelse("__files/dokdistadmin/getForsendelse-happy.json");
-		stubGetSecurityToken();
 		stubFor(post(urlMatching("/safgraphql"))
 				.willReturn(aResponse()
 						.withStatus(OK.value())
@@ -243,7 +237,6 @@ class Qdist013ForAltinnIT extends AbstractQdist013IntegrationTest {
 	@Test
 	void shouldThrowSafJournalpostQueryUnauthorizedException() {
 		stubGetForsendelse("__files/dokdistadmin/getForsendelse-happy.json");
-		stubGetSecurityToken();
 		stubFor(post(urlMatching("/safgraphql"))
 				.willReturn(aResponse()
 						.withStatus(NOT_FOUND.value())));
@@ -256,7 +249,6 @@ class Qdist013ForAltinnIT extends AbstractQdist013IntegrationTest {
 	@Test
 	void shouldThrowSafJournalpostQueryTechnicalException() {
 		stubGetForsendelse("__files/dokdistadmin/getForsendelse-happy.json");
-		stubGetSecurityToken();
 		stubFor(post(urlMatching("/safgraphql"))
 				.willReturn(aResponse()
 						.withStatus(INTERNAL_SERVER_ERROR.value())));
@@ -269,8 +261,7 @@ class Qdist013ForAltinnIT extends AbstractQdist013IntegrationTest {
 	@Test
 	void shouldThrowSafJournalpostValidationException() {
 		stubGetForsendelse("__files/dokdistadmin/getForsendelse-happy.json");
-		stubGetSecurityToken();
-		stubPostSafJournalpost("queryJournalpostId\":\"123\"", "saf/safQdist013GraphQlResponse-tomJournalpostId.json");
+		stubPostSafJournalpost("123", "saf/safQdist013GraphQlResponse-tomJournalpostId.json");
 
 		sendStringMessage(qdist013, classpathToString("qdist013/qdist013-happy.xml"));
 
@@ -280,11 +271,10 @@ class Qdist013ForAltinnIT extends AbstractQdist013IntegrationTest {
 	@Test
 	void shouldPutMessageOnBackoutWhenSafJournalpostIkkeFunnetExceptionUsingLightweightService() {
 		stubGetForsendelse("__files/dokdistadmin/getForsendelse-happy.json");
-		stubGetSecurityToken();
-		stubPostSafJournalpost("queryJournalpostId\":\"123\"", "saf/safQdist013GraphQlResponse-aktoerId.json");
+		stubPostSafJournalpost("123", "saf/safQdist013GraphQlResponse-aktoerId.json");
 		postPdlGraphql(PDL_PERSONNAVN_HAPPY, OK.value());
 		stubFor(post(urlMatching("/safgraphql"))
-				.withRequestBody(containing("queryJournalpostId\":\"448212366\""))
+				.withRequestBody(containing("448212366"))
 				.willReturn(aResponse()
 						.withStatus(OK.value())
 						.withHeader(CONTENT_TYPE, APPLICATION_JSON_VALUE)
@@ -298,11 +288,10 @@ class Qdist013ForAltinnIT extends AbstractQdist013IntegrationTest {
 	@Test
 	void shouldThrowSafJournalpostQueryUnauthorizedExceptionLightweight() {
 		stubGetForsendelse("__files/dokdistadmin/getForsendelse-happy.json");
-		stubGetSecurityToken();
 		postPdlGraphql(PDL_PERSONNAVN_HAPPY, OK.value());
-		stubPostSafJournalpost("queryJournalpostId\":\"123\"", "saf/safQdist013GraphQlResponse-aktoerId.json");
+		stubPostSafJournalpost("123", "saf/safQdist013GraphQlResponse-aktoerId.json");
 		stubFor(post(urlMatching("/safgraphql"))
-				.withRequestBody(containing("queryJournalpostId\":\"448212366\""))
+				.withRequestBody(containing("448212366"))
 				.willReturn(aResponse().withStatus(FORBIDDEN.value())));
 
 		sendStringMessage(qdist013, classpathToString("qdist013/qdist013-happy.xml"));
@@ -313,9 +302,8 @@ class Qdist013ForAltinnIT extends AbstractQdist013IntegrationTest {
 	@Test
 	void shouldGiPersonIkkeFunnetExceptionForNotFoundFraPdl() {
 		stubGetForsendelse("__files/dokdistadmin/getForsendelse-happy.json");
-		stubGetSecurityToken();
-		stubPostSafJournalpost("queryJournalpostId\":\"123\"", "saf/safQdist013GraphQlResponse-aktoerId.json");
-		stubPostSafJournalpost("queryJournalpostId\":\"448212366\"", "saf/safLightweightGraphQlResponse-happy.json");
+		stubPostSafJournalpost("123", "saf/safQdist013GraphQlResponse-aktoerId.json");
+		stubPostSafJournalpost("448212366", "saf/safLightweightGraphQlResponse-happy.json");
 		postPdlGraphql(PDL_IDENT_NOT_FOUND, OK.value());
 
 		sendStringMessage(qdist013, classpathToString("qdist013/qdist013-happy.xml"));
@@ -326,9 +314,8 @@ class Qdist013ForAltinnIT extends AbstractQdist013IntegrationTest {
 	@Test
 	void shouldGiDokdistIllegalArgumentExceptionForUgyldigResponsFraPdl() {
 		stubGetForsendelse("__files/dokdistadmin/getForsendelse-happy.json");
-		stubGetSecurityToken();
-		stubPostSafJournalpost("queryJournalpostId\":\"123\"", "saf/safQdist013GraphQlResponse-aktoerId.json");
-		stubPostSafJournalpost("queryJournalpostId\":\"448212366\"", "saf/safLightweightGraphQlResponse-happy.json");
+		stubPostSafJournalpost("123", "saf/safQdist013GraphQlResponse-aktoerId.json");
+		stubPostSafJournalpost("448212366", "saf/safLightweightGraphQlResponse-happy.json");
 		postPdlGraphql(PDL_FORNAVN_NULL, OK.value());
 
 		sendStringMessage(qdist013, classpathToString("qdist013/qdist013-happy.xml"));
@@ -340,9 +327,8 @@ class Qdist013ForAltinnIT extends AbstractQdist013IntegrationTest {
 	@EnumSource(value = HttpStatus.class, names = {"BAD_REQUEST", "NOT_FOUND"})
 	void shouldThrowEregFunctionalExceptionFor4xxFraEreg(HttpStatus httpStatus) {
 		stubGetForsendelse("__files/dokdistadmin/getForsendelse-happy.json");
-		stubGetSecurityToken();
-		stubPostSafJournalpost("queryJournalpostId\":\"123\"", "saf/safQdist013GraphQlResponse-orgnr.json");
-		stubPostSafJournalpost("queryJournalpostId\":\"448212366\"", "saf/safLightweightGraphQlResponse-happy.json");
+		stubPostSafJournalpost("123", "saf/safQdist013GraphQlResponse-orgnr.json");
+		stubPostSafJournalpost("448212366", "saf/safLightweightGraphQlResponse-happy.json");
 		stubEreg(httpStatus);
 
 		sendStringMessage(qdist013, classpathToString("qdist013/qdist013-happy.xml"));
@@ -353,9 +339,8 @@ class Qdist013ForAltinnIT extends AbstractQdist013IntegrationTest {
 	@Test
 	void shouldThrowEregFunctionalExceptionWhenResponseNull() {
 		stubGetForsendelse("__files/dokdistadmin/getForsendelse-happy.json");
-		stubGetSecurityToken();
-		stubPostSafJournalpost("queryJournalpostId\":\"123\"", "saf/safQdist013GraphQlResponse-orgnr.json");
-		stubPostSafJournalpost("queryJournalpostId\":\"448212366\"", "saf/safLightweightGraphQlResponse-happy.json");
+		stubPostSafJournalpost("123", "saf/safQdist013GraphQlResponse-orgnr.json");
+		stubPostSafJournalpost("448212366", "saf/safLightweightGraphQlResponse-happy.json");
 		stubFor(get(EREG_URL)
 				.willReturn(aResponse()
 						.withStatus(OK.value())
@@ -369,9 +354,8 @@ class Qdist013ForAltinnIT extends AbstractQdist013IntegrationTest {
 	@Test
 	void shouldThrowEregFunctionalExceptionWhenNavnMangler() {
 		stubGetForsendelse("__files/dokdistadmin/getForsendelse-happy.json");
-		stubGetSecurityToken();
-		stubPostSafJournalpost("queryJournalpostId\":\"123\"", "saf/safQdist013GraphQlResponse-orgnr.json");
-		stubPostSafJournalpost("queryJournalpostId\":\"448212366\"", "saf/safLightweightGraphQlResponse-happy.json");
+		stubPostSafJournalpost("123", "saf/safQdist013GraphQlResponse-orgnr.json");
+		stubPostSafJournalpost("448212366", "saf/safLightweightGraphQlResponse-happy.json");
 		stubEreg("ereg/mangler_navn.json");
 
 		sendStringMessage(qdist013, classpathToString("qdist013/qdist013-happy.xml"));
@@ -382,9 +366,8 @@ class Qdist013ForAltinnIT extends AbstractQdist013IntegrationTest {
 	@Test
 	void shouldThrowEregFunctionalExceptionWhenSammensattnavnMangler() {
 		stubGetForsendelse("__files/dokdistadmin/getForsendelse-happy.json");
-		stubGetSecurityToken();
-		stubPostSafJournalpost("queryJournalpostId\":\"123\"", "saf/safQdist013GraphQlResponse-orgnr.json");
-		stubPostSafJournalpost("queryJournalpostId\":\"448212366\"", "saf/safLightweightGraphQlResponse-happy.json");
+		stubPostSafJournalpost("123", "saf/safQdist013GraphQlResponse-orgnr.json");
+		stubPostSafJournalpost("448212366", "saf/safLightweightGraphQlResponse-happy.json");
 		stubEreg("ereg/mangler_sammensattnavn.json");
 
 		sendStringMessage(qdist013, classpathToString("qdist013/qdist013-happy.xml"));
@@ -395,9 +378,8 @@ class Qdist013ForAltinnIT extends AbstractQdist013IntegrationTest {
 	@Test
 	void shouldGiDokdistadminFunctionalExceptionWhenForbiddenForOppdatering() {
 		stubGetForsendelse("__files/dokdistadmin/getForsendelse-happy.json");
-		stubGetSecurityToken();
-		stubPostSafJournalpost("queryJournalpostId\":\"123\"", "saf/safQdist013GraphQlResponse-orgnr.json");
-		stubPostSafJournalpost("queryJournalpostId\":\"448212366\"", "saf/safLightweightGraphQlResponse-happy.json");
+		stubPostSafJournalpost("123", "saf/safQdist013GraphQlResponse-orgnr.json");
+		stubPostSafJournalpost("448212366", "saf/safLightweightGraphQlResponse-happy.json");
 		stubEreg();
 		stubPostMaskinporten();
 		stubGetServiceRegistry();
@@ -444,9 +426,8 @@ class Qdist013ForAltinnIT extends AbstractQdist013IntegrationTest {
 	@Test
 	void shouldGiDokdistadminTechnicalExceptionWhenInternalServerErrorForOppdatering() {
 		stubGetForsendelse("__files/dokdistadmin/getForsendelse-happy.json");
-		stubGetSecurityToken();
-		stubPostSafJournalpost("queryJournalpostId\":\"123\"", "saf/safQdist013GraphQlResponse-orgnr.json");
-		stubPostSafJournalpost("queryJournalpostId\":\"448212366\"", "saf/safLightweightGraphQlResponse-happy.json");
+		stubPostSafJournalpost("123", "saf/safQdist013GraphQlResponse-orgnr.json");
+		stubPostSafJournalpost("448212366", "saf/safLightweightGraphQlResponse-happy.json");
 		stubEreg();
 		stubPostMaskinporten();
 		stubGetServiceRegistry();
@@ -463,9 +444,8 @@ class Qdist013ForAltinnIT extends AbstractQdist013IntegrationTest {
 	@Test
 	void shouldThrowLagreJuridiskLoggTechnicalException() {
 		stubGetForsendelse("__files/dokdistadmin/getForsendelse-happy.json");
-		stubGetSecurityToken();
-		stubPostSafJournalpost("queryJournalpostId\":\"123\"", "saf/safQdist013GraphQlResponse-orgnr.json");
-		stubPostSafJournalpost("queryJournalpostId\":\"448212366\"", "saf/safLightweightGraphQlResponse-happy.json");
+		stubPostSafJournalpost("123", "saf/safQdist013GraphQlResponse-orgnr.json");
+		stubPostSafJournalpost("448212366", "saf/safLightweightGraphQlResponse-happy.json");
 		stubEreg();
 		stubPostMaskinporten();
 		stubGetServiceRegistry();
@@ -483,9 +463,8 @@ class Qdist013ForAltinnIT extends AbstractQdist013IntegrationTest {
 	@Test
 	void shouldThrowEregTechnicalExceptionVedInternalServerErrorFraEreg() {
 		stubGetForsendelse("__files/dokdistadmin/getForsendelse-happy.json");
-		stubGetSecurityToken();
-		stubPostSafJournalpost("queryJournalpostId\":\"123\"", "saf/safQdist013GraphQlResponse-orgnr.json");
-		stubPostSafJournalpost("queryJournalpostId\":\"448212366\"", "saf/safLightweightGraphQlResponse-happy.json");
+		stubPostSafJournalpost("123", "saf/safQdist013GraphQlResponse-orgnr.json");
+		stubPostSafJournalpost("448212366", "saf/safLightweightGraphQlResponse-happy.json");
 		stubEreg(INTERNAL_SERVER_ERROR);
 
 		sendStringMessage(qdist013, classpathToString("qdist013/qdist013-happy.xml"));
@@ -496,9 +475,8 @@ class Qdist013ForAltinnIT extends AbstractQdist013IntegrationTest {
 	@Test
 	void shouldThrowTechnicalExceptionAndRetryWhenServiceRegistryReturnsError() {
 		stubGetForsendelse("__files/dokdistadmin/getForsendelse-happy.json");
-		stubGetSecurityToken();
-		stubPostSafJournalpost("queryJournalpostId\":\"123\"", "saf/safQdist013GraphQlResponse-orgnr.json");
-		stubPostSafJournalpost("queryJournalpostId\":\"448212366\"", "saf/safLightweightGraphQlResponse-happy.json");
+		stubPostSafJournalpost("123", "saf/safQdist013GraphQlResponse-orgnr.json");
+		stubPostSafJournalpost("448212366", "saf/safLightweightGraphQlResponse-happy.json");
 		stubEreg();
 		stubPostMaskinporten();
 		stubFor(get(urlMatching("/serviceregistry/identifier/" + TRYGDERETTEN_ORGNUMMER + "/process/" + AVTALTMELDING_PROCESS))
@@ -514,9 +492,8 @@ class Qdist013ForAltinnIT extends AbstractQdist013IntegrationTest {
 	@Test
 	void shouldThrowInitiateBrokerServiceTechnicalException() {
 		stubGetForsendelse("__files/dokdistadmin/getForsendelse-happy.json");
-		stubGetSecurityToken();
-		stubPostSafJournalpost("queryJournalpostId\":\"123\"", "saf/safQdist013GraphQlResponse-orgnr.json");
-		stubPostSafJournalpost("queryJournalpostId\":\"448212366\"", "saf/safLightweightGraphQlResponse-happy.json");
+		stubPostSafJournalpost("123", "saf/safQdist013GraphQlResponse-orgnr.json");
+		stubPostSafJournalpost("448212366", "saf/safLightweightGraphQlResponse-happy.json");
 		stubEreg();
 		stubPostMaskinporten();
 		stubGetServiceRegistry();
@@ -535,9 +512,8 @@ class Qdist013ForAltinnIT extends AbstractQdist013IntegrationTest {
 	@ValueSource(strings = {PDL_IDENT_HAPPY, PDL_PERSONNAVN_HAPPY})
 	void shouldGiPdlHentPersonTechnicalExceptionForInternalServerErrorFraPdl(String filePath) {
 		stubGetForsendelse("__files/dokdistadmin/getForsendelse-happy.json");
-		stubGetSecurityToken();
-		stubPostSafJournalpost("queryJournalpostId\":\"123\"", "saf/safQdist013GraphQlResponse-aktoerId.json");
-		stubPostSafJournalpost("queryJournalpostId\":\"448212366\"", "saf/safLightweightGraphQlResponse-happy.json");
+		stubPostSafJournalpost("123", "saf/safQdist013GraphQlResponse-aktoerId.json");
+		stubPostSafJournalpost("448212366", "saf/safLightweightGraphQlResponse-happy.json");
 		postPdlGraphql(filePath, INTERNAL_SERVER_ERROR.value());
 
 		sendStringMessage(qdist013, classpathToString("qdist013/qdist013-happy.xml"));
@@ -548,22 +524,10 @@ class Qdist013ForAltinnIT extends AbstractQdist013IntegrationTest {
 	@Test
 	void shouldThrowSafJournalpostQueryTechnicalExceptionLightweight() {
 		stubGetForsendelse("__files/dokdistadmin/getForsendelse-happy.json");
-		stubGetSecurityToken();
-		stubPostSafJournalpost("queryJournalpostId\":\"123\"", "saf/safQdist013GraphQlResponse-aktoerId.json");
+		stubPostSafJournalpost("123", "saf/safQdist013GraphQlResponse-aktoerId.json");
 		postPdlGraphql(PDL_PERSONNAVN_HAPPY, OK.value());
 		stubFor(post(urlMatching("/safgraphql"))
-				.withRequestBody(containing("queryJournalpostId\":\"448212366\""))
-				.willReturn(aResponse().withStatus(INTERNAL_SERVER_ERROR.value())));
-
-		sendStringMessage(qdist013, classpathToString("qdist013/qdist013-happy.xml"));
-
-		await().atMost(10, SECONDS).untilAsserted(() -> assertMessageOnQueue(backoutQueue));
-	}
-
-	@Test
-	void shouldThrowStsTechnicalException() {
-		stubGetForsendelse("__files/dokdistadmin/getForsendelse-happy.json");
-		stubFor(get("/securitytoken?grant_type=client_credentials&scope=openid")
+				.withRequestBody(containing("448212366"))
 				.willReturn(aResponse().withStatus(INTERNAL_SERVER_ERROR.value())));
 
 		sendStringMessage(qdist013, classpathToString("qdist013/qdist013-happy.xml"));
@@ -619,7 +583,7 @@ class Qdist013ForAltinnIT extends AbstractQdist013IntegrationTest {
 	private <T> T receive(Queue queue) {
 		Object response = jmsTemplate.receiveAndConvert(queue);
 		if (response instanceof JAXBElement) {
-			response = ((JAXBElement) response).getValue();
+			response = ((JAXBElement<?>) response).getValue();
 		}
 		return (T) response;
 	}

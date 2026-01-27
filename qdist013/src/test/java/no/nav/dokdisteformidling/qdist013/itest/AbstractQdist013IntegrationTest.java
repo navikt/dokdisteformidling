@@ -12,8 +12,8 @@ import org.springframework.test.context.ActiveProfiles;
 import java.util.UUID;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
-import static com.github.tomakehurst.wiremock.client.WireMock.containing;
 import static com.github.tomakehurst.wiremock.client.WireMock.get;
+import static com.github.tomakehurst.wiremock.client.WireMock.matchingJsonPath;
 import static com.github.tomakehurst.wiremock.client.WireMock.post;
 import static com.github.tomakehurst.wiremock.client.WireMock.put;
 import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
@@ -105,14 +105,6 @@ public abstract class AbstractQdist013IntegrationTest {
 						.withBody(classpathToString("__files/serviceregistry/serviceregistry_happy_response.json"))));
 	}
 
-	public static void stubGetSecurityToken() {
-		stubFor(get("/securitytoken?grant_type=client_credentials&scope=openid")
-				.willReturn(aResponse()
-						.withStatus(OK.value())
-						.withHeader(CONTENT_TYPE, APPLICATION_JSON_VALUE)
-						.withBodyFile("securitytoken/stsResponse_happy.json")));
-	}
-
 	public static void stubPostMaskinporten() {
 		stubFor(post(urlMatching("/maskinporten"))
 				.willReturn(aResponse()
@@ -137,9 +129,9 @@ public abstract class AbstractQdist013IntegrationTest {
 						.withBodyFile(filePath)));
 	}
 
-	protected static void stubPostSafJournalpost(String stringInRequestBody, String returnBodyFileName) {
+	protected static void stubPostSafJournalpost(String journalpostId, String returnBodyFileName) {
 		stubFor(post(urlMatching("/safgraphql"))
-				.withRequestBody(containing(stringInRequestBody))
+				.withRequestBody(matchingJsonPath("$.variables[?(@.queryJournalpostId == '" + journalpostId + "')]"))
 				.willReturn(aResponse()
 						.withStatus(OK.value())
 						.withHeader(CONTENT_TYPE, APPLICATION_JSON_VALUE)
