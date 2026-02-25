@@ -5,6 +5,8 @@ import lombok.Value;
 import no.nav.dokdisteformidling.consumer.eformidling.dokumentpakker.trygderetten.json.KvitteringStatus;
 import no.nav.dokdisteformidling.consumer.eformidling.dokumentpakker.trygderetten.json.TrygderettenMelding;
 
+import javax.xml.datatype.XMLGregorianCalendar;
+
 @Value
 @Builder
 public class DownloadResponse {
@@ -19,13 +21,14 @@ public class DownloadResponse {
 
 	public static DownloadResponse from(AltinnDokument altinnDokument) {
 		TrygderettenMelding trygderettenMelding = altinnDokument.getTrygderettenMelding();
+		XMLGregorianCalendar sentDate = altinnDokument.getManifest().getSentDate();
 		return DownloadResponse.builder()
 				.processIdentifier(trygderettenMelding.getProcess())
 				.documentType(trygderettenMelding.getStandardBusinessDocumentHeader().getDocumentType())
 				.conversationId(trygderettenMelding.getConversationId())
 				.fileReference(altinnDokument.getFileReference())
 				.sendersReference(altinnDokument.getManifest().getSendersReference())
-				.sendtDate(altinnDokument.getManifest().getSentDate().toString())
+				.sendtDate(sentDate == null ? null : sentDate.toString())
 				.kvitteringStatus(trygderettenMelding.getStatus())
 				.build();
 	}
