@@ -28,7 +28,7 @@ public class GoogleCloudBucketStorage implements BucketStorage {
 			byte[] plainText = aead.decrypt(cipherText, associatedData.getBytes());
 
 			return new String(plainText);
-		} catch (GeneralSecurityException | StorageException e) {
+		} catch (Exception e) {
 			throw new BucketFailedToDownloadTechnicalException(String.format("Teknisk feil mot Google Cloud Storage ved henting av objectName=%s. Feilmelding=%s",
 					objectName, e.getMessage()), e);
 		}
