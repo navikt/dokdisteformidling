@@ -22,7 +22,7 @@
   "DOKDISTEFORMIDLING_ENDPOINTS_SAF_SCOPE": "api://dev-fss.teamdokumenthandtering.saf-q1/.default",
   "MASKINPORTEN_URL": "https://test.maskinporten.no/token",
   "MASKINPORTEN_AUDIENCE": "https://test.maskinporten.no/",
-  "SERVICEREGISTRY_URL": "https://qa-meldingsutveksling.difi.no/serviceregistry/",
+  "SERVICEREGISTRY_URL": "https://test.eformidling.no/adressetjeneste/",
   "ALTINN_BROKERSERVICEEXTERNAL_ENDPOINTURL": "https://www.altinn.no/ServiceEngineExternal/BrokerServiceExternal.svc",
   "ALTINN_BROKERSERVICEEXTERNALSTREAMED_ENDPOINTURL": "https://www.altinn.no/ServiceEngineExternal/BrokerServiceExternalStreamed.svc",
   "KLAGEINSTANS_VAULT": "/secret/virksomhetssertifikat/preprod/klageinstans/",
