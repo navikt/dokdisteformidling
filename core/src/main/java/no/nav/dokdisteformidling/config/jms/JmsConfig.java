@@ -1,4 +1,3 @@
-
 package no.nav.dokdisteformidling.config.jms;
 
 import com.ibm.mq.jakarta.jms.MQConnectionFactory;
@@ -37,6 +36,11 @@ public class JmsConfig {
 	@Bean
 	public Queue qdist013FunksjonellFeil(@Value("${dokdisteformidling_qdist013_funk_feil.queuename}") String qdist013FunksjonellFeil) throws JMSException {
 		return new MQQueue(qdist013FunksjonellFeil);
+	}
+
+	@Bean
+	public Queue qdist015(@Value("${dokdistdpo_qdist015_dist_til_dpo.queuename}") String qdist015QueueName) throws JMSException {
+		return new MQQueue(qdist015QueueName);
 	}
 
 	@Bean

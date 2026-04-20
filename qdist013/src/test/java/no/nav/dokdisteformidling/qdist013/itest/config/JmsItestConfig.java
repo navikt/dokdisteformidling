@@ -28,6 +28,11 @@ public class JmsItestConfig {
 	}
 
 	@Bean
+	public Queue qdist015(@Value("${dokdistdpo_qdist015_dist_til_dpo.queuename}") String qdist015QueueName) {
+		return new ActiveMQQueue(qdist015QueueName);
+	}
+
+	@Bean
 	public Queue backoutQueue(@Value("${dokdisteformidling_qdist013_backout.queuename}") String qdist013BqQueueName) {
 		return new ActiveMQQueue(qdist013BqQueueName);
 	}
