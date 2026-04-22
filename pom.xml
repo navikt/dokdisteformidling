@@ -40,7 +40,7 @@
 		<jaxws-ri.version>4.0.3</jaxws-ri.version>
 		<commons-asic.version>1.0.2</commons-asic.version>
 		<httpclient4.version>4.5.14</httpclient4.version>
-		<bouncycastle-jdk18on.version>1.83</bouncycastle-jdk18on.version>
+		<bouncycastle-jdk18on.version>1.84</bouncycastle-jdk18on.version>
 
 		<!-- NAV -->
 		<dok-legacy-tjenestespesifikasjoner.version>41-d282678</dok-legacy-tjenestespesifikasjoner.version>
