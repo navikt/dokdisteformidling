@@ -15,7 +15,6 @@ import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 
 import static no.nav.dokdisteformidling.azure.OAuthEnabledWebClientConfig.CLIENT_REGISTRATION_DOKDISTADMIN;
-import static no.nav.dokdisteformidling.constants.DomainConstants.DISTRIBUSJONSKANAL;
 import static no.nav.dokdisteformidling.constants.RetryConstants.DELAY_SHORT;
 import static no.nav.dokdisteformidling.constants.RetryConstants.MULTIPLIER_SHORT;
 import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
@@ -24,7 +23,7 @@ import static org.springframework.security.oauth2.client.web.reactive.function.c
 
 @Slf4j
 @Component
-public class AdministrerForsendelseConsumer implements AdministrerForsendelse {
+public class AdministrerForsendelseConsumer {
 
 	private final WebClient webClient;
 
@@ -42,7 +41,6 @@ public class AdministrerForsendelseConsumer implements AdministrerForsendelse {
 				.build();
 	}
 
-	@Override
 	@Retryable(retryFor = AbstractDokdisteformidlingTechnicalException.class, backoff = @Backoff(delay = DELAY_SHORT, multiplier = MULTIPLIER_SHORT))
 	public HentForsendelseResponse hentForsendelse(final Long forsendelseId) {
 		return webClient.get()
@@ -56,7 +54,6 @@ public class AdministrerForsendelseConsumer implements AdministrerForsendelse {
 				.block();
 	}
 
-	@Override
 	@Retryable(retryFor = AbstractDokdisteformidlingTechnicalException.class, backoff = @Backoff(delay = DELAY_SHORT, multiplier = MULTIPLIER_SHORT))
 	public void oppdaterForsendelse(OppdaterForsendelseRequest oppdaterForsendelse) {
 		webClient.put()
@@ -69,43 +66,16 @@ public class AdministrerForsendelseConsumer implements AdministrerForsendelse {
 				.block();
 	}
 
-	@Override
-	@Retryable(retryFor = AbstractDokdisteformidlingTechnicalException.class, backoff = @Backoff(delay = DELAY_SHORT, multiplier = MULTIPLIER_SHORT))
-	public HentEformidlingforsendelserResponse hentEformidlingForsendelser() {
-		log.info("hentEformidlingForsendelser henter eformidlingsforsendelser fra rdist001 (dokdistadmin) med distribusjonskanal={}", DISTRIBUSJONSKANAL);
-
-		var response = webClient.get()
-				.uri(uriBuilder -> uriBuilder
-						.path("/henteformidlingforsendelser")
-						.queryParam("distribusjonKanal", DISTRIBUSJONSKANAL)
-						.build())
-				.attributes(clientRegistrationId(CLIENT_REGISTRATION_DOKDISTADMIN))
-				.retrieve()
-				.bodyToMono(HentEformidlingforsendelserResponse.class)
-				.onErrorMap(this::mapError)
-				.block();
-
-		int antallForsendelser = getAntallForsendelser(response);
-		log.info("hentEformidlingForsendelser har hentet {} eformidlingsforsendelser fra rdist001 (dokdistadmin) med distribusjonskanal={}",
-				antallForsendelser, DISTRIBUSJONSKANAL);
-
-		return response;
-	}
-
-	private static int getAntallForsendelser(HentEformidlingforsendelserResponse response) {
-		return response != null && response.getForsendelser() != null ? response.getForsendelser().size() : 0;
-	}
-
 	private Throwable mapError(Throwable error) {
 		if (error instanceof WebClientResponseException response && response.getStatusCode().is4xxClientError()) {
 			return new DokdistadminFunctionalException(
-					String.format("Kall mot rdist001 feilet funksjonelt med status=%s, feilmelding=%s",
+					"Kall mot rdist001 feilet funksjonelt med status=%s, feilmelding=%s".formatted(
 							response.getStatusCode(),
 							response.getMessage()),
 					error);
 		} else {
 			return new DokdistadminTechnicalException(
-					String.format("Kall mot rdist001 feilet teknisk med feilmelding=%s", error.getMessage()),
+					"Kall mot rdist001 feilet teknisk med feilmelding=%s".formatted(error.getMessage()),
 					error);
 		}
 	}

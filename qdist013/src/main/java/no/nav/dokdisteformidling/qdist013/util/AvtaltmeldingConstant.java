@@ -19,4 +19,7 @@ public final class AvtaltmeldingConstant {
     public static final String HOVEDDOKUMENT = "Hoveddokument";
     public static final String VEDLEGG = "Vedlegg";
 
+    public static final String TRYGDERETTEN_ORGNUMMER = "974761084";
+    public static final String NAV_KLAGEINSTANS_STYRINGSENHETEN_ORGNUMMER = "991078045";
+
 }

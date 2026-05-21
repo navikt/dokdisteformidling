@@ -8,9 +8,6 @@ metadata:
 spec:
   envFrom:
     - secret: {{ DOKDISTEFORMIDLING_SECRET }}
-  filesFrom:
-    - secret: {{ DOKDISTEFORMIDLING_SECRET }}
-      mountPath: "/var/run/secrets/nais_secrets"
   env:
     - name: JAVA_TRUSTSTORE_OPTIONS
       value: "-Djavax.net.ssl.trustStore=$(NAV_TRUSTSTORE_PATH)
@@ -19,9 +16,8 @@ spec:
       value: "-Djavax.net.ssl.keyStore=$(NAV_TRUSTSTORE_PATH)
               -Djavax.net.ssl.keyStorePassword=$(NAV_TRUSTSTORE_PASSWORD)
               -Djavax.net.ssl.keyStoreType=jks
-              -XX:MaxRAMPercentage=75
-              -Dorg.apache.cxf.stax.maxChildElements=300000
-              $(JAVA_PROXY_OPTIONS) $(JAVA_TRUSTSTORE_OPTIONS)"
+               -XX:MaxRAMPercentage=75
+               $(JAVA_PROXY_OPTIONS) $(JAVA_TRUSTSTORE_OPTIONS)"
     - name: DOKDISTEFORMIDLING_ENDPOINTS_DOKDISTADMIN_URL
       value: {{ DOKDISTEFORMIDLING_ENDPOINTS_DOKDISTADMIN_URL }}
     - name: DOKDISTEFORMIDLING_ENDPOINTS_DOKDISTADMIN_SCOPE
@@ -38,10 +34,10 @@ spec:
       value: {{ DOKDISTEFORMIDLING_QDIST013_DIST_TRYGDERETTEN_QUEUENAME }}
     - name: DOKDISTEFORMIDLING_QDIST013_FUNK_FEIL_QUEUENAME
       value: {{ DOKDISTEFORMIDLING_QDIST013_FUNK_FEIL_QUEUENAME }}
+    - name: DOKDISTDPO_QDIST015_DIST_TIL_DPO_QUEUENAME
+      value: {{ DOKDISTDPO_QDIST015_DIST_TIL_DPO_QUEUENAME }}
     - name: DOKDISTEFORMIDLING_ENDPOINTS_EREG_URL
       value: {{ DOKDISTEFORMIDLING_ENDPOINTS_EREG_URL }}
-    - name: LAGREJURIDISKLOGG_REST_URL
-      value: {{ LAGREJURIDISKLOGG_REST_URL }}
     - name: DOKDISTEFORMIDLING_ENDPOINTS_PDL_URL
       value: {{ DOKDISTEFORMIDLING_ENDPOINTS_PDL_URL }}
     - name: DOKDISTEFORMIDLING_ENDPOINTS_PDL_SCOPE
@@ -50,34 +46,9 @@ spec:
       value: {{ DOKDISTEFORMIDLING_ENDPOINTS_SAF_URL }}
     - name: DOKDISTEFORMIDLING_ENDPOINTS_SAF_SCOPE
       value: {{ DOKDISTEFORMIDLING_ENDPOINTS_SAF_SCOPE }}
-    - name: MASKINPORTEN_URL
-      value: {{ MASKINPORTEN_URL }}
-    - name: MASKINPORTEN_AUDIENCE
-      value: {{ MASKINPORTEN_AUDIENCE }}
-    - name: SERVICEREGISTRY_URL
-      value: {{ SERVICEREGISTRY_URL }}
-    - name: ALTINN_BROKERSERVICEEXTERNAL_ENDPOINTURL
-      value: {{ ALTINN_BROKERSERVICEEXTERNAL_ENDPOINTURL }}
-    - name: ALTINN_BROKERSERVICEEXTERNALSTREAMED_ENDPOINTURL
-      value: {{ ALTINN_BROKERSERVICEEXTERNALSTREAMED_ENDPOINTURL }}
-    - name: KLAGEINSTANS_VIRKSOMHETSSERTIFIKAT_KEY
-      value: {{ KLAGEINSTANS_VIRKSOMHETSSERTIFIKAT_KEY }}
-    - name: KLAGEINSTANS_VIRKSOMHETSSERTIFIKAT_CREDENTIALS
-      value: {{ KLAGEINSTANS_VIRKSOMHETSSERTIFIKAT_CREDENTIALS }}
-    - name: DOKDISTMELLOMLAGER_PROJECTID
-      value: {{ DOKDISTMELLOMLAGER_PROJECTID }}
-    - name: DOKDISTMELLOMLAGER_BUCKET
-      value: {{ DOKDISTMELLOMLAGER_BUCKET }}
-    - name: DOKDISTMELLOMLAGER_KEYRING
-      value: {{ DOKDISTMELLOMLAGER_KEYRING }}
-    - name: DOKDISTMELLOMLAGER_KEYID
-      value: {{ DOKDISTMELLOMLAGER_KEYID }}
-    - name: GOOGLE_APPLICATION_CREDENTIALS
-      value: "/var/run/secrets/nais_secrets/gcloud_serviceaccount.json"
   image: {{ image }}
   ingresses:
     - {{ INGRESSES }}
-  leaderElection: true
   liveness:
     path: /actuator/health/liveness
     port: 8080
@@ -102,11 +73,6 @@ spec:
     requests:
       cpu: 60m
       memory: {{ MEMORY_REQUESTS }}
-  vault:
-    enabled: true
-    paths:
-      - kvPath: {{ KLAGEINSTANS_VAULT }}
-        mountPath: "/secrets/virksomhetssertifikat"
   azure:
     application:
       enabled: true
