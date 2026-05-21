@@ -10,9 +10,6 @@ public final class DomainConstants {
 
 	public static final String APP_NAME = "dokdisteformidling";
 	public static final String FORSENDELSE_STATUS_KLAR_FOR_DIST = "KLAR_FOR_DIST";
-	public static final String FORSENDELSE_STATUS_OVERSENDT = "OVERSENDT";
-	public static final String DISTRIBUSJONSKANAL = "TRYGDERETTEN";
-
 	public static final String BEARER_PREFIX = "Bearer ";
 
 	public static final String VARIANTFORMAT_SLADDET = "SLADDET";

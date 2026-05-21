@@ -18,6 +18,10 @@
 			<artifactId>core</artifactId>
 		</dependency>
 		<dependency>
+			<groupId>no.nav.dokdisteformidling</groupId>
+			<artifactId>schemas-avtaltmelding</artifactId>
+		</dependency>
+		<dependency>
 			<groupId>no.nav.meldinger.virksomhet</groupId>
 			<artifactId>dok-melding-virksomhet-dokdistfordeling</artifactId>
 		</dependency>

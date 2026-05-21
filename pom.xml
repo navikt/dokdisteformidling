@@ -13,9 +13,7 @@
 		<module>app</module>
 		<module>core</module>
 		<module>qdist013</module>
-		<module>sdist001</module>
 		<module>schemas-avtaltmelding</module>
-		<module>schemas-altinn</module>
 	</modules>
 
 	<parent>
@@ -28,23 +26,12 @@
 		<java.version>25</java.version>
 
 		<camel.version>4.18.0</camel.version>
-		<cxf.version>4.1.4</cxf.version>
 		<logstash-logback-encoder.version>8.1</logstash-logback-encoder.version>
 		<resilience4j.version>2.3.0</resilience4j.version>
-		<libraries-bom.version>26.76.0</libraries-bom.version>
-		<tink.version>1.20.0</tink.version>
-		<tink-gcpkms.version>1.10.0</tink-gcpkms.version>
 		<com.ibm.mq.jakarta.client.version>9.4.5.0</com.ibm.mq.jakarta.client.version>
-		<commons-io.version>2.21.0</commons-io.version>
-		<nimbus-jose-jwt.version>10.7</nimbus-jose-jwt.version>
-		<jaxws-ri.version>4.0.3</jaxws-ri.version>
-		<commons-asic.version>1.0.2</commons-asic.version>
-		<httpclient4.version>4.5.14</httpclient4.version>
-		<bouncycastle-jdk18on.version>1.84</bouncycastle-jdk18on.version>
 
 		<!-- NAV -->
 		<dok-legacy-tjenestespesifikasjoner.version>41-d282678</dok-legacy-tjenestespesifikasjoner.version>
-		<dok-common.version>1.7.1</dok-common.version>
 
 		<!-- test -->
 		<spring-cloud-contract-wiremock.version>4.3.0</spring-cloud-contract-wiremock.version>
@@ -69,17 +56,7 @@
 			</dependency>
 			<dependency>
 				<groupId>no.nav.dokdisteformidling</groupId>
-				<artifactId>sdist001</artifactId>
-				<version>${project.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>no.nav.dokdisteformidling</groupId>
 				<artifactId>schemas-avtaltmelding</artifactId>
-				<version>${project.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>no.nav.dokdisteformidling</groupId>
-				<artifactId>schemas-altinn</artifactId>
 				<version>${project.version}</version>
 			</dependency>
 			<dependency>
@@ -88,42 +65,9 @@
 				<version>${dok-legacy-tjenestespesifikasjoner.version}</version>
 			</dependency>
 			<dependency>
-				<groupId>no.nav.dok-common</groupId>
-				<artifactId>util</artifactId>
-				<version>${dok-common.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>org.apache.httpcomponents</groupId>
-				<artifactId>httpclient</artifactId>
-				<version>${httpclient4.version}</version>
-			</dependency>
-			<dependency>
 				<groupId>net.logstash.logback</groupId>
 				<artifactId>logstash-logback-encoder</artifactId>
 				<version>${logstash-logback-encoder.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>com.google.cloud</groupId>
-				<artifactId>libraries-bom</artifactId>
-				<version>${libraries-bom.version}</version>
-				<type>pom</type>
-				<scope>import</scope>
-			</dependency>
-			<dependency>
-				<groupId>com.google.crypto.tink</groupId>
-				<artifactId>tink</artifactId>
-				<version>${tink.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>com.google.crypto.tink</groupId>
-				<artifactId>tink-gcpkms</artifactId>
-				<version>${tink-gcpkms.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>com.sun.xml.ws</groupId>
-				<artifactId>jaxws-ri</artifactId>
-				<version>${jaxws-ri.version}</version>
-				<type>pom</type>
 			</dependency>
 			<dependency>
 				<groupId>com.ibm.mq</groupId>
@@ -138,46 +82,9 @@
 				<scope>import</scope>
 			</dependency>
 			<dependency>
-				<groupId>org.apache.cxf</groupId>
-				<artifactId>cxf-bom</artifactId>
-				<version>${cxf.version}</version>
-				<type>pom</type>
-				<scope>import</scope>
-			</dependency>
-			<dependency>
-				<groupId>no.ks.fiks</groupId>
-				<artifactId>commons-asic</artifactId>
-				<version>${commons-asic.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>commons-io</groupId>
-				<artifactId>commons-io</artifactId>
-				<version>${commons-io.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>com.nimbusds</groupId>
-				<artifactId>nimbus-jose-jwt</artifactId>
-				<version>${nimbus-jose-jwt.version}</version>
-			</dependency>
-			<dependency>
 				<groupId>io.github.resilience4j</groupId>
 				<artifactId>resilience4j-spring-boot3</artifactId>
 				<version>${resilience4j.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>org.bouncycastle</groupId>
-				<artifactId>bcprov-jdk18on</artifactId>
-				<version>${bouncycastle-jdk18on.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>org.bouncycastle</groupId>
-				<artifactId>bcpkix-jdk18on</artifactId>
-				<version>${bouncycastle-jdk18on.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>org.bouncycastle</groupId>
-				<artifactId>bcutil-jdk18on</artifactId>
-				<version>${bouncycastle-jdk18on.version}</version>
 			</dependency>
 
 			<!-- test -->
