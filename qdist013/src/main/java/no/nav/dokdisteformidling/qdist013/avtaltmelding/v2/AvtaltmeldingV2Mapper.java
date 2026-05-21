@@ -31,11 +31,10 @@ import java.util.Objects;
 
 import static java.lang.String.format;
 import static java.math.BigInteger.ONE;
+import static java.util.Objects.isNull;
 import static no.nav.dokdisteformidling.constants.DomainConstants.APP_NAME;
 import static no.nav.dokdisteformidling.constants.DomainConstants.VARIANTFORMAT_ARKIV;
 import static no.nav.dokdisteformidling.constants.DomainConstants.VARIANTFORMAT_SLADDET;
-import static no.nav.dokdisteformidling.qdist013.util.AvtaltmeldingConstant.NAV_KLAGEINSTANS_STYRINGSENHETEN_ORGNUMMER;
-import static no.nav.dokdisteformidling.qdist013.util.AvtaltmeldingConstant.TRYGDERETTEN_ORGNUMMER;
 import static no.nav.dokdisteformidling.qdist013.saf.main.JournalpostQdist013.DokumentInfo.Dokumentvariant.FILTYPE_JPEG;
 import static no.nav.dokdisteformidling.qdist013.saf.main.JournalpostQdist013.DokumentInfo.Dokumentvariant.FILTYPE_PNG;
 import static no.nav.dokdisteformidling.qdist013.util.ArkivMapperUtil.brukerTypeIsAktoerId;
@@ -50,7 +49,9 @@ import static no.nav.dokdisteformidling.qdist013.util.AvtaltmeldingConstant.DOKU
 import static no.nav.dokdisteformidling.qdist013.util.AvtaltmeldingConstant.EKSPEDERT;
 import static no.nav.dokdisteformidling.qdist013.util.AvtaltmeldingConstant.HOVEDDOKUMENT;
 import static no.nav.dokdisteformidling.qdist013.util.AvtaltmeldingConstant.MOTTAKER;
+import static no.nav.dokdisteformidling.qdist013.util.AvtaltmeldingConstant.NAV_KLAGEINSTANS_STYRINGSENHETEN_ORGNUMMER;
 import static no.nav.dokdisteformidling.qdist013.util.AvtaltmeldingConstant.PRODUKSJONSFORMAT;
+import static no.nav.dokdisteformidling.qdist013.util.AvtaltmeldingConstant.TRYGDERETTEN_ORGNUMMER;
 import static no.nav.dokdisteformidling.qdist013.util.AvtaltmeldingConstant.UNDER_BEHANDLING;
 import static no.nav.dokdisteformidling.qdist013.util.AvtaltmeldingConstant.UTGAAENDE_DOKUMENT;
 import static no.nav.dokdisteformidling.qdist013.util.AvtaltmeldingConstant.VEDLEGG;
@@ -72,7 +73,7 @@ public class AvtaltmeldingV2Mapper {
 	static final String FERDIGSTILT = "FERDIGSTILT";
 	static final String UKJENT = "UKJENT";
 	static final String AVTALTMELDING_NAMESPACE = "http://www.arkivverket.no/standarder/noark5/arkivmelding";
-	static final String REFERANSE_DOKUMENTFIL_FORMAT = "%s-%s-%s.%s";
+	static final String REFERANSE_DOKUMENTFIL_FORMAT = "%s-%s.%s";
 
 	private final PdlGraphQLConsumer pdlGraphQLConsumer;
 	private final EregConsumer eregConsumer;
@@ -250,7 +251,7 @@ public class AvtaltmeldingV2Mapper {
 	}
 
 	private boolean isJournalDatoNull(String journalpostId) {
-		return getLightweightSafJournalpost(journalpostId) == null ? Objects.isNull(getLightweightSafJournalpost(journalpostId)) : getLightweightSafJournalpost(journalpostId).getDatoJournalfoert() == null;
+		return getLightweightSafJournalpost(journalpostId) == null ? isNull(getLightweightSafJournalpost(journalpostId)) : getLightweightSafJournalpost(journalpostId).getDatoJournalfoert() == null;
 	}
 
 	private String getDokumentJournalfortAvNavn(boolean isHoveddok, JournalpostQdist013 journalpostQdist013, JournalpostQdist013.DokumentInfo dokumentInfo) {
@@ -267,7 +268,7 @@ public class AvtaltmeldingV2Mapper {
 	}
 
 	private boolean isJournalfortAvNavnNull(String journalpostId) {
-		return getLightweightSafJournalpost(journalpostId) == null ? Objects.isNull(getLightweightSafJournalpost(journalpostId)) : isBlank(getLightweightSafJournalpost(journalpostId).getJournalfortAvNavn());
+		return getLightweightSafJournalpost(journalpostId) == null ? isNull(getLightweightSafJournalpost(journalpostId)) : isBlank(getLightweightSafJournalpost(journalpostId).getJournalfortAvNavn());
 	}
 
 
@@ -287,7 +288,7 @@ public class AvtaltmeldingV2Mapper {
 	}
 
 	private String mapReferanseDokumentfil(String journalpostId, JournalpostQdist013.DokumentInfo dokumentInfo, AvtaltFilformat avtaltFilformat) {
-		return format(REFERANSE_DOKUMENTFIL_FORMAT, journalpostId, dokumentInfo.getDokumentInfoId(), getDokumentVariant(dokumentInfo), avtaltFilformat.getFilendelse());
+		return format(REFERANSE_DOKUMENTFIL_FORMAT, journalpostId, dokumentInfo.getDokumentInfoId(), avtaltFilformat.getFilendelse());
 	}
 
 	private String getDokumentVariant(JournalpostQdist013.DokumentInfo dokumentInfo) {

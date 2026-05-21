@@ -21,7 +21,7 @@ import java.util.stream.Collectors;
 @Component
 public class AvtaltmeldingV2Service implements AvtaltmeldingService {
 
-	private static final Pattern PATTERN_DOKUMENTREFERANSE = Pattern.compile("^\\d+-(?<dokumentInfoId>\\d+)-[a-zA-Z ]+\\.\\w+$");
+	private static final Pattern PATTERN_DOKUMENTREFERANSE = Pattern.compile("^\\d+-(?<dokumentInfoId>\\d+)\\.\\w+$");
 	private final AvtaltmeldingV2Mapper avtaltmeldingV2Mapper;
 	private final AvtaltmeldingV2Marshaller avtaltmeldingV2Marshaller;
 
