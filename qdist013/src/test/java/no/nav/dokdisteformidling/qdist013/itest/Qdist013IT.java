@@ -1,7 +1,7 @@
 package no.nav.dokdisteformidling.qdist013.itest;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.json.JsonMapper;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import com.github.tomakehurst.wiremock.verification.LoggedRequest;
 import jakarta.jms.Queue;
@@ -38,7 +38,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 class Qdist013IT extends AbstractIT {
 
-	private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
+	private static final JsonMapper OBJECT_MAPPER = JsonMapper.builder().build();
 
 	@Test
 	void shouldLagreAvtalemeldingOgVideresendeTilQdist015VedAktoerIdHappyCase() {

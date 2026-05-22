@@ -19,22 +19,22 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>3.5.10</version>
+		<version>4.0.6</version>
 	</parent>
 
 	<properties>
 		<java.version>25</java.version>
 
-		<camel.version>4.18.0</camel.version>
-		<logstash-logback-encoder.version>8.1</logstash-logback-encoder.version>
-		<resilience4j.version>2.3.0</resilience4j.version>
+		<camel.version>4.20.0</camel.version>
+		<logstash-logback-encoder.version>9.0</logstash-logback-encoder.version>
+		<resilience4j.version>2.4.0</resilience4j.version>
 		<com.ibm.mq.jakarta.client.version>9.4.5.0</com.ibm.mq.jakarta.client.version>
 
 		<!-- NAV -->
 		<dok-legacy-tjenestespesifikasjoner.version>41-d282678</dok-legacy-tjenestespesifikasjoner.version>
 
 		<!-- test -->
-		<spring-cloud-contract-wiremock.version>4.3.0</spring-cloud-contract-wiremock.version>
+		<wiremock-spring-boot.version>4.2.1</wiremock-spring-boot.version>
 
 		<!-- Plugins -->
 		<maven-jaxb2-plugin.version>2.2.1</maven-jaxb2-plugin.version>
@@ -82,16 +82,23 @@
 				<scope>import</scope>
 			</dependency>
 			<dependency>
+				<groupId>org.apache.camel.springboot</groupId>
+				<artifactId>camel-spring-boot-dependencies</artifactId>
+				<version>${camel.version}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+			<dependency>
 				<groupId>io.github.resilience4j</groupId>
-				<artifactId>resilience4j-spring-boot3</artifactId>
+				<artifactId>resilience4j-spring-boot4</artifactId>
 				<version>${resilience4j.version}</version>
 			</dependency>
 
 			<!-- test -->
 			<dependency>
-				<groupId>org.springframework.cloud</groupId>
-				<artifactId>spring-cloud-contract-wiremock</artifactId>
-				<version>${spring-cloud-contract-wiremock.version}</version>
+				<groupId>org.wiremock.integrations</groupId>
+				<artifactId>wiremock-spring-boot</artifactId>
+				<version>${wiremock-spring-boot.version}</version>
 				<scope>test</scope>
 			</dependency>
 		</dependencies>
