@@ -11,7 +11,7 @@ import no.nav.dokdisteformidling.exception.functional.SafJournalpostQueryUnautho
 import no.nav.dokdisteformidling.exception.technical.SafJournalpostQueryTechnicalException;
 import org.springframework.boot.http.client.ClientHttpRequestFactoryBuilder;
 import org.springframework.http.HttpStatusCode;
-import org.springframework.retry.annotation.Retryable;
+import org.springframework.resilience.annotation.Retryable;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 
@@ -40,7 +40,7 @@ public class SafGraphqlConsumer {
 		this.safScope = dokdisteformidlingProperties.getEndpoints().getSaf().getScope();
 	}
 
-	@Retryable(retryFor = SafJournalpostQueryTechnicalException.class)
+	@Retryable(value = SafJournalpostQueryTechnicalException.class)
 	public SafJournalpost performQuery(GraphQLRequest graphQLRequest) {
 		SafJsonJournalpost safJsonJournalpost = restClient.post()
 				.accept(APPLICATION_JSON)

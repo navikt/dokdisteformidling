@@ -7,7 +7,7 @@ import no.nav.dokdisteformidling.exception.functional.PersonIkkeFunnetException;
 import no.nav.dokdisteformidling.exception.technical.AbstractDokdisteformidlingTechnicalException;
 import no.nav.dokdisteformidling.exception.technical.PdlHentPersonTechnicalException;
 import org.springframework.http.ProblemDetail;
-import org.springframework.retry.annotation.Retryable;
+import org.springframework.resilience.annotation.Retryable;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
@@ -42,7 +42,7 @@ public class PdlGraphQLConsumer {
 				.build();
 	}
 
-	@Retryable(retryFor = AbstractDokdisteformidlingTechnicalException.class)
+	@Retryable(value = AbstractDokdisteformidlingTechnicalException.class)
 	public HentPersonInfo hentPerson(final String ident) {
 		return webClient.post()
 				.attributes(clientRegistrationId(CLIENT_REGISTRATION_PDL))
