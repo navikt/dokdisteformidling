@@ -27,7 +27,6 @@
 
 		<camel.version>4.20.0</camel.version>
 		<logstash-logback-encoder.version>9.0</logstash-logback-encoder.version>
-		<resilience4j.version>2.4.0</resilience4j.version>
 		<com.ibm.mq.jakarta.client.version>9.4.5.0</com.ibm.mq.jakarta.client.version>
 
 		<!-- NAV -->
@@ -88,12 +87,6 @@
 				<type>pom</type>
 				<scope>import</scope>
 			</dependency>
-			<dependency>
-				<groupId>io.github.resilience4j</groupId>
-				<artifactId>resilience4j-spring-boot4</artifactId>
-				<version>${resilience4j.version}</version>
-			</dependency>
-
 			<!-- test -->
 			<dependency>
 				<groupId>org.wiremock.integrations</groupId>
