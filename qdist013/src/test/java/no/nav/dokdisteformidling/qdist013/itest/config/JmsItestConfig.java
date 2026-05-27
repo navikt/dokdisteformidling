@@ -12,6 +12,7 @@ import org.springframework.context.annotation.Profile;
 
 import jakarta.jms.ConnectionFactory;
 import jakarta.jms.Queue;
+import org.springframework.jms.core.JmsTemplate;
 
 @Configuration
 @Profile("itest")
@@ -35,6 +36,11 @@ public class JmsItestConfig {
 	@Bean
 	public Queue backoutQueue(@Value("${dokdisteformidling_qdist013_backout.queuename}") String qdist013BqQueueName) {
 		return new ActiveMQQueue(qdist013BqQueueName);
+	}
+
+	@Bean
+	public JmsTemplate jmsTemplate(ConnectionFactory connectionFactory) {
+		return new JmsTemplate(connectionFactory);
 	}
 
 	@Bean(initMethod = "start", destroyMethod = "stop")

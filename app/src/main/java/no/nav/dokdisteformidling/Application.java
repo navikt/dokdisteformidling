@@ -7,18 +7,17 @@ import no.nav.dokdisteformidling.config.props.DokdisteformidlingProperties;
 import no.nav.dokdisteformidling.config.props.NaisProperties;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.autoconfigure.security.servlet.UserDetailsServiceAutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.retry.annotation.EnableRetry;
+import org.springframework.resilience.annotation.EnableResilientMethods;
 
-@EnableRetry
+@EnableResilientMethods
 @EnableConfigurationProperties({ServiceuserAlias.class,
 		MqGatewayAlias.class,
 		DokdisteformidlingProperties.class,
 		AzureProperties.class,
 		NaisProperties.class
 })
-@SpringBootApplication(exclude = UserDetailsServiceAutoConfiguration.class)
+@SpringBootApplication
 public class Application {
 
 	static void main(String[] args) {

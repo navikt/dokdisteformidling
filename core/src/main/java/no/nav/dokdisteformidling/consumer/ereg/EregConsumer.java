@@ -5,7 +5,7 @@ import no.nav.dokdisteformidling.config.props.DokdisteformidlingProperties;
 import no.nav.dokdisteformidling.exception.functional.EregFunctionalException;
 import no.nav.dokdisteformidling.exception.technical.EregTechnicalException;
 import org.slf4j.MDC;
-import org.springframework.retry.annotation.Retryable;
+import org.springframework.resilience.annotation.Retryable;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
@@ -36,7 +36,7 @@ public class EregConsumer {
 				.build();
 	}
 
-	@Retryable(retryFor = EregTechnicalException.class)
+	@Retryable(value = EregTechnicalException.class)
 	public String hentOrganisasjonsnavn(String orgnr) {
 		log.info("Henter organisasjonsnavn for orgnr={}", orgnr);
 

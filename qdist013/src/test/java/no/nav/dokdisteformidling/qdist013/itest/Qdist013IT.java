@@ -1,7 +1,7 @@
 package no.nav.dokdisteformidling.qdist013.itest;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.json.JsonMapper;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import com.github.tomakehurst.wiremock.verification.LoggedRequest;
 import jakarta.jms.Queue;
@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
@@ -38,7 +39,8 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 class Qdist013IT extends AbstractIT {
 
-	private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
+	@Autowired
+	private JsonMapper jsonMapper;
 
 	@Test
 	void shouldLagreAvtalemeldingOgVideresendeTilQdist015VedAktoerIdHappyCase() {
@@ -390,7 +392,7 @@ class Qdist013IT extends AbstractIT {
 
 	private JsonNode parseJson(String body) {
 		try {
-			return OBJECT_MAPPER.readTree(body);
+			return jsonMapper.readTree(body);
 		} catch (Exception e) {
 			throw new AssertionError("Kunne ikke parse oppdaterForsendelse-request som JSON", e);
 		}
