@@ -33,7 +33,7 @@
 		<dok-legacy-tjenestespesifikasjoner.version>41-d282678</dok-legacy-tjenestespesifikasjoner.version>
 
 		<!-- test -->
-		<wiremock-spring-boot.version>4.2.1</wiremock-spring-boot.version>
+		<wiremock-spring-boot.version>4.2.2</wiremock-spring-boot.version>
 
 		<!-- Plugins -->
 		<maven-jaxb2-plugin.version>2.2.1</maven-jaxb2-plugin.version>
