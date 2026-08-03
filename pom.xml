@@ -38,7 +38,7 @@
 		<!-- Plugins -->
 		<maven-jaxb2-plugin.version>2.2.1</maven-jaxb2-plugin.version>
 		<hisrc-basicjaxb.version>2.2.1</hisrc-basicjaxb.version>
-		<maven-toolchains-plugin.version>3.2.0</maven-toolchains-plugin.version>
+		<maven-toolchains-plugin.version>3.3.0</maven-toolchains-plugin.version>
 	</properties>
 
 	<dependencyManagement>
