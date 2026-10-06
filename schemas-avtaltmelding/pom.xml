@@ -25,13 +25,6 @@
 				<groupId>org.patrodyne.jvnet</groupId>
 				<artifactId>hisrc-higherjaxb-maven-plugin</artifactId>
 				<version>${maven-jaxb2-plugin.version}</version>
-				<dependencies>
-					<dependency>
-						<groupId>org.glassfish.jaxb</groupId>
-						<artifactId>jaxb-runtime</artifactId>
-						<version>${glassfish-jaxb.version}</version>
-					</dependency>
-				</dependencies>
 				<executions>
 					<execution>
 						<id>generate-avtaltmelding-v2</id>
@@ -41,6 +34,7 @@
 						</goals>
 						<configuration>
 							<schemaDirectory>${basedir}/src/main/resources/v2</schemaDirectory>
+							<catalog>${basedir}/src/main/resources/v2/catalog.xml</catalog>
 							<schemaIncludes>
 								<include>avtaltmelding_nav_trygderetten_2.0.xsd</include>
 								<include>nav_virksomhet_metadata_1.0.xsd</include>
