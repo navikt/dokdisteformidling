@@ -1,3 +1,4 @@
+# registrer workflow
 name: Automerge Dependabot PRs
 
 on:
