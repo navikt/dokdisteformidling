@@ -1,4 +1,3 @@
-# registrer workflow
 name: Rebuild and release
 
 on:
